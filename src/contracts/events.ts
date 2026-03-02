@@ -43,12 +43,27 @@ export const ReviewCompletedPayloadSchema = z.object({
   mastery: z.number().min(0).max(1),
 });
 
+export const DiagnosticCompletedPayloadSchema = z.object({
+  sessionId: z.string(),
+  subjectSlug: z.string(),
+  itemsSeen: z.number(),
+});
+
+export const InterventionRecommendedPayloadSchema = z.object({
+  skillId: z.string(),
+  reason: z.string(),
+  recentAttempts: z.number(),
+  mastery: z.number(),
+});
+
 export const EventPayloadSchemas: Record<string, z.ZodSchema> = {
   attempt_submitted: AttemptSubmittedPayloadSchema,
   attempt_graded: AttemptGradedPayloadSchema,
   skill_state_updated: SkillStateUpdatedPayloadSchema,
   review_scheduled: ReviewScheduledPayloadSchema,
   review_completed: ReviewCompletedPayloadSchema,
+  diagnostic_completed: DiagnosticCompletedPayloadSchema,
+  intervention_recommended: InterventionRecommendedPayloadSchema,
 };
 
 export type EventName = keyof typeof EventPayloadSchemas;

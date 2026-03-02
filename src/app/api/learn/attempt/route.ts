@@ -68,7 +68,17 @@ export async function POST(req: NextRequest) {
   if (isLast) {
     const allResults = [...previousResults, { itemId, correct }];
     const correctCount = allResults.filter((r) => r.correct).length;
-    await updateSkillMastery(userId, skillId, subjectId, correctCount, totalItems);
+
+    // Detect if this is a due review
+    const skillMastery = await prisma.skillMastery.findUnique({
+      where: { userId_skillId: { userId, skillId } },
+      select: { nextReviewAt: true },
+    });
+    const now = new Date();
+    const isDueReview = skillMastery?.nextReviewAt != null && skillMastery.nextReviewAt <= now;
+    const mode = isDueReview ? 'REVIEW' : 'PRACTICE';
+
+    await updateSkillMastery(userId, skillId, subjectId, correctCount, totalItems, mode);
   }
 
   return NextResponse.json({ correct });

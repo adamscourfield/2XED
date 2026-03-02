@@ -118,6 +118,26 @@ export default async function DashboardPage() {
             <p>No subjects available yet.</p>
           </div>
         )}
+
+        {(session.user as { role?: string }).role === 'ADMIN' && (
+          <section className="mt-6 p-4 bg-purple-50 border border-purple-200 rounded-xl">
+            <h2 className="text-sm font-semibold text-purple-800 mb-3">Admin Tools</h2>
+            <div className="flex gap-3">
+              <Link
+                href="/admin/insight/ks3-maths"
+                className="px-4 py-2 text-sm bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+              >
+                Insight Dashboard
+              </Link>
+              <Link
+                href="/admin/interventions"
+                className="px-4 py-2 text-sm bg-white text-purple-700 border border-purple-300 rounded-lg hover:bg-purple-50 transition-colors"
+              >
+                Interventions
+              </Link>
+            </div>
+          </section>
+        )}
       </div>
     </main>
   );
