@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation';
 import { prisma } from '@/db/prisma';
 import { LearnSession } from '@/features/learn/LearnSession';
 
-const QUESTIONS_PER_SESSION = 5;
+const QUESTIONS_PER_SESSION = 3;
 
 interface Props {
   params: { subjectSlug: string };

@@ -122,7 +122,7 @@ export function LearnSession({ subject, skill, items, userId }: Props) {
           <div className="w-full h-1.5 bg-gray-100 rounded-full">
             <div
               className="h-full bg-blue-500 rounded-full transition-all"
-              style={{ width: `${((currentIndex) / items.length) * 100}%` }}
+              style={{ width: `${((currentIndex + 1) / items.length) * 100}%` }}
             />
           </div>
           <h2 className="text-lg font-semibold text-gray-900">{currentItem.question}</h2>
