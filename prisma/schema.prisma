@@ -9,50 +9,69 @@ datasource db {
 
 enum Role {
   STUDENT
+  TEACHER
+  ADMIN
+}
+
+enum AttemptMode {
+  PRACTICE
+  DIAGNOSTIC
+  REVIEW
+}
+
+enum DiagnosticStatus {
+  IN_PROGRESS
+  COMPLETED
+  ABANDONED
 }
 
 model User {
-  id            String         @id @default(cuid())
-  email         String         @unique
-  password      String
-  name          String?
-  role          Role           @default(STUDENT)
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  attempts      Attempt[]
-  skillMasteries SkillMastery[]
-  events        Event[]
+  id                 String               @id @default(cuid())
+  email              String               @unique
+  password           String
+  name               String?
+  role               Role                 @default(STUDENT)
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  attempts           Attempt[]
+  skillMasteries     SkillMastery[]
+  events             Event[]
+  diagnosticSessions DiagnosticSession[]
+  interventionFlags  InterventionFlag[]
 }
 
 model Subject {
-  id          String    @id @default(cuid())
-  title       String
-  slug        String    @unique
-  description String?
-  createdAt   DateTime  @default(now())
-  skills      Skill[]
-  items       Item[]
-  events      Event[]
+  id                 String               @id @default(cuid())
+  title              String
+  slug               String               @unique
+  description        String?
+  createdAt          DateTime             @default(now())
+  skills             Skill[]
+  items              Item[]
+  events             Event[]
+  diagnosticSessions DiagnosticSession[]
+  interventionFlags  InterventionFlag[]
 }
 
 model Skill {
-  id            String         @id @default(cuid())
-  code          String
-  name          String
-  slug          String
-  strand        String         @default("")
-  isStretch     Boolean        @default(false)
-  sortOrder     Int            @default(0)
-  description   String?
-  intro         String?
-  subjectId     String
-  createdAt     DateTime       @default(now())
-  subject       Subject        @relation(fields: [subjectId], references: [id])
-  prerequisites SkillPrereq[]  @relation("SkillToPrereq")
-  dependents    SkillPrereq[]  @relation("PrereqToSkill")
-  items         ItemSkill[]
-  masteries     SkillMastery[]
-  events        Event[]
+  id                String           @id @default(cuid())
+  code              String
+  name              String
+  slug              String
+  strand            String           @default("")
+  isStretch         Boolean          @default(false)
+  sortOrder         Int              @default(0)
+  description       String?
+  intro             String?
+  subjectId         String
+  createdAt         DateTime         @default(now())
+  subject           Subject          @relation(fields: [subjectId], references: [id])
+  prerequisites     SkillPrereq[]    @relation("SkillToPrereq")
+  dependents        SkillPrereq[]    @relation("PrereqToSkill")
+  items             ItemSkill[]
+  masteries         SkillMastery[]
+  events            Event[]
+  interventionFlags InterventionFlag[]
 
   @@unique([subjectId, slug])
   @@unique([subjectId, code])
@@ -92,30 +111,35 @@ model ItemSkill {
 }
 
 model Attempt {
-  id        String   @id @default(cuid())
-  userId    String
-  itemId    String
-  answer    String
-  correct   Boolean
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id])
-  item      Item     @relation(fields: [itemId], references: [id])
-  events    Event[]
+  id                String             @id @default(cuid())
+  userId            String
+  itemId            String
+  answer            String
+  correct           Boolean
+  sessionId         String?
+  mode              AttemptMode        @default(PRACTICE)
+  createdAt         DateTime           @default(now())
+  user              User               @relation(fields: [userId], references: [id])
+  item              Item               @relation(fields: [itemId], references: [id])
+  events            Event[]
+  diagnosticSession DiagnosticSession? @relation("DiagnosticAttempts", fields: [sessionId], references: [id])
 }
 
 model SkillMastery {
-  id               String    @id @default(cuid())
-  userId           String
-  skillId          String
-  mastery          Float     @default(0)
-  streak           Int       @default(0)
-  confirmedCount   Int       @default(0)
-  lastPracticedAt  DateTime?
-  nextReviewAt     DateTime?
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
-  user             User      @relation(fields: [userId], references: [id])
-  skill            Skill     @relation(fields: [skillId], references: [id])
+  id                   String    @id @default(cuid())
+  userId               String
+  skillId              String
+  mastery              Float     @default(0)
+  streak               Int       @default(0)
+  confirmedCount       Int       @default(0)
+  lastPracticedAt      DateTime?
+  nextReviewAt         DateTime?
+  lastReviewedAt       DateTime?
+  attemptsSinceConfirm Int       @default(0)
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+  user                 User      @relation(fields: [userId], references: [id])
+  skill                Skill     @relation(fields: [skillId], references: [id])
 
   @@unique([userId, skillId])
 }
@@ -136,4 +160,38 @@ model Event {
   skill         Skill?    @relation(fields: [skillId], references: [id])
   item          Item?     @relation(fields: [itemId], references: [id])
   attempt       Attempt?  @relation(fields: [attemptId], references: [id])
+}
+
+model DiagnosticSession {
+  id               String           @id @default(cuid())
+  userId           String
+  subjectId        String
+  startedAt        DateTime         @default(now())
+  completedAt      DateTime?
+  status           DiagnosticStatus @default(IN_PROGRESS)
+  maxItems         Int              @default(25)
+  minItems         Int              @default(12)
+  confidenceTarget Float            @default(0.85)
+  itemsSeen        Int              @default(0)
+  payload          Json             @default("{}")
+  user             User             @relation(fields: [userId], references: [id])
+  subject          Subject          @relation(fields: [subjectId], references: [id])
+  attempts         Attempt[]        @relation("DiagnosticAttempts")
+}
+
+model InterventionFlag {
+  id         String    @id @default(cuid())
+  userId     String
+  subjectId  String
+  skillId    String
+  reason     String
+  isResolved Boolean   @default(false)
+  createdAt  DateTime  @default(now())
+  lastSeenAt DateTime  @default(now())
+  resolvedAt DateTime?
+  user       User      @relation(fields: [userId], references: [id])
+  subject    Subject   @relation(fields: [subjectId], references: [id])
+  skill      Skill     @relation(fields: [skillId], references: [id])
+
+  @@unique([userId, skillId])
 }

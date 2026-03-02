@@ -19,6 +19,19 @@ async function main() {
     },
   });
 
+  // Admin user
+  const adminPassword = await bcrypt.hash('admin123', 10);
+  await prisma.user.upsert({
+    where: { email: 'admin@anaxi.local' },
+    update: {},
+    create: {
+      email: 'admin@anaxi.local',
+      password: adminPassword,
+      name: 'Admin',
+      role: 'ADMIN',
+    },
+  });
+
   // 2️⃣ Subject
   const subject = await prisma.subject.upsert({
     where: { slug: 'ks3-maths' },

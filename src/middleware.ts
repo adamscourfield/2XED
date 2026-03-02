@@ -6,11 +6,19 @@ export default withAuth(
     const token = req.nextauth.token;
     const pathname = req.nextUrl.pathname;
 
-    if (pathname.startsWith('/learn') || pathname.startsWith('/dashboard')) {
+    // Admin-only routes
+    if (pathname.startsWith('/admin')) {
+      if (!token || token.role !== 'ADMIN') {
+        return NextResponse.redirect(new URL('/dashboard', req.url));
+      }
+    }
+
+    // Student/admin-accessible routes
+    if (pathname.startsWith('/learn') || pathname.startsWith('/dashboard') || pathname.startsWith('/diagnostic')) {
       if (!token) {
         return NextResponse.redirect(new URL('/login', req.url));
       }
-      if (token.role !== 'STUDENT') {
+      if (token.role !== 'STUDENT' && token.role !== 'ADMIN') {
         return NextResponse.redirect(new URL('/login', req.url));
       }
     }
@@ -25,5 +33,5 @@ export default withAuth(
 );
 
 export const config = {
-  matcher: ['/learn/:path*', '/dashboard'],
+  matcher: ['/learn/:path*', '/dashboard', '/diagnostic/:path*', '/admin/:path*'],
 };

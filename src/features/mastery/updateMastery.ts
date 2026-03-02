@@ -7,36 +7,50 @@ export async function updateSkillMastery(
   skillId: string,
   subjectId: string,
   correctAnswers: number,
-  total: number
+  total: number,
+  mode: 'PRACTICE' | 'REVIEW' = 'PRACTICE'
 ): Promise<void> {
   const mastery = calculateMastery(correctAnswers, total);
   const now = new Date();
 
   const existing = await prisma.skillMastery.findUnique({
     where: { userId_skillId: { userId, skillId } },
-    select: { confirmedCount: true, streak: true },
+    select: { confirmedCount: true, streak: true, nextReviewAt: true },
   });
 
   const prevConfirmedCount = existing?.confirmedCount ?? 0;
   const prevStreak = existing?.streak ?? 0;
 
-  const newStreak = mastery >= MASTERY_STABLE_THRESHOLD ? prevStreak + 1 : 0;
-  const newConfirmedCount =
-    mastery >= MASTERY_STABLE_THRESHOLD
-      ? Math.min(prevConfirmedCount + 1, 2)
-      : 0;
+  // confirmedCount only increments when completing a scheduled due review
+  const isDueReview = mode === 'REVIEW' && existing?.nextReviewAt != null && existing.nextReviewAt <= now;
+
+  let newConfirmedCount = prevConfirmedCount;
+  let newStreak = prevStreak;
+
+  if (mastery >= MASTERY_STABLE_THRESHOLD) {
+    newStreak = prevStreak + 1;
+    if (isDueReview) {
+      newConfirmedCount = Math.min(prevConfirmedCount + 1, 2);
+    }
+  } else {
+    // Failed review: confirmedCount stays unchanged; streak resets
+    newStreak = 0;
+  }
 
   const nextReviewAt = scheduleNextReview(mastery, newConfirmedCount, now);
 
+  const updateData = {
+    mastery,
+    streak: newStreak,
+    confirmedCount: newConfirmedCount,
+    lastPracticedAt: now,
+    nextReviewAt,
+    ...(isDueReview ? { lastReviewedAt: now } : {}),
+  };
+
   await prisma.skillMastery.upsert({
     where: { userId_skillId: { userId, skillId } },
-    update: {
-      mastery,
-      streak: newStreak,
-      confirmedCount: newConfirmedCount,
-      lastPracticedAt: now,
-      nextReviewAt,
-    },
+    update: updateData,
     create: {
       userId,
       skillId,
@@ -86,4 +100,22 @@ export async function updateSkillMastery(
       nextReviewAt: nextReviewAt.toISOString(),
     },
   });
+
+  if (isDueReview) {
+    await emitEvent({
+      name: 'review_completed',
+      actorUserId: userId,
+      studentUserId: userId,
+      subjectId,
+      skillId,
+      payload: {
+        skillId,
+        skillCode,
+        strand,
+        mastery,
+        outcome: mastery >= MASTERY_STABLE_THRESHOLD ? 'pass' : 'fail',
+        confirmedCount: newConfirmedCount,
+      },
+    });
+  }
 }
