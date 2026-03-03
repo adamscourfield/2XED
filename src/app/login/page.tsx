@@ -11,6 +11,22 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
+  async function handleDemoLogin() {
+    setLoading(true);
+    setError('');
+    const result = await signIn('credentials', {
+      email: 'student@example.com',
+      password: 'password123',
+      redirect: false,
+    });
+    if (result?.error) {
+      setError('Demo login failed. Please try again or contact support.');
+      setLoading(false);
+    } else {
+      router.push('/dashboard');
+    }
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
@@ -74,6 +90,27 @@ export default function LoginPage() {
             {loading ? 'Signing in…' : 'Sign in'}
           </button>
         </form>
+        <div className="mt-4">
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-200" />
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-white text-gray-500">or</span>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={handleDemoLogin}
+            disabled={loading}
+            className="mt-4 w-full py-2 px-4 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 disabled:opacity-50 transition-colors"
+          >
+            Demo login
+          </button>
+          <p className="mt-2 text-center text-xs text-gray-400">
+            student@example.com / password123
+          </p>
+        </div>
       </div>
     </main>
   );
