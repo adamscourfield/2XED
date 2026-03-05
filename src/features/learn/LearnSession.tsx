@@ -80,36 +80,26 @@ export function LearnSession({ subject, skill, items, userId }: Props) {
 
   if (phase === 'intro') {
     return (
-      <main className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="max-w-lg w-full bg-white rounded-xl border border-gray-200 p-8 space-y-6">
+      <main className="anx-shell flex items-center justify-center">
+        <div className="anx-panel w-full max-w-2xl space-y-6 p-7 sm:p-8">
           <div>
-            <p className="text-sm text-blue-600 font-medium mb-1">{subject.title}</p>
-            <h1 className="text-2xl font-bold text-gray-900">{skill.name}</h1>
+            <p className="mb-1 text-sm font-semibold text-indigo-600">{subject.title}</p>
+            <h1 className="text-2xl font-semibold tracking-tight text-slate-900">{skill.name}</h1>
             {SHOW_DEBUG && (
-              <p className="text-xs text-gray-400 mt-1">
-                {skill.code} · {skill.strand}
+              <p className="mt-1 text-xs text-slate-500">
+                {skill.code} · {skill.strand} · {userId}
               </p>
             )}
           </div>
-          {skill.intro && (
-            <div className="prose prose-sm text-gray-600">
-              <p>{skill.intro}</p>
-            </div>
-          )}
-          {skill.description && !skill.intro && (
-            <p className="text-gray-600">{skill.description}</p>
-          )}
-          <div className="flex gap-3">
-            <button
-              onClick={() => setPhase('session')}
-              className="flex-1 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors"
-            >
+
+          {skill.intro && <p className="text-sm leading-relaxed text-slate-600">{skill.intro}</p>}
+          {skill.description && !skill.intro && <p className="text-sm leading-relaxed text-slate-600">{skill.description}</p>}
+
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <button onClick={() => setPhase('session')} className="anx-btn-primary flex-1">
               Start Session ({items.length} questions)
             </button>
-            <button
-              onClick={() => router.push('/dashboard')}
-              className="px-4 py-3 border border-gray-300 text-gray-600 rounded-lg hover:bg-gray-50 transition-colors"
-            >
+            <button onClick={() => router.push('/dashboard')} className="anx-btn-secondary">
               Back
             </button>
           </div>
@@ -120,46 +110,37 @@ export function LearnSession({ subject, skill, items, userId }: Props) {
 
   if (phase === 'session' && currentItem) {
     return (
-      <main className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="max-w-lg w-full bg-white rounded-xl border border-gray-200 p-8 space-y-6">
+      <main className="anx-shell flex items-center justify-center">
+        <div className="anx-panel w-full max-w-2xl space-y-6 p-7 sm:p-8">
           <div className="flex items-center justify-between">
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-slate-500">
               {skill.name}
-              {SHOW_DEBUG && (
-                <span className="ml-2 text-xs text-gray-400">[{skill.code}]</span>
-              )}
+              {SHOW_DEBUG && <span className="ml-2 text-xs text-slate-400">[{skill.code}]</span>}
             </p>
-            <span className="text-sm text-gray-400">
+            <span className="text-sm text-slate-500">
               {currentIndex + 1} / {items.length}
             </span>
           </div>
-          <div className="w-full h-1.5 bg-gray-100 rounded-full">
-            <div
-              className="h-full bg-blue-500 rounded-full transition-all"
-              style={{ width: `${((currentIndex + 1) / items.length) * 100}%` }}
-            />
+
+          <div className="anx-progress-track">
+            <div className="anx-progress-bar" style={{ width: `${((currentIndex + 1) / items.length) * 100}%` }} />
           </div>
-          <h2 className="text-lg font-semibold text-gray-900">{currentItem.question}</h2>
+
+          <h2 className="text-xl font-semibold leading-snug text-slate-900">{currentItem.question}</h2>
+
           <div className="space-y-3">
             {options.map((option, i) => (
               <button
                 key={i}
                 onClick={() => setSelectedAnswer(option)}
-                className={`w-full text-left px-4 py-3 rounded-lg border-2 transition-colors ${
-                  selectedAnswer === option
-                    ? 'border-blue-500 bg-blue-50 text-blue-800'
-                    : 'border-gray-200 hover:border-gray-300 text-gray-700'
-                }`}
+                className={`anx-option ${selectedAnswer === option ? 'anx-option-selected' : ''}`}
               >
                 {option}
               </button>
             ))}
           </div>
-          <button
-            onClick={submitAnswer}
-            disabled={!selectedAnswer || submitting}
-            className="w-full py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 font-medium transition-colors"
-          >
+
+          <button onClick={submitAnswer} disabled={!selectedAnswer || submitting} className="anx-btn-primary w-full">
             {submitting ? 'Submitting…' : currentIndex < items.length - 1 ? 'Next' : 'Finish'}
           </button>
         </div>
@@ -172,38 +153,39 @@ export function LearnSession({ subject, skill, items, userId }: Props) {
     const masteryPct = Math.round((correctCount / results.length) * 100);
 
     return (
-      <main className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="max-w-lg w-full bg-white rounded-xl border border-gray-200 p-8 space-y-6 text-center">
-          <h1 className="text-2xl font-bold text-gray-900">Session Complete!</h1>
-          <div className="py-4">
-            <span className={`text-5xl font-bold ${masteryPct >= 80 ? 'text-green-600' : masteryPct >= 50 ? 'text-yellow-500' : 'text-red-500'}`}>
+      <main className="anx-shell flex items-center justify-center">
+        <div className="anx-panel w-full max-w-2xl space-y-6 p-7 text-center sm:p-8">
+          <h1 className="text-2xl font-semibold tracking-tight text-slate-900">Session Complete</h1>
+
+          <div className="rounded-xl border border-slate-200 bg-slate-50/80 py-5">
+            <span className={`text-5xl font-semibold ${masteryPct >= 80 ? 'text-emerald-600' : masteryPct >= 50 ? 'text-amber-600' : 'text-rose-500'}`}>
               {masteryPct}%
             </span>
-            <p className="text-gray-500 mt-2">
+            <p className="mt-2 text-sm text-slate-600">
               {correctCount} out of {results.length} correct
             </p>
           </div>
-          <div className="space-y-2">
+
+          <div className="space-y-2 rounded-xl border border-slate-200 bg-white p-4 text-left">
             {results.map((r, i) => (
               <div key={r.itemId} className="flex items-center gap-3 text-sm">
-                <span className={`w-5 h-5 rounded-full flex items-center justify-center text-white text-xs font-bold ${r.correct ? 'bg-green-500' : 'bg-red-400'}`}>
+                <span
+                  className={`inline-flex h-5 w-5 items-center justify-center rounded-full text-xs font-semibold text-white ${
+                    r.correct ? 'bg-emerald-500' : 'bg-rose-500'
+                  }`}
+                >
                   {r.correct ? '✓' : '✗'}
                 </span>
-                <span className="text-gray-600">Question {i + 1}</span>
+                <span className="text-slate-700">Question {i + 1}</span>
               </div>
             ))}
           </div>
-          <div className="flex gap-3">
-            <button
-              onClick={() => router.push(`/learn/${subject.slug}`)}
-              className="flex-1 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-            >
+
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <button onClick={() => router.push(`/learn/${subject.slug}`)} className="anx-btn-secondary flex-1">
               Practice Again
             </button>
-            <button
-              onClick={() => router.push('/dashboard')}
-              className="flex-1 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
+            <button onClick={() => router.push('/dashboard')} className="anx-btn-primary flex-1">
               Dashboard
             </button>
           </div>
