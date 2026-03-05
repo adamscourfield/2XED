@@ -43,7 +43,19 @@ export default async function DashboardPage() {
         </div>
 
         {subjects.map((subject) => {
-          const dueSkills = subject.skills.filter((skill) => {
+          const sortedSkills = [...subject.skills].sort((a, b) => a.sortOrder - b.sortOrder);
+          const baseSkill = sortedSkills[0];
+
+          if (!baseSkill) return null;
+
+          const displayedSkills = [
+            {
+              ...baseSkill,
+              name: 'Basic Number',
+            },
+          ];
+
+          const dueSkills = displayedSkills.filter((skill) => {
             const mastery = skill.masteries[0];
             if (!mastery) return true;
             if (!mastery.nextReviewAt) return true;
@@ -71,7 +83,7 @@ export default async function DashboardPage() {
               )}
 
               <div className="space-y-3">
-                {subject.skills.map((skill) => {
+                {displayedSkills.map((skill) => {
                   const mastery = skill.masteries[0];
                   const masteryPct = mastery ? Math.round(mastery.mastery * 100) : 0;
                   const isDue = !mastery?.nextReviewAt || mastery.nextReviewAt <= now;
