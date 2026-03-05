@@ -2,24 +2,26 @@ import Link from 'next/link';
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
-      <div className="text-center space-y-6 p-8">
-        <h1 className="text-4xl font-bold text-gray-900">Anaxi Learn</h1>
-        <p className="text-lg text-gray-600">Adaptive mastery learning, built for students.</p>
-        <div className="flex gap-4 justify-center">
-          <Link
-            href="/login"
-            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            Sign In
-          </Link>
-          <Link
-            href="/dashboard"
-            className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
-          >
-            Dashboard
-          </Link>
-        </div>
+    <main className="anx-shell flex items-center">
+      <div className="anx-container">
+        <section className="anx-panel mx-auto max-w-3xl p-8 sm:p-12">
+          <div className="text-center">
+            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-blue-600/80">Anaxi Family</p>
+            <h1 className="mt-3 text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl">Anaxi Learn</h1>
+            <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-slate-600 sm:text-lg">
+              Adaptive mastery learning with clean pacing, targeted practice, and progress that stays easy to read.
+            </p>
+          </div>
+
+          <div className="mt-10 flex flex-col justify-center gap-3 sm:flex-row">
+            <Link href="/login" className="anx-btn-primary px-6 py-3 text-base">
+              Sign In
+            </Link>
+            <Link href="/dashboard" className="anx-btn-secondary px-6 py-3 text-base">
+              Open Dashboard
+            </Link>
+          </div>
+        </section>
       </div>
     </main>
   );
