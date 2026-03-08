@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 interface Item {
@@ -42,49 +42,70 @@ function getMasteryTextColor(masteryPct: number) {
   return 'text-rose-500';
 }
 
+function parseOptions(options: unknown): string[] {
+  if (!Array.isArray(options)) return [];
+  return options.filter((o): o is string => typeof o === 'string' && o.trim().length > 0);
+}
+
 export function LearnSession({ subject, skill, items, userId }: Props) {
   const [phase, setPhase] = useState<Phase>('intro');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState('');
   const [results, setResults] = useState<{ itemId: string; correct: boolean }[]>([]);
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   const currentItem = items[currentIndex];
-  const options = currentItem ? (currentItem.options as string[]) : [];
+  const options = useMemo(() => (currentItem ? parseOptions(currentItem.options) : []), [currentItem]);
 
   async function submitAnswer() {
-    if (!selectedAnswer || !currentItem) return;
+    if (!selectedAnswer || !currentItem || submitting) return;
     setSubmitting(true);
+    setError(null);
 
-    const res = await fetch('/api/learn/attempt', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        itemId: currentItem.id,
-        skillId: skill.id,
-        subjectId: subject.id,
-        answer: selectedAnswer,
-        isLast: currentIndex === items.length - 1,
-        totalItems: items.length,
-        previousResults: results,
-      }),
-    });
+    try {
+      const res = await fetch('/api/learn/attempt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          itemId: currentItem.id,
+          skillId: skill.id,
+          subjectId: subject.id,
+          answer: selectedAnswer,
+          isLast: currentIndex === items.length - 1,
+          totalItems: items.length,
+          previousResults: results,
+        }),
+      });
 
-    const data = await res.json();
-    const newResults = [...results, { itemId: currentItem.id, correct: data.correct }];
-    setResults(newResults);
+      if (!res.ok) {
+        throw new Error(`Attempt submission failed (${res.status})`);
+      }
 
-    if (currentIndex < items.length - 1) {
-      setCurrentIndex(currentIndex + 1);
-      setSelectedAnswer('');
-    } else {
-      setPhase('results');
+      const data = (await res.json()) as { correct?: boolean };
+      if (typeof data.correct !== 'boolean') {
+        throw new Error('Invalid response from server');
+      }
+
+      const newResults = [...results, { itemId: currentItem.id, correct: data.correct }];
+      setResults(newResults);
+
+      if (currentIndex < items.length - 1) {
+        setCurrentIndex(currentIndex + 1);
+        setSelectedAnswer('');
+      } else {
+        setPhase('results');
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
+    } finally {
+      setSubmitting(false);
     }
-    setSubmitting(false);
   }
 
   if (phase === 'intro') {
+    const hasItems = items.length > 0;
     return (
       <main className="flex min-h-screen items-center justify-center bg-gray-50 p-4 sm:p-6">
         <div className="w-full max-w-xl space-y-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm sm:p-8">
@@ -104,10 +125,13 @@ export function LearnSession({ subject, skill, items, userId }: Props) {
           )}
           {skill.description && !skill.intro && <p className="text-sm leading-6 text-gray-600">{skill.description}</p>}
 
+          {!hasItems && <p className="text-sm text-amber-700">No questions are available for this skill yet.</p>}
+
           <div className="flex flex-wrap gap-3 pt-1">
             <button
               onClick={() => setPhase('session')}
-              className="inline-flex flex-1 items-center justify-center rounded-lg bg-blue-600 px-4 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+              disabled={!hasItems}
+              className="inline-flex flex-1 items-center justify-center rounded-lg bg-blue-600 px-4 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
             >
               Start Session ({items.length} questions)
             </button>
@@ -147,24 +171,35 @@ export function LearnSession({ subject, skill, items, userId }: Props) {
           <h2 className="text-xl font-semibold leading-snug text-gray-900">{currentItem.question}</h2>
 
           <div className="space-y-3">
-            {options.map((option, i) => (
-              <button
-                key={i}
-                onClick={() => setSelectedAnswer(option)}
-                className={`w-full rounded-xl border-2 px-4 py-3 text-left text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 ${
-                  selectedAnswer === option
-                    ? 'border-blue-500 bg-blue-50 text-blue-800'
-                    : 'border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50'
-                }`}
-              >
-                {option}
-              </button>
-            ))}
+            {options.length === 0 ? (
+              <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+                This question has no valid options. Please go back and try again.
+              </p>
+            ) : (
+              options.map((option, i) => (
+                <button
+                  key={i}
+                  onClick={() => {
+                    setSelectedAnswer(option);
+                    setError(null);
+                  }}
+                  className={`w-full rounded-xl border-2 px-4 py-3 text-left text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 ${
+                    selectedAnswer === option
+                      ? 'border-blue-500 bg-blue-50 text-blue-800'
+                      : 'border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50'
+                  }`}
+                >
+                  {option}
+                </button>
+              ))
+            )}
           </div>
+
+          {error && <p className="text-sm text-rose-600">{error}</p>}
 
           <button
             onClick={submitAnswer}
-            disabled={!selectedAnswer || submitting}
+            disabled={!selectedAnswer || submitting || options.length === 0}
             className="w-full rounded-lg bg-blue-600 py-3 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
           >
             {submitting ? 'Submitting…' : currentIndex < items.length - 1 ? 'Next' : 'Finish'}
@@ -176,7 +211,7 @@ export function LearnSession({ subject, skill, items, userId }: Props) {
 
   if (phase === 'results') {
     const correctCount = results.filter((r) => r.correct).length;
-    const masteryPct = Math.round((correctCount / results.length) * 100);
+    const masteryPct = results.length > 0 ? Math.round((correctCount / results.length) * 100) : 0;
 
     return (
       <main className="flex min-h-screen items-center justify-center bg-gray-50 p-4 sm:p-6">
