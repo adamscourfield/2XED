@@ -142,7 +142,13 @@ export function LearnSession({ subject, skill, items, userId, gamification, rout
     return (
       <main className="anx-shell flex items-center justify-center">
         <div className="anx-panel w-full max-w-2xl p-7 sm:p-8">
-          <ReteachSession routeType={routeType} plan={reteachPlan} onComplete={() => setPhase('session')} />
+          <ReteachSession
+            subjectId={subject.id}
+            skillId={skill.id}
+            routeType={routeType}
+            plan={reteachPlan}
+            onComplete={() => setPhase('session')}
+          />
         </div>
       </main>
     );

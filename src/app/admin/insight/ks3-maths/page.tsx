@@ -111,6 +111,25 @@ export default async function InsightDashboardPage() {
     select: { payload: true },
   });
 
+  const stepAttemptEvents = await prisma.event.findMany({
+    where: { name: 'step_checkpoint_attempted', subjectId: subject.id },
+    select: { payload: true },
+  });
+
+  const stepHotspots = stepAttemptEvents.reduce((acc, e) => {
+    const payload = e.payload as { stepTitle?: string; correct?: boolean; retryCount?: number; routeType?: 'A' | 'B' | 'C' };
+    const key = `${payload.routeType ?? 'A'}::${payload.stepTitle ?? 'Unknown step'}`;
+    if (!acc[key]) acc[key] = { routeType: payload.routeType ?? 'A', stepTitle: payload.stepTitle ?? 'Unknown step', attempts: 0, fails: 0, retries2Plus: 0 };
+    acc[key].attempts += 1;
+    if (!payload.correct) acc[key].fails += 1;
+    if ((payload.retryCount ?? 0) >= 2) acc[key].retries2Plus += 1;
+    return acc;
+  }, {} as Record<string, { routeType: string; stepTitle: string; attempts: number; fails: number; retries2Plus: number }>);
+
+  const topStepHotspots = Object.values(stepHotspots)
+    .sort((a, b) => (b.fails - a.fails) || (b.retries2Plus - a.retries2Plus))
+    .slice(0, 6);
+
   const assignmentStats = routeAssignments.reduce(
     (acc, e) => {
       const payload = e.payload as { routeType?: 'A' | 'B' | 'C'; source?: 'diagnostic_signals' | 'fallback_chain' | 'history_default' };
@@ -274,6 +293,39 @@ export default async function InsightDashboardPage() {
                 {recentDrilldownEvents.length === 0 && (
                   <tr>
                     <td colSpan={4} className="px-4 py-8 text-center text-gray-400">No routing/reward events yet.</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section>
+          <h2 className="text-lg font-semibold text-gray-800 mb-3">Reteach Step Hotspots</h2>
+          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+            <table className="w-full text-sm">
+              <thead className="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th className="text-left px-4 py-3 font-medium text-gray-600">Route</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-600">Step</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-600">Attempts</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-600">Fails</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-600">2+ Retry signals</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {topStepHotspots.map((row, idx) => (
+                  <tr key={`${row.routeType}-${idx}`} className="hover:bg-gray-50">
+                    <td className="px-4 py-3 font-mono text-xs">{row.routeType}</td>
+                    <td className="px-4 py-3 text-xs text-gray-700">{row.stepTitle}</td>
+                    <td className="px-4 py-3">{row.attempts}</td>
+                    <td className="px-4 py-3 text-rose-600">{row.fails}</td>
+                    <td className="px-4 py-3 text-amber-700">{row.retries2Plus}</td>
+                  </tr>
+                ))}
+                {topStepHotspots.length === 0 && (
+                  <tr>
+                    <td colSpan={5} className="px-4 py-8 text-center text-gray-400">No step checkpoint data yet.</td>
                   </tr>
                 )}
               </tbody>

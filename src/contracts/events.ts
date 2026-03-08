@@ -118,6 +118,28 @@ export const ExplanationRouteAssignedPayloadSchema = z.object({
   interventionRecommended: z.boolean().optional(),
 });
 
+export const StepCheckpointAttemptedPayloadSchema = z.object({
+  routeType: z.enum(['A', 'B', 'C']),
+  stepIndex: z.number().int().nonnegative(),
+  stepTitle: z.string(),
+  correct: z.boolean(),
+  retryCount: z.number().int().nonnegative(),
+});
+
+export const StepCheckpointMasteredPayloadSchema = z.object({
+  routeType: z.enum(['A', 'B', 'C']),
+  stepIndex: z.number().int().nonnegative(),
+  stepTitle: z.string(),
+  retryCount: z.number().int().nonnegative(),
+});
+
+export const StepAlternativeShownPayloadSchema = z.object({
+  routeType: z.enum(['A', 'B', 'C']),
+  stepIndex: z.number().int().nonnegative(),
+  stepTitle: z.string(),
+  retryCount: z.number().int().nonnegative(),
+});
+
 export const EventPayloadSchemas: Record<string, z.ZodSchema> = {
   attempt_submitted: AttemptSubmittedPayloadSchema,
   attempt_graded: AttemptGradedPayloadSchema,
@@ -132,6 +154,9 @@ export const EventPayloadSchemas: Record<string, z.ZodSchema> = {
   shadow_pair_passed: ShadowPairResultPayloadSchema,
   shadow_pair_failed: ShadowPairResultPayloadSchema,
   explanation_route_assigned: ExplanationRouteAssignedPayloadSchema,
+  step_checkpoint_attempted: StepCheckpointAttemptedPayloadSchema,
+  step_checkpoint_mastered: StepCheckpointMasteredPayloadSchema,
+  step_alternative_shown: StepAlternativeShownPayloadSchema,
   diagnostic_completed: DiagnosticCompletedPayloadSchema,
   intervention_recommended: InterventionRecommendedPayloadSchema,
   intervention_flagged: InterventionFlaggedPayloadSchema,

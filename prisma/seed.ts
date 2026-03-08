@@ -357,9 +357,10 @@ async function main() {
 
       for (let i = 0; i < routeDef.steps.length; i++) {
         const [title, explanation, checkpointQuestion, checkpointOptions, checkpointAnswer] = routeDef.steps[i];
+        const alternativeHint = `Try this: ${explanation}`;
         await prisma.explanationStep.upsert({
           where: { explanationRouteId_stepOrder: { explanationRouteId: route.id, stepOrder: i + 1 } },
-          update: { title, explanation, checkpointQuestion, checkpointOptions, checkpointAnswer },
+          update: { title, explanation, checkpointQuestion, checkpointOptions, checkpointAnswer, alternativeHint },
           create: {
             explanationRouteId: route.id,
             stepOrder: i + 1,
@@ -368,6 +369,7 @@ async function main() {
             checkpointQuestion,
             checkpointOptions,
             checkpointAnswer,
+            alternativeHint,
           },
         });
       }

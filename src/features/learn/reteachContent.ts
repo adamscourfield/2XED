@@ -6,6 +6,7 @@ export interface ReteachStep {
   checkpointQuestion: string;
   checkpointOptions: string[];
   checkpointAnswer: string;
+  alternativeHint?: string;
 }
 
 export interface ReteachPlan {

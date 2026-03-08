@@ -22,6 +22,7 @@ export async function getReteachPlanForSkill(skillId: string, routeType: RouteTy
       checkpointQuestion: s.checkpointQuestion,
       checkpointOptions: (s.checkpointOptions as string[]) ?? [],
       checkpointAnswer: s.checkpointAnswer,
+      alternativeHint: s.alternativeHint ?? undefined,
     })),
   };
 }
