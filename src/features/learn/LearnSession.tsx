@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ReteachSession } from './ReteachSession';
+import type { ReteachPlan } from './reteachContent';
 
 interface Item {
   id: string;
@@ -40,13 +41,14 @@ interface Props {
   userId: string;
   gamification: GamificationSummary;
   routeType: 'A' | 'B' | 'C';
+  reteachPlan: ReteachPlan;
 }
 
 type Phase = 'intro' | 'reteach' | 'session' | 'results';
 
 const SHOW_DEBUG = process.env.NEXT_PUBLIC_SHOW_DEBUG === 'true';
 
-export function LearnSession({ subject, skill, items, userId, gamification, routeType }: Props) {
+export function LearnSession({ subject, skill, items, userId, gamification, routeType, reteachPlan }: Props) {
   const [phase, setPhase] = useState<Phase>('intro');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState('');
@@ -140,7 +142,7 @@ export function LearnSession({ subject, skill, items, userId, gamification, rout
     return (
       <main className="anx-shell flex items-center justify-center">
         <div className="anx-panel w-full max-w-2xl p-7 sm:p-8">
-          <ReteachSession routeType={routeType} onComplete={() => setPhase('session')} />
+          <ReteachSession routeType={routeType} plan={reteachPlan} onComplete={() => setPhase('session')} />
         </div>
       </main>
     );

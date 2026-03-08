@@ -8,10 +8,14 @@ export function inferN11MisconceptionTag(
   skillCode: string,
   selectedAnswer: string,
   options: string[],
-  correct: boolean
+  correct: boolean,
+  misconceptionMap?: Record<string, N11MisconceptionTag>
 ): N11MisconceptionTag | undefined {
   if (skillCode.toUpperCase() !== 'N1.1') return undefined;
   if (correct) return undefined;
+
+  const mapped = misconceptionMap?.[selectedAnswer];
+  if (mapped) return mapped;
 
   const index = options.findIndex((o) => o === selectedAnswer);
   if (index === 0) return 'm1';

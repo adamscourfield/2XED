@@ -7,6 +7,7 @@ import { isSkillUnlocked } from '@/features/learn/prerequisites';
 import { getUserGamificationSummary } from '@/features/gamification/gamificationService';
 import { selectExplanationRoute } from '@/features/diagnostic/routeAssignment';
 import { emitEvent } from '@/features/telemetry/eventService';
+import { getReteachPlanForSkill } from '@/features/learn/reteachService';
 
 const QUESTIONS_PER_SESSION = 3;
 
@@ -128,6 +129,8 @@ export default async function LearnPage({ params }: Props) {
     });
   }
 
+  const reteachPlan = await getReteachPlanForSkill(targetSkill.id, routeDecision.routeType);
+
   return (
     <LearnSession
       subject={subject}
@@ -136,6 +139,7 @@ export default async function LearnPage({ params }: Props) {
       userId={userId}
       gamification={gamification}
       routeType={routeDecision.routeType}
+      reteachPlan={reteachPlan}
     />
   );
 }

@@ -43,7 +43,8 @@ export async function POST(req: NextRequest) {
     skillCode,
     answer,
     (item.options as string[]) ?? [],
-    correct
+    correct,
+    (item.misconceptionMap as Record<string, 'm1' | 'm2' | 'm3' | 'm4'> | undefined)
   );
 
   const attempt = await prisma.attempt.create({

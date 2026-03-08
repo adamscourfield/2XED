@@ -1,15 +1,15 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import { getReteachPlan, type RouteType } from './reteachContent';
+import { useState } from 'react';
+import type { ReteachPlan, RouteType } from './reteachContent';
 
 interface Props {
   routeType: RouteType;
+  plan: ReteachPlan;
   onComplete: () => void;
 }
 
-export function ReteachSession({ routeType, onComplete }: Props) {
-  const plan = useMemo(() => getReteachPlan(routeType), [routeType]);
+export function ReteachSession({ routeType, plan, onComplete }: Props) {
   const [stepIndex, setStepIndex] = useState(0);
   const [selected, setSelected] = useState('');
   const [feedback, setFeedback] = useState<'correct' | 'incorrect' | null>(null);
