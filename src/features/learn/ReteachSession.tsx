@@ -18,6 +18,7 @@ export function ReteachSession({ subjectId, skillId, routeType, plan, onComplete
   const [guided, setGuided] = useState('');
   const [retryCounts, setRetryCounts] = useState<Record<number, number>>({});
   const [altShown, setAltShown] = useState<Record<number, boolean>>({});
+  const [confidenceByStep, setConfidenceByStep] = useState<Record<number, 'low' | 'medium' | 'high'>>({});
 
   const step = plan.steps[stepIndex];
 
@@ -45,6 +46,7 @@ export function ReteachSession({ subjectId, skillId, routeType, plan, onComplete
         stepTitle: step.title,
         correct,
         retryCount: newRetry,
+        confidence: confidenceByStep[stepIndex] ?? 'medium',
         alternativeShown: shouldShowAlt,
       }),
     });
@@ -76,6 +78,20 @@ export function ReteachSession({ subjectId, skillId, routeType, plan, onComplete
 
         <div className="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-3">
           <p className="text-sm font-medium text-slate-800">Checkpoint: {step.checkpointQuestion}</p>
+          <div className="mt-2 flex gap-2 text-xs">
+            {(['low', 'medium', 'high'] as const).map((level) => (
+              <button
+                key={level}
+                type="button"
+                onClick={() => setConfidenceByStep((s) => ({ ...s, [stepIndex]: level }))}
+                className={`rounded-md border px-2 py-1 ${
+                  (confidenceByStep[stepIndex] ?? 'medium') === level ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-slate-300 bg-white text-slate-600'
+                }`}
+              >
+                confidence: {level}
+              </button>
+            ))}
+          </div>
           <div className="mt-3 space-y-2">
             {step.checkpointOptions.map((option) => (
               <button key={option} onClick={() => setSelected(option)} className={`anx-option ${selected === option ? 'anx-option-selected' : ''}`}>
