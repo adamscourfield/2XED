@@ -1,4 +1,5 @@
 export const LEARNING_CONFIG = {
+  defaultSubjectSlug: process.env.NEXT_PUBLIC_DEFAULT_SUBJECT_SLUG ?? 'ks3-maths',
   routedSkillCodes: (process.env.NEXT_PUBLIC_ROUTED_SKILL_CODES ?? 'N1.1')
     .split(',')
     .map((s) => s.trim().toUpperCase())

@@ -2,6 +2,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/features/auth/authOptions';
 import { redirect } from 'next/navigation';
 import { prisma } from '@/db/prisma';
+import { LEARNING_CONFIG } from '@/features/config/learningConfig';
 
 export default async function AdminInterventionsPage() {
   const session = await getServerSession(authOptions);
@@ -81,7 +82,7 @@ export default async function AdminInterventionsPage() {
       <div className="max-w-5xl mx-auto px-4">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold text-gray-900">Intervention Flags</h1>
-          <a href="/admin/insight/ks3-maths" className="text-sm text-blue-600 hover:underline">
+          <a href={`/admin/insight/${LEARNING_CONFIG.defaultSubjectSlug}`} className="text-sm text-blue-600 hover:underline">
             → Insight Dashboard
           </a>
         </div>

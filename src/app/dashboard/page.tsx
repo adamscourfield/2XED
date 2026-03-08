@@ -160,7 +160,7 @@ export default async function DashboardPage() {
             <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-purple-800">Admin Tools</h2>
             <div className="flex flex-wrap gap-3">
               <Link
-                href="/admin/insight/ks3-maths"
+                href={`/admin/insight/${process.env.NEXT_PUBLIC_DEFAULT_SUBJECT_SLUG ?? 'ks3-maths'}`}
                 className="inline-flex items-center justify-center rounded-lg bg-purple-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-purple-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2"
               >
                 Insight Dashboard
