@@ -11,32 +11,77 @@ interface Props {
   onComplete: () => void;
 }
 
+function splitDigits(n: string): string[] {
+  const clean = n.replace(/[^0-9]/g, '');
+  return clean.split('');
+}
+
 function renderVisual(step: ReteachPlan['steps'][number]) {
+  const payload = step.visualPayload ?? {};
+
   if (step.visualType === 'place_value_grid') {
+    const number = String(payload.number ?? '7460');
+    const digits = splitDigits(number);
+    const labels = ['Thousands', 'Hundreds', 'Tens', 'Ones'];
     return (
       <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-xs text-slate-700">
         <p className="mb-2 font-semibold">Place value grid</p>
+        <p className="mb-2 text-[11px] text-slate-500">Read columns left to right for value.</p>
         <div className="grid grid-cols-4 gap-2">
-          {['Thousands', 'Hundreds', 'Tens', 'Ones'].map((h) => (
-            <div key={h} className="rounded border border-slate-200 bg-white px-2 py-1 text-center">{h}</div>
+          {labels.map((h, i) => (
+            <div key={h} className="rounded border border-slate-200 bg-white px-2 py-2 text-center">
+              <p className="text-[10px] uppercase tracking-wide text-slate-500">{h}</p>
+              <p className="mt-1 text-base font-bold text-slate-900">{digits[i] ?? '0'}</p>
+            </div>
           ))}
         </div>
       </div>
     );
   }
+
   if (step.visualType === 'decompose_number') {
+    const number = String(payload.number ?? '8030406');
+    const formatted = number.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     return (
       <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-xs text-slate-700">
         <p className="font-semibold">Decompose the number</p>
-        <p className="mt-1">Split into place-value parts, then add with + signs.</p>
+        <p className="mt-1">{formatted} = ?</p>
+        <p className="mt-2 rounded bg-white px-2 py-1 text-[11px] text-slate-600">Split into place-value parts, then combine with + signs.</p>
       </div>
     );
   }
+
   if (step.visualType === 'compare_columns') {
+    const left = String(payload.left ?? '5203');
+    const right = String(payload.right ?? '5123');
+    const l = splitDigits(left);
+    const r = splitDigits(right);
+    let firstDiff = -1;
+    for (let i = 0; i < Math.max(l.length, r.length); i++) {
+      if ((l[i] ?? '0') !== (r[i] ?? '0')) {
+        firstDiff = i;
+        break;
+      }
+    }
+
     return (
       <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-xs text-slate-700">
         <p className="font-semibold">Compare columns left to right</p>
-        <p className="mt-1">Find the first different column, then decide.</p>
+        <p className="mt-1 text-[11px] text-slate-500">Stop at the first different column.</p>
+        <div className="mt-2 grid grid-cols-2 gap-3">
+          {[{ name: 'A', d: l }, { name: 'B', d: r }].map((row) => (
+            <div key={row.name} className="rounded border border-slate-200 bg-white p-2">
+              <p className="text-[10px] uppercase tracking-wide text-slate-500">{row.name}</p>
+              <div className="mt-1 flex gap-1">
+                {row.d.map((x, i) => (
+                  <span key={`${row.name}-${i}`} className={`inline-flex h-7 w-7 items-center justify-center rounded text-sm font-semibold ${i === firstDiff ? 'bg-blue-100 text-blue-800' : 'bg-slate-100 text-slate-700'}`}>
+                    {x}
+                  </span>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }

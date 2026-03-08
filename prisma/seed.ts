@@ -482,11 +482,22 @@ async function main() {
 
         const stepType = i === 0 ? 'visual_demo' : i === routeDef.steps.length - 1 ? 'transfer_check' : 'guided_action';
         const visualType = routeDef.routeType === 'A' ? 'place_value_grid' : routeDef.routeType === 'B' ? 'compare_columns' : 'decompose_number';
+        const visualPayload =
+          routeDef.routeType === 'A'
+            ? { number: i === 0 ? '4381' : i === 1 ? '5203' : '7460' }
+            : routeDef.routeType === 'B'
+              ? i === 0
+                ? { left: '8307', right: '8370' }
+                : i === 1
+                  ? { left: '4125', right: '4175' }
+                  : { left: '9041', right: '9401' }
+              : { number: i === 0 ? '1090' : i === 1 ? '3604' : '6090' };
+
         const checkpointOptionsPayload = {
           options: checkpointOptions,
           stepType,
           visualType,
-          visualPayload: { routeType: routeDef.routeType, stepNumber: i + 1 },
+          visualPayload,
         };
 
         await prisma.explanationStep.upsert({
