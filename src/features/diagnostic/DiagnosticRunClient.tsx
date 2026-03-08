@@ -58,9 +58,12 @@ export function DiagnosticRunClient({ subject, skill, item, sessionId, itemsSeen
       <div className="anx-panel w-full max-w-2xl space-y-6 p-7 sm:p-8">
         <div className="flex items-center justify-between">
           <p className="text-sm text-slate-500">Diagnostic question</p>
-          <span className="text-sm text-slate-500">
-            {itemsSeen + 1} / {maxItems}
-          </span>
+          <div className="flex items-center gap-3">
+            <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-1 text-xs font-semibold text-slate-700">AX live</span>
+            <span className="text-sm text-slate-500">
+              {itemsSeen + 1} / {maxItems}
+            </span>
+          </div>
         </div>
 
         <div className="anx-progress-track">
@@ -85,7 +88,7 @@ export function DiagnosticRunClient({ subject, skill, item, sessionId, itemsSeen
                     setSelectedAnswer(option);
                     setError(null);
                   }}
-                  className={`anx-option py-4 text-base font-semibold ${selectedAnswer === option ? 'anx-option-selected' : ''}`}
+                  className={`anx-option py-4 text-base font-semibold transition-transform active:scale-[0.99] ${selectedAnswer === option ? 'anx-option-selected' : ''}`}
                 >
                   {option}
                 </button>

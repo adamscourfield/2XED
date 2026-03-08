@@ -205,9 +205,17 @@ export function LearnSession({ subject, skill, items, userId, gamification, rout
         <div className="w-full max-w-xl space-y-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm sm:p-8">
           <div className="flex items-center justify-between gap-2">
             <p className="text-sm font-medium text-gray-500">Question</p>
-            <span className="text-sm tabular-nums text-gray-400">
-              {currentIndex + 1} / {items.length}
-            </span>
+            <div className="flex items-center gap-3">
+              <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-1 text-xs font-semibold text-slate-700">
+                AX {gamification.xp}
+              </span>
+              <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-1 text-xs font-semibold text-slate-700">
+                🔥 {gamification.streakDays}
+              </span>
+              <span className="text-sm tabular-nums text-gray-400">
+                {currentIndex + 1} / {items.length}
+              </span>
+            </div>
           </div>
 
           <div className="h-2 w-full rounded-full bg-gray-100">
