@@ -53,8 +53,6 @@ export default async function AdminInterventionsPage() {
   const routeSummary = recentRouteEvents.reduce(
     (acc, event) => {
       const payload = (event.payload ?? {}) as { route?: 'A' | 'B' | 'C' | null; status?: 'secure' | 'route'; skillCode?: string };
-      // focus this panel on N1.1 if present
-      if (payload.skillCode && payload.skillCode !== 'N1.1') return acc;
 
       if (event.name === 'diagnostic_route_recommended') {
         if (payload.status === 'secure') acc.secureFastPass += 1;
