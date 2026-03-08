@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { ReteachSession } from './ReteachSession';
 
 interface Item {
   id: string;
@@ -41,7 +42,7 @@ interface Props {
   routeType: 'A' | 'B' | 'C';
 }
 
-type Phase = 'intro' | 'session' | 'results';
+type Phase = 'intro' | 'reteach' | 'session' | 'results';
 
 const SHOW_DEBUG = process.env.NEXT_PUBLIC_SHOW_DEBUG === 'true';
 
@@ -123,13 +124,23 @@ export function LearnSession({ subject, skill, items, userId, gamification, rout
           {skill.description && !skill.intro && <p className="text-sm leading-relaxed text-slate-600">{skill.description}</p>}
 
           <div className="flex flex-col gap-3 sm:flex-row">
-            <button onClick={() => setPhase('session')} className="anx-btn-primary flex-1">
-              Start Session ({items.length} questions)
+            <button onClick={() => setPhase('reteach')} className="anx-btn-primary flex-1">
+              Start Reteach ({items.length} key questions follow)
             </button>
             <button onClick={() => router.push('/dashboard')} className="anx-btn-secondary">
               Back
             </button>
           </div>
+        </div>
+      </main>
+    );
+  }
+
+  if (phase === 'reteach') {
+    return (
+      <main className="anx-shell flex items-center justify-center">
+        <div className="anx-panel w-full max-w-2xl p-7 sm:p-8">
+          <ReteachSession routeType={routeType} onComplete={() => setPhase('session')} />
         </div>
       </main>
     );
