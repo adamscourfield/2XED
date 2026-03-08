@@ -56,12 +56,53 @@ export const InterventionRecommendedPayloadSchema = z.object({
   mastery: z.number(),
 });
 
+export const QuestionAnsweredPayloadSchema = z.object({
+  itemId: z.string(),
+  skillId: z.string(),
+  subjectId: z.string(),
+  correct: z.boolean(),
+  mode: z.enum(['DIAGNOSTIC', 'PRACTICE', 'REVIEW']).optional(),
+});
+
+export const RouteCompletedPayloadSchema = z.object({
+  skillId: z.string(),
+  subjectId: z.string(),
+  totalItems: z.number().int().positive(),
+  correctCount: z.number().int().nonnegative(),
+  accuracy: z.number().min(0).max(1),
+});
+
+export const SkillStatusChangedPayloadSchema = z.object({
+  skillId: z.string(),
+  skillCode: z.string().optional(),
+  strand: z.string().optional(),
+  from: z.enum(['NOT_YET', 'DEVELOPING', 'SECURE']),
+  to: z.enum(['NOT_YET', 'DEVELOPING', 'SECURE']),
+});
+
+export const RewardGrantedPayloadSchema = z.object({
+  rewardEvent: z.string(),
+  xp: z.number(),
+  tokens: z.number(),
+  reason: z.string(),
+});
+
+export const StreakExtendedPayloadSchema = z.object({
+  streakDays: z.number().int().positive(),
+  date: z.string(),
+});
+
 export const EventPayloadSchemas: Record<string, z.ZodSchema> = {
   attempt_submitted: AttemptSubmittedPayloadSchema,
   attempt_graded: AttemptGradedPayloadSchema,
+  question_answered: QuestionAnsweredPayloadSchema,
+  route_completed: RouteCompletedPayloadSchema,
   skill_state_updated: SkillStateUpdatedPayloadSchema,
+  skill_status_changed: SkillStatusChangedPayloadSchema,
   review_scheduled: ReviewScheduledPayloadSchema,
   review_completed: ReviewCompletedPayloadSchema,
+  reward_granted: RewardGrantedPayloadSchema,
+  streak_extended: StreakExtendedPayloadSchema,
   diagnostic_completed: DiagnosticCompletedPayloadSchema,
   intervention_recommended: InterventionRecommendedPayloadSchema,
 };

@@ -25,18 +25,26 @@ interface Subject {
   slug: string;
 }
 
+interface GamificationSummary {
+  xp: number;
+  tokens: number;
+  streakDays: number;
+  activeDaysThisWeek: number;
+}
+
 interface Props {
   subject: Subject;
   skill: Skill;
   items: Item[];
   userId: string;
+  gamification: GamificationSummary;
 }
 
 type Phase = 'intro' | 'session' | 'results';
 
 const SHOW_DEBUG = process.env.NEXT_PUBLIC_SHOW_DEBUG === 'true';
 
-export function LearnSession({ subject, skill, items, userId }: Props) {
+export function LearnSession({ subject, skill, items, userId, gamification }: Props) {
   const [phase, setPhase] = useState<Phase>('intro');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState('');
@@ -92,6 +100,21 @@ export function LearnSession({ subject, skill, items, userId }: Props) {
             )}
           </div>
 
+          <div className="grid grid-cols-3 gap-3 text-center text-xs sm:text-sm">
+            <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+              <p className="text-slate-500">XP</p>
+              <p className="font-semibold text-slate-900">{gamification.xp}</p>
+            </div>
+            <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+              <p className="text-slate-500">Streak</p>
+              <p className="font-semibold text-slate-900">{gamification.streakDays} day{gamification.streakDays === 1 ? '' : 's'}</p>
+            </div>
+            <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+              <p className="text-slate-500">Tokens</p>
+              <p className="font-semibold text-slate-900">{gamification.tokens}</p>
+            </div>
+          </div>
+
           {skill.intro && <p className="text-sm leading-relaxed text-slate-600">{skill.intro}</p>}
           {skill.description && !skill.intro && <p className="text-sm leading-relaxed text-slate-600">{skill.description}</p>}
 
@@ -128,6 +151,13 @@ export function LearnSession({ subject, skill, items, userId }: Props) {
 
           <h2 className="text-xl font-semibold leading-snug text-slate-900">{currentItem.question}</h2>
 
+          <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm text-slate-700">
+            <p>
+              Correct so far: <span className="font-semibold">{results.filter((r) => r.correct).length}</span> / {results.length}
+            </p>
+            <p className="text-xs text-slate-500 mt-1">Skill trajectory: Not Yet → Developing → Secure</p>
+          </div>
+
           <div className="space-y-3">
             {options.map((option, i) => (
               <button
@@ -151,6 +181,7 @@ export function LearnSession({ subject, skill, items, userId }: Props) {
   if (phase === 'results') {
     const correctCount = results.filter((r) => r.correct).length;
     const masteryPct = Math.round((correctCount / results.length) * 100);
+    const estimatedXp = results.reduce((sum, r) => sum + (r.correct ? 5 : 2), 0) + 20;
 
     return (
       <main className="anx-shell flex items-center justify-center">
@@ -164,6 +195,7 @@ export function LearnSession({ subject, skill, items, userId }: Props) {
             <p className="mt-2 text-sm text-slate-600">
               {correctCount} out of {results.length} correct
             </p>
+            <p className="mt-1 text-xs text-slate-500">Estimated XP earned this route: +{estimatedXp}</p>
           </div>
 
           <div className="space-y-2 rounded-xl border border-slate-200 bg-white p-4 text-left">

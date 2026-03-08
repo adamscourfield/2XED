@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { prisma } from '@/db/prisma';
 import { LearnSession } from '@/features/learn/LearnSession';
 import { isSkillUnlocked } from '@/features/learn/prerequisites';
+import { getUserGamificationSummary } from '@/features/gamification/gamificationService';
 
 const QUESTIONS_PER_SESSION = 3;
 
@@ -85,6 +86,7 @@ export default async function LearnPage({ params }: Props) {
   });
 
   const items = itemSkills.map((is) => is.item);
+  const gamification = await getUserGamificationSummary(userId);
 
   return (
     <LearnSession
@@ -92,6 +94,7 @@ export default async function LearnPage({ params }: Props) {
       skill={targetSkill}
       items={items}
       userId={userId}
+      gamification={gamification}
     />
   );
 }

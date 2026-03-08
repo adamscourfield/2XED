@@ -65,6 +65,31 @@ export default async function InsightDashboardPage() {
     buckets['7d'][outcome]++;
   }
 
+  const engagementEvents = await prisma.event.findMany({
+    where: { name: 'question_answered', subjectId: subject.id },
+    select: { studentUserId: true, createdAt: true },
+  });
+  const routeEvents = await prisma.event.findMany({
+    where: { name: 'route_completed', subjectId: subject.id },
+    select: { payload: true, studentUserId: true },
+  });
+
+  const uniqueLearners = new Set(engagementEvents.map((e) => e.studentUserId).filter(Boolean)).size;
+  const activeDays = new Set(engagementEvents.map((e) => e.createdAt.toISOString().slice(0, 10))).size;
+  const avgQuestionsPerLearner = uniqueLearners > 0 ? Math.round((engagementEvents.length / uniqueLearners) * 10) / 10 : 0;
+
+  const routeStats = routeEvents.reduce(
+    (acc, e) => {
+      const payload = e.payload as { accuracy?: number };
+      const accuracy = payload?.accuracy ?? 0;
+      acc.count += 1;
+      acc.sumAccuracy += accuracy;
+      if (accuracy >= 0.8) acc.strongRoutes += 1;
+      return acc;
+    },
+    { count: 0, sumAccuracy: 0, strongRoutes: 0 }
+  );
+
   // C) Time to stable mastery (median days from first attempt to confirmedCount=2)
   const stableSkillMasteries = await prisma.skillMastery.findMany({
     where: { confirmedCount: { gte: 2 }, skill: { subjectId: subject.id } },
@@ -95,6 +120,34 @@ export default async function InsightDashboardPage() {
             </a>
           </div>
         </div>
+
+        <section>
+          <h2 className="text-lg font-semibold text-gray-800 mb-3">Snapshot — Engagement & Route Quality</h2>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="rounded-xl border border-gray-200 bg-white p-4">
+              <p className="text-xs text-gray-500">Unique learners</p>
+              <p className="mt-1 text-2xl font-semibold text-gray-900">{uniqueLearners}</p>
+            </div>
+            <div className="rounded-xl border border-gray-200 bg-white p-4">
+              <p className="text-xs text-gray-500">Question events</p>
+              <p className="mt-1 text-2xl font-semibold text-gray-900">{engagementEvents.length}</p>
+            </div>
+            <div className="rounded-xl border border-gray-200 bg-white p-4">
+              <p className="text-xs text-gray-500">Avg questions / learner</p>
+              <p className="mt-1 text-2xl font-semibold text-gray-900">{avgQuestionsPerLearner}</p>
+            </div>
+            <div className="rounded-xl border border-gray-200 bg-white p-4">
+              <p className="text-xs text-gray-500">Strong routes (≥80%)</p>
+              <p className="mt-1 text-2xl font-semibold text-gray-900">
+                {routeStats.count > 0 ? `${Math.round((routeStats.strongRoutes / routeStats.count) * 100)}%` : '—'}
+              </p>
+            </div>
+          </div>
+          <p className="mt-2 text-xs text-gray-500">
+            Active days observed: {activeDays} · Avg route accuracy:{' '}
+            {routeStats.count > 0 ? `${Math.round((routeStats.sumAccuracy / routeStats.count) * 100)}%` : '—'}
+          </p>
+        </section>
 
         {/* A) Coverage by strand */}
         <section>

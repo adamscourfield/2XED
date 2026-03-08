@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { gradeAttempt } from '@/features/learn/gradeAttempt';
 import { emitEvent } from '@/features/telemetry/eventService';
 import { updatePayloadAfterAttempt } from '@/features/diagnostic/diagnosticService';
+import { grantReward } from '@/features/gamification/gamificationService';
 
 const submitSchema = z.object({
   sessionId: z.string(),
@@ -74,6 +75,23 @@ export async function POST(req: NextRequest) {
     itemId,
     attemptId: attempt.id,
     payload: { itemId, attemptId: attempt.id, correct, skillId, skillCode, strand, subjectId, mode: 'DIAGNOSTIC', diagnosticSessionId: sessionId },
+  });
+
+  await emitEvent({
+    name: 'question_answered',
+    actorUserId: userId,
+    studentUserId: userId,
+    subjectId,
+    skillId,
+    itemId,
+    attemptId: attempt.id,
+    payload: { itemId, skillId, subjectId, correct, mode: 'DIAGNOSTIC' },
+  });
+
+  await grantReward(userId, subjectId, correct ? 'diagnostic_item_correct' : 'diagnostic_item_incorrect', {
+    itemId,
+    skillId,
+    mode: 'DIAGNOSTIC',
   });
 
   return NextResponse.json({ correct });

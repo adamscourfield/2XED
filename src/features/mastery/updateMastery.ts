@@ -1,6 +1,8 @@
 import { prisma } from '@/db/prisma';
 import { emitEvent } from '@/features/telemetry/eventService';
 import { calculateMastery, scheduleNextReview, MASTERY_STABLE_THRESHOLD } from './masteryService';
+import { deriveSkillStatus } from './skillStatus';
+import { grantReward } from '@/features/gamification/gamificationService';
 
 export async function updateSkillMastery(
   userId: string,
@@ -15,7 +17,7 @@ export async function updateSkillMastery(
 
   const existing = await prisma.skillMastery.findUnique({
     where: { userId_skillId: { userId, skillId } },
-    select: { confirmedCount: true, streak: true, nextReviewAt: true },
+    select: { mastery: true, confirmedCount: true, streak: true, nextReviewAt: true },
   });
 
   const prevConfirmedCount = existing?.confirmedCount ?? 0;
@@ -37,6 +39,8 @@ export async function updateSkillMastery(
     newStreak = 0;
   }
 
+  const previousStatus = deriveSkillStatus(existing?.mastery ?? 0, prevConfirmedCount);
+  const nextStatus = deriveSkillStatus(mastery, newConfirmedCount);
   const nextReviewAt = scheduleNextReview(mastery, newConfirmedCount, now);
 
   const updateData = {
@@ -100,6 +104,31 @@ export async function updateSkillMastery(
       nextReviewAt: nextReviewAt.toISOString(),
     },
   });
+
+  if (previousStatus !== nextStatus) {
+    await emitEvent({
+      name: 'skill_status_changed',
+      actorUserId: userId,
+      studentUserId: userId,
+      subjectId,
+      skillId,
+      payload: {
+        skillId,
+        skillCode,
+        strand,
+        from: previousStatus,
+        to: nextStatus,
+      },
+    });
+
+    if (nextStatus === 'DEVELOPING') {
+      await grantReward(userId, subjectId, 'skill_to_developing', { skillId, skillCode, strand });
+    }
+
+    if (nextStatus === 'SECURE') {
+      await grantReward(userId, subjectId, 'skill_to_secure', { skillId, skillCode, strand });
+    }
+  }
 
   if (isDueReview) {
     await emitEvent({

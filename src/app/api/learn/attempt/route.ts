@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { gradeAttempt } from '@/features/learn/gradeAttempt';
 import { emitEvent } from '@/features/telemetry/eventService';
 import { updateSkillMastery } from '@/features/mastery/updateMastery';
+import { grantReward, maybeGrantDailyStreak } from '@/features/gamification/gamificationService';
 
 const attemptSchema = z.object({
   itemId: z.string(),
@@ -40,8 +41,16 @@ export async function POST(req: NextRequest) {
 
   const correct = gradeAttempt(item.answer, answer);
 
+  const skillMastery = await prisma.skillMastery.findUnique({
+    where: { userId_skillId: { userId, skillId } },
+    select: { nextReviewAt: true },
+  });
+  const now = new Date();
+  const isDueReview = skillMastery?.nextReviewAt != null && skillMastery.nextReviewAt <= now;
+  const mode = isDueReview ? 'REVIEW' : 'PRACTICE';
+
   const attempt = await prisma.attempt.create({
-    data: { userId, itemId, answer, correct },
+    data: { userId, itemId, answer, correct, mode },
   });
 
   await emitEvent({
@@ -65,18 +74,54 @@ export async function POST(req: NextRequest) {
     payload: { itemId, attemptId: attempt.id, correct, skillId, subjectId },
   });
 
+  await emitEvent({
+    name: 'question_answered',
+    actorUserId: userId,
+    studentUserId: userId,
+    subjectId,
+    skillId,
+    itemId,
+    attemptId: attempt.id,
+    payload: { itemId, skillId, subjectId, correct, mode },
+  });
+
+  await grantReward(userId, subjectId, correct ? 'diagnostic_item_correct' : 'diagnostic_item_incorrect', {
+    itemId,
+    skillId,
+    mode,
+  });
+
+  const hadRecentIncorrect = await prisma.attempt.findFirst({
+    where: {
+      userId,
+      itemId,
+      correct: false,
+      createdAt: { lt: attempt.createdAt },
+    },
+    select: { id: true },
+  });
+
+  if (correct && hadRecentIncorrect) {
+    await grantReward(userId, subjectId, 'retry_recovery', { itemId, skillId, mode });
+  }
+
+  await maybeGrantDailyStreak(userId, subjectId);
+
   if (isLast) {
     const allResults = [...previousResults, { itemId, correct }];
     const correctCount = allResults.filter((r) => r.correct).length;
+    const accuracy = totalItems > 0 ? correctCount / totalItems : 0;
 
-    // Detect if this is a due review
-    const skillMastery = await prisma.skillMastery.findUnique({
-      where: { userId_skillId: { userId, skillId } },
-      select: { nextReviewAt: true },
+    await emitEvent({
+      name: 'route_completed',
+      actorUserId: userId,
+      studentUserId: userId,
+      subjectId,
+      skillId,
+      payload: { skillId, subjectId, totalItems, correctCount, accuracy },
     });
-    const now = new Date();
-    const isDueReview = skillMastery?.nextReviewAt != null && skillMastery.nextReviewAt <= now;
-    const mode = isDueReview ? 'REVIEW' : 'PRACTICE';
+
+    await grantReward(userId, subjectId, 'route_completed', { skillId, accuracy });
 
     await updateSkillMastery(userId, skillId, subjectId, correctCount, totalItems, mode);
   }
