@@ -1,5 +1,6 @@
 import { prisma } from '@/db/prisma';
 import { nextFallbackRoute, selectN11Route, type N11Route } from './n11RouteLogic';
+import { isRoutedSkill } from '@/features/config/learningConfig';
 
 interface RouteSelectionResult {
   routeType: N11Route;
@@ -55,7 +56,7 @@ export async function selectExplanationRoute(
     };
   }
 
-  if (skillCode.toUpperCase() === 'N1.1') {
+  if (isRoutedSkill(skillCode)) {
     const recentDiagnostic = await prisma.event.findMany({
       where: {
         name: 'attempt_graded',

@@ -1,7 +1,9 @@
+import { isRoutedSkill } from '@/features/config/learningConfig';
+
 export type N11MisconceptionTag = 'm1' | 'm2' | 'm3' | 'm4';
 
 /**
- * Lightweight MVP mapper for N1.1 diagnostics.
+ * Lightweight MVP mapper for routed-skill diagnostics.
  * We map answer choice slot -> misconception family so route selection has signals.
  */
 export function inferN11MisconceptionTag(
@@ -11,7 +13,7 @@ export function inferN11MisconceptionTag(
   correct: boolean,
   misconceptionMap?: Record<string, N11MisconceptionTag>
 ): N11MisconceptionTag | undefined {
-  if (skillCode.toUpperCase() !== 'N1.1') return undefined;
+  if (!isRoutedSkill(skillCode)) return undefined;
   if (correct) return undefined;
 
   const mapped = misconceptionMap?.[selectedAnswer];

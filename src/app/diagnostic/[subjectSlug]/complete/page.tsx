@@ -14,7 +14,6 @@ interface Props {
 export default async function DiagnosticCompletePage({ params, searchParams }: Props) {
   const { subjectSlug } = await params;
   const { sessionId } = await searchParams;
-  if (subjectSlug !== 'ks3-maths') notFound();
 
   const session = await getServerSession(authOptions);
   if (!session?.user) redirect('/login');

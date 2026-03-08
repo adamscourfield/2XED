@@ -10,7 +10,6 @@ interface Props {
 
 export default async function DiagnosticIntroPage({ params }: Props) {
   const { subjectSlug } = await params;
-  if (subjectSlug !== 'ks3-maths') notFound();
 
   const session = await getServerSession(authOptions);
   if (!session?.user) redirect('/login');

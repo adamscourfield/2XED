@@ -4,6 +4,7 @@ import { redirect, notFound } from 'next/navigation';
 import { prisma } from '@/db/prisma';
 import { initPayload, shouldStopEarly, selectNextSkill } from '@/features/diagnostic/diagnosticService';
 import { DiagnosticRunClient } from '@/features/diagnostic/DiagnosticRunClient';
+import { LEARNING_CONFIG } from '@/features/config/learningConfig';
 
 interface Props {
   params: Promise<{ subjectSlug: string }>;
@@ -11,7 +12,6 @@ interface Props {
 
 export default async function DiagnosticRunPage({ params }: Props) {
   const { subjectSlug } = await params;
-  if (subjectSlug !== 'ks3-maths') notFound();
 
   const session = await getServerSession(authOptions);
   if (!session?.user) redirect('/login');
@@ -47,10 +47,9 @@ export default async function DiagnosticRunPage({ params }: Props) {
     redirect(`/diagnostic/${subjectSlug}/complete?sessionId=${diagSession.id}`);
   }
 
-  // Select next skill - use core diagnostic strands
-  const diagnosticStrands = ['PV', 'ADD', 'MUL', 'FAC', 'FDP'];
+  // Select next skill - configurable diagnostic strands
   const availableSkills = subject.skills
-    .filter((s) => diagnosticStrands.includes(s.strand))
+    .filter((s) => LEARNING_CONFIG.diagnosticStrands.includes(s.strand.toUpperCase()))
     .map((s) => ({ id: s.id, code: s.code, strand: s.strand }));
 
   const nextSkill = selectNextSkill(availableSkills, payload);
