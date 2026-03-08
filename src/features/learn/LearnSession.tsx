@@ -63,6 +63,7 @@ export function LearnSession({ subject, skill, items, userId, gamification, rout
   const [results, setResults] = useState<{ itemId: string; correct: boolean }[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [feedbackFlash, setFeedbackFlash] = useState<'correct' | 'incorrect' | null>(null);
   const router = useRouter();
 
   const currentItem = items[currentIndex];
@@ -99,6 +100,10 @@ export function LearnSession({ subject, skill, items, userId, gamification, rout
 
       const newResults = [...results, { itemId: currentItem.id, correct: data.correct }];
       setResults(newResults);
+      setFeedbackFlash(data.correct ? 'correct' : 'incorrect');
+
+      await new Promise((resolve) => setTimeout(resolve, data.correct ? 180 : 240));
+      setFeedbackFlash(null);
 
       if (currentIndex < items.length - 1) {
         setCurrentIndex(currentIndex + 1);
@@ -225,7 +230,7 @@ export function LearnSession({ subject, skill, items, userId, gamification, rout
             />
           </div>
 
-          <div className="rounded-2xl border-2 border-blue-100 bg-white px-5 py-6 sm:px-6 sm:py-7">
+          <div className={`rounded-2xl border-2 border-blue-100 bg-white px-5 py-6 sm:px-6 sm:py-7 ${feedbackFlash === 'correct' ? 'anx-pulse-correct' : ''} ${feedbackFlash === 'incorrect' ? 'anx-shake-incorrect' : ''}`}>
             <h2 className="text-2xl font-bold leading-tight text-gray-900 sm:text-3xl">{currentItem.question}</h2>
           </div>
 
@@ -268,6 +273,8 @@ export function LearnSession({ subject, skill, items, userId, gamification, rout
           </div>
 
           {error && <p className="text-sm text-rose-600">{error}</p>}
+          {feedbackFlash === 'correct' && <p className="text-sm font-semibold text-emerald-600">+AX</p>}
+          {feedbackFlash === 'incorrect' && <p className="text-sm text-amber-600">Keep going — you still earn progress.</p>}
 
           <button
             onClick={submitAnswer}

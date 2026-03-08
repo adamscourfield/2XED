@@ -18,6 +18,7 @@ export function DiagnosticRunClient({ subject, skill, item, sessionId, itemsSeen
   const [selectedAnswer, setSelectedAnswer] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [feedbackFlash, setFeedbackFlash] = useState<'correct' | 'incorrect' | null>(null);
   const router = useRouter();
   const answerType = useMemo(() => parseAnswerType(item.type), [item.type]);
   const parsedOptions = useMemo(() => parseItemOptions(item.options), [item.options]);
@@ -43,6 +44,12 @@ export function DiagnosticRunClient({ subject, skill, item, sessionId, itemsSeen
       });
 
       if (!res.ok) throw new Error(`Submit failed (${res.status})`);
+
+      const data = (await res.json()) as { correct?: boolean };
+      const wasCorrect = data.correct === true;
+      setFeedbackFlash(wasCorrect ? 'correct' : 'incorrect');
+      await new Promise((resolve) => setTimeout(resolve, wasCorrect ? 180 : 240));
+      setFeedbackFlash(null);
 
       router.refresh();
       router.push(`/diagnostic/${subjectSlug}/run`);
@@ -70,7 +77,7 @@ export function DiagnosticRunClient({ subject, skill, item, sessionId, itemsSeen
           <div className="anx-progress-bar" style={{ width: `${((itemsSeen + 1) / maxItems) * 100}%` }} />
         </div>
 
-        <div className="rounded-2xl border-2 border-blue-100 bg-white px-5 py-6 sm:px-6 sm:py-7">
+        <div className={`rounded-2xl border-2 border-blue-100 bg-white px-5 py-6 sm:px-6 sm:py-7 ${feedbackFlash === 'correct' ? 'anx-pulse-correct' : ''} ${feedbackFlash === 'incorrect' ? 'anx-shake-incorrect' : ''}`}>
           <h2 className="text-2xl font-bold leading-tight text-slate-900 sm:text-3xl">{item.question}</h2>
         </div>
 
@@ -109,6 +116,8 @@ export function DiagnosticRunClient({ subject, skill, item, sessionId, itemsSeen
         </div>
 
         {error && <p className="text-sm text-rose-600">{error}</p>}
+        {feedbackFlash === 'correct' && <p className="text-sm font-semibold text-emerald-600">+AX</p>}
+        {feedbackFlash === 'incorrect' && <p className="text-sm text-amber-600">Nice try — next one.</p>}
 
         <button
           onClick={submitAnswer}
