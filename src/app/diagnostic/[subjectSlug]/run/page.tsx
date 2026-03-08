@@ -71,7 +71,13 @@ export default async function DiagnosticRunPage({ params }: Props) {
     .map((is) => is.item)
     .filter((item) => !seenItemIds.has(item.id));
 
-  const nextItem = availableItems[0] ?? fullSkill.items[0]?.item;
+  const preferred = availableItems.filter((item) => {
+    if (item.question.startsWith('[')) return false;
+    if (nextSkill.code === 'N1.1') return item.question.startsWith('N1.1 DQ');
+    return true;
+  });
+
+  const nextItem = preferred[0] ?? availableItems.find((item) => !item.question.startsWith('[')) ?? availableItems[0] ?? fullSkill.items[0]?.item;
 
   if (!nextItem) {
     redirect(`/diagnostic/${subjectSlug}/complete?sessionId=${diagSession.id}`);

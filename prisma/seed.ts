@@ -275,9 +275,127 @@ async function main() {
     }
   }
 
-  // 7️⃣ N1.1 misconception maps + explanation routes (A/B/C)
+  // 7️⃣ Real N1.1 item set (diagnostic + shadow + key questions)
   const n11SkillId = skillMap.get('N1.1');
   if (n11SkillId) {
+    const n11RealItems: Array<{
+      question: string;
+      type: string;
+      options: unknown;
+      answer: string;
+      misconceptionMap?: Record<string, string>;
+    }> = [
+      {
+        question: 'N1.1 DQ1: What is the value of the digit 7 in 3,742,915?',
+        type: 'MCQ',
+        options: {
+          choices: ['700000', '70000', '7000', '7'],
+          meta: { role: 'anchor', misconception_tag: 'm1', transfer_level: 'none' },
+        },
+        answer: '700000',
+        misconceptionMap: { '70000': 'm2', '7000': 'm3', '7': 'm4' },
+      },
+      {
+        question: 'N1.1 DQ2: In 504,081, what is the place value of digit 4?',
+        type: 'MCQ',
+        options: {
+          choices: ['thousands', 'ten-thousands', 'hundreds', 'ones'],
+          meta: { role: 'misconception', misconception_tag: 'm2', transfer_level: 'none' },
+        },
+        answer: 'thousands',
+      },
+      {
+        question: 'N1.1 DQ3: Write 8,030,406 in expanded form.',
+        type: 'SHORT_TEXT',
+        options: { meta: { role: 'prerequisite_probe', misconception_tag: 'm2', transfer_level: 'low' } },
+        answer: '8000000 + 30000 + 400 + 6',
+      },
+      {
+        question: 'N1.1 DQ4: Which number has digit 5 worth 50,000?',
+        type: 'MCQ',
+        options: {
+          choices: ['5,203,410', '1,052,340', '305,214', '250,431'],
+          meta: { role: 'transfer', misconception_tag: 'm3', transfer_level: 'medium' },
+        },
+        answer: '1,052,340',
+      },
+      {
+        question: 'N1.1 SC-A1: What is the value of 8 in 1,863,205?',
+        type: 'SHORT_NUMERIC',
+        options: { meta: { role: 'shadow', route: 'A' } },
+        answer: '800000',
+      },
+      {
+        question: 'N1.1 SC-A2: What place is digit 9 in 4,719,300?',
+        type: 'SHORT_TEXT',
+        options: { meta: { role: 'shadow', route: 'A' } },
+        answer: 'thousands',
+      },
+      {
+        question: 'N1.1 SC-B1: Write 6,040,070 in expanded form.',
+        type: 'SHORT_TEXT',
+        options: { meta: { role: 'shadow', route: 'B' } },
+        answer: '6000000 + 40000 + 70',
+      },
+      {
+        question: 'N1.1 SC-B2: Select the number where 3 represents 300,000.',
+        type: 'MCQ',
+        options: {
+          choices: ['3,041,220', '130,422', '43,021', '703,012'],
+          meta: { role: 'shadow', route: 'B' },
+        },
+        answer: '3,041,220',
+      },
+      {
+        question: 'N1.1 SC-C1: Correct this: In 2,701,450 the value of 7 is 700,000.',
+        type: 'SHORT_NUMERIC',
+        options: { meta: { role: 'shadow', route: 'C' } },
+        answer: '700000',
+      },
+      {
+        question: 'N1.1 SC-C2: Which value of 5 is correct in 950,214?',
+        type: 'MCQ',
+        options: {
+          choices: ['5', '50', '5000', '50000'],
+          meta: { role: 'shadow', route: 'C' },
+        },
+        answer: '50000',
+      },
+    ];
+
+    for (const itemData of n11RealItems) {
+      let item = await prisma.item.findFirst({ where: { question: itemData.question, subjectId: subject.id } });
+      if (!item) {
+        item = await prisma.item.create({
+          data: {
+            question: itemData.question,
+            type: itemData.type,
+            options: itemData.options as object,
+            answer: itemData.answer,
+            misconceptionMap: itemData.misconceptionMap as object | undefined,
+            subjectId: subject.id,
+          },
+        });
+      } else {
+        await prisma.item.update({
+          where: { id: item.id },
+          data: {
+            type: itemData.type,
+            options: itemData.options as object,
+            answer: itemData.answer,
+            misconceptionMap: itemData.misconceptionMap as object | undefined,
+          },
+        });
+      }
+
+      await prisma.itemSkill.upsert({
+        where: { itemId_skillId: { itemId: item.id, skillId: n11SkillId } },
+        update: {},
+        create: { itemId: item.id, skillId: n11SkillId },
+      });
+    }
+
+    // 8️⃣ N1.1 misconception maps + explanation routes (A/B/C)
     const n11Items = await prisma.item.findMany({
       where: {
         subjectId: subject.id,

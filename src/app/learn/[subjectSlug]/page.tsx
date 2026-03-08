@@ -85,10 +85,14 @@ export default async function LearnPage({ params }: Props) {
   const itemSkills = await prisma.itemSkill.findMany({
     where: { skillId: targetSkill.id },
     include: { item: true },
-    take: QUESTIONS_PER_SESSION,
   });
 
-  const items = itemSkills.map((is) => is.item);
+  const realItems = itemSkills
+    .map((is) => is.item)
+    .filter((item) => !item.question.startsWith('['));
+
+  const pool = realItems.length > 0 ? realItems : itemSkills.map((is) => is.item);
+  const items = pool.slice(0, QUESTIONS_PER_SESSION);
   const gamification = await getUserGamificationSummary(userId);
 
   const routeDecision = await selectExplanationRoute(
