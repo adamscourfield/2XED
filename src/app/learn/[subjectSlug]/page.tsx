@@ -4,6 +4,10 @@ import { redirect } from 'next/navigation';
 import { prisma } from '@/db/prisma';
 import { LearnSession } from '@/features/learn/LearnSession';
 import { isSkillUnlocked } from '@/features/learn/prerequisites';
+import { getUserGamificationSummary } from '@/features/gamification/gamificationService';
+import { selectExplanationRoute } from '@/features/diagnostic/routeAssignment';
+import { emitEvent } from '@/features/telemetry/eventService';
+import { getReteachPlanForSkill } from '@/features/learn/reteachService';
 
 const QUESTIONS_PER_SESSION = 3;
 
@@ -85,6 +89,47 @@ export default async function LearnPage({ params }: Props) {
   });
 
   const items = itemSkills.map((is) => is.item);
+  const gamification = await getUserGamificationSummary(userId);
+
+  const routeDecision = await selectExplanationRoute(
+    userId,
+    subject.id,
+    targetSkill.id,
+    targetSkill.code
+  );
+
+  await emitEvent({
+    name: 'explanation_route_assigned',
+    actorUserId: userId,
+    studentUserId: userId,
+    subjectId: subject.id,
+    skillId: targetSkill.id,
+    payload: {
+      skillId: targetSkill.id,
+      skillCode: targetSkill.code,
+      routeType: routeDecision.routeType,
+      reason: routeDecision.reason,
+      source: routeDecision.source,
+      interventionRecommended: routeDecision.interventionRecommended ?? false,
+    },
+  });
+
+  if (routeDecision.interventionRecommended) {
+    await emitEvent({
+      name: 'intervention_flagged',
+      actorUserId: userId,
+      studentUserId: userId,
+      subjectId: subject.id,
+      skillId: targetSkill.id,
+      payload: {
+        skillId: targetSkill.id,
+        skillCode: targetSkill.code,
+        reason: 'Fallback chain exhausted after repeated shadow failures',
+      },
+    });
+  }
+
+  const reteachPlan = await getReteachPlanForSkill(targetSkill.id, routeDecision.routeType);
 
   return (
     <LearnSession
@@ -92,6 +137,9 @@ export default async function LearnPage({ params }: Props) {
       skill={targetSkill}
       items={items}
       userId={userId}
+      gamification={gamification}
+      routeType={routeDecision.routeType}
+      reteachPlan={reteachPlan}
     />
   );
 }

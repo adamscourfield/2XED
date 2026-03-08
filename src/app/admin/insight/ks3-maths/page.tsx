@@ -65,6 +65,102 @@ export default async function InsightDashboardPage() {
     buckets['7d'][outcome]++;
   }
 
+  const engagementEvents = await prisma.event.findMany({
+    where: { name: 'question_answered', subjectId: subject.id },
+    select: { studentUserId: true, createdAt: true },
+  });
+  const routeEvents = await prisma.event.findMany({
+    where: { name: 'route_completed', subjectId: subject.id },
+    select: { payload: true, studentUserId: true },
+  });
+
+  const uniqueLearners = new Set(engagementEvents.map((e) => e.studentUserId).filter(Boolean)).size;
+  const activeDays = new Set(engagementEvents.map((e) => e.createdAt.toISOString().slice(0, 10))).size;
+  const avgQuestionsPerLearner = uniqueLearners > 0 ? Math.round((engagementEvents.length / uniqueLearners) * 10) / 10 : 0;
+
+  const routeStats = routeEvents.reduce(
+    (acc, e) => {
+      const payload = e.payload as { accuracy?: number; routeType?: 'A' | 'B' | 'C' };
+      const accuracy = payload?.accuracy ?? 0;
+      const routeType = payload?.routeType ?? 'A';
+      acc.count += 1;
+      acc.sumAccuracy += accuracy;
+      if (accuracy >= 0.8) acc.strongRoutes += 1;
+      acc.byRoute[routeType].count += 1;
+      acc.byRoute[routeType].sumAccuracy += accuracy;
+      return acc;
+    },
+    {
+      count: 0,
+      sumAccuracy: 0,
+      strongRoutes: 0,
+      byRoute: {
+        A: { count: 0, sumAccuracy: 0 },
+        B: { count: 0, sumAccuracy: 0 },
+        C: { count: 0, sumAccuracy: 0 },
+      },
+    }
+  );
+
+  const shadowPassed = await prisma.event.count({ where: { name: 'shadow_pair_passed', subjectId: subject.id } });
+  const shadowFailed = await prisma.event.count({ where: { name: 'shadow_pair_failed', subjectId: subject.id } });
+  const shadowTotal = shadowPassed + shadowFailed;
+
+  const routeAssignments = await prisma.event.findMany({
+    where: { name: 'explanation_route_assigned', subjectId: subject.id },
+    select: { payload: true },
+  });
+
+  const stepAttemptEvents = await prisma.event.findMany({
+    where: { name: 'step_checkpoint_attempted', subjectId: subject.id },
+    select: { payload: true },
+  });
+
+  const stepHotspots = stepAttemptEvents.reduce((acc, e) => {
+    const payload = e.payload as { stepTitle?: string; correct?: boolean; retryCount?: number; routeType?: 'A' | 'B' | 'C' };
+    const key = `${payload.routeType ?? 'A'}::${payload.stepTitle ?? 'Unknown step'}`;
+    if (!acc[key]) acc[key] = { routeType: payload.routeType ?? 'A', stepTitle: payload.stepTitle ?? 'Unknown step', attempts: 0, fails: 0, retries2Plus: 0 };
+    acc[key].attempts += 1;
+    if (!payload.correct) acc[key].fails += 1;
+    if ((payload.retryCount ?? 0) >= 2) acc[key].retries2Plus += 1;
+    return acc;
+  }, {} as Record<string, { routeType: string; stepTitle: string; attempts: number; fails: number; retries2Plus: number }>);
+
+  const topStepHotspots = Object.values(stepHotspots)
+    .sort((a, b) => (b.fails - a.fails) || (b.retries2Plus - a.retries2Plus))
+    .slice(0, 6);
+
+  const assignmentStats = routeAssignments.reduce(
+    (acc, e) => {
+      const payload = e.payload as { routeType?: 'A' | 'B' | 'C'; source?: 'diagnostic_signals' | 'fallback_chain' | 'history_default' };
+      const route = payload?.routeType;
+      const source = payload?.source;
+      if (route) acc.byRoute[route] += 1;
+      if (source) acc.bySource[source] += 1;
+      return acc;
+    },
+    {
+      byRoute: { A: 0, B: 0, C: 0 },
+      bySource: { diagnostic_signals: 0, fallback_chain: 0, history_default: 0 },
+    }
+  );
+
+  const recentDrilldownEvents = await prisma.event.findMany({
+    where: {
+      subjectId: subject.id,
+      name: { in: ['reward_granted', 'explanation_route_assigned', 'intervention_flagged'] },
+    },
+    orderBy: { createdAt: 'desc' },
+    take: 20,
+    select: { name: true, createdAt: true, studentUserId: true, payload: true },
+  });
+
+  const recentStudentIds = [...new Set(recentDrilldownEvents.map((e) => e.studentUserId).filter(Boolean))] as string[];
+  const recentUsers = recentStudentIds.length
+    ? await prisma.user.findMany({ where: { id: { in: recentStudentIds } }, select: { id: true, email: true, name: true } })
+    : [];
+  const userMap = new Map(recentUsers.map((u) => [u.id, u]));
+
   // C) Time to stable mastery (median days from first attempt to confirmedCount=2)
   const stableSkillMasteries = await prisma.skillMastery.findMany({
     where: { confirmedCount: { gte: 2 }, skill: { subjectId: subject.id } },
@@ -95,6 +191,147 @@ export default async function InsightDashboardPage() {
             </a>
           </div>
         </div>
+
+        <section>
+          <h2 className="text-lg font-semibold text-gray-800 mb-3">Snapshot — Engagement & Route Quality</h2>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="rounded-xl border border-gray-200 bg-white p-4">
+              <p className="text-xs text-gray-500">Unique learners</p>
+              <p className="mt-1 text-2xl font-semibold text-gray-900">{uniqueLearners}</p>
+            </div>
+            <div className="rounded-xl border border-gray-200 bg-white p-4">
+              <p className="text-xs text-gray-500">Question events</p>
+              <p className="mt-1 text-2xl font-semibold text-gray-900">{engagementEvents.length}</p>
+            </div>
+            <div className="rounded-xl border border-gray-200 bg-white p-4">
+              <p className="text-xs text-gray-500">Avg questions / learner</p>
+              <p className="mt-1 text-2xl font-semibold text-gray-900">{avgQuestionsPerLearner}</p>
+            </div>
+            <div className="rounded-xl border border-gray-200 bg-white p-4">
+              <p className="text-xs text-gray-500">Strong routes (≥80%)</p>
+              <p className="mt-1 text-2xl font-semibold text-gray-900">
+                {routeStats.count > 0 ? `${Math.round((routeStats.strongRoutes / routeStats.count) * 100)}%` : '—'}
+              </p>
+            </div>
+          </div>
+          <p className="mt-2 text-xs text-gray-500">
+            Active days observed: {activeDays} · Avg route accuracy:{' '}
+            {routeStats.count > 0 ? `${Math.round((routeStats.sumAccuracy / routeStats.count) * 100)}%` : '—'}
+          </p>
+        </section>
+
+        <section>
+          <h2 className="text-lg font-semibold text-gray-800 mb-3">Route Effectiveness (A/B/C) + Shadow Validation</h2>
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+            <div className="rounded-xl border border-gray-200 bg-white p-4">
+              <p className="mb-3 text-sm font-medium text-gray-700">Average Accuracy by Route</p>
+              <div className="space-y-2 text-sm">
+                {(['A', 'B', 'C'] as const).map((route) => {
+                  const row = routeStats.byRoute[route];
+                  const avg = row.count > 0 ? Math.round((row.sumAccuracy / row.count) * 100) : null;
+                  return (
+                    <div key={route} className="flex items-center justify-between rounded-md border border-gray-100 px-3 py-2">
+                      <span className="font-mono text-xs">Route {route}</span>
+                      <span className="text-gray-700">{row.count > 0 ? `${avg}% (${row.count})` : '—'}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+            <div className="rounded-xl border border-gray-200 bg-white p-4">
+              <p className="mb-3 text-sm font-medium text-gray-700">Shadow Pair Pass Rate</p>
+              <p className="text-2xl font-semibold text-gray-900">
+                {shadowTotal > 0 ? `${Math.round((shadowPassed / shadowTotal) * 100)}%` : '—'}
+              </p>
+              <p className="mt-1 text-xs text-gray-500">
+                Passed: {shadowPassed} · Failed: {shadowFailed}
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-200 bg-white p-4">
+              <p className="mb-3 text-sm font-medium text-gray-700">Route Assignment Sources</p>
+              <div className="space-y-2 text-xs text-gray-600">
+                <div>Diagnostic signals: {assignmentStats.bySource.diagnostic_signals}</div>
+                <div>Fallback chain: {assignmentStats.bySource.fallback_chain}</div>
+                <div>History default: {assignmentStats.bySource.history_default}</div>
+              </div>
+              <p className="mt-3 text-xs text-gray-500">
+                Assigned route count — A:{assignmentStats.byRoute.A} · B:{assignmentStats.byRoute.B} · C:{assignmentStats.byRoute.C}
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2 className="text-lg font-semibold text-gray-800 mb-3">Teacher Drilldown — Recent Routing & Rewards</h2>
+          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+            <table className="w-full text-sm">
+              <thead className="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th className="text-left px-4 py-3 font-medium text-gray-600">Time</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-600">Student</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-600">Event</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-600">Detail</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {recentDrilldownEvents.map((e, idx) => {
+                  const user = e.studentUserId ? userMap.get(e.studentUserId) : undefined;
+                  const payload = e.payload as { routeType?: string; reason?: string; rewardEvent?: string; xp?: number; tokens?: number };
+                  return (
+                    <tr key={`${e.name}-${idx}`} className="hover:bg-gray-50">
+                      <td className="px-4 py-3 text-xs text-gray-500">{e.createdAt.toISOString().replace('T', ' ').slice(0, 16)}</td>
+                      <td className="px-4 py-3 text-xs text-gray-700">{user?.name ?? user?.email ?? e.studentUserId ?? '—'}</td>
+                      <td className="px-4 py-3 font-mono text-xs">{e.name}</td>
+                      <td className="px-4 py-3 text-xs text-gray-700">
+                        {e.name === 'explanation_route_assigned' && `Route ${payload.routeType} · ${payload.reason ?? ''}`}
+                        {e.name === 'reward_granted' && `${payload.rewardEvent ?? 'reward'} (+${payload.xp ?? 0} XP, +${payload.tokens ?? 0} tokens)`}
+                        {e.name === 'intervention_flagged' && (payload.reason ?? 'Intervention flagged')}
+                      </td>
+                    </tr>
+                  );
+                })}
+                {recentDrilldownEvents.length === 0 && (
+                  <tr>
+                    <td colSpan={4} className="px-4 py-8 text-center text-gray-400">No routing/reward events yet.</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section>
+          <h2 className="text-lg font-semibold text-gray-800 mb-3">Reteach Step Hotspots</h2>
+          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+            <table className="w-full text-sm">
+              <thead className="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th className="text-left px-4 py-3 font-medium text-gray-600">Route</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-600">Step</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-600">Attempts</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-600">Fails</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-600">2+ Retry signals</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {topStepHotspots.map((row, idx) => (
+                  <tr key={`${row.routeType}-${idx}`} className="hover:bg-gray-50">
+                    <td className="px-4 py-3 font-mono text-xs">{row.routeType}</td>
+                    <td className="px-4 py-3 text-xs text-gray-700">{row.stepTitle}</td>
+                    <td className="px-4 py-3">{row.attempts}</td>
+                    <td className="px-4 py-3 text-rose-600">{row.fails}</td>
+                    <td className="px-4 py-3 text-amber-700">{row.retries2Plus}</td>
+                  </tr>
+                ))}
+                {topStepHotspots.length === 0 && (
+                  <tr>
+                    <td colSpan={5} className="px-4 py-8 text-center text-gray-400">No step checkpoint data yet.</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </section>
 
         {/* A) Coverage by strand */}
         <section>

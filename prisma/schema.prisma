@@ -72,6 +72,7 @@ model Skill {
   masteries         SkillMastery[]
   events            Event[]
   interventionFlags InterventionFlag[]
+  explanationRoutes ExplanationRoute[]
 
   @@unique([subjectId, slug])
   @@unique([subjectId, code])
@@ -88,17 +89,18 @@ model SkillPrereq {
 }
 
 model Item {
-  id        String      @id @default(cuid())
-  question  String
-  type      String      @default("MCQ")
-  options   Json
-  answer    String
-  subjectId String?
-  createdAt DateTime    @default(now())
-  subject   Subject?    @relation(fields: [subjectId], references: [id])
-  skills    ItemSkill[]
-  attempts  Attempt[]
-  events    Event[]
+  id               String      @id @default(cuid())
+  question         String
+  type             String      @default("MCQ")
+  options          Json
+  answer           String
+  misconceptionMap Json?
+  subjectId        String?
+  createdAt        DateTime    @default(now())
+  subject          Subject?    @relation(fields: [subjectId], references: [id])
+  skills           ItemSkill[]
+  attempts         Attempt[]
+  events           Event[]
 }
 
 model ItemSkill {
@@ -160,6 +162,40 @@ model Event {
   skill         Skill?    @relation(fields: [skillId], references: [id])
   item          Item?     @relation(fields: [itemId], references: [id])
   attempt       Attempt?  @relation(fields: [attemptId], references: [id])
+}
+
+model ExplanationRoute {
+  id                   String            @id @default(cuid())
+  skillId              String
+  routeType            String
+  misconceptionSummary String
+  workedExample        String
+  guidedPrompt         String
+  guidedAnswer         String
+  isActive             Boolean           @default(true)
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+  skill                Skill             @relation(fields: [skillId], references: [id])
+  steps                ExplanationStep[]
+
+  @@unique([skillId, routeType])
+}
+
+model ExplanationStep {
+  id                 String           @id @default(cuid())
+  explanationRouteId String
+  stepOrder          Int
+  title              String
+  explanation        String
+  checkpointQuestion String
+  checkpointOptions  Json
+  checkpointAnswer   String
+  alternativeHint    String?
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+  route              ExplanationRoute @relation(fields: [explanationRouteId], references: [id], onDelete: Cascade)
+
+  @@unique([explanationRouteId, stepOrder])
 }
 
 model DiagnosticSession {

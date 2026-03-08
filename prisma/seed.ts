@@ -274,6 +274,108 @@ async function main() {
     }
   }
 
+  // 7️⃣ N1.1 misconception maps + explanation routes (A/B/C)
+  const n11SkillId = skillMap.get('N1.1');
+  if (n11SkillId) {
+    const n11Items = await prisma.item.findMany({
+      where: {
+        subjectId: subject.id,
+        question: { startsWith: 'N1.1 ' },
+      },
+      select: { id: true, options: true },
+    });
+
+    for (const item of n11Items) {
+      const options = (item.options as string[]) ?? [];
+      const map: Record<string, string> = {};
+      if (options[0]) map[options[0]] = 'm1';
+      if (options[1]) map[options[1]] = 'm2';
+      if (options[2]) map[options[2]] = 'm3';
+      if (options[3]) map[options[3]] = 'm4';
+      await prisma.item.update({ where: { id: item.id }, data: { misconceptionMap: map } });
+    }
+
+    const routeDefs = [
+      {
+        routeType: 'A',
+        misconceptionSummary: 'You may be misreading place value columns when comparing or building numbers.',
+        workedExample: '3,540 has 3 thousands, 5 hundreds, 4 tens, 0 ones, so it is greater than 3,450.',
+        guidedPrompt: 'In 6,204, what value does the 2 represent?',
+        guidedAnswer: '200',
+        steps: [
+          ['Identify columns', 'Read thousands, hundreds, tens, ones left to right.', 'In 4,381, what is the hundreds digit?', ['3', '8', '4', '1'], '3'],
+          ['Compare highest column first', 'Compare thousands first; move right only if equal.', 'Which is greater?', ['5,203', '5,123', 'Same', 'Cannot tell'], '5,203'],
+          ['Check tricky middle columns', 'Tens and hundreds are often swapped; name each before deciding.', 'In 7,460, the 6 is worth…', ['6', '60', '600', '6000'], '60'],
+        ],
+      },
+      {
+        routeType: 'B',
+        misconceptionSummary: 'You may be applying a shortcut that breaks when digits shift columns.',
+        workedExample: '2,908 vs 2,980: first difference is tens (0 vs 8), so 2,980 is greater.',
+        guidedPrompt: 'Which is greater: 8,307 or 8,370?',
+        guidedAnswer: '8,370',
+        steps: [
+          ['Use a compare frame', 'Align numbers by column in a place-value table.', 'Which column is checked first?', ['Ones', 'Tens', 'Hundreds', 'Thousands'], 'Thousands'],
+          ['Find first difference', 'Move left to right and stop at first non-match.', 'First different column in 4,125 and 4,175?', ['Thousands', 'Hundreds', 'Tens', 'Ones'], 'Tens'],
+          ['Decide and justify', 'Bigger digit at first difference means bigger number.', 'Which is greater?', ['9,041', '9,401', 'Same', 'Cannot tell'], '9,401'],
+        ],
+      },
+      {
+        routeType: 'C',
+        misconceptionSummary: 'You may be reversing place value logic, giving too much weight to ones.',
+        workedExample: '1,090 is greater than 1,009 because tens are more valuable than ones.',
+        guidedPrompt: 'In 5,072, is the 7 worth 7 or 70?',
+        guidedAnswer: '70',
+        steps: [
+          ['Bigger column bigger impact', 'A change in tens beats a change in ones.', 'Which change is bigger?', ['+1 one', '+1 ten', 'Same', 'Depends'], '+1 ten'],
+          ['Value by position', 'The same digit has different value in different columns.', 'In 3,604 the 6 is worth…', ['6', '60', '600', '6000'], '600'],
+          ['Near-miss practice', 'Use similar-looking pairs to lock in place value logic.', 'Which is greater?', ['6,090', '6,009', 'Same', 'Cannot tell'], '6,090'],
+        ],
+      },
+    ] as const;
+
+    for (const routeDef of routeDefs) {
+      const route = await prisma.explanationRoute.upsert({
+        where: { skillId_routeType: { skillId: n11SkillId, routeType: routeDef.routeType } },
+        update: {
+          misconceptionSummary: routeDef.misconceptionSummary,
+          workedExample: routeDef.workedExample,
+          guidedPrompt: routeDef.guidedPrompt,
+          guidedAnswer: routeDef.guidedAnswer,
+          isActive: true,
+        },
+        create: {
+          skillId: n11SkillId,
+          routeType: routeDef.routeType,
+          misconceptionSummary: routeDef.misconceptionSummary,
+          workedExample: routeDef.workedExample,
+          guidedPrompt: routeDef.guidedPrompt,
+          guidedAnswer: routeDef.guidedAnswer,
+          isActive: true,
+        },
+      });
+
+      for (let i = 0; i < routeDef.steps.length; i++) {
+        const [title, explanation, checkpointQuestion, checkpointOptions, checkpointAnswer] = routeDef.steps[i];
+        const alternativeHint = `Try this: ${explanation}`;
+        await prisma.explanationStep.upsert({
+          where: { explanationRouteId_stepOrder: { explanationRouteId: route.id, stepOrder: i + 1 } },
+          update: { title, explanation, checkpointQuestion, checkpointOptions, checkpointAnswer, alternativeHint },
+          create: {
+            explanationRouteId: route.id,
+            stepOrder: i + 1,
+            title,
+            explanation,
+            checkpointQuestion,
+            checkpointOptions,
+            checkpointAnswer,
+            alternativeHint,
+          },
+        });
+      }
+    }
+  }
+
   console.log('✅ Seed complete:', {
     student: student.email,
     subject: subject.title,

@@ -8,6 +8,8 @@ import { emitEvent } from '@/features/telemetry/eventService';
 import { updatePayloadAfterAttempt } from '@/features/diagnostic/diagnosticService';
 import { parseItemOptions } from '@/features/items/itemMeta';
 import { decideN1Route } from '@/features/diagnostic/n1Routing';
+import { grantReward } from '@/features/gamification/gamificationService';
+import { inferN11MisconceptionTag } from '@/features/diagnostic/misconceptions';
 
 const submitSchema = z.object({
   sessionId: z.string(),
@@ -39,16 +41,24 @@ export async function POST(req: NextRequest) {
   if (!item) return NextResponse.json({ error: 'Item not found' }, { status: 404 });
 
   const correct = gradeAttempt(item.answer, answer);
+  const parsedOptions = parseItemOptions(item.options);
+
+  const inferredTag = inferN11MisconceptionTag(
+    skillCode,
+    answer,
+    parsedOptions.choices,
+    correct,
+    (item as { misconceptionMap?: Record<string, 'm1' | 'm2' | 'm3' | 'm4'> }).misconceptionMap
+  );
+  const misconceptionTag = inferredTag ?? parsedOptions.meta.misconceptionTag ?? undefined;
 
   const attempt = await prisma.attempt.create({
     data: { userId, itemId, answer, correct, sessionId, mode: 'DIAGNOSTIC' },
   });
 
   const currentPayload = diagSession.payload as unknown as Parameters<typeof updatePayloadAfterAttempt>[0];
-  const parsedOptions = parseItemOptions(item.options);
-
   const updatedPayload = updatePayloadAfterAttempt(currentPayload, skillCode, strand, correct, {
-    misconceptionTag: parsedOptions.meta.misconceptionTag,
+    misconceptionTag,
     isTransfer: parsedOptions.meta.questionRole === 'transfer' || parsedOptions.meta.transferLevel !== 'none',
   });
 
@@ -91,7 +101,17 @@ export async function POST(req: NextRequest) {
     subjectId,
     skillId,
     itemId,
-    payload: { itemId, answer, skillId, skillCode, strand, subjectId, mode: 'DIAGNOSTIC', diagnosticSessionId: sessionId },
+    payload: {
+      itemId,
+      answer,
+      skillId,
+      skillCode,
+      strand,
+      subjectId,
+      mode: 'DIAGNOSTIC',
+      diagnosticSessionId: sessionId,
+      misconceptionTag,
+    },
   });
 
   await emitEvent({
@@ -102,7 +122,35 @@ export async function POST(req: NextRequest) {
     skillId,
     itemId,
     attemptId: attempt.id,
-    payload: { itemId, attemptId: attempt.id, correct, skillId, skillCode, strand, subjectId, mode: 'DIAGNOSTIC', diagnosticSessionId: sessionId },
+    payload: {
+      itemId,
+      attemptId: attempt.id,
+      correct,
+      skillId,
+      skillCode,
+      strand,
+      subjectId,
+      mode: 'DIAGNOSTIC',
+      diagnosticSessionId: sessionId,
+      misconceptionTag,
+    },
+  });
+
+  await emitEvent({
+    name: 'question_answered',
+    actorUserId: userId,
+    studentUserId: userId,
+    subjectId,
+    skillId,
+    itemId,
+    attemptId: attempt.id,
+    payload: { itemId, skillId, subjectId, correct, mode: 'DIAGNOSTIC' },
+  });
+
+  await grantReward(userId, subjectId, correct ? 'diagnostic_item_correct' : 'diagnostic_item_incorrect', {
+    itemId,
+    skillId,
+    mode: 'DIAGNOSTIC',
   });
 
   if (routeDecision) {

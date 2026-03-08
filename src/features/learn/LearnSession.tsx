@@ -2,6 +2,8 @@
 
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { ReteachSession } from './ReteachSession';
+import type { ReteachPlan } from './reteachContent';
 import { parseAnswerType, parseItemOptions } from '@/features/items/itemMeta';
 
 interface Item {
@@ -27,14 +29,24 @@ interface Subject {
   slug: string;
 }
 
+interface GamificationSummary {
+  xp: number;
+  tokens: number;
+  streakDays: number;
+  activeDaysThisWeek: number;
+}
+
 interface Props {
   subject: Subject;
   skill: Skill;
   items: Item[];
   userId: string;
+  gamification: GamificationSummary;
+  routeType: 'A' | 'B' | 'C';
+  reteachPlan: ReteachPlan;
 }
 
-type Phase = 'intro' | 'session' | 'results';
+type Phase = 'intro' | 'reteach' | 'session' | 'results';
 
 const SHOW_DEBUG = process.env.NEXT_PUBLIC_SHOW_DEBUG === 'true';
 
@@ -44,8 +56,7 @@ function getMasteryTextColor(masteryPct: number) {
   return 'text-rose-500';
 }
 
-
-export function LearnSession({ subject, skill, items, userId }: Props) {
+export function LearnSession({ subject, skill, items, userId, gamification, routeType, reteachPlan }: Props) {
   const [phase, setPhase] = useState<Phase>('intro');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState('');
@@ -60,7 +71,7 @@ export function LearnSession({ subject, skill, items, userId }: Props) {
   const options = parsedOptions.choices;
 
   async function submitAnswer() {
-    if (!selectedAnswer || !currentItem || submitting) return;
+    if (!selectedAnswer.trim() || !currentItem || submitting) return;
     setSubmitting(true);
     setError(null);
 
@@ -74,19 +85,17 @@ export function LearnSession({ subject, skill, items, userId }: Props) {
           subjectId: subject.id,
           answer: selectedAnswer,
           isLast: currentIndex === items.length - 1,
+          questionIndex: currentIndex,
           totalItems: items.length,
+          routeType,
           previousResults: results,
         }),
       });
 
-      if (!res.ok) {
-        throw new Error(`Attempt submission failed (${res.status})`);
-      }
+      if (!res.ok) throw new Error(`Attempt submission failed (${res.status})`);
 
       const data = (await res.json()) as { correct?: boolean };
-      if (typeof data.correct !== 'boolean') {
-        throw new Error('Invalid response from server');
-      }
+      if (typeof data.correct !== 'boolean') throw new Error('Invalid response from server');
 
       const newResults = [...results, { itemId: currentItem.id, correct: data.correct }];
       setResults(newResults);
@@ -118,6 +127,26 @@ export function LearnSession({ subject, skill, items, userId }: Props) {
               </p>
             )}
           </div>
+
+          <div className="grid grid-cols-3 gap-3 text-center text-xs sm:text-sm">
+            <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+              <p className="text-slate-500">XP</p>
+              <p className="font-semibold text-slate-900">{gamification.xp}</p>
+            </div>
+            <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+              <p className="text-slate-500">Streak</p>
+              <p className="font-semibold text-slate-900">
+                {gamification.streakDays} day{gamification.streakDays === 1 ? '' : 's'}
+              </p>
+            </div>
+            <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+              <p className="text-slate-500">Tokens</p>
+              <p className="font-semibold text-slate-900">{gamification.tokens}</p>
+            </div>
+          </div>
+
+          <p className="text-xs uppercase tracking-wide text-slate-500">Explanation route: {routeType}</p>
+
           {skill.intro && (
             <div className="rounded-lg border border-blue-100 bg-blue-50/60 px-4 py-3 text-sm leading-6 text-gray-700">
               <p>{skill.intro}</p>
@@ -125,15 +154,15 @@ export function LearnSession({ subject, skill, items, userId }: Props) {
           )}
           {skill.description && !skill.intro && <p className="text-sm leading-6 text-gray-600">{skill.description}</p>}
 
-          {!hasItems && <p className="text-sm text-amber-700">No questions are available for this skill yet.</p>}
+          {!hasItems && <p className="text-sm text-amber-700">No key questions are available for this skill yet.</p>}
 
           <div className="flex flex-wrap gap-3 pt-1">
             <button
-              onClick={() => setPhase('session')}
+              onClick={() => setPhase('reteach')}
               disabled={!hasItems}
               className="inline-flex flex-1 items-center justify-center rounded-lg bg-blue-600 px-4 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
             >
-              Start Session ({items.length} questions)
+              Start Reteach ({items.length} key questions follow)
             </button>
             <button
               onClick={() => router.push('/dashboard')}
@@ -142,6 +171,22 @@ export function LearnSession({ subject, skill, items, userId }: Props) {
               Back
             </button>
           </div>
+        </div>
+      </main>
+    );
+  }
+
+  if (phase === 'reteach') {
+    return (
+      <main className="anx-shell flex items-center justify-center">
+        <div className="anx-panel w-full max-w-2xl p-7 sm:p-8">
+          <ReteachSession
+            subjectId={subject.id}
+            skillId={skill.id}
+            routeType={routeType}
+            plan={reteachPlan}
+            onComplete={() => setPhase('session')}
+          />
         </div>
       </main>
     );
@@ -163,8 +208,7 @@ export function LearnSession({ subject, skill, items, userId }: Props) {
 
           {(parsedOptions.meta.route || parsedOptions.meta.questionRole !== 'practice') && (
             <p className="text-xs text-blue-700">
-              {parsedOptions.meta.route ? `Route ${parsedOptions.meta.route}` : 'Guided practice'}
-              {' · '}
+              {parsedOptions.meta.route ? `Route ${parsedOptions.meta.route}` : 'Guided practice'} ·{' '}
               {parsedOptions.meta.questionRole.replace('_', ' ')}
             </p>
           )}
@@ -177,6 +221,13 @@ export function LearnSession({ subject, skill, items, userId }: Props) {
           </div>
 
           <h2 className="text-xl font-semibold leading-snug text-gray-900">{currentItem.question}</h2>
+
+          <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm text-slate-700">
+            <p>
+              Correct so far: <span className="font-semibold">{results.filter((r) => r.correct).length}</span> / {results.length}
+            </p>
+            <p className="text-xs text-slate-500 mt-1">Skill trajectory: Not Yet → Developing → Secure</p>
+          </div>
 
           <div className="space-y-3">
             {answerType === 'MCQ' ? (
@@ -204,7 +255,7 @@ export function LearnSession({ subject, skill, items, userId }: Props) {
               )
             ) : (
               <input
-                type={answerType === 'SHORT_NUMERIC' ? 'text' : 'text'}
+                type="text"
                 value={selectedAnswer}
                 onChange={(e) => {
                   setSelectedAnswer(e.target.value);
@@ -233,6 +284,7 @@ export function LearnSession({ subject, skill, items, userId }: Props) {
   if (phase === 'results') {
     const correctCount = results.filter((r) => r.correct).length;
     const masteryPct = results.length > 0 ? Math.round((correctCount / results.length) * 100) : 0;
+    const estimatedXp = results.reduce((sum, r) => sum + (r.correct ? 5 : 2), 0) + 20;
 
     return (
       <main className="flex min-h-screen items-center justify-center bg-gray-50 p-4 sm:p-6">
@@ -247,13 +299,16 @@ export function LearnSession({ subject, skill, items, userId }: Props) {
             <p className="mt-2 text-sm text-gray-600">
               {correctCount} out of {results.length} correct
             </p>
+            <p className="mt-1 text-xs text-slate-500">Estimated XP earned this route: +{estimatedXp}</p>
           </div>
 
           <div className="space-y-2 rounded-xl border border-gray-100 bg-white p-3">
             {results.map((r, i) => (
               <div key={r.itemId} className="flex items-center gap-3 rounded-lg px-2 py-1.5 text-sm">
                 <span
-                  className={`flex h-5 w-5 items-center justify-center rounded-full text-xs font-bold text-white ${r.correct ? 'bg-emerald-500' : 'bg-rose-500'}`}
+                  className={`flex h-5 w-5 items-center justify-center rounded-full text-xs font-bold text-white ${
+                    r.correct ? 'bg-emerald-500' : 'bg-rose-500'
+                  }`}
                 >
                   {r.correct ? '✓' : '✗'}
                 </span>

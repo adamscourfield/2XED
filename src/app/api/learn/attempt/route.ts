@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { gradeAttempt } from '@/features/learn/gradeAttempt';
 import { emitEvent } from '@/features/telemetry/eventService';
 import { updateSkillMastery } from '@/features/mastery/updateMastery';
-import { parseItemOptions } from '@/features/items/itemMeta';
+import { grantReward, maybeGrantDailyStreak } from '@/features/gamification/gamificationService';
 
 const attemptSchema = z.object({
   itemId: z.string(),
@@ -14,6 +14,8 @@ const attemptSchema = z.object({
   subjectId: z.string(),
   answer: z.string(),
   isLast: z.boolean(),
+  questionIndex: z.number().int().nonnegative().optional(),
+  routeType: z.enum(['A', 'B', 'C']).optional(),
   totalItems: z.number(),
   previousResults: z.array(z.object({ itemId: z.string(), correct: z.boolean() })),
 });
@@ -32,7 +34,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid input' }, { status: 400 });
   }
 
-  const { itemId, skillId, subjectId, answer, isLast, totalItems, previousResults } = parsed.data;
+  const { itemId, skillId, subjectId, answer, isLast, questionIndex, routeType, totalItems, previousResults } = parsed.data;
 
   const item = await prisma.item.findUnique({ where: { id: itemId } });
   if (!item) {
@@ -41,8 +43,18 @@ export async function POST(req: NextRequest) {
 
   const correct = gradeAttempt(item.answer, answer);
 
+  const skillMastery = await prisma.skillMastery.findUnique({
+    where: { userId_skillId: { userId, skillId } },
+    select: { nextReviewAt: true },
+  });
+  const now = new Date();
+  const isDueReview = skillMastery?.nextReviewAt != null && skillMastery.nextReviewAt <= now;
+  const mode = isDueReview ? 'REVIEW' : 'PRACTICE';
+
+  const isShadowQuestion = typeof questionIndex === 'number' && totalItems >= 2 && questionIndex >= totalItems - 2;
+
   const attempt = await prisma.attempt.create({
-    data: { userId, itemId, answer, correct },
+    data: { userId, itemId, answer, correct, mode },
   });
 
   await emitEvent({
@@ -66,44 +78,81 @@ export async function POST(req: NextRequest) {
     payload: { itemId, attemptId: attempt.id, correct, skillId, subjectId },
   });
 
-  // N1.1 shadow gate events (route-level pass/fail) for richer routing telemetry
-  const parsedItemOptions = parseItemOptions(item.options);
-  if (parsedItemOptions.meta.questionRole === 'shadow' && parsedItemOptions.meta.route) {
-    const recentSkillAttempts = await prisma.attempt.findMany({
-      where: {
-        userId,
-        item: { skills: { some: { skillId } } },
-      },
-      include: { item: true },
-      orderBy: { createdAt: 'desc' },
-      take: 10,
+  await emitEvent({
+    name: 'question_answered',
+    actorUserId: userId,
+    studentUserId: userId,
+    subjectId,
+    skillId,
+    itemId,
+    attemptId: attempt.id,
+    payload: { itemId, skillId, subjectId, correct, mode },
+  });
+
+  await grantReward(
+    userId,
+    subjectId,
+    isShadowQuestion && correct ? 'shadow_item_correct' : correct ? 'diagnostic_item_correct' : 'diagnostic_item_incorrect',
+    {
+      itemId,
+      skillId,
+      mode,
+      isShadowQuestion,
+      routeType,
+    }
+  );
+
+  const hadRecentIncorrect = await prisma.attempt.findFirst({
+    where: {
+      userId,
+      itemId,
+      correct: false,
+      createdAt: { lt: attempt.createdAt },
+    },
+    select: { id: true },
+  });
+
+  if (correct && hadRecentIncorrect) {
+    await grantReward(userId, subjectId, 'retry_recovery', { itemId, skillId, mode });
+  }
+
+  await maybeGrantDailyStreak(userId, subjectId);
+
+  if (isLast) {
+    const allResults = [...previousResults, { itemId, correct }];
+    const correctCount = allResults.filter((r) => r.correct).length;
+    const accuracy = totalItems > 0 ? correctCount / totalItems : 0;
+
+    await emitEvent({
+      name: 'route_completed',
+      actorUserId: userId,
+      studentUserId: userId,
+      subjectId,
+      skillId,
+      payload: { skillId, subjectId, totalItems, correctCount, accuracy, routeType: routeType ?? 'A' },
     });
 
-    const recentRouteShadows = recentSkillAttempts
-      .filter((a) => {
-        const m = parseItemOptions(a.item.options).meta;
-        return m.questionRole === 'shadow' && m.route === parsedItemOptions.meta.route;
-      })
-      .slice(0, 2);
+    await grantReward(userId, subjectId, 'route_completed', { skillId, accuracy, routeType: routeType ?? 'A' });
 
-    if (recentRouteShadows.length === 2) {
-      const passed = recentRouteShadows.every((a) => a.correct);
+    const shadowPair = allResults.slice(-2);
+    if (shadowPair.length === 2) {
+      const shadowPassed = shadowPair.every((r) => r.correct);
       await emitEvent({
-        name: passed ? 'shadow_pair_passed' : 'shadow_pair_failed',
+        name: shadowPassed ? 'shadow_pair_passed' : 'shadow_pair_failed',
         actorUserId: userId,
         studentUserId: userId,
         subjectId,
         skillId,
-        itemId,
-        attemptId: attempt.id,
         payload: {
-          route: parsedItemOptions.meta.route,
-          attemptIds: recentRouteShadows.map((a) => a.id),
-          passed,
+          skillId,
+          subjectId,
+          routeType: routeType ?? 'A',
+          pairSize: 2,
+          correctCount: shadowPair.filter((r) => r.correct).length,
         },
       });
 
-      if (!passed && parsedItemOptions.meta.route === 'C') {
+      if (!shadowPassed && (routeType ?? 'A') === 'C') {
         await prisma.interventionFlag.upsert({
           where: { userId_skillId: { userId, skillId } },
           update: { isResolved: false, lastSeenAt: new Date(), reason: 'N1.1 route C shadow pair failed' },
@@ -116,26 +165,10 @@ export async function POST(req: NextRequest) {
           studentUserId: userId,
           subjectId,
           skillId,
-          itemId,
-          attemptId: attempt.id,
-          payload: { reason: 'N1.1 route C shadow pair failed', route: 'C' },
+          payload: { reason: 'N1.1 route C shadow pair failed', routeType: 'C' },
         });
       }
     }
-  }
-
-  if (isLast) {
-    const allResults = [...previousResults, { itemId, correct }];
-    const correctCount = allResults.filter((r) => r.correct).length;
-
-    // Detect if this is a due review
-    const skillMastery = await prisma.skillMastery.findUnique({
-      where: { userId_skillId: { userId, skillId } },
-      select: { nextReviewAt: true },
-    });
-    const now = new Date();
-    const isDueReview = skillMastery?.nextReviewAt != null && skillMastery.nextReviewAt <= now;
-    const mode = isDueReview ? 'REVIEW' : 'PRACTICE';
 
     await updateSkillMastery(userId, skillId, subjectId, correctCount, totalItems, mode);
   }
