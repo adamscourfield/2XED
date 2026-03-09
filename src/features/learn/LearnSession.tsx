@@ -238,7 +238,7 @@ export function LearnSession({ subject, skill, items, userId, gamification, rout
             {answerType === 'MCQ' ? (
               options.length === 0 ? (
                 <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
-                  This question has no valid options. Please go back and try again.
+                  This question has no options yet.
                 </p>
               ) : (
                 options.map((option, i) => (
@@ -279,14 +279,14 @@ export function LearnSession({ subject, skill, items, userId, gamification, rout
 
           {error && <p className="text-sm text-rose-600">{error}</p>}
           {feedbackFlash === 'correct' && <p className="text-sm font-semibold text-emerald-600">+AX</p>}
-          {feedbackFlash === 'incorrect' && <p className="text-sm text-amber-600">Keep going — you still earn progress.</p>}
+          {feedbackFlash === 'incorrect' && <p className="text-sm text-amber-600">Good try — keep going.</p>}
 
           <button
             onClick={submitAnswer}
             disabled={!selectedAnswer.trim() || submitting || (answerType === 'MCQ' && options.length === 0)}
             className="w-full rounded-lg bg-blue-600 py-3 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
           >
-            {submitting ? 'Submitting…' : currentIndex < items.length - 1 ? 'Next' : 'Finish'}
+            {submitting ? 'Saving…' : currentIndex < items.length - 1 ? 'Next question' : 'Finish session'}
           </button>
         </div>
       </main>

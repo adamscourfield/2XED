@@ -114,9 +114,9 @@ export function BaselineRunClient({ subjectSlug }: { subjectSlug: string }) {
     }
   }
 
-  if (loading) return <div className="p-8 text-sm text-slate-600">Preparing baseline assessment…</div>;
+  if (loading) return <div className="p-8 text-sm text-slate-600">Getting your baseline ready…</div>;
   if (error) return <div className="p-8 text-sm text-rose-600">{error}</div>;
-  if (!item) return <div className="p-8 text-sm text-slate-600">Loading next question…</div>;
+  if (!item) return <div className="p-8 text-sm text-slate-600">Loading your next question…</div>;
 
   return (
     <main className="anx-shell flex items-center justify-center">
@@ -165,7 +165,7 @@ export function BaselineRunClient({ subjectSlug }: { subjectSlug: string }) {
           disabled={!selectedAnswer.trim() || submitting}
           className="anx-btn-primary w-full"
         >
-          {submitting ? 'Submitting…' : 'Next'}
+          {submitting ? 'Saving…' : 'Next question'}
         </button>
       </div>
     </main>

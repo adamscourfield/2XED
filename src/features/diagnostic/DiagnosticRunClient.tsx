@@ -127,7 +127,7 @@ export function DiagnosticRunClient({ subject, skill, item, sessionId, itemsSeen
           disabled={!selectedAnswer.trim() || submitting || (answerType === 'MCQ' && parsedOptions.choices.length === 0)}
           className="anx-btn-primary w-full"
         >
-          {submitting ? 'Submitting…' : 'Next'}
+          {submitting ? 'Saving…' : 'Next question'}
         </button>
       </div>
     </main>

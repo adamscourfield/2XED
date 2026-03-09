@@ -125,7 +125,7 @@ export function ReteachSession({ subjectId, skillId, routeType, plan, onComplete
           <p className="font-semibold text-slate-900">Worked example</p>
           <p className="mt-1">{plan.workedExample}</p>
           <button className="anx-btn-primary mt-4 w-full" onClick={() => setStage('guided')}>
-            Next
+            Next step
           </button>
         </div>
       </div>
@@ -147,7 +147,7 @@ export function ReteachSession({ subjectId, skillId, routeType, plan, onComplete
           />
           {!guidedOk && guided.length > 0 && <p className="mt-2 text-xs text-rose-600">Not quite — try again.</p>}
           <button className="anx-btn-primary mt-3 w-full" onClick={onComplete} disabled={!guidedOk}>
-            Continue to key questions
+            Start key questions
           </button>
         </div>
       </div>
