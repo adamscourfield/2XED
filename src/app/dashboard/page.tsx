@@ -25,6 +25,16 @@ function getMasteryStyles(masteryPct: number) {
   };
 }
 
+function getUnitCode(skillCode: string): string {
+  const m = skillCode.match(/^([A-Z]\d+)\./i);
+  return m ? m[1].toUpperCase() : 'OTHER';
+}
+
+function getUnitSortKey(unitCode: string): number {
+  const m = unitCode.match(/^[A-Z](\d+)$/i);
+  return m ? Number(m[1]) : Number.MAX_SAFE_INTEGER;
+}
+
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
   if (!session?.user) redirect('/login');
@@ -91,6 +101,18 @@ export default async function DashboardPage() {
                 : 0;
             const aggregateStyles = getMasteryStyles(aggregateMastery);
 
+            const unitGroups = Object.entries(
+              subtopicSkills.reduce(
+                (acc, skill) => {
+                  const unit = getUnitCode(skill.code);
+                  acc[unit] = acc[unit] ?? [];
+                  acc[unit].push(skill);
+                  return acc;
+                },
+                {} as Record<string, typeof subtopicSkills>
+              )
+            ).sort(([a], [b]) => getUnitSortKey(a) - getUnitSortKey(b));
+
             return (
               <section
                 key={subject.id}
@@ -124,29 +146,68 @@ export default async function DashboardPage() {
                     <div className="h-2 w-full overflow-hidden rounded-full bg-gray-200">
                       <div className={`h-full rounded-full transition-all ${aggregateStyles.bar}`} style={{ width: `${aggregateMastery}%` }} />
                     </div>
-                    <div className="mt-2 text-xs text-gray-500">{subtopicSkills.length} subtopic{subtopicSkills.length === 1 ? '' : 's'}</div>
+                    <div className="mt-2 text-xs text-gray-500">{subtopicSkills.length} subtopic{subtopicSkills.length === 1 ? '' : 's'} • grouped by unit</div>
                   </article>
 
-                  <div className="space-y-2 pl-3 sm:pl-4 border-l-2 border-gray-100">
-                    {subtopicSkills.map((skill) => {
-                      const mastery = skill.masteries[0];
-                      const masteryPct = mastery ? Math.round(mastery.mastery * 100) : 0;
-                      const isDue = !mastery?.nextReviewAt || mastery.nextReviewAt <= now;
-                      const masteryStyles = getMasteryStyles(masteryPct);
+                  <div className="space-y-2">
+                    {unitGroups.map(([unitCode, skillsInUnit]) => {
+                      const unitDue = skillsInUnit.filter((skill) => {
+                        const mastery = skill.masteries[0];
+                        return !mastery?.nextReviewAt || mastery.nextReviewAt <= now;
+                      }).length;
+
+                      const unitMastery =
+                        skillsInUnit.length > 0
+                          ? Math.round(
+                              skillsInUnit.reduce((sum, skill) => {
+                                const mastery = skill.masteries[0];
+                                return sum + (mastery ? mastery.mastery * 100 : 0);
+                              }, 0) / skillsInUnit.length
+                            )
+                          : 0;
+
+                      const unitStyles = getMasteryStyles(unitMastery);
 
                       return (
-                        <article
-                          key={skill.id}
-                          className={`rounded-lg border bg-white p-3 transition-colors ${isDue ? 'border-amber-300' : 'border-gray-200'}`}
-                        >
-                          <div className="mb-2 flex items-center justify-between gap-3">
-                            <span className="text-sm font-medium text-gray-900">{skill.name}</span>
-                            <span className={`text-xs font-semibold tabular-nums ${masteryStyles.text}`}>{masteryPct}%</span>
+                        <details key={unitCode} className="group rounded-lg border border-gray-200 bg-white open:border-blue-200" open={unitDue > 0}>
+                          <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-3 py-2.5">
+                            <div className="flex items-center gap-2">
+                              <span className="inline-block text-xs transition-transform group-open:rotate-90">▶</span>
+                              <span className="text-sm font-semibold text-gray-900">{unitCode}</span>
+                              <span className="text-xs text-gray-500">{skillsInUnit.length} subtopics</span>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              {unitDue > 0 && <span className="rounded bg-amber-100 px-2 py-0.5 text-[11px] font-medium text-amber-800">{unitDue} due</span>}
+                              <span className={`text-xs font-semibold tabular-nums ${unitStyles.text}`}>{unitMastery}%</span>
+                            </div>
+                          </summary>
+
+                          <div className="border-t border-gray-100 px-3 py-3">
+                            <div className="space-y-2 pl-3 sm:pl-4 border-l-2 border-gray-100">
+                              {skillsInUnit.map((skill) => {
+                                const mastery = skill.masteries[0];
+                                const masteryPct = mastery ? Math.round(mastery.mastery * 100) : 0;
+                                const isDue = !mastery?.nextReviewAt || mastery.nextReviewAt <= now;
+                                const masteryStyles = getMasteryStyles(masteryPct);
+
+                                return (
+                                  <article
+                                    key={skill.id}
+                                    className={`rounded-lg border bg-white p-3 transition-colors ${isDue ? 'border-amber-300' : 'border-gray-200'}`}
+                                  >
+                                    <div className="mb-2 flex items-center justify-between gap-3">
+                                      <span className="text-sm font-medium text-gray-900">{skill.code} · {skill.name}</span>
+                                      <span className={`text-xs font-semibold tabular-nums ${masteryStyles.text}`}>{masteryPct}%</span>
+                                    </div>
+                                    <div className="h-1.5 w-full overflow-hidden rounded-full bg-gray-200">
+                                      <div className={`h-full rounded-full transition-all ${masteryStyles.bar}`} style={{ width: `${masteryPct}%` }} />
+                                    </div>
+                                  </article>
+                                );
+                              })}
+                            </div>
                           </div>
-                          <div className="h-1.5 w-full overflow-hidden rounded-full bg-gray-200">
-                            <div className={`h-full rounded-full transition-all ${masteryStyles.bar}`} style={{ width: `${masteryPct}%` }} />
-                          </div>
-                        </article>
+                        </details>
                       );
                     })}
                   </div>
