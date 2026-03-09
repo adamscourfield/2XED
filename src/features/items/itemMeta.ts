@@ -52,6 +52,8 @@ export function stripStudentQuestionLabel(question: unknown): string {
   const patterns = [
     // [N1.1] / [SC:A2] / [SC-C2]
     new RegExp(`^\\s*\\[${codeToken}\\]\\s*`),
+    // N1.1 SC-A2: ... / N1.1 SC:A2 - ... (chained curriculum labels)
+    new RegExp(`^\\s*(?:${codeLikeToken}\\s+){1,3}${codeToken}\\s*[:：\\-–]\\s*`),
     // SC:A2 - ... / SC:A2: ... / SC-C2: ... / N1.1: ...
     new RegExp(`^\\s*${codeToken}\\s*[:：\\-–]\\s*`),
     // SC:A2 DQ ... / N1.1 DQ ... / SC-C2 Q2 ... (only code-like prefix with digits)
