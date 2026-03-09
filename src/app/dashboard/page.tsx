@@ -70,19 +70,26 @@ export default async function DashboardPage() {
 
             if (!baseSkill) return null;
 
-            const displayedSkills = [
-              {
-                ...baseSkill,
-                name: 'Basic Number',
-              },
-            ];
+            const subtopicSkills = sortedSkills;
 
-            const dueSkills = displayedSkills.filter((skill) => {
+            const dueSkills = subtopicSkills.filter((skill) => {
               const mastery = skill.masteries[0];
               if (!mastery) return true;
               if (!mastery.nextReviewAt) return true;
               return mastery.nextReviewAt <= now;
             });
+
+            const aggregateMastery =
+              subtopicSkills.length > 0
+                ? Math.round(
+                    (subtopicSkills.reduce((sum, skill) => {
+                      const mastery = skill.masteries[0];
+                      return sum + (mastery ? mastery.mastery * 100 : 0);
+                    }, 0) /
+                      subtopicSkills.length)
+                  )
+                : 0;
+            const aggregateStyles = getMasteryStyles(aggregateMastery);
 
             return (
               <section
@@ -109,39 +116,40 @@ export default async function DashboardPage() {
                 )}
 
                 <div className="space-y-3">
-                  {displayedSkills.map((skill) => {
-                    const mastery = skill.masteries[0];
-                    const masteryPct = mastery ? Math.round(mastery.mastery * 100) : 0;
-                    const isDue = !mastery?.nextReviewAt || mastery.nextReviewAt <= now;
-                    const masteryStyles = getMasteryStyles(masteryPct);
+                  <article className={`rounded-xl border bg-gray-50/50 p-4 transition-colors ${dueSkills.length > 0 ? 'border-amber-300' : 'border-gray-200'}`}>
+                    <div className="mb-2 flex items-center justify-between gap-3">
+                      <span className="font-medium text-gray-900">Basic Number</span>
+                      <span className={`text-sm font-semibold tabular-nums ${aggregateStyles.text}`}>{aggregateMastery}%</span>
+                    </div>
+                    <div className="h-2 w-full overflow-hidden rounded-full bg-gray-200">
+                      <div className={`h-full rounded-full transition-all ${aggregateStyles.bar}`} style={{ width: `${aggregateMastery}%` }} />
+                    </div>
+                    <div className="mt-2 text-xs text-gray-500">{subtopicSkills.length} subtopic{subtopicSkills.length === 1 ? '' : 's'}</div>
+                  </article>
 
-                    return (
-                      <article
-                        key={skill.id}
-                        className={`rounded-xl border bg-gray-50/50 p-4 transition-colors ${isDue ? 'border-amber-300' : 'border-gray-200'}`}
-                      >
-                        <div className="mb-2 flex items-center justify-between gap-3">
-                          <span className="font-medium text-gray-900">{skill.name}</span>
-                          <span className={`text-sm font-semibold tabular-nums ${masteryStyles.text}`}>{masteryPct}%</span>
-                        </div>
-                        <div className="h-2 w-full overflow-hidden rounded-full bg-gray-200">
-                          <div className={`h-full rounded-full transition-all ${masteryStyles.bar}`} style={{ width: `${masteryPct}%` }} />
-                        </div>
-                        <div className="mt-2 flex items-center justify-between gap-2 text-xs">
-                          <span className="text-gray-500">
-                            {mastery?.lastPracticedAt
-                              ? `Last practiced ${new Date(mastery.lastPracticedAt).toLocaleDateString()}`
-                              : 'Not started'}
-                          </span>
-                          {mastery?.nextReviewAt && (
-                            <span className={isDue ? 'font-medium text-amber-700' : 'text-gray-500'}>
-                              {isDue ? 'Due now' : `Next: ${new Date(mastery.nextReviewAt).toLocaleDateString()}`}
-                            </span>
-                          )}
-                        </div>
-                      </article>
-                    );
-                  })}
+                  <div className="space-y-2 pl-3 sm:pl-4 border-l-2 border-gray-100">
+                    {subtopicSkills.map((skill) => {
+                      const mastery = skill.masteries[0];
+                      const masteryPct = mastery ? Math.round(mastery.mastery * 100) : 0;
+                      const isDue = !mastery?.nextReviewAt || mastery.nextReviewAt <= now;
+                      const masteryStyles = getMasteryStyles(masteryPct);
+
+                      return (
+                        <article
+                          key={skill.id}
+                          className={`rounded-lg border bg-white p-3 transition-colors ${isDue ? 'border-amber-300' : 'border-gray-200'}`}
+                        >
+                          <div className="mb-2 flex items-center justify-between gap-3">
+                            <span className="text-sm font-medium text-gray-900">{skill.name}</span>
+                            <span className={`text-xs font-semibold tabular-nums ${masteryStyles.text}`}>{masteryPct}%</span>
+                          </div>
+                          <div className="h-1.5 w-full overflow-hidden rounded-full bg-gray-200">
+                            <div className={`h-full rounded-full transition-all ${masteryStyles.bar}`} style={{ width: `${masteryPct}%` }} />
+                          </div>
+                        </article>
+                      );
+                    })}
+                  </div>
                 </div>
               </section>
             );
