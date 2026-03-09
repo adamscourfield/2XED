@@ -19,6 +19,9 @@ const schema = z.object({
   interactionCompleted: z.boolean().optional(),
   interactionType: z.string().optional(),
   interactionDurationMs: z.number().int().nonnegative().optional(),
+  completionRuleKind: z.string().optional(),
+  interactionSelected: z.union([z.string(), z.number(), z.array(z.string())]).optional(),
+  interactionExpected: z.union([z.string(), z.number(), z.array(z.string())]).optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -43,6 +46,9 @@ export async function POST(req: NextRequest) {
     interactionCompleted,
     interactionType,
     interactionDurationMs,
+    completionRuleKind,
+    interactionSelected,
+    interactionExpected,
   } = parsed.data;
   const inferredConfidence = durationMs == null ? 'medium' : durationMs > 15000 ? 'low' : durationMs > 7000 ? 'medium' : 'high';
 
@@ -95,6 +101,42 @@ export async function POST(req: NextRequest) {
         stepIndex,
         stepTitle,
         interactionType: interactionType ?? 'none',
+        interactionDurationMs: interactionDurationMs ?? null,
+      },
+    });
+  }
+
+  const ruleKind = completionRuleKind ?? 'selection_required';
+  const rulePassed = interactionCompleted ?? false;
+  let errorType: string | undefined;
+  if (!rulePassed) {
+    if (
+      ruleKind === 'first_difference_correct' &&
+      typeof interactionSelected === 'number' &&
+      typeof interactionExpected === 'number'
+    ) {
+      errorType = interactionSelected !== interactionExpected ? 'wrong_first_difference' : 'rule_not_met';
+    } else {
+      errorType = 'rule_not_met';
+    }
+  }
+
+  if ((interactionType ?? 'none') !== 'none') {
+    await emitEvent({
+      name: 'step_interaction_evaluated',
+      actorUserId: userId,
+      studentUserId: userId,
+      subjectId,
+      skillId,
+      payload: {
+        routeType,
+        stepIndex,
+        stepTitle,
+        interactionType: interactionType ?? 'none',
+        ruleKind,
+        rulePassed,
+        errorType,
+        attemptsBeforePass: rulePassed ? retryCount : undefined,
         interactionDurationMs: interactionDurationMs ?? null,
       },
     });

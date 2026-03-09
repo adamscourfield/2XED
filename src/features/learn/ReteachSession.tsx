@@ -80,6 +80,9 @@ export function ReteachSession({ subjectId, skillId, routeType, plan, onComplete
         interactionCompleted: interactionStatus.completed,
         interactionType: step.interaction?.type ?? step.visualType ?? 'none',
         interactionDurationMs,
+        completionRuleKind: step.interaction?.completionRule?.kind ?? 'selection_required',
+        interactionSelected: interactionStatus.selected ?? null,
+        interactionExpected: interactionStatus.firstDiff ?? null,
       }),
     });
 
