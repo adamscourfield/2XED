@@ -385,7 +385,14 @@ export function LearnSession({ subject, skill, items, userId, gamification, rout
               </button>
             )}
             <button
-              onClick={() => router.push(`/learn/${subject.slug}`)}
+              onClick={() => {
+                setCurrentIndex(0);
+                setSelectedAnswer('');
+                setResults([]);
+                setError(null);
+                setFeedbackFlash(null);
+                setPhase('session');
+              }}
               className="inline-flex flex-1 items-center justify-center rounded-lg border border-gray-300 px-4 py-3 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
             >
               Practice Again
