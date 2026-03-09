@@ -8,7 +8,7 @@ function normalizeAnswer(input: string): string {
   const normalized = stripDiacritics(input)
     .toLowerCase()
     .replace(/&/g, ' and ')
-    .replace(/,/g, ' ')
+    .replace(/,/g, '')
     .replace(/\band\b/g, ' ')
     .replace(/[’']/g, '')
     .replace(/[-_]/g, ' ')
