@@ -893,6 +893,264 @@ async function main() {
     }
   }
 
+  // 🔟 N1.3 item set + explanation routes (A/B/C)
+  const n13SkillId = skillMap.get('N1.3');
+  if (n13SkillId) {
+    const n13RealItems: Array<{
+      question: string;
+      type: string;
+      options: unknown;
+      answer: string;
+      misconceptionMap?: Record<string, string>;
+    }> = [
+      {
+        question: 'N1.3 DQ1: Which statement is true?',
+        type: 'MCQ',
+        options: {
+          choices: ['7 > 12', '7 < 12', '7 ≥ 12', '7 = 12'],
+          meta: { role: 'anchor', misconception_tag: 'm1', transfer_level: 'none' },
+        },
+        answer: '7 < 12',
+        misconceptionMap: { '7 > 12': 'm1', '7 ≥ 12': 'm3', '7 = 12': 'm1' },
+      },
+      {
+        question: 'N1.3 DQ2: Which inequality is true when x = 5?',
+        type: 'MCQ',
+        options: {
+          choices: ['x > 5', 'x < 5', 'x ≥ 5', 'x ≠ 5'],
+          meta: { role: 'misconception', misconception_tag: 'm3', transfer_level: 'none' },
+        },
+        answer: 'x ≥ 5',
+        misconceptionMap: { 'x > 5': 'm3', 'x < 5': 'm1', 'x ≠ 5': 'm3' },
+      },
+      {
+        question: 'N1.3 DQ3: Which is correct?',
+        type: 'MCQ',
+        options: {
+          choices: ['-3 > -8', '-3 < -8', '-8 ≥ -3', '-3 = -8'],
+          meta: { role: 'transfer', misconception_tag: 'm2', transfer_level: 'medium' },
+        },
+        answer: '-3 > -8',
+        misconceptionMap: { '-3 < -8': 'm2', '-8 ≥ -3': 'm2', '-3 = -8': 'm1' },
+      },
+      {
+        question: 'N1.3 SC-A1: Choose the true statement.',
+        type: 'MCQ',
+        options: {
+          choices: ['15 < 9', '15 > 9', '15 ≤ 9', '15 = 9'],
+          meta: { role: 'shadow', route: 'A' },
+        },
+        answer: '15 > 9',
+      },
+      {
+        question: 'N1.3 SC-A2: Fill the symbol: 42 __ 24',
+        type: 'MCQ',
+        options: {
+          choices: ['<', '>', '=', '≤'],
+          meta: { role: 'shadow', route: 'A' },
+        },
+        answer: '>',
+      },
+      {
+        question: 'N1.3 SC-B1: If y = 10, which is true?',
+        type: 'MCQ',
+        options: {
+          choices: ['y > 10', 'y ≥ 10', 'y < 10', 'y ≠ 10'],
+          meta: { role: 'shadow', route: 'B' },
+        },
+        answer: 'y ≥ 10',
+      },
+      {
+        question: 'N1.3 SC-B2: Which is true for z = -4?',
+        type: 'MCQ',
+        options: {
+          choices: ['z > -4', 'z ≥ -4', 'z < -4', 'z ≠ -4'],
+          meta: { role: 'shadow', route: 'B' },
+        },
+        answer: 'z ≥ -4',
+      },
+      {
+        question: 'N1.3 SC-C1: Which is greater?',
+        type: 'MCQ',
+        options: {
+          choices: ['-12', '-21', 'They are equal', 'Cannot tell'],
+          meta: { role: 'shadow', route: 'C' },
+        },
+        answer: '-12',
+      },
+      {
+        question: 'N1.3 SC-C2: Put in order (smallest to largest): -5, 0, -2, 3',
+        type: 'MCQ',
+        options: {
+          choices: ['-5, -2, 0, 3', '-2, -5, 0, 3', '0, -2, -5, 3', '-5, 0, -2, 3'],
+          meta: { role: 'shadow', route: 'C' },
+        },
+        answer: '-5, -2, 0, 3',
+      },
+    ];
+
+    for (const itemData of n13RealItems) {
+      let item = await prisma.item.findFirst({ where: { question: itemData.question, subjectId: subject.id } });
+      if (!item) {
+        item = await prisma.item.create({
+          data: {
+            question: itemData.question,
+            type: itemData.type,
+            options: itemData.options as object,
+            answer: itemData.answer,
+            misconceptionMap: itemData.misconceptionMap as object | undefined,
+            subjectId: subject.id,
+          },
+        });
+      } else {
+        await prisma.item.update({
+          where: { id: item.id },
+          data: {
+            type: itemData.type,
+            options: itemData.options as object,
+            answer: itemData.answer,
+            misconceptionMap: itemData.misconceptionMap as object | undefined,
+          },
+        });
+      }
+
+      await prisma.itemSkill.upsert({
+        where: { itemId_skillId: { itemId: item.id, skillId: n13SkillId } },
+        update: {},
+        create: { itemId: item.id, skillId: n13SkillId },
+      });
+    }
+
+    const routeDefsN13 = [
+      {
+        routeType: 'A',
+        misconceptionSummary: 'You may be reversing < and > when comparing two values.',
+        workedExample: '8 < 11 means 8 is smaller than 11.',
+        guidedPrompt: 'Write the correct symbol: 14 __ 9',
+        guidedAnswer: '>',
+        steps: [
+          ['Read symbols as arrows', 'The open side faces the larger value.', 'Which is true?', ['3 < 7', '3 > 7', '3 ≥ 7', '3 = 7'], '3 < 7'],
+          ['Compare before choosing symbol', 'Decide which number is larger first, then place the symbol.', '19 __ 23', ['<', '>', '=', '≥'], '<'],
+          ['Check by reverse reading', 'Read your inequality aloud both ways to catch direction flips.', 'True statement?', ['45 > 54', '45 < 54', '45 = 54', '45 ≥ 54'], '45 < 54'],
+        ],
+      },
+      {
+        routeType: 'B',
+        misconceptionSummary: 'You may be treating strict and inclusive inequalities as the same.',
+        workedExample: 'If x = 6, then x ≥ 6 is true but x > 6 is false.',
+        guidedPrompt: 'If a = 12, which is true: a > 12 or a ≥ 12?',
+        guidedAnswer: 'a ≥ 12',
+        steps: [
+          ['Strict means not equal', '> and < do not include equality.', 'If p = 4, true statement?', ['p > 4', 'p < 4', 'p ≥ 4', 'p ≠ 4'], 'p ≥ 4'],
+          ['Inclusive includes equality', '≥ and ≤ include the boundary value.', 'If q = -1, true statement?', ['q > -1', 'q ≥ -1', 'q < -1', 'q ≠ -1'], 'q ≥ -1'],
+          ['Boundary check strategy', 'Substitute the boundary value to test the statement.', 'At t = 0, which is true?', ['t < 0', 't ≤ 0', 't > 0', 't ≠ 0'], 't ≤ 0'],
+        ],
+      },
+      {
+        routeType: 'C',
+        misconceptionSummary: 'You may be misordering negative numbers or comparing place values too quickly.',
+        workedExample: '-2 > -9 because -2 is closer to zero.',
+        guidedPrompt: 'Which is greater: -15 or -6?',
+        guidedAnswer: '-6',
+        steps: [
+          ['Use a number line model', 'Numbers further right are greater, including negatives.', 'Which is greater?', ['-7', '-3', 'equal', 'cannot tell'], '-3'],
+          ['Compare full place value', 'For positive integers, compare highest place first, then move right.', 'Which is larger?', ['3,405', '3,450', 'equal', 'cannot tell'], '3,450'],
+          ['Order mixed integers', 'Mix negatives, zero, and positives in ascending order.', 'Smallest to largest?', ['-4, -1, 0, 2', '-1, -4, 0, 2', '0, -4, -1, 2', '-4, 0, -1, 2'], '-4, -1, 0, 2'],
+        ],
+      },
+    ] as const;
+
+    const compareColumnsType = await prisma.interactionType.findUnique({
+      where: { key_version: { key: 'compare_columns', version: 'v1' } },
+      select: { id: true },
+    });
+
+    for (const routeDef of routeDefsN13) {
+      const route = await prisma.explanationRoute.upsert({
+        where: { skillId_routeType: { skillId: n13SkillId, routeType: routeDef.routeType } },
+        update: {
+          misconceptionSummary: routeDef.misconceptionSummary,
+          workedExample: routeDef.workedExample,
+          guidedPrompt: routeDef.guidedPrompt,
+          guidedAnswer: routeDef.guidedAnswer,
+          isActive: true,
+        },
+        create: {
+          skillId: n13SkillId,
+          routeType: routeDef.routeType,
+          misconceptionSummary: routeDef.misconceptionSummary,
+          workedExample: routeDef.workedExample,
+          guidedPrompt: routeDef.guidedPrompt,
+          guidedAnswer: routeDef.guidedAnswer,
+          isActive: true,
+        },
+      });
+
+      for (let i = 0; i < routeDef.steps.length; i++) {
+        const [title, explanation, checkpointQuestion, checkpointOptions, checkpointAnswer] = routeDef.steps[i];
+        const step = await prisma.explanationStep.upsert({
+          where: { explanationRouteId_stepOrder: { explanationRouteId: route.id, stepOrder: i + 1 } },
+          update: {
+            title,
+            explanation,
+            stepType: i === 0 ? 'visual_demo' : i === routeDef.steps.length - 1 ? 'transfer_check' : 'guided_action',
+            checkpointQuestion,
+            checkpointOptions: {
+              options: [...checkpointOptions],
+              stepType: 'checkpoint',
+              visualType: 'compare_columns',
+              visualPayload: { mode: routeDef.routeType === 'C' ? 'integer_order' : 'inequality_symbol' },
+            },
+            checkpointAnswer,
+            alternativeHint: `Try checking with a number line or place-value comparison: ${explanation}`,
+          },
+          create: {
+            explanationRouteId: route.id,
+            stepOrder: i + 1,
+            title,
+            explanation,
+            stepType: i === 0 ? 'visual_demo' : i === routeDef.steps.length - 1 ? 'transfer_check' : 'guided_action',
+            checkpointQuestion,
+            checkpointOptions: {
+              options: [...checkpointOptions],
+              stepType: 'checkpoint',
+              visualType: 'compare_columns',
+              visualPayload: { mode: routeDef.routeType === 'C' ? 'integer_order' : 'inequality_symbol' },
+            },
+            checkpointAnswer,
+            alternativeHint: `Try checking with a number line or place-value comparison: ${explanation}`,
+          },
+        });
+
+        if (compareColumnsType?.id) {
+          await prisma.stepInteraction.upsert({
+            where: { explanationStepId_sortOrder: { explanationStepId: step.id, sortOrder: 1 } },
+            update: {
+              interactionTypeId: compareColumnsType.id,
+              config: {
+                mode: routeDef.routeType === 'C' ? 'integer_order' : 'inequality_symbol',
+                routeType: routeDef.routeType,
+                step: i + 1,
+              },
+              completionRule: { kind: 'first_difference_correct' },
+            },
+            create: {
+              explanationStepId: step.id,
+              sortOrder: 1,
+              interactionTypeId: compareColumnsType.id,
+              config: {
+                mode: routeDef.routeType === 'C' ? 'integer_order' : 'inequality_symbol',
+                routeType: routeDef.routeType,
+                step: i + 1,
+              },
+              completionRule: { kind: 'first_difference_correct' },
+            },
+          });
+        }
+      }
+    }
+  }
+
   console.log('✅ Seed complete:', {
     student: student.email,
     subject: subject.title,
