@@ -74,6 +74,7 @@ export default async function DiagnosticRunPage({ params }: Props) {
   const preferred = availableItems.filter((item) => {
     if (item.question.startsWith('[')) return false;
     if (nextSkill.code === 'N1.1') return item.question.startsWith('N1.1 DQ');
+    if (nextSkill.code === 'N1.2') return item.question.startsWith('N1.2 DQ');
     return true;
   });
 

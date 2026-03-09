@@ -144,6 +144,7 @@ async function main() {
   // 3️⃣ Skill definitions
   const skillDefs = [
     { code: 'N1.1',  name: 'Recognise the place value of each digit in whole numbers up to millions',             strand: 'PV',  isStretch: false, sortOrder: 5   },
+    { code: 'N1.2',  name: 'Write integers in words and figures',                                                    strand: 'PV',  isStretch: false, sortOrder: 7   },
     { code: 'N1.3',  name: 'Compare two numbers using =, ≠, <, >, ≤, ≥',                                            strand: 'PV',  isStretch: false, sortOrder: 10  },
     { code: 'N1.5',  name: 'Find the median from a set of numbers (incl midpoint using a calculator)',               strand: 'STA', isStretch: false, sortOrder: 20  },
     { code: 'N1.6',  name: 'Decimal place value',                                                                    strand: 'PV',  isStretch: false, sortOrder: 30  },
@@ -226,6 +227,8 @@ async function main() {
 
   // 5️⃣ SkillPrereq edges
   const prereqEdges: Array<{ parentCode: string; childCode: string; weight: number }> = [
+    { parentCode: 'N1.1',  childCode: 'N1.2',  weight: 1 },
+    { parentCode: 'N1.2',  childCode: 'N1.3',  weight: 1 },
     { parentCode: 'N1.3',  childCode: 'N1.9',  weight: 1 },
     { parentCode: 'N1.6',  childCode: 'N1.7',  weight: 1 },
     { parentCode: 'N1.3',  childCode: 'N1.7',  weight: 1 },
@@ -661,6 +664,231 @@ async function main() {
             completionRule,
           },
         });
+      }
+    }
+  }
+
+  // 9️⃣ N1.2 item set + explanation routes (A/B/C)
+  const n12SkillId = skillMap.get('N1.2');
+  if (n12SkillId) {
+    const n12RealItems: Array<{
+      question: string;
+      type: string;
+      options: unknown;
+      answer: string;
+      misconceptionMap?: Record<string, string>;
+    }> = [
+      {
+        question: 'N1.2 DQ1: Write 4,206 in words.',
+        type: 'SHORT_TEXT',
+        options: { meta: { role: 'anchor', misconception_tag: 'm1', transfer_level: 'none' } },
+        answer: 'four thousand two hundred and six',
+      },
+      {
+        question: 'N1.2 DQ2: Write "seven thousand and forty" in figures.',
+        type: 'SHORT_TEXT',
+        options: { meta: { role: 'misconception', misconception_tag: 'm2', transfer_level: 'none' } },
+        answer: '7040',
+      },
+      {
+        question: 'N1.2 DQ3: Which is the correct figure for "ninety thousand three hundred and five"?',
+        type: 'MCQ',
+        options: {
+          choices: ['90,305', '9,305', '90,035', '903,005'],
+          meta: { role: 'transfer', misconception_tag: 'm3', transfer_level: 'medium' },
+        },
+        answer: '90,305',
+        misconceptionMap: { '9,305': 'm2', '90,035': 'm1', '903,005': 'm4' },
+      },
+      {
+        question: 'N1.2 SC-A1: Write 13,050 in words.',
+        type: 'SHORT_TEXT',
+        options: { meta: { role: 'shadow', route: 'A' } },
+        answer: 'thirteen thousand and fifty',
+      },
+      {
+        question: 'N1.2 SC-A2: Write "two hundred and nine" in figures.',
+        type: 'SHORT_TEXT',
+        options: { meta: { role: 'shadow', route: 'A' } },
+        answer: '209',
+      },
+      {
+        question: 'N1.2 SC-B1: Which figure matches "five thousand and four"?',
+        type: 'MCQ',
+        options: {
+          choices: ['5,004', '5,040', '504', '50,04'],
+          meta: { role: 'shadow', route: 'B' },
+        },
+        answer: '5,004',
+      },
+      {
+        question: 'N1.2 SC-B2: Write 60,700 in words.',
+        type: 'SHORT_TEXT',
+        options: { meta: { role: 'shadow', route: 'B' } },
+        answer: 'sixty thousand seven hundred',
+      },
+      {
+        question: 'N1.2 SC-C1: Write "one hundred and five thousand" in figures.',
+        type: 'SHORT_TEXT',
+        options: { meta: { role: 'shadow', route: 'C' } },
+        answer: '105000',
+      },
+      {
+        question: 'N1.2 SC-C2: Which wording matches 40,019?',
+        type: 'MCQ',
+        options: {
+          choices: [
+            'forty thousand and nineteen',
+            'four thousand and nineteen',
+            'forty thousand and one hundred and nine',
+            'forty thousand one hundred and ninety',
+          ],
+          meta: { role: 'shadow', route: 'C' },
+        },
+        answer: 'forty thousand and nineteen',
+      },
+    ];
+
+    for (const itemData of n12RealItems) {
+      let item = await prisma.item.findFirst({ where: { question: itemData.question, subjectId: subject.id } });
+      if (!item) {
+        item = await prisma.item.create({
+          data: {
+            question: itemData.question,
+            type: itemData.type,
+            options: itemData.options as object,
+            answer: itemData.answer,
+            misconceptionMap: itemData.misconceptionMap as object | undefined,
+            subjectId: subject.id,
+          },
+        });
+      } else {
+        await prisma.item.update({
+          where: { id: item.id },
+          data: {
+            type: itemData.type,
+            options: itemData.options as object,
+            answer: itemData.answer,
+            misconceptionMap: itemData.misconceptionMap as object | undefined,
+          },
+        });
+      }
+
+      await prisma.itemSkill.upsert({
+        where: { itemId_skillId: { itemId: item.id, skillId: n12SkillId } },
+        update: {},
+        create: { itemId: item.id, skillId: n12SkillId },
+      });
+    }
+
+    const routeDefsN12 = [
+      {
+        routeType: 'A',
+        misconceptionSummary: 'You may be omitting place-value words when converting figures to words.',
+        workedExample: '4,206 = four thousand, two hundred and six.',
+        guidedPrompt: 'Write 3,040 in words.',
+        guidedAnswer: 'three thousand and forty',
+        steps: [
+          ['Chunk by commas', 'Split large numbers into groups of three digits from right to left.', 'How many groups are in 12,305?', ['1', '2', '3', '4'], '2'],
+          ['Name each group', 'Read each group with its place-value name (thousand, million).', 'What is 12,305 in words?', ['twelve thousand three hundred and five', 'one two three zero five', 'twelve hundred and thirty-five', 'twelve thousand and thirty-five'], 'twelve thousand three hundred and five'],
+          ['Check zero placeholders', 'Zeros can remove a place but keep the surrounding structure.', 'Write 5,040 in words.', ['five thousand and forty', 'five hundred and forty', 'fifty-four', 'five thousand four hundred'], 'five thousand and forty'],
+        ],
+      },
+      {
+        routeType: 'B',
+        misconceptionSummary: 'You may be misplacing zeros when converting words to figures.',
+        workedExample: '"Seven thousand and forty" = 7,040 (0 hundreds, 4 tens).',
+        guidedPrompt: 'Write "nine thousand and six" in figures.',
+        guidedAnswer: '9006',
+        steps: [
+          ['Build a place-value frame', 'Mark thousands, hundreds, tens, ones before writing digits.', 'In 7,040 what is the hundreds digit?', ['7', '4', '0', 'Cannot tell'], '0'],
+          ['Place spoken values', 'Map each spoken part into the correct column.', '"two thousand, three hundred" in figures is…', ['2,300', '23,000', '2,030', '230'], '2,300'],
+          ['Fill missing places with zero', 'If a place is not named, write 0 in that column.', '"five thousand and four" in figures is…', ['5,004', '5,040', '504', '50,04'], '5,004'],
+        ],
+      },
+      {
+        routeType: 'C',
+        misconceptionSummary: 'You may be collapsing digit strings instead of preserving place value language.',
+        workedExample: '"Forty thousand and nineteen" is 40,019, not 4,019.',
+        guidedPrompt: 'Write "sixty thousand and seven" in figures.',
+        guidedAnswer: '60007',
+        steps: [
+          ['Start with highest place', 'Anchor the largest named place value first.', 'Highest place in "eighty thousand and two"?', ['thousands', 'hundreds', 'tens', 'ones'], 'thousands'],
+          ['Protect internal zeros', 'Use zeros to hold empty places between named values.', '"ten thousand and six" is…', ['10,006', '1,006', '10,600', '100,06'], '10,006'],
+          ['Verify by reverse reading', 'Read your figure back into words to confirm.', 'Words for 40,019 are…', ['forty thousand and nineteen', 'four thousand and nineteen', 'forty thousand and one hundred and nine', 'forty thousand one hundred and ninety'], 'forty thousand and nineteen'],
+        ],
+      },
+    ] as const;
+
+    const decomposeType = await prisma.interactionType.findUnique({
+      where: { key_version: { key: 'decompose_number', version: 'v1' } },
+      select: { id: true },
+    });
+
+    for (const routeDef of routeDefsN12) {
+      const route = await prisma.explanationRoute.upsert({
+        where: { skillId_routeType: { skillId: n12SkillId, routeType: routeDef.routeType } },
+        update: {
+          misconceptionSummary: routeDef.misconceptionSummary,
+          workedExample: routeDef.workedExample,
+          guidedPrompt: routeDef.guidedPrompt,
+          guidedAnswer: routeDef.guidedAnswer,
+          isActive: true,
+        },
+        create: {
+          skillId: n12SkillId,
+          routeType: routeDef.routeType,
+          misconceptionSummary: routeDef.misconceptionSummary,
+          workedExample: routeDef.workedExample,
+          guidedPrompt: routeDef.guidedPrompt,
+          guidedAnswer: routeDef.guidedAnswer,
+          isActive: true,
+        },
+      });
+
+      for (let i = 0; i < routeDef.steps.length; i++) {
+        const [title, explanation, checkpointQuestion, checkpointOptions, checkpointAnswer] = routeDef.steps[i];
+        const step = await prisma.explanationStep.upsert({
+          where: { explanationRouteId_stepOrder: { explanationRouteId: route.id, stepOrder: i + 1 } },
+          update: {
+            title,
+            explanation,
+            stepType: i === 0 ? 'visual_demo' : i === routeDef.steps.length - 1 ? 'transfer_check' : 'guided_action',
+            checkpointQuestion,
+            checkpointOptions: { options: [...checkpointOptions], stepType: 'checkpoint', visualType: 'decompose_number', visualPayload: { mode: 'word_figure' } },
+            checkpointAnswer,
+            alternativeHint: `Try place-value columns first: ${explanation}`,
+          },
+          create: {
+            explanationRouteId: route.id,
+            stepOrder: i + 1,
+            title,
+            explanation,
+            stepType: i === 0 ? 'visual_demo' : i === routeDef.steps.length - 1 ? 'transfer_check' : 'guided_action',
+            checkpointQuestion,
+            checkpointOptions: { options: [...checkpointOptions], stepType: 'checkpoint', visualType: 'decompose_number', visualPayload: { mode: 'word_figure' } },
+            checkpointAnswer,
+            alternativeHint: `Try place-value columns first: ${explanation}`,
+          },
+        });
+
+        if (decomposeType?.id) {
+          await prisma.stepInteraction.upsert({
+            where: { explanationStepId_sortOrder: { explanationStepId: step.id, sortOrder: 1 } },
+            update: {
+              interactionTypeId: decomposeType.id,
+              config: { mode: 'word_figure', routeType: routeDef.routeType, step: i + 1 },
+              completionRule: { kind: 'all_parts_selected' },
+            },
+            create: {
+              explanationStepId: step.id,
+              sortOrder: 1,
+              interactionTypeId: decomposeType.id,
+              config: { mode: 'word_figure', routeType: routeDef.routeType, step: i + 1 },
+              completionRule: { kind: 'all_parts_selected' },
+            },
+          });
+        }
       }
     }
   }
