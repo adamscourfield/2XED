@@ -66,7 +66,7 @@ export function ReteachSession({ subjectId, skillId, routeType, plan, onComplete
   };
 
   const interactionStatus = useMemo(() => {
-    const payload = step.visualPayload ?? {};
+    const payload = step.interaction?.config ?? step.visualPayload ?? {};
 
     if (step.visualType === 'place_value_grid') {
       return {
@@ -109,10 +109,10 @@ export function ReteachSession({ subjectId, skillId, routeType, plan, onComplete
     }
 
     return { started: false, completed: false };
-  }, [interaction, step.visualPayload, step.visualType]);
+  }, [interaction, step.interaction?.config, step.visualPayload, step.visualType]);
 
   function renderVisual() {
-    const payload = step.visualPayload ?? {};
+    const payload = step.interaction?.config ?? step.visualPayload ?? {};
 
     if (step.visualType === 'place_value_grid') {
       const number = String(payload.number ?? '7460');
@@ -260,7 +260,7 @@ export function ReteachSession({ subjectId, skillId, routeType, plan, onComplete
         alternativeShown: shouldShowAlt,
         interactionStarted: interactionStatus.started,
         interactionCompleted: interactionStatus.completed,
-        interactionType: step.visualType ?? 'none',
+        interactionType: step.interaction?.type ?? step.visualType ?? 'none',
         interactionDurationMs,
       }),
     });

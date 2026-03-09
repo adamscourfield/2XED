@@ -187,15 +187,47 @@ model ExplanationStep {
   stepOrder          Int
   title              String
   explanation        String
+  stepType           String           @default("checkpoint")
   checkpointQuestion String
   checkpointOptions  Json
   checkpointAnswer   String
   alternativeHint    String?
+  subtopicCode       String?
+  questionType       String?
   createdAt          DateTime         @default(now())
   updatedAt          DateTime         @updatedAt
   route              ExplanationRoute @relation(fields: [explanationRouteId], references: [id], onDelete: Cascade)
+  interactions       StepInteraction[]
 
   @@unique([explanationRouteId, stepOrder])
+}
+
+model InteractionType {
+  id          String            @id @default(cuid())
+  key         String
+  version     String
+  schema      Json?
+  rendererKey String?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  steps       StepInteraction[]
+
+  @@unique([key, version])
+}
+
+model StepInteraction {
+  id                String          @id @default(cuid())
+  explanationStepId String
+  interactionTypeId String
+  sortOrder         Int             @default(1)
+  config            Json
+  completionRule    Json?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  step              ExplanationStep @relation(fields: [explanationStepId], references: [id], onDelete: Cascade)
+  interactionType   InteractionType @relation(fields: [interactionTypeId], references: [id])
+
+  @@unique([explanationStepId, sortOrder])
 }
 
 model DiagnosticSession {

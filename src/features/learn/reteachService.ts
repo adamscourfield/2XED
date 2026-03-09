@@ -1,12 +1,22 @@
 import { prisma } from '@/db/prisma';
-import { getReteachPlan, type RouteType, type ReteachPlan, type StepType, type VisualType } from './reteachContent';
+import { getReteachPlan, type RouteType, type ReteachPlan, type StepType, type VisualType, type StepInteraction } from './reteachContent';
 
 export async function getReteachPlanForSkill(skillId: string, routeType: RouteType): Promise<ReteachPlan> {
   const strictDbMode = process.env.RETEACH_DB_REQUIRED === 'true';
 
   const route = await prisma.explanationRoute.findUnique({
     where: { skillId_routeType: { skillId, routeType } },
-    include: { steps: { orderBy: { stepOrder: 'asc' } } },
+    include: {
+      steps: {
+        orderBy: { stepOrder: 'asc' },
+        include: {
+          interactions: {
+            orderBy: { sortOrder: 'asc' },
+            include: { interactionType: true },
+          },
+        },
+      },
+    },
   });
 
   if (!route || route.steps.length === 0) {
@@ -34,9 +44,41 @@ export async function getReteachPlanForSkill(skillId: string, routeType: RouteTy
           ? (asObject?.options as unknown[]).filter((o): o is string => typeof o === 'string')
           : [];
 
-      const stepType = asObject?.stepType;
-      const visualType = asObject?.visualType;
-      const visualPayload = asObject?.visualPayload;
+      const legacyStepType = asObject?.stepType;
+      const legacyVisualType = asObject?.visualType;
+      const legacyVisualPayload = asObject?.visualPayload;
+
+      const normalizedInteraction = s.interactions[0]
+        ? {
+            type: `${s.interactions[0].interactionType.key}.${s.interactions[0].interactionType.version}` as StepInteraction['type'],
+            config: (s.interactions[0].config as Record<string, unknown>) ?? {},
+            completionRule: (s.interactions[0].completionRule as Record<string, unknown> | null) ?? undefined,
+          }
+        : undefined;
+
+      const interaction = normalizedInteraction ??
+        ((legacyVisualType as VisualType | undefined) && legacyVisualType !== 'none'
+          ? {
+              type:
+                legacyVisualType === 'place_value_grid'
+                  ? 'place_value_select.v1'
+                  : legacyVisualType === 'compare_columns'
+                    ? 'compare_columns.v1'
+                    : legacyVisualType === 'decompose_number'
+                      ? 'decompose_number.v1'
+                      : 'none',
+              config: (legacyVisualPayload as Record<string, unknown> | undefined) ?? {},
+            }
+          : { type: 'none' as const });
+
+      const visualType: VisualType =
+        interaction.type === 'place_value_select.v1'
+          ? 'place_value_grid'
+          : interaction.type === 'compare_columns.v1'
+            ? 'compare_columns'
+            : interaction.type === 'decompose_number.v1'
+              ? 'decompose_number'
+              : ((legacyVisualType as VisualType | undefined) ?? 'none');
 
       return {
         title: s.title,
@@ -45,9 +87,12 @@ export async function getReteachPlanForSkill(skillId: string, routeType: RouteTy
         checkpointOptions,
         checkpointAnswer: s.checkpointAnswer,
         alternativeHint: s.alternativeHint ?? undefined,
-        stepType: (stepType as StepType | undefined) ?? 'checkpoint',
-        visualType: (visualType as VisualType | undefined) ?? 'none',
-        visualPayload: (visualPayload as Record<string, unknown> | undefined) ?? undefined,
+        stepType: (s.stepType as StepType | undefined) ?? (legacyStepType as StepType | undefined) ?? 'checkpoint',
+        visualType,
+        visualPayload:
+          (interaction.config as Record<string, unknown> | undefined) ??
+          ((legacyVisualPayload as Record<string, unknown> | undefined) ?? undefined),
+        interaction,
       };
     }),
   };

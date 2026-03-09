@@ -3,6 +3,12 @@ export type RouteType = 'A' | 'B' | 'C';
 export type StepType = 'goal' | 'visual_demo' | 'guided_action' | 'checkpoint' | 'transfer_check';
 export type VisualType = 'none' | 'place_value_grid' | 'compare_columns' | 'decompose_number' | 'number_line';
 
+export interface StepInteraction {
+  type: 'none' | 'place_value_select.v1' | 'compare_columns.v1' | 'decompose_number.v1';
+  config?: Record<string, unknown>;
+  completionRule?: { kind: string; [key: string]: unknown };
+}
+
 export interface ReteachStep {
   title: string;
   explanation: string;
@@ -13,6 +19,7 @@ export interface ReteachStep {
   stepType?: StepType;
   visualType?: VisualType;
   visualPayload?: Record<string, unknown>;
+  interaction?: StepInteraction;
 }
 
 export interface ReteachPlan {

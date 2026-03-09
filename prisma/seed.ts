@@ -414,6 +414,24 @@ async function main() {
       await prisma.item.update({ where: { id: item.id }, data: { misconceptionMap: map } });
     }
 
+    const interactionTypeMap = {
+      placeValue: await prisma.interactionType.upsert({
+        where: { key_version: { key: 'place_value_select', version: 'v1' } },
+        update: { rendererKey: 'place_value_select.v1' },
+        create: { key: 'place_value_select', version: 'v1', rendererKey: 'place_value_select.v1' },
+      }),
+      compareColumns: await prisma.interactionType.upsert({
+        where: { key_version: { key: 'compare_columns', version: 'v1' } },
+        update: { rendererKey: 'compare_columns.v1' },
+        create: { key: 'compare_columns', version: 'v1', rendererKey: 'compare_columns.v1' },
+      }),
+      decomposeNumber: await prisma.interactionType.upsert({
+        where: { key_version: { key: 'decompose_number', version: 'v1' } },
+        update: { rendererKey: 'decompose_number.v1' },
+        create: { key: 'decompose_number', version: 'v1', rendererKey: 'decompose_number.v1' },
+      }),
+    };
+
     const routeDefs = [
       {
         routeType: 'A',
@@ -500,18 +518,49 @@ async function main() {
           visualPayload,
         };
 
-        await prisma.explanationStep.upsert({
+        const step = await prisma.explanationStep.upsert({
           where: { explanationRouteId_stepOrder: { explanationRouteId: route.id, stepOrder: i + 1 } },
-          update: { title, explanation, checkpointQuestion, checkpointOptions: checkpointOptionsPayload, checkpointAnswer, alternativeHint },
+          update: { title, explanation, stepType, checkpointQuestion, checkpointOptions: checkpointOptionsPayload, checkpointAnswer, alternativeHint },
           create: {
             explanationRouteId: route.id,
             stepOrder: i + 1,
             title,
             explanation,
+            stepType,
             checkpointQuestion,
             checkpointOptions: checkpointOptionsPayload,
             checkpointAnswer,
             alternativeHint,
+          },
+        });
+
+        const interactionTypeId =
+          routeDef.routeType === 'A'
+            ? interactionTypeMap.placeValue.id
+            : routeDef.routeType === 'B'
+              ? interactionTypeMap.compareColumns.id
+              : interactionTypeMap.decomposeNumber.id;
+
+        const completionRule =
+          routeDef.routeType === 'A'
+            ? { kind: 'selection_required' }
+            : routeDef.routeType === 'B'
+              ? { kind: 'first_difference_correct' }
+              : { kind: 'all_parts_selected' };
+
+        await prisma.stepInteraction.upsert({
+          where: { explanationStepId_sortOrder: { explanationStepId: step.id, sortOrder: 1 } },
+          update: {
+            interactionTypeId,
+            config: visualPayload,
+            completionRule,
+          },
+          create: {
+            explanationStepId: step.id,
+            sortOrder: 1,
+            interactionTypeId,
+            config: visualPayload,
+            completionRule,
           },
         });
       }
