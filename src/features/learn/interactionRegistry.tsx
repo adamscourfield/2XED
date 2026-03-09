@@ -45,6 +45,32 @@ function decomposeParts(number: string): string[] {
   return parts;
 }
 
+function decomposeOptions(number: string): string[] {
+  const digits = splitDigits(number);
+  const len = digits.length;
+  const correct = decomposeParts(number);
+  const options = new Set<string>(correct);
+
+  // Plausible distractors: right digit, wrong place value.
+  digits.forEach((d, i) => {
+    const digit = Number(d);
+    if (digit === 0) return;
+    const zeros = Math.max(0, len - i - 2);
+    const wrong = String(digit * 10 ** zeros);
+    if (!correct.includes(wrong)) options.add(wrong);
+  });
+
+  // Include bare digit distractors for larger numbers.
+  digits.forEach((d) => {
+    if (d !== '0' && !correct.includes(d)) options.add(d);
+  });
+
+  // Keep a stable, readable order and enough choice for mistakes.
+  return Array.from(options)
+    .sort((a, b) => Number(b) - Number(a))
+    .slice(0, Math.max(correct.length + 3, 6));
+}
+
 const noneRenderer: InteractionRenderer = {
   status: () => ({ started: false, completed: false }),
   render: () => null,
@@ -63,9 +89,9 @@ const placeValueRenderer: InteractionRenderer = {
     const labels = ['Thousands', 'Hundreds', 'Tens', 'Ones'];
 
     return (
-      <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-xs text-slate-700">
-        <p className="mb-2 font-semibold">Tap a place-value column</p>
-        <p className="mb-2 text-[11px] text-slate-500">Select the column you want to focus on before answering checkpoint.</p>
+      <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-base text-slate-700">
+        <p className="mb-2 text-lg font-bold text-slate-900">Tap a place-value column</p>
+        <p className="mb-2 text-sm text-slate-600">Select the column you want to focus on before answering checkpoint.</p>
         <div className="grid grid-cols-4 gap-2">
           {labels.map((h, i) => {
             const active = state.placeValueSelection === h;
@@ -138,7 +164,7 @@ const compareRenderer: InteractionRenderer = {
                     <button
                       key={`${row.name}-${i}`}
                       onClick={() => markInteraction({ compareColumnIndex: i, completedAt: Date.now() })}
-                      className={`inline-flex h-7 w-7 items-center justify-center rounded text-sm font-semibold ${active ? (picked === firstDiff ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-800') : 'bg-slate-100 text-slate-700'}`}
+                      className={`inline-flex h-10 w-10 items-center justify-center rounded text-base font-semibold ${active ? (picked === firstDiff ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-800') : 'bg-slate-100 text-slate-700'}`}
                     >
                       {x}
                     </button>
@@ -178,14 +204,15 @@ const decomposeRenderer: InteractionRenderer = {
     const number = String(payload.number ?? '8030406');
     const formatted = number.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     const parts = decomposeParts(number);
+    const options = decomposeOptions(number);
     const selectedParts = state.decompositionParts;
 
     return (
-      <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-xs text-slate-700">
-        <p className="font-semibold">Build the decomposition</p>
-        <p className="mt-1">{formatted} = ?</p>
-        <div className="mt-2 flex flex-wrap gap-2">
-          {parts.map((p) => {
+      <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-base text-slate-700">
+        <p className="text-lg font-bold text-slate-900">Build the decomposition</p>
+        <p className="mt-1 text-xl font-semibold tabular-nums text-slate-900">{formatted} = ?</p>
+        <div className="mt-3 flex flex-wrap gap-2.5">
+          {options.map((p) => {
             const on = selectedParts.includes(p);
             return (
               <button
@@ -194,16 +221,17 @@ const decomposeRenderer: InteractionRenderer = {
                   const next = on ? selectedParts.filter((x) => x !== p) : [...selectedParts, p];
                   markInteraction({ decompositionParts: next, completedAt: Date.now() });
                 }}
-                className={`rounded-md border px-2 py-1 text-xs ${on ? 'border-blue-300 bg-blue-100 text-blue-900' : 'border-slate-300 bg-white text-slate-700'}`}
+                className={`rounded-lg border px-3 py-2 text-base font-semibold ${on ? 'border-blue-300 bg-blue-100 text-blue-900' : 'border-slate-300 bg-white text-slate-700'}`}
               >
                 {p}
               </button>
             );
           })}
         </div>
-        <p className="mt-2 rounded bg-white px-2 py-1 text-[11px] text-slate-600">
-          {selectedParts.length > 0 ? selectedParts.join(' + ') : 'Tap parts to build the expression'}
+        <p className="mt-3 rounded-lg bg-white px-3 py-2 text-sm text-slate-700">
+          {selectedParts.length > 0 ? selectedParts.join(' + ') : 'Tap parts to build your answer'}
         </p>
+        <p className="mt-2 text-xs text-slate-500">Tip: choose all correct parts only — there are extra options on purpose.</p>
       </div>
     );
   },

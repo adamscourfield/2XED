@@ -121,8 +121,8 @@ export function ReteachSession({ subjectId, skillId, routeType, plan, onComplete
   if (stage === 'worked') {
     return (
       <div className="space-y-5">
-        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5 text-sm text-slate-700">
-          <p className="font-semibold text-slate-900">Worked example</p>
+        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6 text-base text-slate-700">
+          <p className="text-lg font-bold text-slate-900">Worked example</p>
           <p className="mt-1">{plan.workedExample}</p>
           <button className="anx-btn-primary mt-4 w-full" onClick={() => setStage('guided')}>
             Next step
@@ -135,18 +135,18 @@ export function ReteachSession({ subjectId, skillId, routeType, plan, onComplete
   if (stage === 'guided') {
     return (
       <div className="space-y-5">
-        <div className="rounded-xl border border-slate-200 bg-white p-4">
-          <p className="text-sm font-semibold text-slate-900">Try one yourself</p>
-          <p className="mt-1 text-sm text-slate-700">{plan.guidedPrompt}</p>
-          {needsWritingHint && <p className="mt-2 text-xs text-slate-600">Write it clearly. You can use “and” or leave it out.</p>}
+        <div className="rounded-xl border border-slate-200 bg-white p-5">
+          <p className="text-lg font-bold text-slate-900">Try one yourself</p>
+          <p className="mt-1 text-base text-slate-700">{plan.guidedPrompt}</p>
+          {needsWritingHint && <p className="mt-2 text-sm text-slate-600">Write it clearly. You can use “and” or leave it out.</p>}
           <input
-            className="mt-3 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+            className="mt-3 w-full rounded-lg border border-slate-300 px-4 py-3 text-base"
             value={guided}
             onChange={(e) => setGuided(e.target.value)}
             placeholder="Type your answer"
           />
-          {!guidedOk && guided.length > 0 && <p className="mt-2 text-xs text-rose-600">Not quite — try again.</p>}
-          <button className="anx-btn-primary mt-3 w-full" onClick={onComplete} disabled={!guidedOk}>
+          {!guidedOk && guided.length > 0 && <p className="mt-2 text-sm text-rose-600">Not quite — try again.</p>}
+          <button className="anx-btn-primary mt-3 w-full py-3 text-base" onClick={onComplete} disabled={!guidedOk}>
             Start key questions
           </button>
         </div>
@@ -157,10 +157,10 @@ export function ReteachSession({ subjectId, skillId, routeType, plan, onComplete
   if (stage === 'checkpoint') {
     return (
       <div className="space-y-5">
-        <div className={`rounded-2xl border border-slate-200 bg-white p-5 ${feedback === 'correct' ? 'anx-pulse-correct' : ''} ${feedback === 'incorrect' ? 'anx-shake-incorrect' : ''}`}>
-          <p className="text-xs uppercase tracking-wide text-slate-500">Step {stepIndex + 1} of {plan.steps.length}</p>
-          <p className="mt-3 text-sm font-semibold text-slate-900">Checkpoint</p>
-          <p className="mt-1 text-sm text-slate-700">{step.checkpointQuestion}</p>
+        <div className={`rounded-2xl border border-slate-200 bg-white p-6 ${feedback === 'correct' ? 'anx-pulse-correct' : ''} ${feedback === 'incorrect' ? 'anx-shake-incorrect' : ''}`}>
+          <p className="text-sm uppercase tracking-wide text-slate-500">Step {stepIndex + 1} of {plan.steps.length}</p>
+          <p className="mt-3 text-lg font-bold text-slate-900">Checkpoint</p>
+          <p className="mt-1 text-base text-slate-700">{step.checkpointQuestion}</p>
           <div className="mt-3 space-y-2">
             {step.checkpointOptions.map((option) => (
               <button key={option} onClick={() => setSelected(option)} className={`anx-option ${selected === option ? 'anx-option-selected' : ''}`}>
@@ -168,7 +168,7 @@ export function ReteachSession({ subjectId, skillId, routeType, plan, onComplete
               </button>
             ))}
           </div>
-          <button onClick={checkStep} className="anx-btn-primary mt-4 w-full py-3 text-sm" disabled={!canCheck}>
+          <button onClick={checkStep} className="anx-btn-primary mt-4 w-full py-3 text-base" disabled={!canCheck}>
             Check answer
           </button>
           {!selected && <p className="mt-2 text-xs text-slate-500">Choose one answer.</p>}
@@ -190,10 +190,10 @@ export function ReteachSession({ subjectId, skillId, routeType, plan, onComplete
 
   return (
     <div className="space-y-5">
-      <div className="rounded-2xl border border-slate-200 bg-white p-5">
-        <p className="text-xs uppercase tracking-wide text-slate-500">Step {stepIndex + 1} of {plan.steps.length}</p>
-        <h3 className="mt-1 text-base font-semibold text-slate-900">{step.title}</h3>
-        <p className="mt-2 text-sm leading-relaxed text-slate-700">{step.explanation}</p>
+      <div className="rounded-2xl border border-slate-200 bg-white p-6">
+        <p className="text-sm uppercase tracking-wide text-slate-500">Step {stepIndex + 1} of {plan.steps.length}</p>
+        <h3 className="mt-1 text-xl font-bold text-slate-900">{step.title}</h3>
+        <p className="mt-2 text-base leading-relaxed text-slate-700">{step.explanation}</p>
 
         <div className="mt-4">{renderer.render({ step, state: interaction, markInteraction })}</div>
 
