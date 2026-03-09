@@ -35,13 +35,13 @@ export function stripStudentQuestionLabel(question: unknown): string {
 
   const patterns = [
     // [N1.1] Question...
-    /^\s*\[[A-Za-z]{1,5}\d*(?:\.\d+){1,4}\]\s*/,
-    // N1.1: Question... / N1.1 - Question...
-    /^\s*[A-Za-z]{1,5}\d*(?:\.\d+){1,4}\s*[:\-–]\s*/,
-    // N1.1 DQ ... / N1.1 Q2 ... / N1.1 Question...
-    /^\s*[A-Za-z]{1,5}\d*(?:\.\d+){1,4}(?:\s+[A-Za-z]{1,8}\d*)?\s+/,
+    /^\s*\[[A-Za-z]{1,8}(?::[A-Za-z0-9]+)?(?:\.?[A-Za-z0-9]+){0,4}\]\s*/,
+    // SC:A2 - Question... / SC:A2: Question... / N1.1: Question...
+    /^\s*[A-Za-z]{1,8}(?::[A-Za-z0-9]+)?(?:\.?[A-Za-z0-9]+){0,4}\s*[:\-–]\s*/,
+    // SC:A2 DQ ... / N1.1 DQ ... / N1.1 Q2 ... / N1.1 Question...
+    /^\s*[A-Za-z]{1,8}(?::[A-Za-z0-9]+)?(?:\.?[A-Za-z0-9]+){0,4}(?:\s+[A-Za-z]{1,8}\d*)?\s+/,
     // Subtopic N1.1: Question...
-    /^\s*subtopic\s+[A-Za-z0-9.\-_/]+\s*[:\-–]?\s*/i,
+    /^\s*subtopic\s+[A-Za-z0-9.:\-_/]+\s*[:\-–]?\s*/i,
   ];
 
   let cleaned = question;
