@@ -20,7 +20,8 @@ export default async function LearnPage({ params }: Props) {
   const session = await getServerSession(authOptions);
   if (!session?.user) redirect('/login');
 
-  const userId = (session.user as { id: string }).id;
+  const user = session.user as { id: string; role?: string };
+  const userId = user.id;
 
   const subject = await prisma.subject.findUnique({
     where: { slug: subjectSlug },
@@ -35,6 +36,17 @@ export default async function LearnPage({ params }: Props) {
   });
 
   if (!subject) redirect('/dashboard');
+
+  if ((user.role ?? 'STUDENT') === 'STUDENT') {
+    const baselineCompleted = await prisma.baselineSession.findFirst({
+      where: { userId, subjectId: subject.id, status: 'COMPLETED' },
+      select: { id: true },
+    });
+
+    if (!baselineCompleted) {
+      redirect(`/baseline/${subjectSlug}`);
+    }
+  }
 
   const skillIds = subject.skills.map((s) => s.id);
 
