@@ -20,6 +20,14 @@ const attemptSchema = z.object({
   previousResults: z.array(z.object({ itemId: z.string(), correct: z.boolean() })),
 });
 
+async function safeSideEffect(label: string, fn: () => Promise<void>) {
+  try {
+    await fn();
+  } catch (error) {
+    console.error(`[learn/attempt] Side effect failed: ${label}`, error);
+  }
+}
+
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session?.user) {
@@ -57,50 +65,58 @@ export async function POST(req: NextRequest) {
     data: { userId, itemId, answer, correct, mode },
   });
 
-  await emitEvent({
-    name: 'attempt_submitted',
-    actorUserId: userId,
-    studentUserId: userId,
-    subjectId,
-    skillId,
-    itemId,
-    payload: { itemId, answer, skillId, subjectId },
-  });
-
-  await emitEvent({
-    name: 'attempt_graded',
-    actorUserId: userId,
-    studentUserId: userId,
-    subjectId,
-    skillId,
-    itemId,
-    attemptId: attempt.id,
-    payload: { itemId, attemptId: attempt.id, correct, skillId, subjectId },
-  });
-
-  await emitEvent({
-    name: 'question_answered',
-    actorUserId: userId,
-    studentUserId: userId,
-    subjectId,
-    skillId,
-    itemId,
-    attemptId: attempt.id,
-    payload: { itemId, skillId, subjectId, correct, mode },
-  });
-
-  await grantReward(
-    userId,
-    subjectId,
-    isShadowQuestion && correct ? 'shadow_item_correct' : correct ? 'diagnostic_item_correct' : 'diagnostic_item_incorrect',
-    {
-      itemId,
+  await safeSideEffect('attempt_submitted', async () => {
+    await emitEvent({
+      name: 'attempt_submitted',
+      actorUserId: userId,
+      studentUserId: userId,
+      subjectId,
       skillId,
-      mode,
-      isShadowQuestion,
-      routeType,
-    }
-  );
+      itemId,
+      payload: { itemId, answer, skillId, subjectId },
+    });
+  });
+
+  await safeSideEffect('attempt_graded', async () => {
+    await emitEvent({
+      name: 'attempt_graded',
+      actorUserId: userId,
+      studentUserId: userId,
+      subjectId,
+      skillId,
+      itemId,
+      attemptId: attempt.id,
+      payload: { itemId, attemptId: attempt.id, correct, skillId, subjectId },
+    });
+  });
+
+  await safeSideEffect('question_answered', async () => {
+    await emitEvent({
+      name: 'question_answered',
+      actorUserId: userId,
+      studentUserId: userId,
+      subjectId,
+      skillId,
+      itemId,
+      attemptId: attempt.id,
+      payload: { itemId, skillId, subjectId, correct, mode },
+    });
+  });
+
+  await safeSideEffect('diagnostic_reward', async () => {
+    await grantReward(
+      userId,
+      subjectId,
+      isShadowQuestion && correct ? 'shadow_item_correct' : correct ? 'diagnostic_item_correct' : 'diagnostic_item_incorrect',
+      {
+        itemId,
+        skillId,
+        mode,
+        isShadowQuestion,
+        routeType,
+      }
+    );
+  });
 
   const hadRecentIncorrect = await prisma.attempt.findFirst({
     where: {
@@ -113,64 +129,80 @@ export async function POST(req: NextRequest) {
   });
 
   if (correct && hadRecentIncorrect) {
-    await grantReward(userId, subjectId, 'retry_recovery', { itemId, skillId, mode });
+    await safeSideEffect('retry_recovery_reward', async () => {
+      await grantReward(userId, subjectId, 'retry_recovery', { itemId, skillId, mode });
+    });
   }
 
-  await maybeGrantDailyStreak(userId, subjectId);
+  await safeSideEffect('daily_streak', async () => {
+    await maybeGrantDailyStreak(userId, subjectId);
+  });
 
   if (isLast) {
     const allResults = [...previousResults, { itemId, correct }];
     const correctCount = allResults.filter((r) => r.correct).length;
     const accuracy = totalItems > 0 ? correctCount / totalItems : 0;
 
-    await emitEvent({
-      name: 'route_completed',
-      actorUserId: userId,
-      studentUserId: userId,
-      subjectId,
-      skillId,
-      payload: { skillId, subjectId, totalItems, correctCount, accuracy, routeType: routeType ?? 'A' },
-    });
-
-    await grantReward(userId, subjectId, 'route_completed', { skillId, accuracy, routeType: routeType ?? 'A' });
-
-    const shadowPair = allResults.slice(-2);
-    if (shadowPair.length === 2) {
-      const shadowPassed = shadowPair.every((r) => r.correct);
+    await safeSideEffect('route_completed_event', async () => {
       await emitEvent({
-        name: shadowPassed ? 'shadow_pair_passed' : 'shadow_pair_failed',
+        name: 'route_completed',
         actorUserId: userId,
         studentUserId: userId,
         subjectId,
         skillId,
-        payload: {
-          skillId,
-          subjectId,
-          routeType: routeType ?? 'A',
-          pairSize: 2,
-          correctCount: shadowPair.filter((r) => r.correct).length,
-        },
+        payload: { skillId, subjectId, totalItems, correctCount, accuracy, routeType: routeType ?? 'A' },
       });
+    });
 
-      if (!shadowPassed && (routeType ?? 'A') === 'C') {
-        await prisma.interventionFlag.upsert({
-          where: { userId_skillId: { userId, skillId } },
-          update: { isResolved: false, lastSeenAt: new Date(), reason: 'N1.1 route C shadow pair failed' },
-          create: { userId, subjectId, skillId, reason: 'N1.1 route C shadow pair failed' },
-        });
+    await safeSideEffect('route_completed_reward', async () => {
+      await grantReward(userId, subjectId, 'route_completed', { skillId, accuracy, routeType: routeType ?? 'A' });
+    });
 
+    const shadowPair = allResults.slice(-2);
+    if (shadowPair.length === 2) {
+      const shadowPassed = shadowPair.every((r) => r.correct);
+      await safeSideEffect('shadow_pair_event', async () => {
         await emitEvent({
-          name: 'intervention_flagged',
+          name: shadowPassed ? 'shadow_pair_passed' : 'shadow_pair_failed',
           actorUserId: userId,
           studentUserId: userId,
           subjectId,
           skillId,
-          payload: { reason: 'N1.1 route C shadow pair failed', routeType: 'C' },
+          payload: {
+            skillId,
+            subjectId,
+            routeType: routeType ?? 'A',
+            pairSize: 2,
+            correctCount: shadowPair.filter((r) => r.correct).length,
+          },
+        });
+      });
+
+      if (!shadowPassed && (routeType ?? 'A') === 'C') {
+        await safeSideEffect('intervention_flag_upsert', async () => {
+          await prisma.interventionFlag.upsert({
+            where: { userId_skillId: { userId, skillId } },
+            update: { isResolved: false, lastSeenAt: new Date(), reason: 'N1.1 route C shadow pair failed' },
+            create: { userId, subjectId, skillId, reason: 'N1.1 route C shadow pair failed' },
+          });
+        });
+
+        await safeSideEffect('intervention_flagged_event', async () => {
+          await emitEvent({
+            name: 'intervention_flagged',
+            actorUserId: userId,
+            studentUserId: userId,
+            subjectId,
+            skillId,
+            payload: { reason: 'N1.1 route C shadow pair failed', routeType: 'C' },
+          });
         });
       }
     }
 
-    await updateSkillMastery(userId, skillId, subjectId, correctCount, totalItems, mode);
+    await safeSideEffect('update_skill_mastery', async () => {
+      await updateSkillMastery(userId, skillId, subjectId, correctCount, totalItems, mode);
+    });
   }
 
   return NextResponse.json({ correct });

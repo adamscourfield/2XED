@@ -93,7 +93,7 @@ export function LearnSession({ subject, skill, items, userId, gamification, rout
         }),
       });
 
-      if (!res.ok) throw new Error(`Attempt submission failed (${res.status})`);
+      if (!res.ok) throw new Error('Could not save your answer. Please tap Next again.');
 
       const data = (await res.json()) as { correct?: boolean };
       if (typeof data.correct !== 'boolean') throw new Error('Invalid response from server');
