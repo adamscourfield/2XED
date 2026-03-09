@@ -143,6 +143,21 @@ export const StepAlternativeShownPayloadSchema = z.object({
   confidence: z.enum(['low', 'medium', 'high']).optional(),
 });
 
+export const StepInteractionStartedPayloadSchema = z.object({
+  routeType: z.enum(['A', 'B', 'C']),
+  stepIndex: z.number().int().nonnegative(),
+  stepTitle: z.string(),
+  interactionType: z.string().optional(),
+});
+
+export const StepInteractionCompletedPayloadSchema = z.object({
+  routeType: z.enum(['A', 'B', 'C']),
+  stepIndex: z.number().int().nonnegative(),
+  stepTitle: z.string(),
+  interactionType: z.string().optional(),
+  interactionDurationMs: z.number().int().nonnegative().nullable().optional(),
+});
+
 export const EventPayloadSchemas: Record<string, z.ZodSchema> = {
   attempt_submitted: AttemptSubmittedPayloadSchema,
   attempt_graded: AttemptGradedPayloadSchema,
@@ -160,6 +175,8 @@ export const EventPayloadSchemas: Record<string, z.ZodSchema> = {
   step_checkpoint_attempted: StepCheckpointAttemptedPayloadSchema,
   step_checkpoint_mastered: StepCheckpointMasteredPayloadSchema,
   step_alternative_shown: StepAlternativeShownPayloadSchema,
+  step_interaction_started: StepInteractionStartedPayloadSchema,
+  step_interaction_completed: StepInteractionCompletedPayloadSchema,
   diagnostic_completed: DiagnosticCompletedPayloadSchema,
   intervention_recommended: InterventionRecommendedPayloadSchema,
   intervention_flagged: InterventionFlaggedPayloadSchema,

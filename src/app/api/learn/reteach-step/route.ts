@@ -15,6 +15,10 @@ const schema = z.object({
   retryCount: z.number().int().nonnegative(),
   durationMs: z.number().int().nonnegative().optional(),
   alternativeShown: z.boolean().optional(),
+  interactionStarted: z.boolean().optional(),
+  interactionCompleted: z.boolean().optional(),
+  interactionType: z.string().optional(),
+  interactionDurationMs: z.number().int().nonnegative().optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -25,7 +29,21 @@ export async function POST(req: NextRequest) {
   const parsed = schema.safeParse(await req.json());
   if (!parsed.success) return NextResponse.json({ error: 'Invalid input' }, { status: 400 });
 
-  const { subjectId, skillId, routeType, stepIndex, stepTitle, correct, retryCount, durationMs, alternativeShown } = parsed.data;
+  const {
+    subjectId,
+    skillId,
+    routeType,
+    stepIndex,
+    stepTitle,
+    correct,
+    retryCount,
+    durationMs,
+    alternativeShown,
+    interactionStarted,
+    interactionCompleted,
+    interactionType,
+    interactionDurationMs,
+  } = parsed.data;
   const inferredConfidence = durationMs == null ? 'medium' : durationMs > 15000 ? 'low' : durationMs > 7000 ? 'medium' : 'high';
 
   await emitEvent({
@@ -34,8 +52,53 @@ export async function POST(req: NextRequest) {
     studentUserId: userId,
     subjectId,
     skillId,
-    payload: { routeType, stepIndex, stepTitle, correct, retryCount, durationMs: durationMs ?? null, inferredConfidence },
+    payload: {
+      routeType,
+      stepIndex,
+      stepTitle,
+      correct,
+      retryCount,
+      durationMs: durationMs ?? null,
+      inferredConfidence,
+      interactionStarted: interactionStarted ?? false,
+      interactionCompleted: interactionCompleted ?? false,
+      interactionType: interactionType ?? 'none',
+      interactionDurationMs: interactionDurationMs ?? null,
+    },
   });
+
+  if (interactionStarted) {
+    await emitEvent({
+      name: 'step_interaction_started',
+      actorUserId: userId,
+      studentUserId: userId,
+      subjectId,
+      skillId,
+      payload: {
+        routeType,
+        stepIndex,
+        stepTitle,
+        interactionType: interactionType ?? 'none',
+      },
+    });
+  }
+
+  if (interactionCompleted) {
+    await emitEvent({
+      name: 'step_interaction_completed',
+      actorUserId: userId,
+      studentUserId: userId,
+      subjectId,
+      skillId,
+      payload: {
+        routeType,
+        stepIndex,
+        stepTitle,
+        interactionType: interactionType ?? 'none',
+        interactionDurationMs: interactionDurationMs ?? null,
+      },
+    });
+  }
 
   if (correct) {
     await emitEvent({
