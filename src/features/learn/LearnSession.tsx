@@ -70,6 +70,10 @@ export function LearnSession({ subject, skill, items, userId, gamification, rout
   const answerType = useMemo(() => parseAnswerType(currentItem?.type), [currentItem?.type]);
   const parsedOptions = useMemo(() => parseItemOptions(currentItem?.options), [currentItem?.options]);
   const options = parsedOptions.choices;
+  const isTrueFalsePrompt = useMemo(
+    () => Boolean(currentItem?.question && /^(correct|incorrect)\s*:/i.test(currentItem.question)),
+    [currentItem?.question]
+  );
 
   async function submitAnswer() {
     if (!selectedAnswer.trim() || !currentItem || submitting) return;
@@ -259,6 +263,38 @@ export function LearnSession({ subject, skill, items, userId, gamification, rout
                   </button>
                 ))
               )
+            ) : isTrueFalsePrompt ? (
+              <div className="space-y-2">
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => {
+                      setSelectedAnswer('true');
+                      setError(null);
+                    }}
+                    className={`w-full rounded-xl border-2 px-4 py-3 text-base font-semibold transition-all ${
+                      selectedAnswer === 'true'
+                        ? 'border-blue-500 bg-blue-50 text-blue-800'
+                        : 'border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50'
+                    }`}
+                  >
+                    True
+                  </button>
+                  <button
+                    onClick={() => {
+                      setSelectedAnswer('false');
+                      setError(null);
+                    }}
+                    className={`w-full rounded-xl border-2 px-4 py-3 text-base font-semibold transition-all ${
+                      selectedAnswer === 'false'
+                        ? 'border-blue-500 bg-blue-50 text-blue-800'
+                        : 'border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50'
+                    }`}
+                  >
+                    False
+                  </button>
+                </div>
+                <p className="text-xs text-slate-600">Tap True or False.</p>
+              </div>
             ) : (
               <div className="space-y-2">
                 <input

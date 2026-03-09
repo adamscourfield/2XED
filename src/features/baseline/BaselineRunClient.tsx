@@ -26,6 +26,7 @@ export function BaselineRunClient({ subjectSlug }: { subjectSlug: string }) {
 
   const answerType = useMemo(() => parseAnswerType(item?.type), [item?.type]);
   const parsedOptions = useMemo(() => parseItemOptions(item?.options ?? {}), [item?.options]);
+  const isTrueFalsePrompt = useMemo(() => Boolean(item?.question && /^(correct|incorrect)\s*:/i.test(item.question)), [item?.question]);
 
   async function loadNext(currentSessionId: string) {
     const nextRes = await fetch('/api/baseline/next', {
@@ -146,6 +147,24 @@ export function BaselineRunClient({ subjectSlug }: { subjectSlug: string }) {
                 {option}
               </button>
             ))
+          ) : isTrueFalsePrompt ? (
+            <div className="space-y-2">
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => setSelectedAnswer('true')}
+                  className={`anx-option py-3 text-base font-semibold ${selectedAnswer === 'true' ? 'anx-option-selected' : ''}`}
+                >
+                  True
+                </button>
+                <button
+                  onClick={() => setSelectedAnswer('false')}
+                  className={`anx-option py-3 text-base font-semibold ${selectedAnswer === 'false' ? 'anx-option-selected' : ''}`}
+                >
+                  False
+                </button>
+              </div>
+              <p className="text-xs text-slate-600">Tap True or False.</p>
+            </div>
           ) : (
             <div className="space-y-2">
               <input

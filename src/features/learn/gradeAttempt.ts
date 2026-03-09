@@ -5,7 +5,7 @@ function stripDiacritics(value: string): string {
 }
 
 function normalizeAnswer(input: string): string {
-  return stripDiacritics(input)
+  const normalized = stripDiacritics(input)
     .toLowerCase()
     .replace(/&/g, ' and ')
     .replace(/,/g, ' ')
@@ -15,6 +15,11 @@ function normalizeAnswer(input: string): string {
     .replace(/[^a-z0-9./\s]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
+
+  if (normalized === 'true' || normalized === 'correct' || normalized === 'yes') return 'true';
+  if (normalized === 'false' || normalized === 'incorrect' || normalized === 'no') return 'false';
+
+  return normalized;
 }
 
 function acceptedAnswers(correctAnswer: string): string[] {

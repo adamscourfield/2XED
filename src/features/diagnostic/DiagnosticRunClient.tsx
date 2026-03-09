@@ -22,6 +22,7 @@ export function DiagnosticRunClient({ subject, skill, item, sessionId, itemsSeen
   const router = useRouter();
   const answerType = useMemo(() => parseAnswerType(item.type), [item.type]);
   const parsedOptions = useMemo(() => parseItemOptions(item.options), [item.options]);
+  const isTrueFalsePrompt = useMemo(() => /^(correct|incorrect)\s*:/i.test(item.question), [item.question]);
 
   async function submitAnswer() {
     if (!selectedAnswer.trim() || submitting) return;
@@ -102,6 +103,30 @@ export function DiagnosticRunClient({ subject, skill, item, sessionId, itemsSeen
                 </button>
               ))
             )
+          ) : isTrueFalsePrompt ? (
+            <div className="space-y-2">
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => {
+                    setSelectedAnswer('true');
+                    setError(null);
+                  }}
+                  className={`anx-option py-3 text-base font-semibold ${selectedAnswer === 'true' ? 'anx-option-selected' : ''}`}
+                >
+                  True
+                </button>
+                <button
+                  onClick={() => {
+                    setSelectedAnswer('false');
+                    setError(null);
+                  }}
+                  className={`anx-option py-3 text-base font-semibold ${selectedAnswer === 'false' ? 'anx-option-selected' : ''}`}
+                >
+                  False
+                </button>
+              </div>
+              <p className="text-xs text-slate-600">Tap True or False.</p>
+            </div>
           ) : (
             <div className="space-y-2">
               <input
