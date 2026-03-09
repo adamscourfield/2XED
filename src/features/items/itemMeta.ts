@@ -48,13 +48,14 @@ export function stripStudentQuestionLabel(question: unknown): string {
   if (typeof question !== 'string') return '';
 
   const codeToken = '[A-Za-z]{1,6}[A-Za-z0-9]*(?:[.:-][A-Za-z0-9]+)*';
+  const codeLikeToken = '(?=[A-Za-z0-9.:-]*\\d)[A-Za-z]{1,6}[A-Za-z0-9]*(?:[.:-][A-Za-z0-9]+)*';
   const patterns = [
     // [N1.1] / [SC:A2] / [SC-C2]
     new RegExp(`^\\s*\\[${codeToken}\\]\\s*`),
     // SC:A2 - ... / SC:A2: ... / SC-C2: ... / N1.1: ...
     new RegExp(`^\\s*${codeToken}\\s*[:：\\-–]\\s*`),
-    // SC:A2 DQ ... / N1.1 DQ ... / SC-C2 Q2 ...
-    new RegExp(`^\\s*${codeToken}(?:\\s+[A-Za-z]{1,12}\\d*)?\\s+`),
+    // SC:A2 DQ ... / N1.1 DQ ... / SC-C2 Q2 ... (only code-like prefix with digits)
+    new RegExp(`^\\s*${codeLikeToken}\\s+(?:DQ|Q|QUESTION)\\d*\\s*[:：\\-–]?\\s*`, 'i'),
     // DQ1: ... / Q2: ... / Question3 - ...
     /^\s*(?:DQ|Q|QUESTION)\s*\d+\s*[:：\-–]\s*/i,
     // DQ: ... / Q: ... / Question: ...
@@ -64,13 +65,8 @@ export function stripStudentQuestionLabel(question: unknown): string {
   ];
 
   let cleaned = question;
-  let changed = true;
-  while (changed) {
-    const before = cleaned;
-    for (const pattern of patterns) {
-      cleaned = cleaned.replace(pattern, '');
-    }
-    changed = cleaned !== before;
+  for (const pattern of patterns) {
+    cleaned = cleaned.replace(pattern, '');
   }
 
   return cleaned.trim();
