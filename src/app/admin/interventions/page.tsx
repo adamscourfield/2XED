@@ -1,3 +1,4 @@
+import React from 'react';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/features/auth/authOptions';
 import { redirect } from 'next/navigation';
