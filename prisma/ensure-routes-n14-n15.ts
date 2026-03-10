@@ -50,8 +50,40 @@ async function ensureRoute(skillCode: string, routeType: RouteType, meta: { summ
   const subject = await prisma.subject.findUnique({ where: { slug: 'ks3-maths' } });
   if (!subject) throw new Error('ks3-maths subject missing');
 
-  const skill = await prisma.skill.findUnique({ where: { subjectId_code: { subjectId: subject.id, code: skillCode } } });
-  if (!skill) throw new Error(`${skillCode} skill missing`);
+  const fallbackSkillMeta: Record<string, { name: string; strand: string; sortOrder: number }> = {
+    'N1.4': {
+      name: 'Use and interpret inequalities in context (incl number lines and statements)',
+      strand: 'PV',
+      sortOrder: 15,
+    },
+    'N1.5': {
+      name: 'Find the median from a set of numbers (incl midpoint using a calculator)',
+      strand: 'STA',
+      sortOrder: 20,
+    },
+  };
+
+  const metaForCreate = fallbackSkillMeta[skillCode];
+  const slug = skillCode.toLowerCase().replace('.', '-');
+  const skill = await prisma.skill.upsert({
+    where: { subjectId_code: { subjectId: subject.id, code: skillCode } },
+    update: {
+      slug,
+      name: metaForCreate?.name ?? skillCode,
+      strand: metaForCreate?.strand ?? 'PV',
+      isStretch: false,
+      sortOrder: metaForCreate?.sortOrder ?? 999,
+    },
+    create: {
+      subjectId: subject.id,
+      code: skillCode,
+      slug,
+      name: metaForCreate?.name ?? skillCode,
+      strand: metaForCreate?.strand ?? 'PV',
+      isStretch: false,
+      sortOrder: metaForCreate?.sortOrder ?? 999,
+    },
+  });
 
   const route = await prisma.explanationRoute.upsert({
     where: { skillId_routeType: { skillId: skill.id, routeType } },
