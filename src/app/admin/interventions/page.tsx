@@ -155,7 +155,7 @@ export default async function AdminInterventionsPage() {
 
   return (
     <main className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-5xl mx-auto px-4">
+      <div className="max-w-6xl mx-auto px-4 space-y-6">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold text-gray-900">Intervention Flags</h1>
           <div className="flex items-center gap-4">

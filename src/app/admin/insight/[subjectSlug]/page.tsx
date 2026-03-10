@@ -200,7 +200,7 @@ export default async function InsightDashboardPage({ params, searchParams }: Pro
 
   return (
     <main className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-5xl mx-auto px-4 space-y-10">
+      <div className="max-w-6xl mx-auto px-4 space-y-10">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-gray-900">Insight Dashboard — {subject.title}</h1>
           <div className="flex items-center gap-4 text-sm">
@@ -215,7 +215,7 @@ export default async function InsightDashboardPage({ params, searchParams }: Pro
 
         <section>
           <h2 className="text-lg font-semibold text-gray-800 mb-3">Snapshot — Engagement & Route Quality</h2>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
             <div className="rounded-xl border border-gray-200 bg-white p-4">
               <p className="text-xs text-gray-500">Unique learners</p>
               <p className="mt-1 text-2xl font-semibold text-gray-900">{uniqueLearners}</p>
@@ -256,7 +256,7 @@ export default async function InsightDashboardPage({ params, searchParams }: Pro
               ))}
             </div>
           </div>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
             <div className="rounded-xl border border-gray-200 bg-white p-4">
               <p className="text-xs text-gray-500">Loops started</p>
               <p className="mt-1 text-2xl font-semibold text-gray-900">{phase9.loopsStarted}</p>
