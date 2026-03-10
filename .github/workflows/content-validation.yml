@@ -60,3 +60,6 @@ jobs:
 
       - name: Validate explanation integrity
         run: npm run validate:explanations
+        env:
+          NEXT_PUBLIC_DEFAULT_SUBJECT_SLUG: ${{ vars.NEXT_PUBLIC_DEFAULT_SUBJECT_SLUG || 'ks3-maths' }}
+          NEXT_PUBLIC_ROUTED_SKILL_CODES: ${{ vars.NEXT_PUBLIC_ROUTED_SKILL_CODES || 'N1.1,N1.2,N1.3,N1.4,N1.5' }}

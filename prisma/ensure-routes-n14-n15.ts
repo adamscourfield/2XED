@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { validateExplanationStepWrite } from '../src/features/learn/explanationStepWriteGuard';
 
 const prisma = new PrismaClient();
 
@@ -152,16 +153,23 @@ async function ensureRoute(skillCode: string, routeType: RouteType, meta: { summ
   ];
 
   for (const def of stepDefs) {
+    const validated = validateExplanationStepWrite({
+      checkpointQuestion: def.question,
+      checkpointOptions: def.options,
+      checkpointAnswer: def.answer,
+      questionType: 'MCQ',
+    });
+
     const step = await prisma.explanationStep.upsert({
       where: { explanationRouteId_stepOrder: { explanationRouteId: route.id, stepOrder: def.stepOrder } },
       update: {
         title: def.title,
         explanation: def.explanation,
         stepType: def.stepType,
-        checkpointQuestion: def.question,
-        checkpointOptions: { options: def.options, stepType: 'checkpoint' },
-        checkpointAnswer: def.answer,
-        questionType: 'MCQ',
+        checkpointQuestion: validated.checkpointQuestion,
+        checkpointOptions: validated.checkpointOptions,
+        checkpointAnswer: validated.checkpointAnswer,
+        questionType: validated.questionType,
       },
       create: {
         explanationRouteId: route.id,
@@ -169,10 +177,10 @@ async function ensureRoute(skillCode: string, routeType: RouteType, meta: { summ
         title: def.title,
         explanation: def.explanation,
         stepType: def.stepType,
-        checkpointQuestion: def.question,
-        checkpointOptions: { options: def.options, stepType: 'checkpoint' },
-        checkpointAnswer: def.answer,
-        questionType: 'MCQ',
+        checkpointQuestion: validated.checkpointQuestion,
+        checkpointOptions: validated.checkpointOptions,
+        checkpointAnswer: validated.checkpointAnswer,
+        questionType: validated.questionType,
       },
     });
 
