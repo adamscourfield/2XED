@@ -69,7 +69,12 @@ export default async function AdminInterventionsPage() {
 
   const reteachExceptions = await Promise.all(
     reteachEscalations.map(async (event) => {
-      const payload = (event.payload ?? {}) as { assignedPathId?: string; reason?: string };
+      const payload = (event.payload ?? {}) as {
+        assignedPathId?: string;
+        reason?: string;
+        reasonCode?: string;
+        interventionSuggestions?: Array<{ code?: string; label?: string; detail?: string }>;
+      };
       const assignedPathId = payload.assignedPathId;
 
       const [attemptCount, latestGate] = await Promise.all([
@@ -112,6 +117,8 @@ export default async function AdminInterventionsPage() {
         subjectTitle: event.subject?.title ?? '—',
         assignedPathId: assignedPathId ?? '—',
         reason: payload.reason ?? 'Reteach gate escalation',
+        reasonCode: payload.reasonCode ?? null,
+        suggestedActions: (payload.interventionSuggestions ?? []).filter((s) => s?.label).map((s) => s.label as string),
         attemptCount,
         checks: gatePayload.checks ?? null,
       };
@@ -244,7 +251,13 @@ export default async function AdminInterventionsPage() {
                     <p>Delayed retrieval: <span className="font-semibold">{ex.checks?.delayedRetrievalOk ? 'OK' : 'Not met'}</span></p>
                   </div>
                   <p className="mt-2 text-xs text-gray-600">Reason: {ex.reason}</p>
-                  <p className="mt-1 text-xs text-indigo-700">Suggested teacher action: run a 1:1 worked example, then assign a short independent retrieval check next session.</p>
+                  {ex.reasonCode && <p className="mt-1 text-xs text-gray-500">Decision code: {ex.reasonCode}</p>}
+                  <p className="mt-1 text-xs text-indigo-700">
+                    Suggested teacher action:{' '}
+                    {ex.suggestedActions.length > 0
+                      ? ex.suggestedActions.join(' · ')
+                      : 'run a 1:1 worked example, then assign a short independent retrieval check next session.'}
+                  </p>
                 </div>
               ))}
             </div>

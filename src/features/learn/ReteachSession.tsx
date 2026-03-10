@@ -198,8 +198,15 @@ export function ReteachSession({ subjectId, skillId, routeType, assignedPathId, 
                   body: JSON.stringify({ subjectId, skillId, assignedPathId }),
                 });
                 if (gateRes.ok) {
-                  const gate = (await gateRes.json()) as { decision?: 'pass' | 'continue' | 'escalate' };
+                  const gate = (await gateRes.json()) as {
+                    decision?: 'pass' | 'continue' | 'escalate';
+                    decisionTrace?: {
+                      decisionReason?: string;
+                      interventionSuggestions?: Array<{ code: string; label: string; detail: string }>;
+                    };
+                  };
                   if (gate.decision === 'escalate') {
+                    const decisionReason = gate.decisionTrace?.decisionReason;
                     await fetch('/api/student/reteach/escalate', {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
@@ -207,7 +214,12 @@ export function ReteachSession({ subjectId, skillId, routeType, assignedPathId, 
                         subjectId,
                         skillId,
                         assignedPathId,
-                        reason: 'Student did not meet reteach gate after loop completion',
+                        reason: decisionReason
+                          ? `Student did not meet reteach gate: ${decisionReason}`
+                          : 'Student did not meet reteach gate after loop completion',
+                        reasonCode: decisionReason,
+                        interventionSuggestions: gate.decisionTrace?.interventionSuggestions,
+                        decisionTrace: gate.decisionTrace,
                       }),
                     });
                   }

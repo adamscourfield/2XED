@@ -1,3 +1,4 @@
+import type { Prisma } from '@prisma/client';
 import { prisma } from '@/db/prisma';
 import { getEffectiveReteachConfig, type EffectiveReteachConfig } from './reteachPolicy';
 
@@ -10,6 +11,22 @@ export type ReteachReasonCode =
 
 export type ReteachLoopStep = 'TEACH' | 'GUIDED' | 'INDEPENDENT' | 'RETRIEVAL';
 export type GateDecision = 'pass' | 'continue' | 'escalate';
+export type GateDecisionReason =
+  | 'mastery_with_independence'
+  | 'repeated_failed_loops'
+  | 'attempt_budget_exhausted'
+  | 'high_hint_dependence_without_recovery'
+  | 'needs_more_independent_success'
+  | 'recovering_keep_looping'
+  | 'v1_mastery_gate_met'
+  | 'v1_repeated_failed_loops'
+  | 'insufficient_evidence';
+
+export interface InterventionSuggestion {
+  code: 'RUN_WORKED_EXAMPLE_1TO1' | 'ASSIGN_SHORT_RETRIEVAL_SET' | 'CHECK_FOUNDATION_PREREQUISITE' | 'REDUCE_SCAFFOLD_GRADUALLY';
+  label: string;
+  detail: string;
+}
 
 type SupportLevel = 'INDEPENDENT' | 'LIGHT_PROMPT' | 'WORKED_EXAMPLE' | 'SCAFFOLDED' | 'FULL_EXPLANATION';
 
@@ -163,6 +180,54 @@ export async function recordReteachAttempt(input: AttemptRecordInput) {
   });
 }
 
+export function getInterventionSuggestions(reason: GateDecisionReason): InterventionSuggestion[] {
+  switch (reason) {
+    case 'repeated_failed_loops':
+    case 'v1_repeated_failed_loops':
+      return [
+        {
+          code: 'RUN_WORKED_EXAMPLE_1TO1',
+          label: 'Run a short 1:1 worked example',
+          detail: 'Model one high-quality example with think-aloud and immediate check for understanding.',
+        },
+        {
+          code: 'CHECK_FOUNDATION_PREREQUISITE',
+          label: 'Check prerequisite skill',
+          detail: 'Run a quick prerequisite probe and reteach the blocked prior concept if needed.',
+        },
+      ];
+    case 'high_hint_dependence_without_recovery':
+      return [
+        {
+          code: 'REDUCE_SCAFFOLD_GRADUALLY',
+          label: 'Fade scaffolds deliberately',
+          detail: 'Move from scaffolded prompts to independent retrieval over 3-4 short items.',
+        },
+        {
+          code: 'ASSIGN_SHORT_RETRIEVAL_SET',
+          label: 'Assign a short independent retrieval set',
+          detail: 'Use 3-5 low-stakes independent checks next session to build autonomy.',
+        },
+      ];
+    case 'attempt_budget_exhausted':
+      return [
+        {
+          code: 'RUN_WORKED_EXAMPLE_1TO1',
+          label: 'Reset with one clean model',
+          detail: 'Pause repeated attempts and re-model one canonical method before rechecking.',
+        },
+      ];
+    default:
+      return [
+        {
+          code: 'ASSIGN_SHORT_RETRIEVAL_SET',
+          label: 'Continue with short retrieval checks',
+          detail: 'Use brief delayed retrieval items to confirm durable independent recall.',
+        },
+      ];
+  }
+}
+
 function buildGateMetrics(parsed: ParsedAttempt[], config: EffectiveReteachConfig, failedLoops: number) {
   const independent = parsed.filter((a) => a.supportLevel === 'INDEPENDENT');
   const independentWindow = Math.max(1, Math.round(config.gateIndependentRateWindow));
@@ -250,7 +315,7 @@ export async function evaluateGate(input: {
   };
 
   let decision: GateDecision = 'continue';
-  let decisionReason = 'insufficient_evidence';
+  let decisionReason: GateDecisionReason = 'insufficient_evidence';
 
   if (config.policyVersion === 'v2') {
     if (rules.masteryGateMet && rules.lowHintReliance && rules.attemptsWithinBudget) {
@@ -280,6 +345,8 @@ export async function evaluateGate(input: {
     }
   }
 
+  const interventionSuggestions = getInterventionSuggestions(decisionReason);
+
   const decisionTrace = {
     policyVersion: config.policyVersion,
     signals: {
@@ -297,6 +364,7 @@ export async function evaluateGate(input: {
     },
     rules,
     decisionReason,
+    interventionSuggestions,
   };
 
   await prisma.event.create({
@@ -315,7 +383,7 @@ export async function evaluateGate(input: {
           delayedRetrievalOk: metrics.delayedRetrievalOk,
         },
         decisionTrace,
-      },
+      } as unknown as Prisma.InputJsonValue,
     },
   });
 
@@ -327,6 +395,7 @@ export async function evaluateGate(input: {
       delayedRetrievalOk: metrics.delayedRetrievalOk,
     },
     decisionTrace,
+    interventionSuggestions,
   };
 }
 
@@ -336,6 +405,9 @@ export async function escalateReteach(input: {
   skillId: string;
   assignedPathId: string;
   reason: string;
+  reasonCode?: GateDecisionReason;
+  interventionSuggestions?: InterventionSuggestion[];
+  decisionTrace?: unknown;
 }) {
   await prisma.$transaction([
     prisma.interventionFlag.upsert({
@@ -363,7 +435,10 @@ export async function escalateReteach(input: {
         payload: {
           assignedPathId: input.assignedPathId,
           reason: input.reason,
-        },
+          reasonCode: input.reasonCode ?? null,
+          interventionSuggestions: input.interventionSuggestions ?? null,
+          decisionTrace: input.decisionTrace ?? null,
+        } as unknown as Prisma.InputJsonValue,
       },
     }),
   ]);
