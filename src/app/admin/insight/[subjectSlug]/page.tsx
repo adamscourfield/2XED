@@ -2,13 +2,18 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/features/auth/authOptions';
 import { redirect } from 'next/navigation';
 import { prisma } from '@/db/prisma';
+import { getPhase9Analytics } from '@/features/reteach/phase9Analytics';
 
 interface Props {
   params: Promise<{ subjectSlug: string }>;
+  searchParams?: Promise<{ days?: string }>;
 }
 
-export default async function InsightDashboardPage({ params }: Props) {
+export default async function InsightDashboardPage({ params, searchParams }: Props) {
   const { subjectSlug } = await params;
+  const sp = searchParams ? await searchParams : undefined;
+  const daysParam = Number(sp?.days ?? '30');
+  const phase9Days = [7, 30, 90].includes(daysParam) ? daysParam : 30;
   const session = await getServerSession(authOptions);
   if (!session?.user) redirect('/login');
   const role = (session.user as { role: string }).role;
@@ -17,13 +22,19 @@ export default async function InsightDashboardPage({ params }: Props) {
   const subject = await prisma.subject.findUnique({ where: { slug: subjectSlug } });
   if (!subject) return <div>Subject not found</div>;
 
-  const skills = await prisma.skill.findMany({
-    where: { subjectId: subject.id },
-    include: {
-      masteries: { select: { mastery: true, confirmedCount: true, userId: true } },
-    },
-    orderBy: { sortOrder: 'asc' },
-  });
+  const [skills, phase9, phase9_7, phase9_30, phase9_90] = await Promise.all([
+    prisma.skill.findMany({
+      where: { subjectId: subject.id },
+      include: {
+        masteries: { select: { mastery: true, confirmedCount: true, userId: true } },
+      },
+      orderBy: { sortOrder: 'asc' },
+    }),
+    getPhase9Analytics(subject.id, phase9Days),
+    getPhase9Analytics(subject.id, 7),
+    getPhase9Analytics(subject.id, 30),
+    getPhase9Analytics(subject.id, 90),
+  ]);
 
   // A) Coverage by strand
   const strandMap = new Map<string, { totalStudents: number; stableStudents: number; masteries: number[] }>();
@@ -189,7 +200,7 @@ export default async function InsightDashboardPage({ params }: Props) {
 
   return (
     <main className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-5xl mx-auto px-4 space-y-10">
+      <div className="max-w-6xl mx-auto px-4 space-y-10">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-gray-900">Insight Dashboard — {subject.title}</h1>
           <div className="flex items-center gap-4 text-sm">
@@ -204,7 +215,7 @@ export default async function InsightDashboardPage({ params }: Props) {
 
         <section>
           <h2 className="text-lg font-semibold text-gray-800 mb-3">Snapshot — Engagement & Route Quality</h2>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
             <div className="rounded-xl border border-gray-200 bg-white p-4">
               <p className="text-xs text-gray-500">Unique learners</p>
               <p className="mt-1 text-2xl font-semibold text-gray-900">{uniqueLearners}</p>
@@ -228,6 +239,94 @@ export default async function InsightDashboardPage({ params }: Props) {
             Active days observed: {activeDays} · Avg route accuracy:{' '}
             {routeStats.count > 0 ? `${Math.round((routeStats.sumAccuracy / routeStats.count) * 100)}%` : '—'}
           </p>
+        </section>
+
+        <section>
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+            <h2 className="text-lg font-semibold text-gray-800">Phase 9 — Student-First Reteach ({phase9Days}d)</h2>
+            <div className="flex items-center gap-2 text-xs">
+              {[7, 30, 90].map((d) => (
+                <a
+                  key={d}
+                  href={`/admin/insight/${subject.slug}?days=${d}`}
+                  className={`rounded border px-2 py-1 ${phase9Days === d ? 'border-indigo-300 bg-indigo-50 text-indigo-700' : 'border-gray-300 bg-white text-gray-600 hover:bg-gray-50'}`}
+                >
+                  {d}d
+                </a>
+              ))}
+            </div>
+          </div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <div className="rounded-xl border border-gray-200 bg-white p-4">
+              <p className="text-xs text-gray-500">Loops started</p>
+              <p className="mt-1 text-2xl font-semibold text-gray-900">{phase9.loopsStarted}</p>
+            </div>
+            <div className="rounded-xl border border-gray-200 bg-white p-4">
+              <p className="text-xs text-gray-500">Recovery rate</p>
+              <p className="mt-1 text-2xl font-semibold text-emerald-700">
+                {typeof phase9.recoveryRate === 'number' ? `${Math.round(phase9.recoveryRate * 100)}%` : '—'}
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-200 bg-white p-4">
+              <p className="text-xs text-gray-500">Escalation rate</p>
+              <p className="mt-1 text-2xl font-semibold text-rose-700">
+                {typeof phase9.escalationRate === 'number' ? `${Math.round(phase9.escalationRate * 100)}%` : '—'}
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-200 bg-white p-4">
+              <p className="text-xs text-gray-500">Avg time to recovery</p>
+              <p className="mt-1 text-2xl font-semibold text-gray-900">
+                {typeof phase9.avgHoursToRecovery === 'number' ? `${phase9.avgHoursToRecovery.toFixed(1)}h` : '—'}
+              </p>
+            </div>
+          </div>
+          <p className="mt-2 text-xs text-gray-500">
+            Avg attempts before pass: {typeof phase9.avgAttemptsBeforePass === 'number' ? phase9.avgAttemptsBeforePass.toFixed(1) : '—'} ·
+            API: <code>/api/admin/insight/{subject.slug}/phase9?days={phase9Days}</code>
+          </p>
+          <div className="mt-2 rounded-lg border border-gray-200 bg-white p-3 text-xs text-gray-600">
+            <p>
+              Recovery trend: 7d {typeof phase9_7.recoveryRate === 'number' ? `${Math.round(phase9_7.recoveryRate * 100)}%` : '—'} ·
+              30d {typeof phase9_30.recoveryRate === 'number' ? `${Math.round(phase9_30.recoveryRate * 100)}%` : '—'} ·
+              90d {typeof phase9_90.recoveryRate === 'number' ? `${Math.round(phase9_90.recoveryRate * 100)}%` : '—'}
+            </p>
+            <div className="mt-2 grid gap-2 sm:grid-cols-2">
+              <div>
+                <p className="mb-1 text-[11px] font-medium uppercase tracking-wide text-gray-500">Recovery rate</p>
+                {[{ label: '7d', value: phase9_7.recoveryRate }, { label: '30d', value: phase9_30.recoveryRate }, { label: '90d', value: phase9_90.recoveryRate }].map((row) => {
+                  const pct = typeof row.value === 'number' ? Math.max(0, Math.min(100, Math.round(row.value * 100))) : null;
+                  return (
+                    <div key={`recovery-${row.label}`} className="mb-1">
+                      <div className="mb-0.5 flex items-center justify-between text-[11px]">
+                        <span>{row.label}</span>
+                        <span>{pct === null ? '—' : `${pct}%`}</span>
+                      </div>
+                      <div className="h-2 rounded bg-gray-100">
+                        <div className="h-2 rounded bg-emerald-500" style={{ width: `${pct ?? 0}%` }} />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <div>
+                <p className="mb-1 text-[11px] font-medium uppercase tracking-wide text-gray-500">Escalation rate</p>
+                {[{ label: '7d', value: phase9_7.escalationRate }, { label: '30d', value: phase9_30.escalationRate }, { label: '90d', value: phase9_90.escalationRate }].map((row) => {
+                  const pct = typeof row.value === 'number' ? Math.max(0, Math.min(100, Math.round(row.value * 100))) : null;
+                  return (
+                    <div key={`escalation-${row.label}`} className="mb-1">
+                      <div className="mb-0.5 flex items-center justify-between text-[11px]">
+                        <span>{row.label}</span>
+                        <span>{pct === null ? '—' : `${pct}%`}</span>
+                      </div>
+                      <div className="h-2 rounded bg-gray-100">
+                        <div className="h-2 rounded bg-rose-500" style={{ width: `${pct ?? 0}%` }} />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
         </section>
 
         <section>

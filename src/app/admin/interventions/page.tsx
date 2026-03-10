@@ -4,6 +4,7 @@ import { authOptions } from '@/features/auth/authOptions';
 import { redirect } from 'next/navigation';
 import { prisma } from '@/db/prisma';
 import { LEARNING_CONFIG } from '@/features/config/learningConfig';
+import { AdminReteachPolicyPanel } from '@/features/reteach/AdminReteachPolicyPanel';
 
 export default async function AdminInterventionsPage() {
   const session = await getServerSession(authOptions);
@@ -40,6 +41,80 @@ export default async function AdminInterventionsPage() {
         }),
       ]);
       return { ...flag, masteryValue: mastery?.mastery ?? 0, recentAttempts };
+    })
+  );
+
+  const sevenDaysReteachAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+  const [reteachEscalations, policyUpdates] = await Promise.all([
+    prisma.event.findMany({
+      where: {
+        name: 'reteach_escalated',
+        createdAt: { gte: sevenDaysReteachAgo },
+      },
+      include: {
+        actor: { select: { name: true, email: true } },
+        skill: { select: { code: true, name: true, strand: true } },
+        subject: { select: { title: true, slug: true } },
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 50,
+    }),
+    prisma.event.findMany({
+      where: { name: 'reteach_policy_updated' },
+      include: { actor: { select: { name: true, email: true } } },
+      orderBy: { createdAt: 'desc' },
+      take: 10,
+    }),
+  ]);
+
+  const reteachExceptions = await Promise.all(
+    reteachEscalations.map(async (event) => {
+      const payload = (event.payload ?? {}) as { assignedPathId?: string; reason?: string };
+      const assignedPathId = payload.assignedPathId;
+
+      const [attemptCount, latestGate] = await Promise.all([
+        assignedPathId
+          ? prisma.event.count({
+              where: {
+                name: 'reteach_attempt_recorded',
+                studentUserId: event.studentUserId ?? undefined,
+                skillId: event.skillId ?? undefined,
+                payload: { path: ['assignedPathId'], equals: assignedPathId },
+              },
+            })
+          : Promise.resolve(0),
+        assignedPathId
+          ? prisma.event.findFirst({
+              where: {
+                name: 'reteach_gate_evaluated',
+                studentUserId: event.studentUserId ?? undefined,
+                skillId: event.skillId ?? undefined,
+                payload: { path: ['assignedPathId'], equals: assignedPathId },
+              },
+              orderBy: { createdAt: 'desc' },
+              select: { payload: true },
+            })
+          : Promise.resolve(null),
+      ]);
+
+      const gatePayload = (latestGate?.payload ?? {}) as {
+        checks?: { consecutiveIndependentCorrect?: number; independentCorrectRate?: number; delayedRetrievalOk?: boolean };
+      };
+
+      return {
+        id: event.id,
+        createdAt: event.createdAt,
+        studentName: event.actor?.name ?? '—',
+        studentEmail: event.actor?.email ?? '—',
+        skillCode: event.skill?.code ?? '—',
+        skillName: event.skill?.name ?? 'Unknown skill',
+        strand: event.skill?.strand ?? '—',
+        subjectTitle: event.subject?.title ?? '—',
+        assignedPathId: assignedPathId ?? '—',
+        reason: payload.reason ?? 'Reteach gate escalation',
+        attemptCount,
+        checks: gatePayload.checks ?? null,
+      };
     })
   );
 
@@ -80,7 +155,7 @@ export default async function AdminInterventionsPage() {
 
   return (
     <main className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-5xl mx-auto px-4">
+      <div className="max-w-6xl mx-auto px-4 space-y-6">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold text-gray-900">Intervention Flags</h1>
           <div className="flex items-center gap-4">
@@ -91,6 +166,32 @@ export default async function AdminInterventionsPage() {
               → Insight Dashboard
             </a>
           </div>
+        </div>
+
+        <div className="mb-6">
+          <AdminReteachPolicyPanel />
+        </div>
+
+        <div className="mb-6 rounded-xl border border-gray-200 bg-white overflow-hidden">
+          <div className="border-b border-gray-100 px-4 py-3">
+            <h2 className="text-sm font-semibold text-gray-900">Recent policy changes</h2>
+            <p className="mt-1 text-xs text-gray-600">Last 10 updates to Phase 9 thresholds (audit trail).</p>
+          </div>
+          {policyUpdates.length === 0 ? (
+            <div className="px-4 py-4 text-xs text-gray-500">No policy updates yet.</div>
+          ) : (
+            <div className="divide-y divide-gray-100">
+              {policyUpdates.map((event) => (
+                <div key={event.id} className="px-4 py-3 text-xs text-gray-700">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span className="font-medium text-gray-900">{event.actor?.name ?? event.actor?.email ?? 'Admin'}</span>
+                    <span className="text-gray-500">{event.createdAt.toISOString().replace('T', ' ').slice(0, 16)}</span>
+                  </div>
+                  <pre className="mt-2 overflow-x-auto rounded bg-gray-50 p-2 text-[11px] text-gray-600">{JSON.stringify(event.payload, null, 2)}</pre>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 mb-6">
@@ -110,6 +211,44 @@ export default async function AdminInterventionsPage() {
             <div className="text-xs text-gray-500">Interventions flagged (7d)</div>
             <div className="mt-2 text-2xl font-semibold text-rose-600">{routeSummary.interventionFlagged}</div>
           </div>
+        </div>
+
+        <div className="mb-6 rounded-xl border border-indigo-200 bg-white overflow-hidden">
+          <div className="border-b border-indigo-100 bg-indigo-50 px-4 py-3">
+            <h2 className="text-sm font-semibold text-indigo-900">Teacher Exceptions · Reteach Escalations (7d)</h2>
+            <p className="mt-1 text-xs text-indigo-700">Only students who did not recover through automated reteach loops appear here.</p>
+          </div>
+          {reteachExceptions.length === 0 ? (
+            <div className="px-4 py-6 text-sm text-gray-500">No reteach escalations in the last 7 days.</div>
+          ) : (
+            <div className="divide-y divide-gray-100">
+              {reteachExceptions.map((ex) => (
+                <div key={ex.id} className="px-4 py-3">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div>
+                      <p className="text-sm font-semibold text-gray-900">
+                        {ex.studentName} <span className="text-gray-500">({ex.studentEmail})</span>
+                      </p>
+                      <p className="text-xs text-gray-600">
+                        {ex.subjectTitle} · {ex.skillCode} {ex.skillName} · {ex.strand}
+                      </p>
+                    </div>
+                    <span className="rounded-full border border-rose-200 bg-rose-50 px-2 py-1 text-xs font-semibold text-rose-700">
+                      Escalated
+                    </span>
+                  </div>
+                  <div className="mt-2 grid gap-2 text-xs text-gray-700 sm:grid-cols-2 lg:grid-cols-4">
+                    <p>Attempts in loop: <span className="font-semibold">{ex.attemptCount}</span></p>
+                    <p>Consecutive independent correct: <span className="font-semibold">{ex.checks?.consecutiveIndependentCorrect ?? 0}</span></p>
+                    <p>Independent rate: <span className="font-semibold">{typeof ex.checks?.independentCorrectRate === 'number' ? `${Math.round(ex.checks.independentCorrectRate * 100)}%` : '—'}</span></p>
+                    <p>Delayed retrieval: <span className="font-semibold">{ex.checks?.delayedRetrievalOk ? 'OK' : 'Not met'}</span></p>
+                  </div>
+                  <p className="mt-2 text-xs text-gray-600">Reason: {ex.reason}</p>
+                  <p className="mt-1 text-xs text-indigo-700">Suggested teacher action: run a 1:1 worked example, then assign a short independent retrieval check next session.</p>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {flagsWithStats.length === 0 ? (
