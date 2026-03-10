@@ -285,9 +285,47 @@ export default async function InsightDashboardPage({ params, searchParams }: Pro
             API: <code>/api/admin/insight/{subject.slug}/phase9?days={phase9Days}</code>
           </p>
           <div className="mt-2 rounded-lg border border-gray-200 bg-white p-3 text-xs text-gray-600">
-            Recovery trend: 7d {typeof phase9_7.recoveryRate === 'number' ? `${Math.round(phase9_7.recoveryRate * 100)}%` : '—'} ·
-            30d {typeof phase9_30.recoveryRate === 'number' ? `${Math.round(phase9_30.recoveryRate * 100)}%` : '—'} ·
-            90d {typeof phase9_90.recoveryRate === 'number' ? `${Math.round(phase9_90.recoveryRate * 100)}%` : '—'}
+            <p>
+              Recovery trend: 7d {typeof phase9_7.recoveryRate === 'number' ? `${Math.round(phase9_7.recoveryRate * 100)}%` : '—'} ·
+              30d {typeof phase9_30.recoveryRate === 'number' ? `${Math.round(phase9_30.recoveryRate * 100)}%` : '—'} ·
+              90d {typeof phase9_90.recoveryRate === 'number' ? `${Math.round(phase9_90.recoveryRate * 100)}%` : '—'}
+            </p>
+            <div className="mt-2 grid gap-2 sm:grid-cols-2">
+              <div>
+                <p className="mb-1 text-[11px] font-medium uppercase tracking-wide text-gray-500">Recovery rate</p>
+                {[{ label: '7d', value: phase9_7.recoveryRate }, { label: '30d', value: phase9_30.recoveryRate }, { label: '90d', value: phase9_90.recoveryRate }].map((row) => {
+                  const pct = typeof row.value === 'number' ? Math.max(0, Math.min(100, Math.round(row.value * 100))) : null;
+                  return (
+                    <div key={`recovery-${row.label}`} className="mb-1">
+                      <div className="mb-0.5 flex items-center justify-between text-[11px]">
+                        <span>{row.label}</span>
+                        <span>{pct === null ? '—' : `${pct}%`}</span>
+                      </div>
+                      <div className="h-2 rounded bg-gray-100">
+                        <div className="h-2 rounded bg-emerald-500" style={{ width: `${pct ?? 0}%` }} />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <div>
+                <p className="mb-1 text-[11px] font-medium uppercase tracking-wide text-gray-500">Escalation rate</p>
+                {[{ label: '7d', value: phase9_7.escalationRate }, { label: '30d', value: phase9_30.escalationRate }, { label: '90d', value: phase9_90.escalationRate }].map((row) => {
+                  const pct = typeof row.value === 'number' ? Math.max(0, Math.min(100, Math.round(row.value * 100))) : null;
+                  return (
+                    <div key={`escalation-${row.label}`} className="mb-1">
+                      <div className="mb-0.5 flex items-center justify-between text-[11px]">
+                        <span>{row.label}</span>
+                        <span>{pct === null ? '—' : `${pct}%`}</span>
+                      </div>
+                      <div className="h-2 rounded bg-gray-100">
+                        <div className="h-2 rounded bg-rose-500" style={{ width: `${pct ?? 0}%` }} />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         </section>
 
