@@ -49,11 +49,17 @@ export async function getReteachPlanForSkill(skillId: string, routeType: RouteTy
       const legacyVisualType = asObject?.visualType;
       const legacyVisualPayload = asObject?.visualPayload;
 
+      const rawCompletionRule = s.interactions[0]?.completionRule as Record<string, unknown> | null | undefined;
+      const normalizedCompletionRule =
+        rawCompletionRule && typeof rawCompletionRule.kind === 'string'
+          ? (rawCompletionRule as { kind: string; [key: string]: unknown })
+          : undefined;
+
       const normalizedInteraction = s.interactions[0]
         ? {
             type: `${s.interactions[0].interactionType.key}.${s.interactions[0].interactionType.version}` as StepInteraction['type'],
             config: (s.interactions[0].config as Record<string, unknown>) ?? {},
-            completionRule: (s.interactions[0].completionRule as Record<string, unknown> | null) ?? undefined,
+            completionRule: normalizedCompletionRule,
           }
         : undefined;
 
