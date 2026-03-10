@@ -146,6 +146,7 @@ async function main() {
     { code: 'N1.1',  name: 'Recognise the place value of each digit in whole numbers up to millions',             strand: 'PV',  isStretch: false, sortOrder: 5   },
     { code: 'N1.2',  name: 'Write integers in words and figures',                                                    strand: 'PV',  isStretch: false, sortOrder: 7   },
     { code: 'N1.3',  name: 'Compare two numbers using =, ≠, <, >, ≤, ≥',                                            strand: 'PV',  isStretch: false, sortOrder: 10  },
+    { code: 'N1.4',  name: 'Use and interpret inequalities in context (incl number lines and statements)',            strand: 'PV',  isStretch: false, sortOrder: 15  },
     { code: 'N1.5',  name: 'Find the median from a set of numbers (incl midpoint using a calculator)',               strand: 'STA', isStretch: false, sortOrder: 20  },
     { code: 'N1.6',  name: 'Decimal place value',                                                                    strand: 'PV',  isStretch: false, sortOrder: 30  },
     { code: 'N1.7',  name: 'Compare decimals using =, ≠, <, >, ≤, ≥',                                              strand: 'PV',  isStretch: false, sortOrder: 40  },
@@ -229,6 +230,8 @@ async function main() {
   const prereqEdges: Array<{ parentCode: string; childCode: string; weight: number }> = [
     { parentCode: 'N1.1',  childCode: 'N1.2',  weight: 1 },
     { parentCode: 'N1.2',  childCode: 'N1.3',  weight: 1 },
+    { parentCode: 'N1.3',  childCode: 'N1.4',  weight: 1 },
+    { parentCode: 'N1.4',  childCode: 'N1.5',  weight: 1 },
     { parentCode: 'N1.3',  childCode: 'N1.9',  weight: 1 },
     { parentCode: 'N1.6',  childCode: 'N1.7',  weight: 1 },
     { parentCode: 'N1.3',  childCode: 'N1.7',  weight: 1 },
