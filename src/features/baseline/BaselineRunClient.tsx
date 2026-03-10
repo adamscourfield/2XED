@@ -140,15 +140,21 @@ export function BaselineRunClient({ subjectSlug }: { subjectSlug: string }) {
 
         <div className="space-y-3">
           {answerType === 'MCQ' ? (
-            parsedOptions.choices.map((option, i) => (
-              <button
-                key={i}
-                onClick={() => setSelectedAnswer(option)}
-                className={`anx-option py-4 text-base font-semibold ${selectedAnswer === option ? 'anx-option-selected' : ''}`}
-              >
-                {option}
-              </button>
-            ))
+            parsedOptions.choices.length === 0 ? (
+              <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+                This question has no options yet.
+              </p>
+            ) : (
+              parsedOptions.choices.map((option, i) => (
+                <button
+                  key={i}
+                  onClick={() => setSelectedAnswer(option)}
+                  className={`anx-option py-4 text-base font-semibold ${selectedAnswer === option ? 'anx-option-selected' : ''}`}
+                >
+                  {option}
+                </button>
+              ))
+            )
           ) : answerType === 'TRUE_FALSE' ? (
             <div className="space-y-2">
               <div className="grid grid-cols-2 gap-2">
@@ -183,7 +189,7 @@ export function BaselineRunClient({ subjectSlug }: { subjectSlug: string }) {
 
         <button
           onClick={submit}
-          disabled={!selectedAnswer.trim() || submitting}
+          disabled={!selectedAnswer.trim() || submitting || (answerType === 'MCQ' && parsedOptions.choices.length === 0)}
           className="anx-btn-primary w-full"
         >
           {submitting ? 'Saving…' : 'Next question'}
