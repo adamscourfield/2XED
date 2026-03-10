@@ -30,4 +30,12 @@ describe('gradeAttempt', () => {
   it('normalizes ampersand and and consistently', () => {
     expect(gradeAttempt('one hundred and five', 'one hundred & five')).toBe(true);
   });
+
+  it('normalizes diacritics for short text answers', () => {
+    expect(gradeAttempt('cafe', 'café')).toBe(true);
+  });
+
+  it('supports multiple accepted answers split by semicolon/pipe/newline', () => {
+    expect(gradeAttempt('4;four|IV\n 04 ', 'iv')).toBe(true);
+  });
 });
