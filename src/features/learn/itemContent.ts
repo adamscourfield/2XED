@@ -1,4 +1,4 @@
-export type ItemInteractionType = 'MCQ' | 'TRUE_FALSE' | 'SHORT_TEXT' | 'ORDER';
+export type ItemInteractionType = 'MCQ' | 'TRUE_FALSE' | 'SHORT_TEXT' | 'SHORT_NUMERIC' | 'ORDER';
 
 export interface ItemContent {
   type: ItemInteractionType;

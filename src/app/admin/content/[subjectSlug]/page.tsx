@@ -37,7 +37,7 @@ export default async function AdminContentPage({ params }: Props) {
     include: {
       skills: {
         include: {
-          skill: { select: { code: true } },
+          skill: { select: { code: true, sortOrder: true } },
         },
       },
       reviewNotes: {
@@ -47,16 +47,36 @@ export default async function AdminContentPage({ params }: Props) {
         orderBy: { createdAt: 'desc' },
       },
     },
-    orderBy: { question: 'asc' },
+    orderBy: [{ createdAt: 'asc' }, { question: 'asc' }],
   });
 
-  const qaItems = importedItems.map(buildQaItemView);
+  const qaItems = importedItems
+    .map(buildQaItemView)
+    .sort((a, b) => {
+      const purposeOrder = { ONBOARDING: 0, LEARN: 1, RETEACH_SHADOW: 2 } as const;
+      const routeOrder = { A: 0, B: 1, C: 2 } as const;
+
+      return (
+        a.primarySkillSortOrder - b.primarySkillSortOrder ||
+        a.primarySkillCode.localeCompare(b.primarySkillCode) ||
+        purposeOrder[a.questionPurpose] - purposeOrder[b.questionPurpose] ||
+        a.sequenceKey.diagnosticOrdinal - b.sequenceKey.diagnosticOrdinal ||
+        a.sequenceKey.questionOrdinal - b.sequenceKey.questionOrdinal ||
+        a.sequenceKey.questionAlphaOrder - b.sequenceKey.questionAlphaOrder ||
+        (routeOrder[a.sequenceKey.shadowRoute as keyof typeof routeOrder] ?? 99) -
+          (routeOrder[b.sequenceKey.shadowRoute as keyof typeof routeOrder] ?? 99) ||
+        a.sequenceKey.shadowOrdinal - b.sequenceKey.shadowOrdinal ||
+        (a.sequenceKey.createdAt ?? '').localeCompare(b.sequenceKey.createdAt ?? '') ||
+        a.displayQuestion.localeCompare(b.displayQuestion)
+      );
+    });
   const skillSet = Array.from(new Set(qaItems.flatMap((item) => item.skills))).sort();
   const typeSet = Array.from(new Set(qaItems.map((item) => item.type))).sort();
   const typeCounts = typeSet.map((type) => ({
     type,
     count: qaItems.filter((item) => item.type === type).length,
   }));
+  const placeholderCount = qaItems.filter((item) => item.isPlaceholder).length;
   const issueCount = qaItems.reduce((sum, item) => sum + item.issues.length, 0);
   const flaggedCount = qaItems.filter((item) => item.issues.length > 0).length;
   const repairOpenCount = qaItems.reduce(
@@ -83,6 +103,9 @@ export default async function AdminContentPage({ params }: Props) {
           <div className="rounded-xl border border-gray-200 bg-white p-4">
             <div className="text-xs text-gray-500">Questions loaded</div>
             <div className="mt-1 text-2xl font-bold text-gray-900">{qaItems.length}</div>
+            {placeholderCount > 0 && (
+              <div className="mt-1 text-xs text-gray-500">{placeholderCount} placeholder rows hidden by default in the list</div>
+            )}
           </div>
           <div className="rounded-xl border border-gray-200 bg-white p-4">
             <div className="text-xs text-gray-500">Flagged items</div>

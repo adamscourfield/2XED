@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getItemContent, ItemInteractionType } from './itemContent';
 import { sanitizeStudentCopy } from './studentCopy';
@@ -62,14 +62,20 @@ export function LearnSession({ subject, skill, items, userId }: Props) {
   }
 
   function renderAnswerInput(type: ItemInteractionType) {
-    if (type === 'SHORT_TEXT') {
+    if (type === 'SHORT_TEXT' || type === 'SHORT_NUMERIC') {
       return (
-        <input
-          value={selectedAnswer}
-          onChange={(e) => setSelectedAnswer(e.target.value)}
-          className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 text-gray-700 focus:border-blue-500 focus:outline-none"
-          placeholder="Type your answer"
-        />
+        <div className="space-y-2">
+          <input
+            value={selectedAnswer}
+            onChange={(e) => setSelectedAnswer(e.target.value)}
+            inputMode={type === 'SHORT_NUMERIC' ? 'decimal' : 'text'}
+            className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 text-gray-700 focus:border-blue-500 focus:outline-none"
+            placeholder={type === 'SHORT_NUMERIC' ? 'Enter a number' : 'Type your answer'}
+          />
+          {type === 'SHORT_TEXT' && (
+            <p className="text-sm text-gray-500">Use clear words. Commas and “and” are both okay.</p>
+          )}
+        </div>
       );
     }
 

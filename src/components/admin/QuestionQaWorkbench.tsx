@@ -6,22 +6,50 @@ import { getItemContent, gradeAttempt, normalizeAnswer, type ItemInteractionType
 interface QaItem {
   id: string;
   question: string;
+  displayQuestion: string;
   type: string;
+  answerType: 'MCQ' | 'SHORT_TEXT' | 'SHORT_NUMERIC' | 'TRUE_FALSE';
+  answerModeLabel: string;
   answer: string;
   options: unknown;
   skills: string[];
+  primarySkillCode: string;
+  primarySkillSortOrder: number;
+  questionPurpose: 'ONBOARDING' | 'LEARN' | 'RETEACH_SHADOW';
+  isPlaceholder: boolean;
+  sequenceKey: {
+    diagnosticOrdinal: number;
+    questionOrdinal: number;
+    questionAlphaOrder: number;
+    shadowRoute: string | null;
+    shadowOrdinal: number;
+    createdAt: string | null;
+    displayQuestion: string;
+  };
   issues: Array<{ code: string; message: string; severity: 'error' | 'warning' }>;
+  reviewNotes?: Array<{
+    id: string;
+    status: 'OPEN' | 'RESOLVED';
+    category: 'ANSWER_MODE' | 'ANSWER_MAPPING' | 'STEM_COPY' | 'DISTRACTOR_QUALITY' | 'SKILL_MAPPING' | 'OTHER';
+    note: string;
+    createdAt: string;
+    resolvedAt: string | null;
+    authorLabel: string;
+  }>;
 }
 
 interface Props {
   items: QaItem[];
   availableSkills: string[];
+  availableTypes?: string[];
 }
 
-export function QuestionQaWorkbench({ items, availableSkills }: Props) {
+export function QuestionQaWorkbench({ items, availableSkills, availableTypes = [] }: Props) {
   const [skillFilter, setSkillFilter] = useState('ALL');
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'ISSUES' | 'CLEAN'>('ALL');
   const [modeFilter, setModeFilter] = useState<'ALL' | ItemInteractionType>('ALL');
+  const [typeFilter, setTypeFilter] = useState('ALL');
+  const [contentFilter, setContentFilter] = useState<'REAL_ONLY' | 'ALL' | 'PLACEHOLDERS'>('REAL_ONLY');
   const [selectedId, setSelectedId] = useState(items[0]?.id ?? '');
   const [draftAnswer, setDraftAnswer] = useState('');
   const [submittedAnswer, setSubmittedAnswer] = useState('');
@@ -31,10 +59,13 @@ export function QuestionQaWorkbench({ items, availableSkills }: Props) {
       if (skillFilter !== 'ALL' && !item.skills.includes(skillFilter)) return false;
       if (statusFilter === 'ISSUES' && item.issues.length === 0) return false;
       if (statusFilter === 'CLEAN' && item.issues.length > 0) return false;
+      if (contentFilter === 'REAL_ONLY' && item.isPlaceholder) return false;
+      if (contentFilter === 'PLACEHOLDERS' && !item.isPlaceholder) return false;
+      if (typeFilter !== 'ALL' && item.type !== typeFilter) return false;
       if (modeFilter !== 'ALL' && getItemContent(item).type !== modeFilter) return false;
       return true;
     });
-  }, [items, modeFilter, skillFilter, statusFilter]);
+  }, [contentFilter, items, modeFilter, skillFilter, statusFilter, typeFilter]);
 
   useEffect(() => {
     if (!filteredItems.some((item) => item.id === selectedId)) {
@@ -51,6 +82,7 @@ export function QuestionQaWorkbench({ items, availableSkills }: Props) {
         MCQ: 'Single-choice buttons',
         TRUE_FALSE: 'True / False buttons',
         SHORT_TEXT: 'Typed short answer',
+        SHORT_NUMERIC: 'Typed numeric answer',
         ORDER: 'Tap-to-order sequence',
       } satisfies Record<ItemInteractionType, string>)[itemContent.type]
     : null;
@@ -77,13 +109,14 @@ export function QuestionQaWorkbench({ items, availableSkills }: Props) {
   function renderInput(type: ItemInteractionType) {
     if (!itemContent) return null;
 
-    if (type === 'SHORT_TEXT') {
+    if (type === 'SHORT_TEXT' || type === 'SHORT_NUMERIC') {
       return (
         <input
           value={draftAnswer}
           onChange={(e) => setDraftAnswer(e.target.value)}
           className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none"
-          placeholder="Type a test answer"
+          inputMode={type === 'SHORT_NUMERIC' ? 'decimal' : 'text'}
+          placeholder={type === 'SHORT_NUMERIC' ? 'Enter a test number' : 'Type a test answer'}
         />
       );
     }
@@ -183,6 +216,18 @@ export function QuestionQaWorkbench({ items, availableSkills }: Props) {
               </select>
             </label>
             <label className="block text-sm">
+              <span className="mb-1 block text-gray-600">Content</span>
+              <select
+                value={contentFilter}
+                onChange={(e) => setContentFilter(e.target.value as 'REAL_ONLY' | 'ALL' | 'PLACEHOLDERS')}
+                className="w-full rounded-lg border border-gray-300 px-3 py-2"
+              >
+                <option value="REAL_ONLY">Real questions only</option>
+                <option value="ALL">All rows</option>
+                <option value="PLACEHOLDERS">Placeholders only</option>
+              </select>
+            </label>
+            <label className="block text-sm">
               <span className="mb-1 block text-gray-600">Answer mode</span>
               <select
                 value={modeFilter}
@@ -193,9 +238,25 @@ export function QuestionQaWorkbench({ items, availableSkills }: Props) {
                 <option value="MCQ">Single-choice</option>
                 <option value="TRUE_FALSE">True / False</option>
                 <option value="SHORT_TEXT">Short answer</option>
+                <option value="SHORT_NUMERIC">Numeric answer</option>
                 <option value="ORDER">Ordered sequence</option>
               </select>
             </label>
+            {availableTypes.length > 0 && (
+              <label className="block text-sm">
+                <span className="mb-1 block text-gray-600">Stored type</span>
+                <select
+                  value={typeFilter}
+                  onChange={(e) => setTypeFilter(e.target.value)}
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                >
+                  <option value="ALL">All stored types</option>
+                  {availableTypes.map((type) => (
+                    <option key={type} value={type}>{type}</option>
+                  ))}
+                </select>
+              </label>
+            )}
           </div>
           <div className="mt-4 text-xs text-gray-500">
             Showing {filteredItems.length} of {items.length} questions
@@ -217,13 +278,21 @@ export function QuestionQaWorkbench({ items, availableSkills }: Props) {
             >
               <div className="flex items-center justify-between gap-3">
                 <span className="text-xs font-medium text-gray-500">Q{index + 1}</span>
-                {item.issues.length > 0 && (
-                  <span className="rounded-full bg-red-50 px-2 py-0.5 text-xs font-medium text-red-700">
-                    {item.issues.length} issue{item.issues.length !== 1 ? 's' : ''}
-                  </span>
-                )}
+                <div className="flex items-center gap-2">
+                  {item.isPlaceholder && (
+                    <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-700">
+                      Placeholder
+                    </span>
+                  )}
+                  {item.issues.length > 0 && (
+                    <span className="rounded-full bg-red-50 px-2 py-0.5 text-xs font-medium text-red-700">
+                      {item.issues.length} issue{item.issues.length !== 1 ? 's' : ''}
+                    </span>
+                  )}
+                </div>
               </div>
-              <p className="mt-1 text-sm text-gray-800">{item.question}</p>
+              <p className="mt-1 text-xs font-medium text-blue-700">{item.primarySkillCode} · {item.questionPurpose}</p>
+              <p className="mt-1 text-sm text-gray-800">{item.displayQuestion}</p>
             </button>
           ))}
         </div>
@@ -245,8 +314,16 @@ export function QuestionQaWorkbench({ items, availableSkills }: Props) {
                 {skill}
               </span>
             ))}
+            {currentItem.isPlaceholder && (
+              <span className="rounded-full bg-slate-100 px-2 py-1 text-xs font-medium text-slate-700">
+                Placeholder seed row
+              </span>
+            )}
           </div>
-          <h2 className="mt-4 text-xl font-semibold text-gray-900">{currentItem.question}</h2>
+          <h2 className="mt-4 text-xl font-semibold text-gray-900">{currentItem.displayQuestion}</h2>
+          {currentItem.displayQuestion !== currentItem.question && (
+            <p className="mt-2 text-xs text-gray-500">Stored stem: {currentItem.question}</p>
+          )}
 
           <div className="mt-6 rounded-xl border border-gray-200 bg-gray-50 p-4">
             <h3 className="text-sm font-semibold text-gray-900">Student Preview</h3>
@@ -333,6 +410,30 @@ export function QuestionQaWorkbench({ items, availableSkills }: Props) {
             <p className="mt-4 text-sm text-green-700">No contract issues detected for this item.</p>
           )}
         </div>
+
+        {currentItem.reviewNotes && currentItem.reviewNotes.length > 0 && (
+          <div className="rounded-xl border border-gray-200 bg-white p-6">
+            <h3 className="text-sm font-semibold text-gray-900">Repair Notes</h3>
+            <div className="mt-4 space-y-3">
+              {currentItem.reviewNotes.map((note) => (
+                <div key={note.id} className="rounded-lg border border-gray-200 p-4 text-sm">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="rounded-full bg-slate-100 px-2 py-1 text-xs font-medium text-slate-700">
+                      {note.category}
+                    </span>
+                    <span className={`rounded-full px-2 py-1 text-xs font-medium ${
+                      note.status === 'OPEN' ? 'bg-amber-50 text-amber-700' : 'bg-green-50 text-green-700'
+                    }`}>
+                      {note.status}
+                    </span>
+                    <span className="text-xs text-gray-500">{note.authorLabel}</span>
+                  </div>
+                  <p className="mt-2 text-gray-800">{note.note}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </section>
     </div>
   );
