@@ -67,6 +67,7 @@ export default async function AdminContentKSMathsPage() {
     });
   const skillSet = Array.from(new Set(qaItems.flatMap((item) => item.skills))).sort();
   const typeSet = Array.from(new Set(qaItems.map((item) => item.type))).sort();
+  const realQuestionCount = qaItems.filter((item) => !item.isPlaceholder).length;
   const placeholderCount = qaItems.filter((item) => item.isPlaceholder).length;
   const issueCount = qaItems.reduce((sum, item) => sum + item.issues.length, 0);
   const flaggedCount = qaItems.filter((item) => item.issues.length > 0).length;
@@ -90,12 +91,20 @@ export default async function AdminContentKSMathsPage() {
           </a>
         </div>
 
-        <section className="grid gap-4 md:grid-cols-5">
+        <section className="grid gap-4 md:grid-cols-6">
           <div className="rounded-xl border border-gray-200 bg-white p-4">
-            <div className="text-xs text-gray-500">Questions loaded</div>
+            <div className="text-xs text-gray-500">Total rows</div>
             <div className="mt-1 text-2xl font-bold text-gray-900">{qaItems.length}</div>
+          </div>
+          <div className="rounded-xl border border-gray-200 bg-white p-4">
+            <div className="text-xs text-gray-500">Real questions</div>
+            <div className="mt-1 text-2xl font-bold text-emerald-700">{realQuestionCount}</div>
+          </div>
+          <div className="rounded-xl border border-gray-200 bg-white p-4">
+            <div className="text-xs text-gray-500">Placeholder rows</div>
+            <div className="mt-1 text-2xl font-bold text-slate-600">{placeholderCount}</div>
             {placeholderCount > 0 && (
-              <div className="mt-1 text-xs text-gray-500">{placeholderCount} placeholder rows hidden by default in the list</div>
+              <div className="mt-1 text-xs text-gray-500">Hidden by default in the list</div>
             )}
           </div>
           <div className="rounded-xl border border-gray-200 bg-white p-4">
