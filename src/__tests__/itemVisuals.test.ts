@@ -68,6 +68,49 @@ describe('resolveItemVisuals', () => {
     });
   });
 
+  it('builds a jump number line for starts-at-and-jumps prompts', () => {
+    const visuals = resolveItemVisuals(
+      {
+        question: 'What addition is being shown if a number line starts at 10 and jumps on 6?',
+        options: {},
+      },
+      'N2.1'
+    );
+
+    expect(visuals).toHaveLength(1);
+    expect(visuals[0]).toMatchObject({
+      type: 'number-line',
+      markers: [{ value: 10 }, { value: 16 }],
+      jumps: [{ from: 10, to: 16, label: '+6' }],
+    });
+  });
+
+  it('builds irregular polygons as irregular shapes, not regular ones', () => {
+    const visuals = resolveItemVisuals(
+      {
+        question: 'Find the perimeter of an irregular polygon with side lengths 5 cm, 8 cm, 3 cm and 6 cm.',
+        options: {},
+      },
+      'N2.9'
+    );
+
+    expect(visuals).toHaveLength(1);
+    expect(visuals[0]).toMatchObject({
+      type: 'shape',
+      shape: 'irregular-polygon',
+    });
+    expect(visuals[0]).toMatchObject({
+      vertices: expect.arrayContaining([
+        expect.objectContaining({ x: expect.any(Number), y: expect.any(Number) }),
+      ]),
+    });
+    if (visuals[0].type === 'shape') {
+      expect(visuals[0].vertices).toHaveLength(4);
+      expect(visuals[0].edges).toHaveLength(4);
+      expect(visuals[0].meta?.polygonSides).toBe(4);
+    }
+  });
+
   it('builds a column arithmetic visual for formal methods questions', () => {
     const visuals = resolveItemVisuals(
       {
@@ -99,6 +142,22 @@ describe('resolveItemVisuals', () => {
     expect(visuals[0]).toMatchObject({
       type: 'shape',
       shape: 'compound-l-shape',
+    });
+  });
+
+  it('renders regular 4-sided naming prompts as squares', () => {
+    const visuals = resolveItemVisuals(
+      {
+        question: 'A pupil says a regular 4-sided shape is called a rectangle. What is the correct name?',
+        options: {},
+      },
+      'N2.10'
+    );
+
+    expect(visuals).toHaveLength(1);
+    expect(visuals[0]).toMatchObject({
+      type: 'shape',
+      shape: 'square',
     });
   });
 });

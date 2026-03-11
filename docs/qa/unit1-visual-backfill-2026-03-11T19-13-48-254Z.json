@@ -1,0 +1,331 @@
+{
+  "generatedAt": "2026-03-11T19:13:48.254Z",
+  "scope": "Unit 1 items linked to N1.* or N2.* skills",
+  "summary": {
+    "totalItems": 352,
+    "generated": 60,
+    "alreadyStored": 0,
+    "manualReview": 2,
+    "notNeeded": 290
+  },
+  "manualReviewItems": [
+    {
+      "itemId": "cmmm83wbm006dzps3bvu8ej40",
+      "primarySkillCode": "N2.5",
+      "question": "Find the perimeter of a parallelogram with side lengths 2.9 cm and 0.7 cm.",
+      "type": "SHORT_NUMERIC",
+      "status": "manual_review",
+      "reason": "A low-confidence fallback visual was possible, but this question still needs a manually authored spec."
+    },
+    {
+      "itemId": "cmmm83wc5006pzps38fzg2yjv",
+      "primarySkillCode": "N2.9",
+      "question": "Perimeter is the distance around the outside of a 2D shape. True or false?",
+      "type": "MCQ",
+      "status": "manual_review",
+      "reason": "This question should have a visual, but no deterministic spec could be generated from the current data."
+    }
+  ],
+  "generatedItems": [
+    {
+      "itemId": "cmmjawsje000vqxi9kjv673yg",
+      "primarySkillCode": "N1.10",
+      "question": "Round 7.2 to the nearest integer."
+    },
+    {
+      "itemId": "cmmjawsji000xqxi9t4tpo2sd",
+      "primarySkillCode": "N1.10",
+      "question": "Round 1.9 to the nearest integer."
+    },
+    {
+      "itemId": "cmmjawsjm000zqxi9ma19x0as",
+      "primarySkillCode": "N1.10",
+      "question": "Round 14.3 to the nearest integer."
+    },
+    {
+      "itemId": "cmmjawsjq0011qxi9mgg5lvbo",
+      "primarySkillCode": "N1.10",
+      "question": "Round 50.6 to the nearest integer."
+    },
+    {
+      "itemId": "cmmjawsju0013qxi95n3nhqxl",
+      "primarySkillCode": "N1.10",
+      "question": "Round 27.8 to the nearest integer."
+    },
+    {
+      "itemId": "cmmjawsjx0015qxi9itwjbjag",
+      "primarySkillCode": "N1.10",
+      "question": "Round 154.7 to the nearest integer."
+    },
+    {
+      "itemId": "cmmjawsk10017qxi9xsvne2bu",
+      "primarySkillCode": "N1.10",
+      "question": "Round 29.1 to the nearest integer."
+    },
+    {
+      "itemId": "cmmjawsk50019qxi9m6rc1m82",
+      "primarySkillCode": "N1.10",
+      "question": "Round 6.34 to the nearest integer."
+    },
+    {
+      "itemId": "cmmjawsk8001bqxi9hh8ba61p",
+      "primarySkillCode": "N1.10",
+      "question": "Round 38.15 to the nearest integer."
+    },
+    {
+      "itemId": "cmmjawskb001dqxi92qmp0cw2",
+      "primarySkillCode": "N1.10",
+      "question": "Round 103.46 to the nearest integer."
+    },
+    {
+      "itemId": "cmmm83w500029zps3qcbsxuy8",
+      "primarySkillCode": "N1.3",
+      "question": "A number line goes 10, 20, 30, 40. What number is halfway between 20 and 30?"
+    },
+    {
+      "itemId": "cmmm83w57002dzps3qkyfplin",
+      "primarySkillCode": "N1.3",
+      "question": "A number line shows 100 and 150 as neighbouring marks. Estimate the value halfway between them."
+    },
+    {
+      "itemId": "cmmm83w59002fzps3tzhm3714",
+      "primarySkillCode": "N1.3",
+      "question": "A number line starts at 0 and ends at 100. Where would 70 go?"
+    },
+    {
+      "itemId": "cmmm83w5c002hzps375ze5xrd",
+      "primarySkillCode": "N1.3",
+      "question": "What is the midpoint between 2990 and 3010 on a number line?"
+    },
+    {
+      "itemId": "cmmm83w5e002jzps3smm9msvb",
+      "primarySkillCode": "N1.9",
+      "question": "Round 134 to the nearest 10."
+    },
+    {
+      "itemId": "cmmm83w5h002lzps39w11zkxp",
+      "primarySkillCode": "N1.9",
+      "question": "Round 2158 to the nearest 10."
+    },
+    {
+      "itemId": "cmmm83w5m002nzps34fkzpymm",
+      "primarySkillCode": "N1.9",
+      "question": "Round 574 to the nearest 10."
+    },
+    {
+      "itemId": "cmmm83w5o002pzps32fu0mxvv",
+      "primarySkillCode": "N1.9",
+      "question": "Round 1853 to the nearest 1000."
+    },
+    {
+      "itemId": "cmmm83w5v002tzps3x4xptcos",
+      "primarySkillCode": "N1.6",
+      "question": "What is the midpoint between 1.2 and 1.4 on a number line?"
+    },
+    {
+      "itemId": "cmmm83w5z002vzps3rotv3bq4",
+      "primarySkillCode": "N1.6",
+      "question": "A decimal lies halfway between 0.3 and 0.4 on a number line. What is it?"
+    },
+    {
+      "itemId": "cmmm83w63002xzps3f6rlel56",
+      "primarySkillCode": "N1.6",
+      "question": "Which number would be between 0.8 and 0.9 on a number line?"
+    },
+    {
+      "itemId": "cmmm83w68002zzps3k4xue70k",
+      "primarySkillCode": "N1.6",
+      "question": "Which section would 0.7501 belong in on a number line split into sections 0.70-0.75, 0.75-0.80, 0.80-0.85, 0.85-0.90?"
+    },
+    {
+      "itemId": "cmmm83w70003bzps3opmjjph6",
+      "primarySkillCode": "N1.9",
+      "question": "Which number is smaller: -1 or -5?"
+    },
+    {
+      "itemId": "cmmm83w73003dzps3ud6rzcvz",
+      "primarySkillCode": "N1.9",
+      "question": "Write these numbers from left to right on a number line: -10, -4, -17"
+    },
+    {
+      "itemId": "cmmm83w76003fzps3vuxf8xsm",
+      "primarySkillCode": "N1.9",
+      "question": "The difference between P and Q is 24 on a negative number line. If Q is at -12 and P is to the left of Q, what is P?"
+    },
+    {
+      "itemId": "cmmm83w79003hzps31l0ncfro",
+      "primarySkillCode": "N1.13",
+      "question": "True or false: -4 > -7"
+    },
+    {
+      "itemId": "cmmm83w7d003jzps3ivvvmijn",
+      "primarySkillCode": "N1.13",
+      "question": "Complete the statement with < or > : -740 __ -470"
+    },
+    {
+      "itemId": "cmmm83w7g003lzps352u0tbua",
+      "primarySkillCode": "N1.13",
+      "question": "Rewrite this statement so it is true: -3 < -5"
+    },
+    {
+      "itemId": "cmmm83w7k003nzps3jyyoj1oc",
+      "primarySkillCode": "N1.13",
+      "question": "True or false: a = -8 satisfies the inequality a < -5"
+    },
+    {
+      "itemId": "cmmm83w8i0045zps3h6vtyrfg",
+      "primarySkillCode": "N1.13",
+      "question": "Explain why 5 - 10 = 5 is not correct."
+    },
+    {
+      "itemId": "cmmm83w8l0047zps3q7a4hbtp",
+      "primarySkillCode": "N1.3",
+      "question": "Use a number line to calculate 4 + 3."
+    },
+    {
+      "itemId": "cmmm83w8o0049zps3wfbggpj3",
+      "primarySkillCode": "N2.2",
+      "question": "Calculate 5 + 6 mentally."
+    },
+    {
+      "itemId": "cmmm83w8r004bzps3i6c6mcil",
+      "primarySkillCode": "N2.1",
+      "question": "What addition is being shown if a number line starts at 10 and jumps on 6?"
+    },
+    {
+      "itemId": "cmmm83w94004nzps3ysqp5h77",
+      "primarySkillCode": "N1.1",
+      "question": "Calculate 15 + 30 using column addition."
+    },
+    {
+      "itemId": "cmmm83w96004pzps391dbdt4b",
+      "primarySkillCode": "N1.1",
+      "question": "Calculate 45 + 32 using column addition."
+    },
+    {
+      "itemId": "cmmm83w98004rzps3733ezlem",
+      "primarySkillCode": "N1.1",
+      "question": "Calculate 444 + 351 using column addition."
+    },
+    {
+      "itemId": "cmmm83w9d004vzps36xnry2ri",
+      "primarySkillCode": "N1.6",
+      "question": "Calculate 11.8 + 2.3."
+    },
+    {
+      "itemId": "cmmm83w9g004xzps3vzuj3wdm",
+      "primarySkillCode": "N1.6",
+      "question": "Calculate 2.04 + 0.7 using column addition."
+    },
+    {
+      "itemId": "cmmm83w9j004zzps3da3sii08",
+      "primarySkillCode": "N1.6",
+      "question": "Calculate 0.53 + 5.27 using column addition."
+    },
+    {
+      "itemId": "cmmm83w9p0053zps3k9lst9hy",
+      "primarySkillCode": "N1.1",
+      "question": "Calculate 83 - 52 using column subtraction."
+    },
+    {
+      "itemId": "cmmm83w9r0055zps3twqawf6d",
+      "primarySkillCode": "N1.1",
+      "question": "Calculate 96 - 24 using column subtraction."
+    },
+    {
+      "itemId": "cmmm83w9u0057zps340zyqii8",
+      "primarySkillCode": "N1.1",
+      "question": "Calculate 45 - 32 using column subtraction."
+    },
+    {
+      "itemId": "cmmm83wa0005bzps38qg5divj",
+      "primarySkillCode": "N1.7",
+      "question": "Calculate 3.8 - 2.5."
+    },
+    {
+      "itemId": "cmmm83wa3005dzps38hnzgjn2",
+      "primarySkillCode": "N1.7",
+      "question": "Calculate 1.8 - 0.6 using column subtraction."
+    },
+    {
+      "itemId": "cmmm83wa6005fzps3o70dy5f9",
+      "primarySkillCode": "N1.7",
+      "question": "Calculate 8.7 - 1.3 using column subtraction."
+    },
+    {
+      "itemId": "cmmm83way005vzps3xib3lh8y",
+      "primarySkillCode": "N2.1",
+      "question": "An irregular polygon has side lengths 4 cm, 6 cm and 7 cm. What is its perimeter?"
+    },
+    {
+      "itemId": "cmmm83wb1005xzps3hk804b6c",
+      "primarySkillCode": "N2.1",
+      "question": "Find the perimeter of an irregular polygon with side lengths 5 cm, 8 cm, 3 cm and 6 cm."
+    },
+    {
+      "itemId": "cmmm83wb60061zps3o23cw2we",
+      "primarySkillCode": "N2.9",
+      "question": "A regular polygon has all sides the same length and all angles equal. True or false?"
+    },
+    {
+      "itemId": "cmmm83wb90063zps3w4n5ukah",
+      "primarySkillCode": "N2.1",
+      "question": "A regular pentagon has side length 3 cm. What is its perimeter?"
+    },
+    {
+      "itemId": "cmmm83wbc0065zps3t6r2j7kf",
+      "primarySkillCode": "N2.1",
+      "question": "A regular hexagon has side length 4 cm. What is its perimeter?"
+    },
+    {
+      "itemId": "cmmm83wbf0067zps321aizglp",
+      "primarySkillCode": "N2.9",
+      "question": "A pupil says a regular 4-sided shape is called a rectangle. What is the correct name?"
+    },
+    {
+      "itemId": "cmmm83wbi0069zps30dx7rw2b",
+      "primarySkillCode": "N2.1",
+      "question": "A rectangle has opposite sides equal. If one long side is 9 cm, how long is the opposite side?"
+    },
+    {
+      "itemId": "cmmm83wbk006bzps34msqsvv9",
+      "primarySkillCode": "N2.1",
+      "question": "Find the perimeter of a rectangle with length 9 cm and width 4 cm."
+    },
+    {
+      "itemId": "cmmm83wbq006fzps3jkssu15d",
+      "primarySkillCode": "N2.1",
+      "question": "A pupil says the perimeter of a rectangle with sides 8 cm and 3 cm is 11 cm. What have they forgotten to do?"
+    },
+    {
+      "itemId": "cmmm83wbs006hzps33sbl2qgs",
+      "primarySkillCode": "N2.10",
+      "question": "An isosceles triangle has two sides of equal length. True or false?"
+    },
+    {
+      "itemId": "cmmm83wbw006jzps3qurzbt7x",
+      "primarySkillCode": "N2.1",
+      "question": "An isosceles triangle has two equal sides of 5 cm and a base of 3 cm. What is its perimeter?"
+    },
+    {
+      "itemId": "cmmm83wbz006lzps3nbphwr1j",
+      "primarySkillCode": "N2.1",
+      "question": "An isosceles trapezium has parallel sides of 9 cm and 5 cm, and the two equal non-parallel sides are 4 cm each. What is its perimeter?"
+    },
+    {
+      "itemId": "cmmm83wc2006nzps3utekqx8i",
+      "primarySkillCode": "N2.10",
+      "question": "In an isosceles trapezium, one non-parallel side is 6 cm. How long is the other non-parallel side?"
+    },
+    {
+      "itemId": "cmmm83wca006rzps3aed76xn6",
+      "primarySkillCode": "N2.9",
+      "question": "A compound shape is made by joining two rectangles. The outside side lengths are 6 cm, 4 cm, 2 cm, 3 cm, 8 cm and 7 cm. What is its perimeter?"
+    },
+    {
+      "itemId": "cmmm83wce006tzps3eytuqw2g",
+      "primarySkillCode": "N2.9",
+      "question": "When finding the perimeter of a compound shape, should you include an inside edge where two rectangles join?"
+    }
+  ]
+}

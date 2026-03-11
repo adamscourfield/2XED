@@ -45,6 +45,21 @@ function parseNumericTokens(question: string): number[] {
   );
 }
 
+function parseOperationTokens(question: string): { left: number; operator: '+' | '-'; right: number } | null {
+  const match = question.match(/(-?\d[\d,]*(?:\.\d+)?)\s*([+\-])\s*(-?\d[\d,]*(?:\.\d+)?)/);
+  if (!match) return null;
+
+  const left = Number(match[1].replace(/,/g, ''));
+  const right = Number(match[3].replace(/,/g, ''));
+  if (!Number.isFinite(left) || !Number.isFinite(right)) return null;
+
+  return {
+    left,
+    operator: match[2] as '+' | '-',
+    right,
+  };
+}
+
 function parseCentimetreValues(question: string): string[] {
   return [...question.matchAll(/([-+]?\d+(?:\.\d+)?)\s*cm\b/gi)].map((match) => `${match[1]} cm`);
 }
@@ -139,6 +154,29 @@ function createRectangle(labels: string[]): ShapeVisual {
   };
 }
 
+function createSquare(labels: string[]): ShapeVisual {
+  const sideLabel = labels[0] ?? 'side';
+  return {
+    type: 'shape',
+    shape: 'square',
+    altText: 'Square with equal sides.',
+    caption: 'Structured square diagram generated from the question.',
+    vertices: [
+      { x: 52, y: 40 },
+      { x: 180, y: 40 },
+      { x: 180, y: 168 },
+      { x: 52, y: 168 },
+    ],
+    edges: [
+      { from: 0, to: 1, label: sideLabel, offsetY: -10 },
+      { from: 1, to: 2, label: sideLabel, anchor: 'start', offsetX: 14 },
+      { from: 2, to: 3, label: sideLabel, offsetY: 18 },
+      { from: 3, to: 0, label: sideLabel, anchor: 'end', offsetX: -14 },
+    ],
+    meta: { notToScale: true },
+  };
+}
+
 function createParallelogram(labels: string[]): ShapeVisual {
   return {
     type: 'shape',
@@ -220,6 +258,58 @@ function edgeLabelsForPolygon(labels: string[], points: VisualPoint[]): ShapeEdg
   }));
 }
 
+function irregularPolygonPoints(sides: number): VisualPoint[] {
+  const templates: Record<number, VisualPoint[]> = {
+    3: [
+      { x: 126, y: 28 },
+      { x: 38, y: 162 },
+      { x: 214, y: 138 },
+    ],
+    4: [
+      { x: 44, y: 56 },
+      { x: 176, y: 34 },
+      { x: 214, y: 132 },
+      { x: 68, y: 164 },
+    ],
+    5: [
+      { x: 42, y: 64 },
+      { x: 132, y: 30 },
+      { x: 214, y: 68 },
+      { x: 184, y: 150 },
+      { x: 64, y: 164 },
+    ],
+    6: [
+      { x: 45, y: 52 },
+      { x: 128, y: 30 },
+      { x: 218, y: 64 },
+      { x: 188, y: 148 },
+      { x: 82, y: 164 },
+      { x: 30, y: 102 },
+    ],
+    7: [
+      { x: 54, y: 42 },
+      { x: 132, y: 24 },
+      { x: 212, y: 56 },
+      { x: 226, y: 122 },
+      { x: 172, y: 170 },
+      { x: 88, y: 164 },
+      { x: 34, y: 108 },
+    ],
+    8: [
+      { x: 58, y: 34 },
+      { x: 136, y: 24 },
+      { x: 206, y: 54 },
+      { x: 224, y: 114 },
+      { x: 196, y: 170 },
+      { x: 126, y: 182 },
+      { x: 60, y: 158 },
+      { x: 28, y: 94 },
+    ],
+  };
+
+  return templates[Math.max(3, Math.min(8, sides))] ?? templates[5];
+}
+
 function createRegularPolygon(question: string, labels: string[]): ShapeVisual {
   const lower = question.toLowerCase();
   const sides = lower.includes('triangle')
@@ -247,29 +337,41 @@ function createRegularPolygon(question: string, labels: string[]): ShapeVisual {
   };
 }
 
+function createGenericTriangle(labels: string[]): ShapeVisual {
+  return {
+    type: 'shape',
+    shape: 'triangle',
+    altText: 'Triangle with labelled sides.',
+    caption: 'Structured triangle diagram generated from the question.',
+    vertices: [
+      { x: 120, y: 34 },
+      { x: 44, y: 152 },
+      { x: 206, y: 140 },
+    ],
+    edges: [
+      { from: 0, to: 1, label: labels[0] ?? 'side a', offsetX: -14 },
+      { from: 1, to: 2, label: labels[1] ?? 'side b', offsetY: 18 },
+      { from: 2, to: 0, label: labels[2] ?? labels[0] ?? 'side c', offsetX: 12 },
+    ],
+    meta: { notToScale: true },
+  };
+}
+
 function createIrregularPolygon(labels: string[]): ShapeVisual {
+  const sideCount = Math.max(3, Math.min(8, labels.length || 5));
+  const vertices = irregularPolygonPoints(sideCount);
   return {
     type: 'shape',
     shape: 'irregular-polygon',
     altText: 'Irregular polygon with labelled outside edges.',
     caption: 'Structured polygon diagram generated from the question.',
-    vertices: [
-      { x: 45, y: 52 },
-      { x: 128, y: 30 },
-      { x: 218, y: 64 },
-      { x: 188, y: 148 },
-      { x: 82, y: 164 },
-      { x: 30, y: 102 },
-    ],
-    edges: [
-      { from: 0, to: 1, label: labels[0] ?? 'a', offsetY: -8 },
-      { from: 1, to: 2, label: labels[1] ?? 'b', offsetY: -6, anchor: 'start', offsetX: 8 },
-      { from: 2, to: 3, label: labels[2] ?? 'c', anchor: 'start', offsetX: 12 },
-      { from: 3, to: 4, label: labels[3] ?? 'd', offsetY: 16 },
-      { from: 4, to: 5, label: labels[4] ?? 'e', anchor: 'end', offsetX: -12 },
-      { from: 5, to: 0, label: labels[5] ?? 'f', anchor: 'end', offsetX: -10 },
-    ],
-    meta: { notToScale: true },
+    vertices,
+    edges: vertices.map((_, index) => ({
+      from: index,
+      to: (index + 1) % vertices.length,
+      label: labels[index] ?? String.fromCharCode(97 + index),
+    })),
+    meta: { notToScale: true, polygonSides: vertices.length },
   };
 }
 
@@ -306,14 +408,20 @@ function inferShapeVisual(question: string, primarySkillCode?: string): ShapeVis
   if (primarySkillCode === 'N2.13' || lower.includes('compound shape')) {
     return createCompoundLShape(labels);
   }
+  if (lower.includes('irregular polygon') || lower.includes('irregular shape')) {
+    return createIrregularPolygon(labels);
+  }
+  if (/\b(square|regular\s+(?:4-sided|four-sided)\s+shape)\b/i.test(question)) return createSquare(labels);
   if (lower.includes('rectangle')) return createRectangle(labels);
   if (lower.includes('parallelogram')) return createParallelogram(labels);
   if (lower.includes('isosceles triangle')) return createIsoscelesTriangle(labels);
   if (lower.includes('isosceles trapezium')) return createIsoscelesTrapezium(labels);
-  if (lower.includes('regular') || /(triangle|square|pentagon|hexagon|heptagon|octagon)/i.test(question)) {
+  if (/\btriangle\b/i.test(question)) {
+    return createGenericTriangle(labels);
+  }
+  if (lower.includes('regular') || /\b(square|pentagon|hexagon|heptagon|octagon)\b/i.test(question)) {
     return createRegularPolygon(question, labels);
   }
-  if (primarySkillCode === 'N2.9' || lower.includes('irregular polygon')) return createIrregularPolygon(labels);
   return null;
 }
 
@@ -328,6 +436,49 @@ function inferNumberLine(question: string, primarySkillCode?: string): NumberLin
     !lower.includes('number line')
   ) {
     return null;
+  }
+
+  const jumpMatch = question.match(/starts?\s+at\s+(-?\d+(?:\.\d+)?)\s+and\s+jumps?\s+(?:on|by)\s+(-?\d+(?:\.\d+)?)/i);
+  if (jumpMatch) {
+    const start = Number(jumpMatch[1]);
+    const delta = Number(jumpMatch[2]);
+    const end = start + delta;
+    const min = Math.min(start, end) - 1;
+    const max = Math.max(start, end) + 1;
+    return {
+      type: 'number-line',
+      min,
+      max,
+      step: 1,
+      markers: [
+        { value: start, label: String(start), kind: 'point' },
+        { value: end, label: String(end), kind: 'target' },
+      ],
+      jumps: [{ from: start, to: end, label: `${delta >= 0 ? '+' : ''}${delta}` }],
+      altText: `Number line jump from ${start} to ${end}.`,
+      caption: 'Structured number line jump generated from the question.',
+    };
+  }
+
+  if (lower.includes('number line') || primarySkillCode === 'N2.1') {
+    const operation = parseOperationTokens(question);
+    if (operation && operation.operator === '+') {
+      const start = operation.left;
+      const end = operation.left + operation.right;
+      return {
+        type: 'number-line',
+        min: Math.min(start, end) - 1,
+        max: Math.max(start, end) + 1,
+        step: 1,
+        markers: [
+          { value: start, label: String(start), kind: 'point' },
+          { value: end, label: String(end), kind: 'target' },
+        ],
+        jumps: [{ from: start, to: end, label: `+${operation.right}` }],
+        altText: `Number line jump from ${start} to ${end}.`,
+        caption: 'Structured number line jump generated from the question.',
+      };
+    }
   }
 
   const tokens = parseNumericTokens(question);
@@ -375,12 +526,15 @@ function inferFractionBar(question: string): FractionBarVisual | null {
 }
 
 function inferGeneratedVisuals(question: string, primarySkillCode?: string): MathsVisual[] {
-  const visuals: Array<ArithmeticLayoutVisual | ShapeVisual | NumberLineVisual | FractionBarVisual | null> = [
-    inferShapeVisual(question, primarySkillCode),
-    inferArithmeticLayout(question, primarySkillCode),
-    inferNumberLine(question, primarySkillCode),
-    inferFractionBar(question),
-  ];
+  const lower = question.toLowerCase();
+  const numberLine = inferNumberLine(question, primarySkillCode);
+  const arithmetic = inferArithmeticLayout(question, primarySkillCode);
+  const shape = inferShapeVisual(question, primarySkillCode);
+  const fractionBar = inferFractionBar(question);
+
+  const visuals: Array<ArithmeticLayoutVisual | ShapeVisual | NumberLineVisual | FractionBarVisual | null> = lower.includes('number line')
+    ? [numberLine, arithmetic, shape, fractionBar]
+    : [shape, arithmetic, numberLine, fractionBar];
 
   return visuals.filter(
     (

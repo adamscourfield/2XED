@@ -42,6 +42,15 @@ function visualExpectation(skillCode: string, question: string): 'required' | 'u
   return 'none';
 }
 
+function stripStoredVisualKeys(options: unknown): unknown {
+  if (!options || typeof options !== 'object' || Array.isArray(options)) return options;
+  const next = { ...(options as Record<string, unknown>) };
+  delete next.visuals;
+  delete next.visual;
+  delete next.visualMeta;
+  return next;
+}
+
 function generatedVisualIsExactEnough(skillCode: string, question: string, visuals: MathsVisual[]): boolean {
   if (visuals.length === 0) return false;
   const visualTypes = new Set(visuals.map((visual) => visual.type));
@@ -76,9 +85,16 @@ export function buildUnit1VisualBackfill(input: {
   type: string;
   options?: unknown;
   primarySkillCode: string;
+  refreshGenerated?: boolean;
 }): Unit1VisualBackfillResult {
   const stored = parseStoredVisuals(input.options);
-  if (stored.length > 0) {
+  const visualMeta =
+    input.options && typeof input.options === 'object' && !Array.isArray(input.options)
+      ? (input.options as { visualMeta?: { source?: string } }).visualMeta
+      : undefined;
+  const shouldReuseStored = stored.length > 0 && !(input.refreshGenerated && visualMeta?.source === 'unit1-backfill');
+
+  if (shouldReuseStored) {
     return {
       status: 'already_stored',
       visuals: stored,
@@ -87,7 +103,14 @@ export function buildUnit1VisualBackfill(input: {
   }
 
   const expectation = visualExpectation(input.primarySkillCode, input.question);
-  const generated = resolveItemVisuals(input, input.primarySkillCode);
+  const generationInput =
+    input.refreshGenerated && stored.length > 0
+      ? {
+          ...input,
+          options: stripStoredVisualKeys(input.options),
+        }
+      : input;
+  const generated = resolveItemVisuals(generationInput, input.primarySkillCode);
 
   if (generated.length > 0) {
     if (!generatedVisualIsExactEnough(input.primarySkillCode, input.question, generated)) {

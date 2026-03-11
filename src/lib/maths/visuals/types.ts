@@ -82,12 +82,19 @@ export interface NumberLineMarker {
   kind?: 'point' | 'target' | 'open';
 }
 
+export interface NumberLineJump {
+  from: number;
+  to: number;
+  label?: string;
+}
+
 export interface NumberLineVisual extends VisualCaptioned {
   type: 'number-line';
   min: number;
   max: number;
   step?: number;
   markers: NumberLineMarker[];
+  jumps?: NumberLineJump[];
 }
 
 export interface FractionBarSegment {

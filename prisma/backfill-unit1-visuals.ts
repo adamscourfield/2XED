@@ -24,6 +24,7 @@ function asJsonObject(value: unknown): Prisma.InputJsonObject {
 
 async function main() {
   const now = new Date();
+  const refreshGenerated = process.argv.includes('--refresh-generated');
   const reportDir = path.resolve(process.cwd(), 'docs/qa');
   fs.mkdirSync(reportDir, { recursive: true });
 
@@ -66,6 +67,7 @@ async function main() {
       type: item.type,
       options: item.options,
       primarySkillCode,
+      refreshGenerated,
     });
 
     reportRows.push({
@@ -88,6 +90,7 @@ async function main() {
         source: 'unit1-backfill',
         generatedAt: now.toISOString(),
         primarySkillCode,
+        refreshed: refreshGenerated,
       };
 
       await prisma.item.update({
