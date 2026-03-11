@@ -208,7 +208,7 @@ export function deriveStoredItemFromMapping(row: MappingRow): {
     TRUE_FALSE: 'TRUE_FALSE',
     SINGLE_CHOICE: 'MCQ',
     SHORT_TEXT: 'SHORT_TEXT',
-    NUMERIC: 'SHORT_TEXT',
+    NUMERIC: 'SHORT_NUMERIC',
     ORDER_SEQUENCE: 'ORDER',
   };
 
