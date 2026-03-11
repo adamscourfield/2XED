@@ -37,4 +37,16 @@ describe('summarizeQuestionQa', () => {
     expect(summary.answerModeLabel).toBe('Drag-and-drop fridge magnets');
     expect(summary.choices).toEqual(['90531', '95031', '91530', '95130', '95101']);
   });
+
+  it('shows all magnets for order prompts with and-separated tails', () => {
+    const summary = summarizeQuestionQa({
+      question: 'Put these temperatures in order: -8°C, 12°C, 9°C, -15°C, 11°C, -7°C and 2°C.',
+      type: 'SHORT_TEXT',
+      options: {},
+      answer: '-15°C | -8°C | -7°C | 2°C | 9°C | 11°C | 12°C',
+    });
+
+    expect(summary.answerType).toBe('ORDER');
+    expect(summary.choices).toEqual(['-8°C', '12°C', '9°C', '-15°C', '11°C', '-7°C', '2°C']);
+  });
 });

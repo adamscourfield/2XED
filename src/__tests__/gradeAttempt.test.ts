@@ -83,4 +83,16 @@ describe('gradeAttempt', () => {
     expect(item.type).toBe('ORDER');
     expect(item.choices).toEqual(['90531', '95031', '91530', '95130', '95101']);
   });
+
+  it('treats any clear order prompt as ORDER and preserves all magnets', () => {
+    const item = getItemContent({
+      type: 'SHORT_TEXT',
+      question: 'Put these temperatures in order: -8°C, 12°C, 9°C, -15°C, 11°C, -7°C and 2°C.',
+      answer: '-15°C | -8°C | -7°C | 2°C | 9°C | 11°C | 12°C',
+      options: {},
+    });
+
+    expect(item.type).toBe('ORDER');
+    expect(item.choices).toEqual(['-8°C', '12°C', '9°C', '-15°C', '11°C', '-7°C', '2°C']);
+  });
 });

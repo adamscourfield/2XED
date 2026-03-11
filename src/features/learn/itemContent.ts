@@ -91,21 +91,24 @@ function normalizeAcceptedAnswers(input: AcceptedAnswerInput): string[] {
   return unique(splitAcceptedAnswerString(input));
 }
 
-function parseOptions(options: unknown, question?: string): { choices: string[]; acceptedAnswers: string[] } {
+function parseOptions(options: unknown, question?: string, answer?: string): { choices: string[]; acceptedAnswers: string[] } {
   if (Array.isArray(options)) {
     const choices = unique(toStringList(options));
-    return { choices: choices.length > 0 ? choices : question ? extractOrderingChoices(question) : [], acceptedAnswers: [] };
+    return {
+      choices: choices.length > 0 ? choices : question ? extractOrderingChoices(question, answer) : [],
+      acceptedAnswers: [],
+    };
   }
 
   if (isObject(options)) {
     const choices = unique(toStringList(options.choices));
     return {
-      choices: choices.length > 0 ? choices : question ? extractOrderingChoices(question) : [],
+      choices: choices.length > 0 ? choices : question ? extractOrderingChoices(question, answer) : [],
       acceptedAnswers: unique(toStringList(options.acceptedAnswers)),
     };
   }
 
-  return { choices: question ? extractOrderingChoices(question) : [], acceptedAnswers: [] };
+  return { choices: question ? extractOrderingChoices(question, answer) : [], acceptedAnswers: [] };
 }
 
 function inferInteractionType(item: {
@@ -134,7 +137,7 @@ export function getItemContent(item: {
   answer: string;
   options?: unknown;
 }): ItemContent {
-  const parsed = parseOptions(item.options, item.question);
+  const parsed = parseOptions(item.options, item.question, item.answer);
   const acceptedAnswers = unique([item.answer, ...parsed.acceptedAnswers]);
 
   return {
