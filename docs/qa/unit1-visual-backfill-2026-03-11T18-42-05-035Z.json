@@ -1,0 +1,176 @@
+{
+  "generatedAt": "2026-03-11T18:42:05.035Z",
+  "scope": "Unit 1 items linked to N1.* or N2.* skills",
+  "summary": {
+    "totalItems": 352,
+    "generated": 29,
+    "alreadyStored": 31,
+    "manualReview": 2,
+    "notNeeded": 290
+  },
+  "manualReviewItems": [
+    {
+      "itemId": "cmmm83wbm006dzps3bvu8ej40",
+      "primarySkillCode": "N2.5",
+      "question": "Find the perimeter of a parallelogram with side lengths 2.9 cm and 0.7 cm.",
+      "type": "SHORT_NUMERIC",
+      "status": "manual_review",
+      "reason": "A low-confidence fallback visual was possible, but this question still needs a manually authored spec."
+    },
+    {
+      "itemId": "cmmm83wc5006pzps38fzg2yjv",
+      "primarySkillCode": "N2.9",
+      "question": "Perimeter is the distance around the outside of a 2D shape. True or false?",
+      "type": "MCQ",
+      "status": "manual_review",
+      "reason": "A low-confidence fallback visual was possible, but this question still needs a manually authored spec."
+    }
+  ],
+  "generatedItems": [
+    {
+      "itemId": "cmmjawsje000vqxi9kjv673yg",
+      "primarySkillCode": "N1.10",
+      "question": "Round 7.2 to the nearest integer."
+    },
+    {
+      "itemId": "cmmjawsji000xqxi9t4tpo2sd",
+      "primarySkillCode": "N1.10",
+      "question": "Round 1.9 to the nearest integer."
+    },
+    {
+      "itemId": "cmmjawsjm000zqxi9ma19x0as",
+      "primarySkillCode": "N1.10",
+      "question": "Round 14.3 to the nearest integer."
+    },
+    {
+      "itemId": "cmmjawsjq0011qxi9mgg5lvbo",
+      "primarySkillCode": "N1.10",
+      "question": "Round 50.6 to the nearest integer."
+    },
+    {
+      "itemId": "cmmjawsju0013qxi95n3nhqxl",
+      "primarySkillCode": "N1.10",
+      "question": "Round 27.8 to the nearest integer."
+    },
+    {
+      "itemId": "cmmjawsjx0015qxi9itwjbjag",
+      "primarySkillCode": "N1.10",
+      "question": "Round 154.7 to the nearest integer."
+    },
+    {
+      "itemId": "cmmjawsk10017qxi9xsvne2bu",
+      "primarySkillCode": "N1.10",
+      "question": "Round 29.1 to the nearest integer."
+    },
+    {
+      "itemId": "cmmjawsk50019qxi9m6rc1m82",
+      "primarySkillCode": "N1.10",
+      "question": "Round 6.34 to the nearest integer."
+    },
+    {
+      "itemId": "cmmjawsk8001bqxi9hh8ba61p",
+      "primarySkillCode": "N1.10",
+      "question": "Round 38.15 to the nearest integer."
+    },
+    {
+      "itemId": "cmmjawskb001dqxi92qmp0cw2",
+      "primarySkillCode": "N1.10",
+      "question": "Round 103.46 to the nearest integer."
+    },
+    {
+      "itemId": "cmmm83w5v002tzps3x4xptcos",
+      "primarySkillCode": "N1.6",
+      "question": "What is the midpoint between 1.2 and 1.4 on a number line?"
+    },
+    {
+      "itemId": "cmmm83w5z002vzps3rotv3bq4",
+      "primarySkillCode": "N1.6",
+      "question": "A decimal lies halfway between 0.3 and 0.4 on a number line. What is it?"
+    },
+    {
+      "itemId": "cmmm83w63002xzps3f6rlel56",
+      "primarySkillCode": "N1.6",
+      "question": "Which number would be between 0.8 and 0.9 on a number line?"
+    },
+    {
+      "itemId": "cmmm83w68002zzps3k4xue70k",
+      "primarySkillCode": "N1.6",
+      "question": "Which section would 0.7501 belong in on a number line split into sections 0.70-0.75, 0.75-0.80, 0.80-0.85, 0.85-0.90?"
+    },
+    {
+      "itemId": "cmmm83w70003bzps3opmjjph6",
+      "primarySkillCode": "N1.9",
+      "question": "Which number is smaller: -1 or -5?"
+    },
+    {
+      "itemId": "cmmm83w79003hzps31l0ncfro",
+      "primarySkillCode": "N1.13",
+      "question": "True or false: -4 > -7"
+    },
+    {
+      "itemId": "cmmm83w7d003jzps3ivvvmijn",
+      "primarySkillCode": "N1.13",
+      "question": "Complete the statement with < or > : -740 __ -470"
+    },
+    {
+      "itemId": "cmmm83w7g003lzps352u0tbua",
+      "primarySkillCode": "N1.13",
+      "question": "Rewrite this statement so it is true: -3 < -5"
+    },
+    {
+      "itemId": "cmmm83w7k003nzps3jyyoj1oc",
+      "primarySkillCode": "N1.13",
+      "question": "True or false: a = -8 satisfies the inequality a < -5"
+    },
+    {
+      "itemId": "cmmm83w8i0045zps3h6vtyrfg",
+      "primarySkillCode": "N1.13",
+      "question": "Explain why 5 - 10 = 5 is not correct."
+    },
+    {
+      "itemId": "cmmm83w94004nzps3ysqp5h77",
+      "primarySkillCode": "N1.1",
+      "question": "Calculate 15 + 30 using column addition."
+    },
+    {
+      "itemId": "cmmm83w96004pzps391dbdt4b",
+      "primarySkillCode": "N1.1",
+      "question": "Calculate 45 + 32 using column addition."
+    },
+    {
+      "itemId": "cmmm83w98004rzps3733ezlem",
+      "primarySkillCode": "N1.1",
+      "question": "Calculate 444 + 351 using column addition."
+    },
+    {
+      "itemId": "cmmm83w9d004vzps36xnry2ri",
+      "primarySkillCode": "N1.6",
+      "question": "Calculate 11.8 + 2.3."
+    },
+    {
+      "itemId": "cmmm83w9g004xzps3vzuj3wdm",
+      "primarySkillCode": "N1.6",
+      "question": "Calculate 2.04 + 0.7 using column addition."
+    },
+    {
+      "itemId": "cmmm83w9j004zzps3da3sii08",
+      "primarySkillCode": "N1.6",
+      "question": "Calculate 0.53 + 5.27 using column addition."
+    },
+    {
+      "itemId": "cmmm83w9p0053zps3k9lst9hy",
+      "primarySkillCode": "N1.1",
+      "question": "Calculate 83 - 52 using column subtraction."
+    },
+    {
+      "itemId": "cmmm83w9r0055zps3twqawf6d",
+      "primarySkillCode": "N1.1",
+      "question": "Calculate 96 - 24 using column subtraction."
+    },
+    {
+      "itemId": "cmmm83w9u0057zps340zyqii8",
+      "primarySkillCode": "N1.1",
+      "question": "Calculate 45 - 32 using column subtraction."
+    }
+  ]
+}

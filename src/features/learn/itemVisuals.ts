@@ -1,4 +1,4 @@
-import { isMathsVisual } from '@/lib/maths/visuals/guards';
+import { isMathsVisual } from '../../lib/maths/visuals/guards';
 import type {
   ArithmeticLayoutVisual,
   FractionBarVisual,
@@ -7,7 +7,7 @@ import type {
   ShapeEdgeLabel,
   ShapeVisual,
   VisualPoint,
-} from '@/lib/maths/visuals/types';
+} from '../../lib/maths/visuals/types';
 
 function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
@@ -28,7 +28,7 @@ function cleanQuestionForVisualInference(question: string): string {
     .trim();
 }
 
-function parseStoredVisuals(options: unknown): MathsVisual[] {
+export function parseStoredVisuals(options: unknown): MathsVisual[] {
   if (!isObject(options)) return [];
 
   const explicit =
@@ -321,7 +321,9 @@ function inferNumberLine(question: string, primarySkillCode?: string): NumberLin
   const lower = question.toLowerCase();
   if (
     primarySkillCode !== 'N1.9' &&
+    primarySkillCode !== 'N1.10' &&
     primarySkillCode !== 'N1.11' &&
+    primarySkillCode !== 'N1.12' &&
     primarySkillCode !== 'N1.13' &&
     !lower.includes('number line')
   ) {
