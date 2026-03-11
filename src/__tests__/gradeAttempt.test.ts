@@ -71,4 +71,16 @@ describe('gradeAttempt', () => {
 
     expect(item.type).toBe('ORDER');
   });
+
+  it('extracts draggable magnets for legacy correct-order prompts', () => {
+    const item = getItemContent({
+      type: 'SHORT_TEXT',
+      question: 'Which is the correct descending order for 90531, 95031, 91530, 95130, 95101?',
+      answer: '95130 | 95101 | 95031 | 91530 | 90531',
+      options: {},
+    });
+
+    expect(item.type).toBe('ORDER');
+    expect(item.choices).toEqual(['90531', '95031', '91530', '95130', '95101']);
+  });
 });

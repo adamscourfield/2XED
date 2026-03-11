@@ -1,3 +1,5 @@
+import { isOrderingPrompt } from './ordering';
+
 export type QuestionRole = 'anchor' | 'misconception' | 'prerequisite_probe' | 'transfer' | 'shadow' | 'practice';
 export type MisconceptionTag = string;
 export type TransferLevel = 'none' | 'low' | 'medium' | 'high';
@@ -158,15 +160,12 @@ function answerLooksBoolean(answer: unknown): boolean {
   );
 }
 
-const ORDER_PROMPT_RE =
-  /(^order\b|\bput in order\b|\barrange\b|\bascending order\b|\bdescending order\b|\bfrom smallest to largest\b|\bfrom largest to smallest\b|\bsmallest to largest\b|\blargest to smallest\b|\bhighest to lowest\b|\blowest to highest\b|\bcoldest to warmest\b|\bwarmest to coldest\b|\bleft to right on a number line\b)/i;
-
 export function parseAnswerType(itemType: unknown, question?: unknown, options?: unknown, answer?: unknown): AnswerType {
   if (looksLikeTrueFalseQuestion(question) || optionsContainBooleanChoices(options) || answerLooksBoolean(answer)) {
     return 'TRUE_FALSE';
   }
 
-  if (typeof question === 'string' && ORDER_PROMPT_RE.test(question)) {
+  if (typeof question === 'string' && isOrderingPrompt(question)) {
     return 'ORDER';
   }
 

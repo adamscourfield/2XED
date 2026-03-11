@@ -5,6 +5,7 @@ import {
   type AnswerType,
   type QuestionRole,
 } from './itemMeta';
+import { isOrderingPrompt } from './ordering';
 
 export type ItemPurpose = 'ONBOARDING' | 'LEARN' | 'RETEACH_SHADOW';
 
@@ -23,8 +24,6 @@ export interface InferredItemPurpose {
   choices: string[];
 }
 
-const ORDER_PROMPT_RE =
-  /(^order\b|\bput in order\b|\bascending order\b|\bdescending order\b|\bcoldest to warmest\b|\bwarmest to coldest\b|\bsmallest to largest\b|\blargest to smallest\b)/i;
 const SIGN_PROMPT_RE = /\b(fill (?:in )?(?:the )?(?:sign|symbol)|complete)\b/i;
 const NUMERIC_RESPONSE_PROMPT_RE =
   /\b(in figures|what is the value|which is greater|which is less|which is closer to zero|what place|value of digit|digit \d in|correct this|expanded form)\b/i;
@@ -98,7 +97,7 @@ function inferAnswerType(input: ItemPurposeInput, purpose: ItemPurpose): AnswerT
 
   const text = questionText(input.question);
 
-  if (ORDER_PROMPT_RE.test(text)) return 'ORDER';
+  if (isOrderingPrompt(text)) return 'ORDER';
   if (SIGN_PROMPT_RE.test(text) || text.includes('__')) return 'SHORT_TEXT';
   if (NUMERIC_RESPONSE_PROMPT_RE.test(text)) return answerLooksNumeric(input.answer) ? 'SHORT_NUMERIC' : 'SHORT_TEXT';
   if (WRITTEN_RESPONSE_PROMPT_RE.test(text)) return answerLooksNumeric(input.answer) ? 'SHORT_NUMERIC' : 'SHORT_TEXT';

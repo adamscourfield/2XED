@@ -1,6 +1,6 @@
 import { gradeAttempt } from '../learn/gradeAttempt';
+import { getItemContent } from '../learn/itemContent';
 import {
-  parseAnswerType,
   parseItemOptions,
   stripStudentQuestionLabel,
   type AnswerType,
@@ -63,7 +63,11 @@ function labelForAnswerType(answerType: AnswerType): string {
 
 export function summarizeQuestionQa(item: QaItemShape): QaSummary {
   const parsed = parseItemOptions(item.options);
-  const answerType = parseAnswerType(item.type, item.question, item.options, item.answer);
+  const content = getItemContent({
+    ...item,
+    type: item.type ?? 'MCQ',
+  });
+  const answerType = content.type;
   const displayQuestion = stripStudentQuestionLabel(item.question);
   const issues: QaIssue[] = [];
 
@@ -79,16 +83,16 @@ export function summarizeQuestionQa(item: QaItemShape): QaSummary {
     issues.push({ code: 'duplicate_choices', message: 'Answer choices contain duplicates after normalization.', severity: 'error' });
   }
 
-  if ((answerType === 'MCQ' || answerType === 'TRUE_FALSE') && parsed.choices.length < 2) {
+  if ((answerType === 'MCQ' || answerType === 'TRUE_FALSE') && content.choices.length < 2) {
     issues.push({ code: 'too_few_choices', message: 'Choice-based question has fewer than two valid options.', severity: 'error' });
   }
 
-  if ((answerType === 'MCQ' || answerType === 'TRUE_FALSE') && !hasOptionMatch(item.answer, parsed.choices)) {
+  if ((answerType === 'MCQ' || answerType === 'TRUE_FALSE') && !hasOptionMatch(item.answer, content.choices)) {
     issues.push({ code: 'answer_missing_from_choices', message: 'Stored correct answer is not available among the student choices.', severity: 'error' });
   }
 
   if (answerType === 'TRUE_FALSE') {
-    const booleanChoices = new Set(parsed.choices.map((choice) => normalized(choice)));
+    const booleanChoices = new Set(content.choices.map((choice) => normalized(choice)));
     const validSets =
       (booleanChoices.has('true') && booleanChoices.has('false')) ||
       (booleanChoices.has('correct') && booleanChoices.has('incorrect')) ||
@@ -102,7 +106,7 @@ export function summarizeQuestionQa(item: QaItemShape): QaSummary {
     issues.push({ code: 'typed_question_has_choices', message: 'Typed-answer question still has stored choices. Check whether the mode is correct.', severity: 'warning' });
   }
 
-  if (answerType === 'ORDER' && parsed.choices.length < 2) {
+  if (answerType === 'ORDER' && content.choices.length < 2) {
     issues.push({ code: 'order_missing_choices', message: 'Ordering question needs draggable values in the choice list.', severity: 'error' });
   }
 
@@ -110,7 +114,7 @@ export function summarizeQuestionQa(item: QaItemShape): QaSummary {
     answerType,
     answerModeLabel: labelForAnswerType(answerType),
     displayQuestion,
-    choices: parsed.choices,
+    choices: content.choices,
     issues,
   };
 }

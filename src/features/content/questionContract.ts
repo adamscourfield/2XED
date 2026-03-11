@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { ItemInteractionType, getItemContent, normalizeAnswer } from '../learn/itemContent';
+import { extractOrderingChoices, isOrderingPrompt } from '../items/ordering';
 
 export const CanonicalQuestionFormatSchema = z.enum([
   'TRUE_FALSE',
@@ -100,13 +101,7 @@ function numericDistractors(answer: string): string[] {
 }
 
 export function parseOrderedValues(stem: string): string[] {
-  const match = stem.match(/:\s*(.+?)\.?$/);
-  if (!match) return [];
-
-  return match[1]
-    .split(',')
-    .map((part) => part.trim())
-    .filter(Boolean);
+  return extractOrderingChoices(stem);
 }
 
 export function inferCanonicalQuestionFormat(
@@ -116,9 +111,6 @@ export function inferCanonicalQuestionFormat(
 ): CanonicalQuestionFormat {
   const lcStem = stem.toLowerCase();
   const lcAnswer = answer.toLowerCase();
-  const orderPrompt =
-    /(^order\b|\bput in order\b|\barrange\b|\bascending order\b|\bdescending order\b|\bfrom smallest to largest\b|\bfrom largest to smallest\b|\bsmallest to largest\b|\blargest to smallest\b|\bhighest to lowest\b|\blowest to highest\b|\bcoldest to warmest\b|\bwarmest to coldest\b|\bleft to right on a number line\b)/i;
-
   if (format && CanonicalQuestionFormatSchema.safeParse(format).success) {
     return format as CanonicalQuestionFormat;
   }
@@ -132,7 +124,7 @@ export function inferCanonicalQuestionFormat(
     return 'TRUE_FALSE';
   }
 
-  if (orderPrompt.test(stem)) {
+  if (isOrderingPrompt(stem)) {
     return 'ORDER_SEQUENCE';
   }
 

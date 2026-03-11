@@ -1,3 +1,5 @@
+import { extractOrderingChoices, isOrderingPrompt } from '@/features/items/ordering';
+
 export type ItemInteractionType = 'MCQ' | 'TRUE_FALSE' | 'SHORT_TEXT' | 'SHORT_NUMERIC' | 'ORDER';
 
 export interface ItemContent {
@@ -6,9 +8,6 @@ export interface ItemContent {
   acceptedAnswers: string[];
   canonicalAnswer: string;
 }
-
-const ORDER_PROMPT_RE =
-  /(^order\b|\bput in order\b|\barrange\b|\bascending order\b|\bdescending order\b|\bfrom smallest to largest\b|\bfrom largest to smallest\b|\bsmallest to largest\b|\blargest to smallest\b|\bhighest to lowest\b|\blowest to highest\b|\bcoldest to warmest\b|\bwarmest to coldest\b|\bleft to right on a number line\b)/i;
 
 type AcceptedAnswerInput = string | string[];
 
@@ -92,19 +91,21 @@ function normalizeAcceptedAnswers(input: AcceptedAnswerInput): string[] {
   return unique(splitAcceptedAnswerString(input));
 }
 
-function parseOptions(options: unknown): { choices: string[]; acceptedAnswers: string[] } {
+function parseOptions(options: unknown, question?: string): { choices: string[]; acceptedAnswers: string[] } {
   if (Array.isArray(options)) {
-    return { choices: unique(toStringList(options)), acceptedAnswers: [] };
+    const choices = unique(toStringList(options));
+    return { choices: choices.length > 0 ? choices : question ? extractOrderingChoices(question) : [], acceptedAnswers: [] };
   }
 
   if (isObject(options)) {
+    const choices = unique(toStringList(options.choices));
     return {
-      choices: unique(toStringList(options.choices)),
+      choices: choices.length > 0 ? choices : question ? extractOrderingChoices(question) : [],
       acceptedAnswers: unique(toStringList(options.acceptedAnswers)),
     };
   }
 
-  return { choices: [], acceptedAnswers: [] };
+  return { choices: question ? extractOrderingChoices(question) : [], acceptedAnswers: [] };
 }
 
 function inferInteractionType(item: {
@@ -113,7 +114,7 @@ function inferInteractionType(item: {
   answer: string;
   options?: unknown;
 }): ItemInteractionType {
-  if (typeof item.question === 'string' && ORDER_PROMPT_RE.test(item.question)) {
+  if (typeof item.question === 'string' && isOrderingPrompt(item.question)) {
     return 'ORDER';
   }
 
@@ -133,7 +134,7 @@ export function getItemContent(item: {
   answer: string;
   options?: unknown;
 }): ItemContent {
-  const parsed = parseOptions(item.options);
+  const parsed = parseOptions(item.options, item.question);
   const acceptedAnswers = unique([item.answer, ...parsed.acceptedAnswers]);
 
   return {

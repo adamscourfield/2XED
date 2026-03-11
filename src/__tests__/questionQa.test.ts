@@ -24,4 +24,17 @@ describe('summarizeQuestionQa', () => {
 
     expect(summary.issues.some((issue) => issue.code === 'answer_missing_from_choices')).toBe(true);
   });
+
+  it('shows fridge-magnet mode for legacy descending-order prompts', () => {
+    const summary = summarizeQuestionQa({
+      question: 'Which is the correct descending order for 90531, 95031, 91530, 95130, 95101?',
+      type: 'SHORT_TEXT',
+      options: {},
+      answer: '95130 | 95101 | 95031 | 91530 | 90531',
+    });
+
+    expect(summary.answerType).toBe('ORDER');
+    expect(summary.answerModeLabel).toBe('Drag-and-drop fridge magnets');
+    expect(summary.choices).toEqual(['90531', '95031', '91530', '95130', '95101']);
+  });
 });
