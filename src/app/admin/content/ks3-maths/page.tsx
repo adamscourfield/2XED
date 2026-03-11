@@ -16,7 +16,18 @@ export default async function AdminContentKSMathsPage() {
 
   const importedItems = await prisma.item.findMany({
     where: {
-      subjectId: subject.id,
+      OR: [
+        { subjectId: subject.id },
+        {
+          skills: {
+            some: {
+              skill: {
+                subjectId: subject.id,
+              },
+            },
+          },
+        },
+      ],
     },
     include: {
       skills: {
@@ -36,6 +47,11 @@ export default async function AdminContentKSMathsPage() {
 
   const qaItems = importedItems.map(buildQaItemView);
   const skillSet = Array.from(new Set(qaItems.flatMap((item) => item.skills))).sort();
+  const typeSet = Array.from(new Set(qaItems.map((item) => item.type))).sort();
+  const typeCounts = typeSet.map((type) => ({
+    type,
+    count: qaItems.filter((item) => item.type === type).length,
+  }));
   const issueCount = qaItems.reduce((sum, item) => sum + item.issues.length, 0);
   const flaggedCount = qaItems.filter((item) => item.issues.length > 0).length;
   const repairOpenCount = qaItems.reduce(
@@ -84,11 +100,22 @@ export default async function AdminContentKSMathsPage() {
         <section className="rounded-xl border border-blue-200 bg-blue-50 p-5 text-sm text-blue-900">
           <p className="font-semibold">Use this page to test how the student actually answers the question.</p>
           <p className="mt-1">
-            Filter by answer mode, preview the student input, and check whether the stored answer can really be selected or typed.
+            Filter by answer mode or stored type, preview the student input, and check whether the stored answer can really be selected or typed.
           </p>
         </section>
 
-        <QuestionQaWorkbench items={qaItems} availableSkills={skillSet} />
+        <section className="rounded-xl border border-slate-200 bg-white p-5">
+          <h2 className="text-sm font-semibold text-slate-900">Stored Type Coverage</h2>
+          <div className="mt-4 flex flex-wrap gap-3">
+            {typeCounts.map(({ type, count }) => (
+              <div key={type} className="rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700">
+                {type}: <span className="font-semibold text-slate-900">{count}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <QuestionQaWorkbench items={qaItems} availableSkills={skillSet} availableTypes={typeSet} />
       </div>
     </main>
   );

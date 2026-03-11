@@ -35,14 +35,16 @@ interface QaItem {
 interface Props {
   items: QaItem[];
   availableSkills: string[];
+  availableTypes: string[];
 }
 
-export function QuestionQaWorkbench({ items, availableSkills }: Props) {
+export function QuestionQaWorkbench({ items, availableSkills, availableTypes }: Props) {
   const [localItems, setLocalItems] = useState(items);
   const [skillFilter, setSkillFilter] = useState('ALL');
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'ISSUES' | 'CLEAN'>('ALL');
   const [repairFilter, setRepairFilter] = useState<'ALL' | 'OPEN_ONLY' | 'WITH_NOTES'>('ALL');
   const [modeFilter, setModeFilter] = useState<'ALL' | AnswerType>('ALL');
+  const [storedTypeFilter, setStoredTypeFilter] = useState('ALL');
   const [selectedId, setSelectedId] = useState(items[0]?.id ?? '');
   const [draftAnswer, setDraftAnswer] = useState('');
   const [submittedAnswer, setSubmittedAnswer] = useState('');
@@ -69,11 +71,12 @@ export function QuestionQaWorkbench({ items, availableSkills }: Props) {
         if (statusFilter === 'ISSUES' && item.issues.length === 0) return false;
         if (statusFilter === 'CLEAN' && item.issues.length > 0) return false;
         if (modeFilter !== 'ALL' && item.answerType !== modeFilter) return false;
+        if (storedTypeFilter !== 'ALL' && item.type !== storedTypeFilter) return false;
         if (repairFilter === 'OPEN_ONLY' && !item.reviewNotes.some((note) => note.status === 'OPEN')) return false;
         if (repairFilter === 'WITH_NOTES' && item.reviewNotes.length === 0) return false;
         return true;
       }),
-    [localItems, modeFilter, repairFilter, skillFilter, statusFilter]
+    [localItems, modeFilter, repairFilter, skillFilter, statusFilter, storedTypeFilter]
   );
 
   useEffect(() => {
@@ -258,6 +261,20 @@ export function QuestionQaWorkbench({ items, availableSkills }: Props) {
                 <option value="TRUE_FALSE">True / False</option>
                 <option value="SHORT_TEXT">Short text</option>
                 <option value="SHORT_NUMERIC">Short numeric</option>
+              </select>
+            </label>
+
+            <label className="block text-sm">
+              <span className="mb-1 block text-slate-600">Stored type</span>
+              <select
+                value={storedTypeFilter}
+                onChange={(e) => setStoredTypeFilter(e.target.value)}
+                className="w-full rounded-lg border border-slate-300 px-3 py-2"
+              >
+                <option value="ALL">All stored types</option>
+                {availableTypes.map((type) => (
+                  <option key={type} value={type}>{type}</option>
+                ))}
               </select>
             </label>
           </div>
