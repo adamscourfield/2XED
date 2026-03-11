@@ -117,7 +117,7 @@ export function inferCanonicalQuestionFormat(
   const lcStem = stem.toLowerCase();
   const lcAnswer = answer.toLowerCase();
   const orderPrompt =
-    /\b(order|put in order|arrange|ascending order|descending order|from smallest to largest|from largest to smallest|smallest to largest|largest to smallest|highest to lowest|lowest to highest|coldest to warmest|warmest to coldest|left to right on a number line)\b/i;
+    /(^order\b|\bput in order\b|\barrange\b|\bascending order\b|\bdescending order\b|\bfrom smallest to largest\b|\bfrom largest to smallest\b|\bsmallest to largest\b|\blargest to smallest\b|\bhighest to lowest\b|\blowest to highest\b|\bcoldest to warmest\b|\bwarmest to coldest\b|\bleft to right on a number line\b)/i;
 
   if (format && CanonicalQuestionFormatSchema.safeParse(format).success) {
     return format as CanonicalQuestionFormat;

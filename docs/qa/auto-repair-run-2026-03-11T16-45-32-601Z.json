@@ -1,0 +1,3393 @@
+{
+  "startedAt": "2026-03-11T16:45:32.428Z",
+  "finishedAt": "2026-03-11T16:45:32.601Z",
+  "batchSize": 50,
+  "repairedItemCount": 1,
+  "resolvedNotesCount": 2,
+  "unresolvedNotes": [
+    {
+      "noteId": "cmmm90ec10001coyqbbm5p0b1",
+      "itemId": "cmmm66div003sj5wxa2cgw9y3",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ec30003coyqwyimdmvk",
+      "itemId": "cmmm66dj0003uj5wx05zq6llo",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ec40005coyqvohrggy6",
+      "itemId": "cmmm66dj3003wj5wxorf4k28v",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ec40007coyq3qviwjci",
+      "itemId": "cmmm66dj5003yj5wx7wr1lz9t",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ec50009coyq20ethu44",
+      "itemId": "cmmm66dj70040j5wxjf4bns66",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ec6000bcoyq4h9p1spb",
+      "itemId": "cmmm66dj90042j5wxsx0pcfia",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ec7000dcoyqce82dmx7",
+      "itemId": "cmmm66djb0044j5wxnkyzv56c",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ec7000fcoyqgen9yeqh",
+      "itemId": "cmmm66djc0046j5wxvzoevi2o",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ec8000hcoyqosv0qlhb",
+      "itemId": "cmmm66djf0048j5wx8s61u625",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ec8000jcoyqvyk80i1f",
+      "itemId": "cmmm66djh004aj5wxfjurw9lq",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ec9000lcoyqygryxahk",
+      "itemId": "cmmm66djj004cj5wx4csebpck",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90eca000ncoyqphwdgnvs",
+      "itemId": "cmmm66djk004ej5wxkbawew09",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90eca000pcoyqqivxurnb",
+      "itemId": "cmmm66djm004gj5wx7yykxkry",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ecd000rcoyq363gmi0f",
+      "itemId": "cmmm66djo004ij5wxgywql4hn",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ecd000tcoyqm481bcbt",
+      "itemId": "cmmm66djq004kj5wx5w8v26v8",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ece000vcoyqmtnqr29b",
+      "itemId": "cmmm66djr004mj5wxqey7299c",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ece000xcoyqxlbzcrjc",
+      "itemId": "cmmm66djt004oj5wx4g7yidgk",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ece000zcoyqftrvdtqk",
+      "itemId": "cmmm66dju004qj5wxcg31qrq3",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ecf0011coyqtnhd7l8t",
+      "itemId": "cmmm66djy004sj5wx6k2nvjet",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ecf0013coyqngh9wgcr",
+      "itemId": "cmmm66dk0004uj5wxqb75a6rk",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ecg0015coyq9kodwvww",
+      "itemId": "cmmm66dk1004wj5wxyshucbqq",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ecg0017coyqod4ls0rx",
+      "itemId": "cmmm66dk3004yj5wx1o1dc6q0",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ech0019coyq1cvs7l34",
+      "itemId": "cmmm66dk50050j5wxpfkflobn",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ech001bcoyq87hzng2d",
+      "itemId": "cmmm66dk70052j5wx42mlg8y4",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ech001dcoyqeezf7jxk",
+      "itemId": "cmmm66dk80054j5wx5xd5le2s",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90eci001fcoyqz8a7wxsq",
+      "itemId": "cmmm66dka0056j5wxtkubr5bl",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90eci001hcoyqx28d22oo",
+      "itemId": "cmmm66dkc0058j5wxp698fdlo",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90eck001jcoyqdo3hccly",
+      "itemId": "cmmm66dkf005aj5wxz5qq0jat",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ecl001lcoyq42dbogi9",
+      "itemId": "cmmm66dkh005cj5wxk27ohojn",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ecl001ncoyq2fz4yyyx",
+      "itemId": "cmmm66dkj005ej5wx7pchpzpr",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ecl001pcoyqm02z8uc3",
+      "itemId": "cmmm66dkk005gj5wxg13xrdji",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ecm001rcoyq8xcqge3l",
+      "itemId": "cmmm66dkn005ij5wxblws899j",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ecm001tcoyqon00av00",
+      "itemId": "cmmm66dko005kj5wxnv1pjg05",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ecm001vcoyq82k4jsiw",
+      "itemId": "cmmm66dkr005mj5wx97e1wbv7",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ecn001xcoyqwym4cxj1",
+      "itemId": "cmmm66dks005oj5wx0brpxh2q",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ecn001zcoyqnedo2q55",
+      "itemId": "cmmm66dku005qj5wxigyv2yq0",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ecn0021coyqqiuq23x0",
+      "itemId": "cmmm66dkw005sj5wxvw2z16il",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90eco0023coyqp0wvdgib",
+      "itemId": "cmmm66dkx005uj5wx6ek2iwjr",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90eco0025coyq67dvpa5g",
+      "itemId": "cmmm66dky005wj5wxrj9vrofs",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90eco0027coyq0hvyqki1",
+      "itemId": "cmmm66dkz005yj5wxbwi4toz0",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ecp0029coyq7otd7jtb",
+      "itemId": "cmmm66dl10060j5wxwpghnz0n",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ecp002bcoyqp884my6o",
+      "itemId": "cmmm66dl30062j5wxkbgfqgth",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ecp002dcoyql5r6vlwv",
+      "itemId": "cmmm66dl40064j5wxuccunl9b",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ecq002fcoyqhxr2mcmb",
+      "itemId": "cmmm66dl60066j5wxrelunpbr",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ecq002hcoyqd9e5i7f5",
+      "itemId": "cmmm66dl70068j5wx5ymcvvlo",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ecr002jcoyqfcg6a7e4",
+      "itemId": "cmmm66dl9006aj5wxiulq8a4z",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ecr002lcoyqg4iv5296",
+      "itemId": "cmmm66dla006cj5wxhwsi97pu",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ecs002ncoyqkuwh511o",
+      "itemId": "cmmm66dlc006ej5wxjnpnr5cj",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ect002pcoyqn2rzi1v5",
+      "itemId": "cmmm66dld006gj5wxtq3y4hr9",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ecu002rcoyqqco7zo88",
+      "itemId": "cmmm66dle006ij5wxnh60imdr",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ecu002tcoyql7dm8iv2",
+      "itemId": "cmmm66dlg006kj5wxr5je1mwl",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ecv002vcoyq84pjikgv",
+      "itemId": "cmmm66dlh006mj5wxwsquw950",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ecv002xcoyql5kzfcdr",
+      "itemId": "cmmm66dlj006oj5wxjri118bk",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ecx002zcoyq0q4p4iie",
+      "itemId": "cmmm66dll006qj5wx1jawnc1t",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ecx0031coyqhpq2ubql",
+      "itemId": "cmmm66dlm006sj5wxcbi8nsb8",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ecy0033coyq51tovktk",
+      "itemId": "cmmm66dln006uj5wxvu4nhbxb",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ecy0035coyq68f23nkl",
+      "itemId": "cmmm66dlo006wj5wxyy2bswu1",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ecz0037coyq8218a37x",
+      "itemId": "cmmm66dlp006yj5wxmq6m1xqv",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ecz0039coyqya0h5zid",
+      "itemId": "cmmm66dlq0070j5wx407njeym",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ecz003bcoyq9og1b3ah",
+      "itemId": "cmmm66dls0072j5wxgwuclq8i",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ed0003dcoyqb6oj84j7",
+      "itemId": "cmmm66dlt0074j5wxsor271rx",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ed0003fcoyq0f1ao74n",
+      "itemId": "cmmm66dlv0076j5wx56661oc0",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ed0003hcoyq7zui152f",
+      "itemId": "cmmm66dlw0078j5wxokfpa9c8",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ed1003jcoyqo3jx3ckn",
+      "itemId": "cmmm66dlx007aj5wxvb33yx0b",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ed1003lcoyqemz2j4aj",
+      "itemId": "cmmm66dly007cj5wxlx7a9nas",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ed1003ncoyqkod5rak0",
+      "itemId": "cmmm66dlz007ej5wxeprpl5yj",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ed3003pcoyqm8ctkxw5",
+      "itemId": "cmmm66dm0007gj5wxhasvztj9",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ed3003rcoyq8hd64v6s",
+      "itemId": "cmmm66dm1007ij5wxpdtz32g6",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ed3003tcoyqpq6xp611",
+      "itemId": "cmmm66dm2007kj5wxnhski3vl",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ed4003vcoyqhuoahdda",
+      "itemId": "cmmm66dm3007mj5wxvpts9rmo",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ed4003xcoyqhktgoyfw",
+      "itemId": "cmmm66dm4007oj5wx9m669gz9",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ed4003zcoyq44xh454m",
+      "itemId": "cmmm66dm5007qj5wxfq8quh4l",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ed50041coyqh3w8ozjv",
+      "itemId": "cmmm66dm6007sj5wxfdkb00p1",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ed50043coyqdm3nfrhz",
+      "itemId": "cmmm66dm7007uj5wxyaqfc96j",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ed50045coyqva6q8fub",
+      "itemId": "cmmm66dm8007wj5wx2bzyi2sm",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ed60047coyqbltaows1",
+      "itemId": "cmmm66dm9007yj5wxa88qvxk9",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ed60049coyqygp8wr0w",
+      "itemId": "cmmm66dma0080j5wxl7weq6g3",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ed7004bcoyqzzfpeono",
+      "itemId": "cmmm66dmb0082j5wxksv1n0r4",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ed7004dcoyqxd9zd26k",
+      "itemId": "cmmm66dmc0084j5wxntjxgp2y",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ed8004fcoyq6gf87iuu",
+      "itemId": "cmmm66dmd0086j5wxcd6ksxul",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ed8004hcoyq5mghuhi7",
+      "itemId": "cmmm66dmd0088j5wxfk5je2u5",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ed9004jcoyqjlz6r849",
+      "itemId": "cmmm66dme008aj5wxcn5y72ey",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ed9004lcoyqe8iw05oy",
+      "itemId": "cmmm66dmf008cj5wx4bs6fy94",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90eda004ncoyqd0c95eyz",
+      "itemId": "cmmm66dmg008ej5wxx5pohuus",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90edb004pcoyqojtyxpec",
+      "itemId": "cmmm66dmh008gj5wx6sdf70du",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90edb004rcoyq9uypcd3p",
+      "itemId": "cmmm66dmi008ij5wx9swy84im",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90edb004tcoyq9hu9j9kk",
+      "itemId": "cmmm66dmj008kj5wxx8b692x3",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90edc004vcoyqr3zcxvtx",
+      "itemId": "cmmm66dmk008mj5wxz58n5z5d",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90edc004xcoyqob6law0y",
+      "itemId": "cmmm66dml008oj5wxwugtjcyt",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90edc004zcoyqycuek9fl",
+      "itemId": "cmmm66dmm008qj5wx95yjzv57",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90edd0051coyqhapjlux8",
+      "itemId": "cmmm66dmn008sj5wxt4a6isvq",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ede0053coyq7n44vglj",
+      "itemId": "cmmm66dmo008uj5wxihgjas5r",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90ede0055coyq97a4cadx",
+      "itemId": "cmmm66dmp008wj5wxjiv1x967",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90edf0057coyqvm09g0fh",
+      "itemId": "cmmm66dmp008yj5wxrnctfi28",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90edf0059coyqp76so094",
+      "itemId": "cmmm66dmq0090j5wx3289qhnl",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90edf005bcoyq7664tbhq",
+      "itemId": "cmmm66dmr0092j5wxffvj2ck7",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90edg005dcoyqy0akl77f",
+      "itemId": "cmmm66dms0094j5wxzx2w16ei",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90edg005fcoyq09gaqbwa",
+      "itemId": "cmmm66dmt0096j5wx8r628b07",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90edg005hcoyqiwmzb7gs",
+      "itemId": "cmmm66dmu0098j5wxr39z20oq",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90edh005jcoyq6tdd71l8",
+      "itemId": "cmmm66dmv009aj5wx56goxx9o",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90edh005lcoyq091qxu2e",
+      "itemId": "cmmm66dmw009cj5wxpl0pgvkq",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90edh005ncoyqn5ft7863",
+      "itemId": "cmmm66dmx009ej5wx2v9e4b70",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90edi005pcoyqgqck6ak8",
+      "itemId": "cmmm66dmy009gj5wxnrkwu8ex",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90edj005rcoyqjuzl6k4o",
+      "itemId": "cmmm66dmz009ij5wx4k8xs0zo",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90edj005tcoyqa6vt079a",
+      "itemId": "cmmm66dn0009kj5wx5z1f9bmb",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90edj005vcoyq9kvtbqtz",
+      "itemId": "cmmm66dn2009mj5wx0duwalbz",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90edk005xcoyqkoaz75k1",
+      "itemId": "cmmm66dn3009oj5wxusenuq4g",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90edk005zcoyqa025g7ro",
+      "itemId": "cmmm66dn4009qj5wx8sprnk7c",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90edk0061coyqzw28hcb1",
+      "itemId": "cmmm66dn5009sj5wxd6htf75l",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90edk0063coyqgklerwuo",
+      "itemId": "cmmm66dn6009uj5wxw6dlgkhr",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90edl0065coyqdz5y9999",
+      "itemId": "cmmm66dn7009wj5wxhcmqxb1s",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90edl0067coyqba9dq4de",
+      "itemId": "cmmm66dn7009yj5wxzime6742",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90edm0069coyqlxmdgity",
+      "itemId": "cmmm66dn800a0j5wx8a2fdg3r",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90edm006bcoyqgans4hhk",
+      "itemId": "cmmm66dn900a2j5wxxh5od26e",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90edn006dcoyq9vd1dy23",
+      "itemId": "cmmm66dna00a4j5wxpdzl860y",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90edn006fcoyqlyh8go4z",
+      "itemId": "cmmm66dnb00a6j5wxeqvpi738",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90edo006hcoyq4mw81dmt",
+      "itemId": "cmmm66dnc00a8j5wx3p7v5ss0",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90edp006jcoyq82j08dh6",
+      "itemId": "cmmm66dnd00aaj5wxudvfdp8a",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90edq006lcoyqaybj24tf",
+      "itemId": "cmmm66dne00acj5wxjz9cebxf",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90edr006ncoyqs7zxorsh",
+      "itemId": "cmmm66dnf00aej5wxuha6toeq",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90eds006pcoyqw7ew23o0",
+      "itemId": "cmmm66dng00agj5wxgxdtwuk0",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "noteId": "cmmm90edt006rcoyqst4ghz4t",
+      "itemId": "cmmm66dnh00aij5wxsbulcht8",
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    }
+  ],
+  "skippedNotes": [],
+  "repairedEntries": [
+    {
+      "itemId": "cmmm66div003sj5wxa2cgw9y3",
+      "noteIds": [
+        "cmmm90ec10001coyqbbm5p0b1"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66div003sj5wxa2cgw9y3",
+        "question": "[N1.1] Placeholder question 1 for: Recognise the place value of each digit in whole numbers up to millions",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dj0003uj5wx05zq6llo",
+      "noteIds": [
+        "cmmm90ec30003coyqwyimdmvk"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dj0003uj5wx05zq6llo",
+        "question": "[N1.1] Placeholder question 2 for: Recognise the place value of each digit in whole numbers up to millions",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dj3003wj5wxorf4k28v",
+      "noteIds": [
+        "cmmm90ec40005coyqvohrggy6"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dj3003wj5wxorf4k28v",
+        "question": "[N1.2] Placeholder question 1 for: Write integers in words and figures",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dj5003yj5wx7wr1lz9t",
+      "noteIds": [
+        "cmmm90ec40007coyq3qviwjci"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dj5003yj5wx7wr1lz9t",
+        "question": "[N1.2] Placeholder question 2 for: Write integers in words and figures",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dj70040j5wxjf4bns66",
+      "noteIds": [
+        "cmmm90ec50009coyq20ethu44"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dj70040j5wxjf4bns66",
+        "question": "[N1.3] Placeholder question 1 for: Compare two numbers using =, ≠, <, >, ≤, ≥",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dj90042j5wxsx0pcfia",
+      "noteIds": [
+        "cmmm90ec6000bcoyq4h9p1spb"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dj90042j5wxsx0pcfia",
+        "question": "[N1.3] Placeholder question 2 for: Compare two numbers using =, ≠, <, >, ≤, ≥",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66djb0044j5wxnkyzv56c",
+      "noteIds": [
+        "cmmm90ec7000dcoyqce82dmx7"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66djb0044j5wxnkyzv56c",
+        "question": "[N1.4] Placeholder question 1 for: Use and interpret inequalities in context (incl number lines and statements)",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66djc0046j5wxvzoevi2o",
+      "noteIds": [
+        "cmmm90ec7000fcoyqgen9yeqh"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66djc0046j5wxvzoevi2o",
+        "question": "[N1.4] Placeholder question 2 for: Use and interpret inequalities in context (incl number lines and statements)",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66djf0048j5wx8s61u625",
+      "noteIds": [
+        "cmmm90ec8000hcoyqosv0qlhb"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66djf0048j5wx8s61u625",
+        "question": "[N1.5] Placeholder question 1 for: Find the median from a set of numbers (incl midpoint using a calculator)",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66djh004aj5wxfjurw9lq",
+      "noteIds": [
+        "cmmm90ec8000jcoyqvyk80i1f"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66djh004aj5wxfjurw9lq",
+        "question": "[N1.5] Placeholder question 2 for: Find the median from a set of numbers (incl midpoint using a calculator)",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66djj004cj5wx4csebpck",
+      "noteIds": [
+        "cmmm90ec9000lcoyqygryxahk"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66djj004cj5wx4csebpck",
+        "question": "[N1.6] Placeholder question 1 for: Decimal place value",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66djk004ej5wxkbawew09",
+      "noteIds": [
+        "cmmm90eca000ncoyqphwdgnvs"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66djk004ej5wxkbawew09",
+        "question": "[N1.6] Placeholder question 2 for: Decimal place value",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66djm004gj5wx7yykxkry",
+      "noteIds": [
+        "cmmm90eca000pcoyqqivxurnb"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66djm004gj5wx7yykxkry",
+        "question": "[N1.7] Placeholder question 1 for: Compare decimals using =, ≠, <, >, ≤, ≥",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66djo004ij5wxgywql4hn",
+      "noteIds": [
+        "cmmm90ecd000rcoyq363gmi0f"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66djo004ij5wxgywql4hn",
+        "question": "[N1.7] Placeholder question 2 for: Compare decimals using =, ≠, <, >, ≤, ≥",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66djq004kj5wx5w8v26v8",
+      "noteIds": [
+        "cmmm90ecd000tcoyqm481bcbt"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66djq004kj5wx5w8v26v8",
+        "question": "[N1.8] Placeholder question 1 for: Order a list of decimals",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66djr004mj5wxqey7299c",
+      "noteIds": [
+        "cmmm90ece000vcoyqmtnqr29b"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66djr004mj5wxqey7299c",
+        "question": "[N1.8] Placeholder question 2 for: Order a list of decimals",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66djt004oj5wx4g7yidgk",
+      "noteIds": [
+        "cmmm90ece000xcoyqxlbzcrjc"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66djt004oj5wx4g7yidgk",
+        "question": "[N1.9] Placeholder question 1 for: Position integers on a number line",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dju004qj5wxcg31qrq3",
+      "noteIds": [
+        "cmmm90ece000zcoyqftrvdtqk"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dju004qj5wxcg31qrq3",
+        "question": "[N1.9] Placeholder question 2 for: Position integers on a number line",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66djy004sj5wx6k2nvjet",
+      "noteIds": [
+        "cmmm90ecf0011coyqtnhd7l8t"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66djy004sj5wx6k2nvjet",
+        "question": "[N1.10] Placeholder question 1 for: Rounding to the nearest 10, 100, 1000, integer",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dk0004uj5wxqb75a6rk",
+      "noteIds": [
+        "cmmm90ecf0013coyqngh9wgcr"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dk0004uj5wxqb75a6rk",
+        "question": "[N1.10] Placeholder question 2 for: Rounding to the nearest 10, 100, 1000, integer",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dk1004wj5wxyshucbqq",
+      "noteIds": [
+        "cmmm90ecg0015coyq9kodwvww"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dk1004wj5wxyshucbqq",
+        "question": "[N1.11] Placeholder question 1 for: Position decimals on a number line (incl midpoint using a calculator)",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dk3004yj5wx1o1dc6q0",
+      "noteIds": [
+        "cmmm90ecg0017coyqod4ls0rx"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dk3004yj5wx1o1dc6q0",
+        "question": "[N1.11] Placeholder question 2 for: Position decimals on a number line (incl midpoint using a calculator)",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dk50050j5wxpfkflobn",
+      "noteIds": [
+        "cmmm90ech0019coyq1cvs7l34"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dk50050j5wxpfkflobn",
+        "question": "[N1.12] Placeholder question 1 for: Rounding to decimal places",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dk70052j5wx42mlg8y4",
+      "noteIds": [
+        "cmmm90ech001bcoyq87hzng2d"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dk70052j5wx42mlg8y4",
+        "question": "[N1.12] Placeholder question 2 for: Rounding to decimal places",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dk80054j5wx5xd5le2s",
+      "noteIds": [
+        "cmmm90ech001dcoyqeezf7jxk"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dk80054j5wx5xd5le2s",
+        "question": "[N1.13] Placeholder question 1 for: Position negatives on a number line",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dka0056j5wxtkubr5bl",
+      "noteIds": [
+        "cmmm90eci001fcoyqz8a7wxsq"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dka0056j5wxtkubr5bl",
+        "question": "[N1.13] Placeholder question 2 for: Position negatives on a number line",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dkc0058j5wxp698fdlo",
+      "noteIds": [
+        "cmmm90eci001hcoyqx28d22oo"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dkc0058j5wxp698fdlo",
+        "question": "[N1.14] Placeholder question 1 for: Compare negatives using =, ≠, <, >, ≤, ≥",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dkf005aj5wxz5qq0jat",
+      "noteIds": [
+        "cmmm90eck001jcoyqdo3hccly"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dkf005aj5wxz5qq0jat",
+        "question": "[N1.14] Placeholder question 2 for: Compare negatives using =, ≠, <, >, ≤, ≥",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dkh005cj5wxk27ohojn",
+      "noteIds": [
+        "cmmm90ecl001lcoyq42dbogi9"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dkh005cj5wxk27ohojn",
+        "question": "[N1.15] Placeholder question 1 for: Order any integers, negatives and decimals",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dkj005ej5wx7pchpzpr",
+      "noteIds": [
+        "cmmm90ecl001ncoyq2fz4yyyx"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dkj005ej5wx7pchpzpr",
+        "question": "[N1.15] Placeholder question 2 for: Order any integers, negatives and decimals",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dkk005gj5wxg13xrdji",
+      "noteIds": [
+        "cmmm90ecl001pcoyqm02z8uc3"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dkk005gj5wxg13xrdji",
+        "question": "[N1.16] Placeholder question 1 for: Rounding to significant figures",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dkn005ij5wxblws899j",
+      "noteIds": [
+        "cmmm90ecm001rcoyq8xcqge3l"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dkn005ij5wxblws899j",
+        "question": "[N1.16] Placeholder question 2 for: Rounding to significant figures",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dko005kj5wxnv1pjg05",
+      "noteIds": [
+        "cmmm90ecm001tcoyqon00av00"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dko005kj5wxnv1pjg05",
+        "question": "[N1.17] Placeholder question 1 for: Write 10, 100, 1000 etc. as powers of 10",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dkr005mj5wx97e1wbv7",
+      "noteIds": [
+        "cmmm90ecm001vcoyq82k4jsiw"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dkr005mj5wx97e1wbv7",
+        "question": "[N1.17] Placeholder question 2 for: Write 10, 100, 1000 etc. as powers of 10",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dks005oj5wx0brpxh2q",
+      "noteIds": [
+        "cmmm90ecn001xcoyqwym4cxj1"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dks005oj5wx0brpxh2q",
+        "question": "[N1.18] Placeholder question 1 for: Write positive integers in the form A × 10^n",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dku005qj5wxigyv2yq0",
+      "noteIds": [
+        "cmmm90ecn001zcoyqnedo2q55"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dku005qj5wxigyv2yq0",
+        "question": "[N1.18] Placeholder question 2 for: Write positive integers in the form A × 10^n",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dkw005sj5wxvw2z16il",
+      "noteIds": [
+        "cmmm90ecn0021coyqqiuq23x0"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dkw005sj5wxvw2z16il",
+        "question": "[N1.19] Placeholder question 1 for: Understand negative powers of 10",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dkx005uj5wx6ek2iwjr",
+      "noteIds": [
+        "cmmm90eco0023coyqp0wvdgib"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dkx005uj5wx6ek2iwjr",
+        "question": "[N1.19] Placeholder question 2 for: Understand negative powers of 10",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dky005wj5wxrj9vrofs",
+      "noteIds": [
+        "cmmm90eco0025coyq67dvpa5g"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dky005wj5wxrj9vrofs",
+        "question": "[N1.20] Placeholder question 1 for: Place value systems beyond base 10",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dkz005yj5wxbwi4toz0",
+      "noteIds": [
+        "cmmm90eco0027coyq0hvyqki1"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dkz005yj5wxbwi4toz0",
+        "question": "[N1.20] Placeholder question 2 for: Place value systems beyond base 10",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dl10060j5wxwpghnz0n",
+      "noteIds": [
+        "cmmm90ecp0029coyq7otd7jtb"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dl10060j5wxwpghnz0n",
+        "question": "[N2.3] Placeholder question 1 for: Use commutative and associative laws",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dl30062j5wxkbgfqgth",
+      "noteIds": [
+        "cmmm90ecp002bcoyqp884my6o"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dl30062j5wxkbgfqgth",
+        "question": "[N2.3] Placeholder question 2 for: Use commutative and associative laws",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dl40064j5wxuccunl9b",
+      "noteIds": [
+        "cmmm90ecp002dcoyql5r6vlwv"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dl40064j5wxuccunl9b",
+        "question": "[N2.5] Placeholder question 1 for: Use formal methods for addition of decimals",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dl60066j5wxrelunpbr",
+      "noteIds": [
+        "cmmm90ecq002fcoyqhxr2mcmb"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dl60066j5wxrelunpbr",
+        "question": "[N2.5] Placeholder question 2 for: Use formal methods for addition of decimals",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dl70068j5wx5ymcvvlo",
+      "noteIds": [
+        "cmmm90ecq002hcoyqd9e5i7f5"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dl70068j5wx5ymcvvlo",
+        "question": "[N2.7] Placeholder question 1 for: Use formal methods for subtraction of decimals; complement of a decimal (1 − p)",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dl9006aj5wxiulq8a4z",
+      "noteIds": [
+        "cmmm90ecr002jcoyqfcg6a7e4"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dl9006aj5wxiulq8a4z",
+        "question": "[N2.7] Placeholder question 2 for: Use formal methods for subtraction of decimals; complement of a decimal (1 − p)",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dla006cj5wxhwsi97pu",
+      "noteIds": [
+        "cmmm90ecr002lcoyqg4iv5296"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dla006cj5wxhwsi97pu",
+        "question": "[N2.8] Placeholder question 1 for: Money problems involving addition and subtraction",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dlc006ej5wxjnpnr5cj",
+      "noteIds": [
+        "cmmm90ecs002ncoyqkuwh511o"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dlc006ej5wxjnpnr5cj",
+        "question": "[N2.8] Placeholder question 2 for: Money problems involving addition and subtraction",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dld006gj5wxtq3y4hr9",
+      "noteIds": [
+        "cmmm90ect002pcoyqn2rzi1v5"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dld006gj5wxtq3y4hr9",
+        "question": "[N2.9] Placeholder question 1 for: Perimeter of irregular polygons",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dle006ij5wxnh60imdr",
+      "noteIds": [
+        "cmmm90ecu002rcoyqqco7zo88"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dle006ij5wxnh60imdr",
+        "question": "[N2.9] Placeholder question 2 for: Perimeter of irregular polygons",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dlg006kj5wxr5je1mwl",
+      "noteIds": [
+        "cmmm90ecu002tcoyql7dm8iv2"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dlg006kj5wxr5je1mwl",
+        "question": "[N2.10] Placeholder question 1 for: Perimeter of regular polygons",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dlh006mj5wxwsquw950",
+      "noteIds": [
+        "cmmm90ecv002vcoyq84pjikgv"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dlh006mj5wxwsquw950",
+        "question": "[N2.10] Placeholder question 2 for: Perimeter of regular polygons",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dlj006oj5wxjri118bk",
+      "noteIds": [
+        "cmmm90ecv002xcoyql5kzfcdr"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dlj006oj5wxjri118bk",
+        "question": "[N2.11] Placeholder question 1 for: Perimeter of rectangles and parallelograms",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dll006qj5wx1jawnc1t",
+      "noteIds": [
+        "cmmm90ecx002zcoyq0q4p4iie"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dll006qj5wx1jawnc1t",
+        "question": "[N2.11] Placeholder question 2 for: Perimeter of rectangles and parallelograms",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dlm006sj5wxcbi8nsb8",
+      "noteIds": [
+        "cmmm90ecx0031coyqhpq2ubql"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dlm006sj5wxcbi8nsb8",
+        "question": "[N2.12] Placeholder question 1 for: Perimeter of an isosceles triangle or an isosceles trapezium",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dln006uj5wxvu4nhbxb",
+      "noteIds": [
+        "cmmm90ecy0033coyq51tovktk"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dln006uj5wxvu4nhbxb",
+        "question": "[N2.12] Placeholder question 2 for: Perimeter of an isosceles triangle or an isosceles trapezium",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dlo006wj5wxyy2bswu1",
+      "noteIds": [
+        "cmmm90ecy0035coyq68f23nkl"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dlo006wj5wxyy2bswu1",
+        "question": "[N2.13] Placeholder question 1 for: Perimeter of a compound shape",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dlp006yj5wxmq6m1xqv",
+      "noteIds": [
+        "cmmm90ecz0037coyq8218a37x"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dlp006yj5wxmq6m1xqv",
+        "question": "[N2.13] Placeholder question 2 for: Perimeter of a compound shape",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dlq0070j5wx407njeym",
+      "noteIds": [
+        "cmmm90ecz0039coyqya0h5zid"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dlq0070j5wx407njeym",
+        "question": "[N2.14] Placeholder question 1 for: Solve problems involving tables and timetables",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dls0072j5wxgwuclq8i",
+      "noteIds": [
+        "cmmm90ecz003bcoyq9og1b3ah"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dls0072j5wxgwuclq8i",
+        "question": "[N2.14] Placeholder question 2 for: Solve problems involving tables and timetables",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dlt0074j5wxsor271rx",
+      "noteIds": [
+        "cmmm90ed0003dcoyqb6oj84j7"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dlt0074j5wxsor271rx",
+        "question": "[N2.15] Placeholder question 1 for: Solve problems with frequency trees",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dlv0076j5wx56661oc0",
+      "noteIds": [
+        "cmmm90ed0003fcoyq0f1ao74n"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dlv0076j5wx56661oc0",
+        "question": "[N2.15] Placeholder question 2 for: Solve problems with frequency trees",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dlw0078j5wxokfpa9c8",
+      "noteIds": [
+        "cmmm90ed0003hcoyq7zui152f"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dlw0078j5wxokfpa9c8",
+        "question": "[N2.16] Placeholder question 1 for: Add and subtract numbers given in standard form",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dlx007aj5wxvb33yx0b",
+      "noteIds": [
+        "cmmm90ed1003jcoyqo3jx3ckn"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dlx007aj5wxvb33yx0b",
+        "question": "[N2.16] Placeholder question 2 for: Add and subtract numbers given in standard form",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dly007cj5wxlx7a9nas",
+      "noteIds": [
+        "cmmm90ed1003lcoyqemz2j4aj"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dly007cj5wxlx7a9nas",
+        "question": "[N3.3] Placeholder question 1 for: Multiply and divide integers and decimals by powers of 10",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dlz007ej5wxeprpl5yj",
+      "noteIds": [
+        "cmmm90ed1003ncoyqkod5rak0"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dlz007ej5wxeprpl5yj",
+        "question": "[N3.3] Placeholder question 2 for: Multiply and divide integers and decimals by powers of 10",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dm0007gj5wxhasvztj9",
+      "noteIds": [
+        "cmmm90ed3003pcoyqm8ctkxw5"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dm0007gj5wxhasvztj9",
+        "question": "[N3.5] Placeholder question 1 for: Multiplication (with carrying)",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dm1007ij5wxpdtz32g6",
+      "noteIds": [
+        "cmmm90ed3003rcoyq8hd64v6s"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dm1007ij5wxpdtz32g6",
+        "question": "[N3.5] Placeholder question 2 for: Multiplication (with carrying)",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dm2007kj5wxnhski3vl",
+      "noteIds": [
+        "cmmm90ed3003tcoyqpq6xp611"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dm2007kj5wxnhski3vl",
+        "question": "[N3.6] Placeholder question 1 for: Area of rectangles, parallelograms, triangles and compound shapes",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dm3007mj5wxvpts9rmo",
+      "noteIds": [
+        "cmmm90ed4003vcoyqhuoahdda"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dm3007mj5wxvpts9rmo",
+        "question": "[N3.6] Placeholder question 2 for: Area of rectangles, parallelograms, triangles and compound shapes",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dm4007oj5wx9m669gz9",
+      "noteIds": [
+        "cmmm90ed4003xcoyqhktgoyfw"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dm4007oj5wx9m669gz9",
+        "question": "[N3.8] Placeholder question 1 for: Short division (with carrying)",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dm5007qj5wxfq8quh4l",
+      "noteIds": [
+        "cmmm90ed4003zcoyq44xh454m"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dm5007qj5wxfq8quh4l",
+        "question": "[N3.8] Placeholder question 2 for: Short division (with carrying)",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dm6007sj5wxfdkb00p1",
+      "noteIds": [
+        "cmmm90ed50041coyqh3w8ozjv"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dm6007sj5wxfdkb00p1",
+        "question": "[N3.9] Placeholder question 1 for: Order of Operations (DM before AS, L→R, indices/roots, brackets, inserting brackets)",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dm7007uj5wxyaqfc96j",
+      "noteIds": [
+        "cmmm90ed50043coyqdm3nfrhz"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dm7007uj5wxyaqfc96j",
+        "question": "[N3.9] Placeholder question 2 for: Order of Operations (DM before AS, L→R, indices/roots, brackets, inserting brackets)",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dm8007wj5wx2bzyi2sm",
+      "noteIds": [
+        "cmmm90ed50045coyqva6q8fub"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dm8007wj5wx2bzyi2sm",
+        "question": "[N3.10] Placeholder question 1 for: Multiples",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dm9007yj5wxa88qvxk9",
+      "noteIds": [
+        "cmmm90ed60047coyqbltaows1"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dm9007yj5wxa88qvxk9",
+        "question": "[N3.10] Placeholder question 2 for: Multiples",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dma0080j5wxl7weq6g3",
+      "noteIds": [
+        "cmmm90ed60049coyqygp8wr0w"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dma0080j5wxl7weq6g3",
+        "question": "[N3.11] Placeholder question 1 for: Factors",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dmb0082j5wxksv1n0r4",
+      "noteIds": [
+        "cmmm90ed7004bcoyqzzfpeono"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dmb0082j5wxksv1n0r4",
+        "question": "[N3.11] Placeholder question 2 for: Factors",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dmc0084j5wxntjxgp2y",
+      "noteIds": [
+        "cmmm90ed7004dcoyqxd9zd26k"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dmc0084j5wxntjxgp2y",
+        "question": "[N3.12] Placeholder question 1 for: Lowest Common Multiple",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dmd0086j5wxcd6ksxul",
+      "noteIds": [
+        "cmmm90ed8004fcoyq6gf87iuu"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dmd0086j5wxcd6ksxul",
+        "question": "[N3.12] Placeholder question 2 for: Lowest Common Multiple",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dmd0088j5wxfk5je2u5",
+      "noteIds": [
+        "cmmm90ed8004hcoyq5mghuhi7"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dmd0088j5wxfk5je2u5",
+        "question": "[N3.13] Placeholder question 1 for: Highest Common Factor",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dme008aj5wxcn5y72ey",
+      "noteIds": [
+        "cmmm90ed9004jcoyqjlz6r849"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dme008aj5wxcn5y72ey",
+        "question": "[N3.13] Placeholder question 2 for: Highest Common Factor",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dmf008cj5wx4bs6fy94",
+      "noteIds": [
+        "cmmm90ed9004lcoyqe8iw05oy"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dmf008cj5wx4bs6fy94",
+        "question": "[N3.14] Placeholder question 1 for: Convert metric units",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dmg008ej5wxx5pohuus",
+      "noteIds": [
+        "cmmm90eda004ncoyqd0c95eyz"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dmg008ej5wxx5pohuus",
+        "question": "[N3.14] Placeholder question 2 for: Convert metric units",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dmh008gj5wx6sdf70du",
+      "noteIds": [
+        "cmmm90edb004pcoyqojtyxpec"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dmh008gj5wx6sdf70du",
+        "question": "[N3.15] Placeholder question 1 for: Decimal multiplication (decimal × integer)",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dmi008ij5wx9swy84im",
+      "noteIds": [
+        "cmmm90edb004rcoyq9uypcd3p"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dmi008ij5wx9swy84im",
+        "question": "[N3.15] Placeholder question 2 for: Decimal multiplication (decimal × integer)",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dmj008kj5wxx8b692x3",
+      "noteIds": [
+        "cmmm90edb004tcoyq9hu9j9kk"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dmj008kj5wxx8b692x3",
+        "question": "[N3.16] Placeholder question 1 for: Decimal multiplication (decimal × decimal)",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dmk008mj5wxz58n5z5d",
+      "noteIds": [
+        "cmmm90edc004vcoyqr3zcxvtx"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dmk008mj5wxz58n5z5d",
+        "question": "[N3.16] Placeholder question 2 for: Decimal multiplication (decimal × decimal)",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dml008oj5wxwugtjcyt",
+      "noteIds": [
+        "cmmm90edc004xcoyqob6law0y"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dml008oj5wxwugtjcyt",
+        "question": "[N3.17] Placeholder question 1 for: Multiply by 0.1 and 0.01",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dmm008qj5wx95yjzv57",
+      "noteIds": [
+        "cmmm90edc004zcoyqycuek9fl"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dmm008qj5wx95yjzv57",
+        "question": "[N3.17] Placeholder question 2 for: Multiply by 0.1 and 0.01",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dmn008sj5wxt4a6isvq",
+      "noteIds": [
+        "cmmm90edd0051coyqhapjlux8"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dmn008sj5wxt4a6isvq",
+        "question": "[N3.18] Placeholder question 1 for: Short division (remainders)",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dmo008uj5wxihgjas5r",
+      "noteIds": [
+        "cmmm90ede0053coyq7n44vglj"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dmo008uj5wxihgjas5r",
+        "question": "[N3.18] Placeholder question 2 for: Short division (remainders)",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dmp008wj5wxjiv1x967",
+      "noteIds": [
+        "cmmm90ede0055coyq97a4cadx"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dmp008wj5wxjiv1x967",
+        "question": "[N3.19] Placeholder question 1 for: Short division (decimal answers)",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dmp008yj5wxrnctfi28",
+      "noteIds": [
+        "cmmm90edf0057coyqvm09g0fh"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dmp008yj5wxrnctfi28",
+        "question": "[N3.19] Placeholder question 2 for: Short division (decimal answers)",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dmq0090j5wx3289qhnl",
+      "noteIds": [
+        "cmmm90edf0059coyqp76so094"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dmq0090j5wx3289qhnl",
+        "question": "[N3.20] Placeholder question 1 for: Divide decimals (by an integer / by a decimal; incl ÷0.1, ÷0.2, ÷0.5 etc.)",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dmr0092j5wxffvj2ck7",
+      "noteIds": [
+        "cmmm90edf005bcoyq7664tbhq"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dmr0092j5wxffvj2ck7",
+        "question": "[N3.20] Placeholder question 2 for: Divide decimals (by an integer / by a decimal; incl ÷0.1, ÷0.2, ÷0.5 etc.)",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dms0094j5wxzx2w16ei",
+      "noteIds": [
+        "cmmm90edg005dcoyqy0akl77f"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dms0094j5wxzx2w16ei",
+        "question": "[N3.21] Placeholder question 1 for: Find missing lengths given area (rectangles, parallelograms, triangles and compound shapes)",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dmt0096j5wx8r628b07",
+      "noteIds": [
+        "cmmm90edg005fcoyq09gaqbwa"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dmt0096j5wx8r628b07",
+        "question": "[N3.21] Placeholder question 2 for: Find missing lengths given area (rectangles, parallelograms, triangles and compound shapes)",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dmu0098j5wxr39z20oq",
+      "noteIds": [
+        "cmmm90edg005hcoyqiwmzb7gs"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dmu0098j5wxr39z20oq",
+        "question": "[N3.22] Placeholder question 1 for: Solve problems using the mean",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dmv009aj5wx56goxx9o",
+      "noteIds": [
+        "cmmm90edh005jcoyq6tdd71l8"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dmv009aj5wx56goxx9o",
+        "question": "[N3.22] Placeholder question 2 for: Solve problems using the mean",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dmw009cj5wxpl0pgvkq",
+      "noteIds": [
+        "cmmm90edh005lcoyq091qxu2e"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dmw009cj5wxpl0pgvkq",
+        "question": "[N3.23] Placeholder question 1 for: Square and cube numbers, roots",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dmx009ej5wx2v9e4b70",
+      "noteIds": [
+        "cmmm90edh005ncoyqn5ft7863"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dmx009ej5wx2v9e4b70",
+        "question": "[N3.23] Placeholder question 2 for: Square and cube numbers, roots",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dmy009gj5wxnrkwu8ex",
+      "noteIds": [
+        "cmmm90edi005pcoyqgqck6ak8"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dmy009gj5wxnrkwu8ex",
+        "question": "[N3.24] Placeholder question 1 for: Introduction to primes",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dmz009ij5wx4k8xs0zo",
+      "noteIds": [
+        "cmmm90edj005rcoyqjuzl6k4o"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dmz009ij5wx4k8xs0zo",
+        "question": "[N3.24] Placeholder question 2 for: Introduction to primes",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dn0009kj5wx5z1f9bmb",
+      "noteIds": [
+        "cmmm90edj005tcoyqa6vt079a"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dn0009kj5wx5z1f9bmb",
+        "question": "[N4.1] Placeholder question 1 for: Understand a fraction as part of a whole and locate simple fractions on a number line",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dn2009mj5wx0duwalbz",
+      "noteIds": [
+        "cmmm90edj005vcoyq9kvtbqtz"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dn2009mj5wx0duwalbz",
+        "question": "[N4.1] Placeholder question 2 for: Understand a fraction as part of a whole and locate simple fractions on a number line",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dn3009oj5wxusenuq4g",
+      "noteIds": [
+        "cmmm90edk005xcoyqkoaz75k1"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dn3009oj5wxusenuq4g",
+        "question": "[N4.2] Placeholder question 1 for: Generate equivalent fractions",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dn4009qj5wx8sprnk7c",
+      "noteIds": [
+        "cmmm90edk005zcoyqa025g7ro"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dn4009qj5wx8sprnk7c",
+        "question": "[N4.2] Placeholder question 2 for: Generate equivalent fractions",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dn5009sj5wxd6htf75l",
+      "noteIds": [
+        "cmmm90edk0061coyqzw28hcb1"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dn5009sj5wxd6htf75l",
+        "question": "[N4.3] Placeholder question 1 for: Simplify a fraction using factors/HCF",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dn6009uj5wxw6dlgkhr",
+      "noteIds": [
+        "cmmm90edk0063coyqgklerwuo"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dn6009uj5wxw6dlgkhr",
+        "question": "[N4.3] Placeholder question 2 for: Simplify a fraction using factors/HCF",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dn7009wj5wxhcmqxb1s",
+      "noteIds": [
+        "cmmm90edl0065coyqdz5y9999"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dn7009wj5wxhcmqxb1s",
+        "question": "[N4.4] Placeholder question 1 for: Convert a fraction to a decimal (terminating decimals)",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dn7009yj5wxzime6742",
+      "noteIds": [
+        "cmmm90edl0067coyqba9dq4de"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dn7009yj5wxzime6742",
+        "question": "[N4.4] Placeholder question 2 for: Convert a fraction to a decimal (terminating decimals)",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dn800a0j5wx8a2fdg3r",
+      "noteIds": [
+        "cmmm90edm0069coyqlxmdgity"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dn800a0j5wx8a2fdg3r",
+        "question": "[N4.5] Placeholder question 1 for: Convert a decimal to a fraction (simple/terminating)",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dn900a2j5wxxh5od26e",
+      "noteIds": [
+        "cmmm90edm006bcoyqgans4hhk"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dn900a2j5wxxh5od26e",
+        "question": "[N4.5] Placeholder question 2 for: Convert a decimal to a fraction (simple/terminating)",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dna00a4j5wxpdzl860y",
+      "noteIds": [
+        "cmmm90edn006dcoyq9vd1dy23"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dna00a4j5wxpdzl860y",
+        "question": "[N4.6] Placeholder question 1 for: Convert a decimal to a percentage and a percentage to a decimal",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dnb00a6j5wxeqvpi738",
+      "noteIds": [
+        "cmmm90edn006fcoyqlyh8go4z"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dnb00a6j5wxeqvpi738",
+        "question": "[N4.6] Placeholder question 2 for: Convert a decimal to a percentage and a percentage to a decimal",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dnc00a8j5wx3p7v5ss0",
+      "noteIds": [
+        "cmmm90edo006hcoyq4mw81dmt"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dnc00a8j5wx3p7v5ss0",
+        "question": "[N4.7] Placeholder question 1 for: Convert a fraction to a percentage (via decimal or equivalence to /100)",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dnd00aaj5wxudvfdp8a",
+      "noteIds": [
+        "cmmm90edp006jcoyq82j08dh6"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dnd00aaj5wxudvfdp8a",
+        "question": "[N4.7] Placeholder question 2 for: Convert a fraction to a percentage (via decimal or equivalence to /100)",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dne00acj5wxjz9cebxf",
+      "noteIds": [
+        "cmmm90edq006lcoyqaybj24tf"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dne00acj5wxjz9cebxf",
+        "question": "[N4.8] Placeholder question 1 for: Compare and order fractions, decimals and percentages",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dnf00aej5wxuha6toeq",
+      "noteIds": [
+        "cmmm90edr006ncoyqs7zxorsh"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dnf00aej5wxuha6toeq",
+        "question": "[N4.8] Placeholder question 2 for: Compare and order fractions, decimals and percentages",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dng00agj5wxgxdtwuk0",
+      "noteIds": [
+        "cmmm90eds006pcoyqw7ew23o0"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dng00agj5wxgxdtwuk0",
+        "question": "[N4.9] Placeholder question 1 for: Find a percentage of an amount (using non-calculator-friendly methods)",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm66dnh00aij5wxsbulcht8",
+      "noteIds": [
+        "cmmm90edt006rcoyqst4ghz4t"
+      ],
+      "issueCodes": [
+        "label_leak"
+      ],
+      "before": {
+        "id": "cmmm66dnh00aij5wxsbulcht8",
+        "question": "[N4.9] Placeholder question 2 for: Find a percentage of an amount (using non-calculator-friendly methods)",
+        "type": "MCQ",
+        "answer": "Option A",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ]
+      },
+      "reason": "Placeholder content needs human authoring; stripping labels would still expose placeholder text."
+    },
+    {
+      "itemId": "cmmm83w2u000vzps3fxh45968",
+      "noteIds": [
+        "cmmm90eem009xcoyq2w05tjnx",
+        "cmmm90eem009zcoyq93wnxtm3"
+      ],
+      "issueCodes": [
+        "label_leak",
+        "typed_question_has_choices"
+      ],
+      "before": {
+        "id": "cmmm83w2u000vzps3fxh45968",
+        "question": "[Slide27-N1.4-RT-01] A pupil orders 321, 301, 312, 213, 212 as 321, 312, 301, 212, 213. Which two numbers have been put in the wrong order at the end?",
+        "type": "SHORT_TEXT",
+        "answer": "212 and 213",
+        "options": {
+          "meta": {
+            "source": {
+              "source_file": "(PART A) N1-3 Secondary Ready - Applications of Numeracy (FOUNDATION Not Meeting Expected Standard) - Answers.pptx",
+              "question_ref": "Slide27-N1.4-RT-01",
+              "slide_number": 27
+            },
+            "question_role": "practice"
+          },
+          "media": [
+            {
+              "alt": "Diagram from slide 27",
+              "src": "/curriculum-slide-media/part-a-n1-3-secondary-ready-applications-of-numeracy-foundation-not-meeting-expected-standard-answers/slide-27/image37.png",
+              "caption": "Source diagram from slide 27",
+              "assetIndex": 0
+            },
+            {
+              "alt": "Diagram from slide 27",
+              "src": "/curriculum-slide-media/part-a-n1-3-secondary-ready-applications-of-numeracy-foundation-not-meeting-expected-standard-answers/slide-27/image36.png",
+              "caption": "Source diagram from slide 27",
+              "assetIndex": 1
+            }
+          ],
+          "choices": [
+            "212 and 213"
+          ],
+          "acceptedAnswers": [
+            "212 and 213",
+            "213 and 212"
+          ]
+        }
+      },
+      "after": {
+        "id": "cmmm83w2u000vzps3fxh45968",
+        "question": "A pupil orders 321, 301, 312, 213, 212 as 321, 312, 301, 212, 213. Which two numbers have been put in the wrong order at the end?",
+        "type": "SHORT_TEXT",
+        "answer": "212 and 213",
+        "options": {
+          "meta": {
+            "source": {
+              "source_file": "(PART A) N1-3 Secondary Ready - Applications of Numeracy (FOUNDATION Not Meeting Expected Standard) - Answers.pptx",
+              "question_ref": "Slide27-N1.4-RT-01",
+              "slide_number": 27
+            },
+            "question_role": "practice"
+          },
+          "media": [
+            {
+              "alt": "Diagram from slide 27",
+              "src": "/curriculum-slide-media/part-a-n1-3-secondary-ready-applications-of-numeracy-foundation-not-meeting-expected-standard-answers/slide-27/image37.png",
+              "caption": "Source diagram from slide 27",
+              "assetIndex": 0
+            },
+            {
+              "alt": "Diagram from slide 27",
+              "src": "/curriculum-slide-media/part-a-n1-3-secondary-ready-applications-of-numeracy-foundation-not-meeting-expected-standard-answers/slide-27/image36.png",
+              "caption": "Source diagram from slide 27",
+              "assetIndex": 1
+            }
+          ],
+          "choices": [],
+          "acceptedAnswers": [
+            "212 and 213",
+            "213 and 212"
+          ]
+        }
+      },
+      "actions": [
+        "Removed internal label/prefix from the stored stem.",
+        "Cleared fixed choices from typed-answer item."
+      ]
+    }
+  ]
+}

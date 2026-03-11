@@ -8,7 +8,7 @@ export interface ItemContent {
 }
 
 const ORDER_PROMPT_RE =
-  /\b(order|put in order|arrange|ascending order|descending order|from smallest to largest|from largest to smallest|smallest to largest|largest to smallest|highest to lowest|lowest to highest|coldest to warmest|warmest to coldest|left to right on a number line)\b/i;
+  /(^order\b|\bput in order\b|\barrange\b|\bascending order\b|\bdescending order\b|\bfrom smallest to largest\b|\bfrom largest to smallest\b|\bsmallest to largest\b|\blargest to smallest\b|\bhighest to lowest\b|\blowest to highest\b|\bcoldest to warmest\b|\bwarmest to coldest\b|\bleft to right on a number line\b)/i;
 
 type AcceptedAnswerInput = string | string[];
 
@@ -113,16 +113,16 @@ function inferInteractionType(item: {
   answer: string;
   options?: unknown;
 }): ItemInteractionType {
+  if (typeof item.question === 'string' && ORDER_PROMPT_RE.test(item.question)) {
+    return 'ORDER';
+  }
+
   const normalized = item.type?.trim().toUpperCase();
   if (normalized === 'ORDER') return 'ORDER';
   if (normalized === 'TRUE_FALSE') return 'TRUE_FALSE';
   if (normalized === 'SHORT_NUMERIC' || normalized === 'NUMERIC') return 'SHORT_NUMERIC';
   if (normalized === 'SHORT_TEXT') return 'SHORT_TEXT';
   if (normalized === 'MCQ') return 'MCQ';
-
-  if (typeof item.question === 'string' && ORDER_PROMPT_RE.test(item.question)) {
-    return 'ORDER';
-  }
 
   return (item.type as ItemInteractionType) || 'MCQ';
 }

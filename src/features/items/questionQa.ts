@@ -1,4 +1,4 @@
-import { gradeAttempt } from '@/features/learn/gradeAttempt';
+import { gradeAttempt } from '../learn/gradeAttempt';
 import {
   parseAnswerType,
   parseItemOptions,

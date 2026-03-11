@@ -24,7 +24,7 @@ export interface InferredItemPurpose {
 }
 
 const ORDER_PROMPT_RE =
-  /\b(order|put in order|ascending order|descending order|ascending|descending|coldest to warmest|warmest to coldest|smallest to largest|largest to smallest)\b/i;
+  /(^order\b|\bput in order\b|\bascending order\b|\bdescending order\b|\bcoldest to warmest\b|\bwarmest to coldest\b|\bsmallest to largest\b|\blargest to smallest\b)/i;
 const SIGN_PROMPT_RE = /\b(fill (?:in )?(?:the )?(?:sign|symbol)|complete)\b/i;
 const NUMERIC_RESPONSE_PROMPT_RE =
   /\b(in figures|what is the value|which is greater|which is less|which is closer to zero|what place|value of digit|digit \d in|correct this|expanded form)\b/i;
