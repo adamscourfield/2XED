@@ -18,7 +18,7 @@ interface QaItem {
   question: string;
   displayQuestion: string;
   type: string;
-  answerType: 'MCQ' | 'SHORT_TEXT' | 'SHORT_NUMERIC' | 'TRUE_FALSE';
+  answerType: 'MCQ' | 'SHORT_TEXT' | 'SHORT_NUMERIC' | 'TRUE_FALSE' | 'ORDER';
   answerModeLabel: string;
   answer: string;
   options: unknown;

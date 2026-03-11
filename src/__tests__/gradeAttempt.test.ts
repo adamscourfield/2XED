@@ -58,4 +58,17 @@ describe('gradeAttempt', () => {
   it('supports multiple accepted answers split by semicolon/pipe/newline', () => {
     expect(gradeAttempt('4;four|IV\n 04 ', 'iv')).toBe(true);
   });
+
+  it('infers ORDER interaction for ordering prompts even when stored as SHORT', () => {
+    const item = getItemContent({
+      type: 'SHORT',
+      question: 'Write these numbers in ascending order: 4.61, 4.21, 4.67',
+      answer: '4.21, 4.61, 4.67',
+      options: {
+        choices: ['4.61', '4.21', '4.67'],
+      },
+    });
+
+    expect(item.type).toBe('ORDER');
+  });
 });

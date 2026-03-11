@@ -2,7 +2,7 @@ export type QuestionRole = 'anchor' | 'misconception' | 'prerequisite_probe' | '
 export type MisconceptionTag = string;
 export type TransferLevel = 'none' | 'low' | 'medium' | 'high';
 export type StrictnessLevel = 'exact' | 'normalized';
-export type AnswerType = 'MCQ' | 'SHORT_TEXT' | 'SHORT_NUMERIC' | 'TRUE_FALSE';
+export type AnswerType = 'MCQ' | 'SHORT_TEXT' | 'SHORT_NUMERIC' | 'TRUE_FALSE' | 'ORDER';
 
 export interface ItemMeta {
   questionRole: QuestionRole;
@@ -158,6 +158,9 @@ function answerLooksBoolean(answer: unknown): boolean {
   );
 }
 
+const ORDER_PROMPT_RE =
+  /\b(order|put in order|arrange|ascending order|descending order|from smallest to largest|from largest to smallest|smallest to largest|largest to smallest|highest to lowest|lowest to highest|coldest to warmest|warmest to coldest|left to right on a number line)\b/i;
+
 export function parseAnswerType(itemType: unknown, question?: unknown, options?: unknown, answer?: unknown): AnswerType {
   if (looksLikeTrueFalseQuestion(question) || optionsContainBooleanChoices(options) || answerLooksBoolean(answer)) {
     return 'TRUE_FALSE';
@@ -165,9 +168,14 @@ export function parseAnswerType(itemType: unknown, question?: unknown, options?:
 
   if (typeof itemType === 'string') {
     const normalized = itemType.trim().toUpperCase();
+    if (normalized === 'ORDER') return 'ORDER';
     if (normalized === 'TRUE_FALSE' || normalized === 'BOOLEAN' || normalized === 'TF') return 'TRUE_FALSE';
     if (normalized === 'SHORT_TEXT' || normalized === 'SHORT') return 'SHORT_TEXT';
     if (normalized === 'SHORT_NUMERIC' || normalized === 'NUMERIC') return 'SHORT_NUMERIC';
+  }
+
+  if (typeof question === 'string' && ORDER_PROMPT_RE.test(question)) {
+    return 'ORDER';
   }
 
   return 'MCQ';

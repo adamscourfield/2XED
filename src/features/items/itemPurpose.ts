@@ -93,11 +93,12 @@ function inferRoute(question: string, explicitRoute: 'A' | 'B' | 'C' | null): 'A
 
 function inferAnswerType(input: ItemPurposeInput, purpose: ItemPurpose): AnswerType {
   const existing = parseAnswerType(input.type, input.question, input.options, input.answer);
+  if (existing === 'ORDER') return 'ORDER';
   if (existing === 'TRUE_FALSE') return 'TRUE_FALSE';
 
   const text = questionText(input.question);
 
-  if (ORDER_PROMPT_RE.test(text)) return 'SHORT_TEXT';
+  if (ORDER_PROMPT_RE.test(text)) return 'ORDER';
   if (SIGN_PROMPT_RE.test(text) || text.includes('__')) return 'SHORT_TEXT';
   if (NUMERIC_RESPONSE_PROMPT_RE.test(text)) return answerLooksNumeric(input.answer) ? 'SHORT_NUMERIC' : 'SHORT_TEXT';
   if (WRITTEN_RESPONSE_PROMPT_RE.test(text)) return answerLooksNumeric(input.answer) ? 'SHORT_NUMERIC' : 'SHORT_TEXT';

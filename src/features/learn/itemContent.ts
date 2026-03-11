@@ -7,6 +7,9 @@ export interface ItemContent {
   canonicalAnswer: string;
 }
 
+const ORDER_PROMPT_RE =
+  /\b(order|put in order|arrange|ascending order|descending order|from smallest to largest|from largest to smallest|smallest to largest|largest to smallest|highest to lowest|lowest to highest|coldest to warmest|warmest to coldest|left to right on a number line)\b/i;
+
 type AcceptedAnswerInput = string | string[];
 
 type RawOptions =
@@ -104,8 +107,29 @@ function parseOptions(options: unknown): { choices: string[]; acceptedAnswers: s
   return { choices: [], acceptedAnswers: [] };
 }
 
+function inferInteractionType(item: {
+  type?: string | null;
+  question?: string;
+  answer: string;
+  options?: unknown;
+}): ItemInteractionType {
+  const normalized = item.type?.trim().toUpperCase();
+  if (normalized === 'ORDER') return 'ORDER';
+  if (normalized === 'TRUE_FALSE') return 'TRUE_FALSE';
+  if (normalized === 'SHORT_NUMERIC' || normalized === 'NUMERIC') return 'SHORT_NUMERIC';
+  if (normalized === 'SHORT_TEXT') return 'SHORT_TEXT';
+  if (normalized === 'MCQ') return 'MCQ';
+
+  if (typeof item.question === 'string' && ORDER_PROMPT_RE.test(item.question)) {
+    return 'ORDER';
+  }
+
+  return (item.type as ItemInteractionType) || 'MCQ';
+}
+
 export function getItemContent(item: {
   type: string;
+  question?: string;
   answer: string;
   options?: unknown;
 }): ItemContent {
@@ -113,7 +137,7 @@ export function getItemContent(item: {
   const acceptedAnswers = unique([item.answer, ...parsed.acceptedAnswers]);
 
   return {
-    type: (item.type as ItemInteractionType) || 'MCQ',
+    type: inferInteractionType(item),
     choices: parsed.choices,
     acceptedAnswers,
     canonicalAnswer: item.answer,

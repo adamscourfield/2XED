@@ -50,6 +50,8 @@ function labelForAnswerType(answerType: AnswerType): string {
   switch (answerType) {
     case 'TRUE_FALSE':
       return 'True / False buttons';
+    case 'ORDER':
+      return 'Drag-and-drop fridge magnets';
     case 'SHORT_TEXT':
       return 'Typed short answer';
     case 'SHORT_NUMERIC':
@@ -98,6 +100,10 @@ export function summarizeQuestionQa(item: QaItemShape): QaSummary {
 
   if ((answerType === 'SHORT_TEXT' || answerType === 'SHORT_NUMERIC') && parsed.choices.length > 0) {
     issues.push({ code: 'typed_question_has_choices', message: 'Typed-answer question still has stored choices. Check whether the mode is correct.', severity: 'warning' });
+  }
+
+  if (answerType === 'ORDER' && parsed.choices.length < 2) {
+    issues.push({ code: 'order_missing_choices', message: 'Ordering question needs draggable values in the choice list.', severity: 'error' });
   }
 
   return {
