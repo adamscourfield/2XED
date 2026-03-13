@@ -236,6 +236,7 @@ export function LearnSession({ subject, skill, items, userId }: Props) {
   if (phase === 'results') {
     const correctCount = results.filter((r) => r.correct).length;
     const masteryPct = Math.round((correctCount / results.length) * 100);
+    const outcomeTone = masteryPct >= 80 ? 'green' : masteryPct >= 50 ? 'amber' : 'blue';
 
     return (
       <main className="anx-shell flex items-center justify-center">
@@ -249,7 +250,6 @@ export function LearnSession({ subject, skill, items, userId }: Props) {
             <p className="mt-2 text-sm" style={{ color: 'var(--anx-text-muted)' }}>
               {correctCount} out of {results.length} correct
             </p>
-            <p className="mt-2 text-sm text-gray-500">One question does not decide everything. Your next step will be based on the whole session.</p>
           </div>
           <div className="anx-divider" />
           <div className="space-y-2 text-left">
@@ -270,13 +270,13 @@ export function LearnSession({ subject, skill, items, userId }: Props) {
               onClick={() => router.push(`/learn/${subject.slug}`)}
               className="anx-btn-secondary flex-1 py-3"
             >
-              Try this skill again
+              Practice again
             </button>
             <button
               onClick={() => router.push('/dashboard')}
               className="anx-btn-primary flex-1 py-3"
             >
-              Dashboard
+              Dashboard and next skill
             </button>
           </div>
         </div>

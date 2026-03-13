@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { prisma } from '@/db/prisma';
 import Link from 'next/link';
 import { hasCompletedOnboardingDiagnostic } from '@/features/learn/onboarding';
+import { selectNextSkill } from '@/features/learn/nextSkill';
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
@@ -39,6 +40,7 @@ export default async function DashboardPage() {
     include: {
       skills: {
         include: {
+          prerequisites: true,
           masteries: {
             where: { userId },
           },
@@ -78,6 +80,30 @@ export default async function DashboardPage() {
             if (!mastery.nextReviewAt) return true;
             return mastery.nextReviewAt <= now;
           });
+          const nextSkill = selectNextSkill(
+            subject.skills,
+            subject.skills
+              .map((skill) => {
+                const mastery = skill.masteries[0];
+                if (!mastery) return null;
+                return {
+                  skillId: skill.id,
+                  mastery: mastery.mastery,
+                  confirmedCount: mastery.confirmedCount,
+                  nextReviewAt: mastery.nextReviewAt,
+                };
+              })
+              .filter((mastery): mastery is {
+                skillId: string;
+                mastery: number;
+                confirmedCount: number;
+                nextReviewAt: Date | null;
+              } => mastery !== null),
+            now
+          );
+          const nextSkillMastery = nextSkill ? nextSkill.masteries[0] : null;
+          const nextSkillStarted = Boolean(nextSkillMastery?.lastPracticedAt);
+          const nextSkillIsDue = !nextSkillMastery?.nextReviewAt || nextSkillMastery.nextReviewAt <= now;
 
           return (
             <section key={subject.id} className="mb-10">

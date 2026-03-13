@@ -103,7 +103,7 @@ export default async function DiagnosticCompletePage({ params, searchParams }: P
           href={`/learn/${subjectSlug}`}
           className="anx-btn-primary block w-full py-3.5 text-center text-base"
         >
-          Go to your next skill
+          See my first skill
         </Link>
       </div>
     </main>
