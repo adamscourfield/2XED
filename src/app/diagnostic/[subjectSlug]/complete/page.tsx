@@ -93,14 +93,19 @@ export default async function DiagnosticCompletePage({ params, searchParams }: P
             You answered {diagSession.itemsSeen} question{diagSession.itemsSeen !== 1 ? 's' : ''}. We now know where to start and will choose the next skill for you.
           </p>
         </div>
-        <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-800">
-          Your first learning steps are ready. You do not need to choose the next skill yourself.
+        <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 text-left text-sm text-blue-900">
+          <p className="font-semibold">What happens next</p>
+          <ol className="mt-2 list-decimal space-y-1 pl-5">
+            <li>We will choose your next skill for you.</li>
+            <li>You will get a short practice session, one question at a time.</li>
+            <li>If something feels hard, that is okay — we will keep the next step small.</li>
+          </ol>
         </div>
         <Link
           href={`/learn/${subjectSlug}`}
           className="block w-full py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors"
         >
-          Go to your next skill
+          See my first skill
         </Link>
       </div>
     </main>

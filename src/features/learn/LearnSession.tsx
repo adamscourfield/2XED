@@ -162,7 +162,11 @@ export function LearnSession({ subject, skill, items, userId }: Props) {
           )}
           <div className="rounded-lg border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-900">
             <p className="font-medium">What happens next</p>
-            <p className="mt-1">You will do a short set of {items.length} questions. After that, we will either keep practising this skill, bring it back later, or move you on when you are ready.</p>
+            <ol className="mt-2 list-decimal space-y-1 pl-5">
+              <li>You will do a short set of {items.length} questions.</li>
+              <li>We will use this session to check how secure this skill feels.</li>
+              <li>After this, your dashboard will show the next best skill for you.</li>
+            </ol>
           </div>
           <div className="flex gap-3">
             <button
@@ -265,12 +269,11 @@ export function LearnSession({ subject, skill, items, userId }: Props) {
 
           <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
             <p className="text-sm font-semibold text-gray-900">What happens next</p>
-            <p className="mt-2 text-sm text-gray-700">
-              We will use this whole session to decide whether you should practise this skill again soon, come back to it later, or move on to the next skill when you are ready.
-            </p>
-            <p className="mt-2 text-sm text-gray-600">
-              If this one still feels tricky, that is okay. The next session will stay short and focused.
-            </p>
+            <ol className="mt-2 list-decimal space-y-2 pl-5 text-sm text-gray-700">
+              <li>This session is now saved.</li>
+              <li>Your dashboard will show the next best skill for you.</li>
+              <li>If this still feels tricky, that is okay. The next session will stay short and focused.</li>
+            </ol>
           </div>
 
           <div className="space-y-2">
@@ -288,13 +291,13 @@ export function LearnSession({ subject, skill, items, userId }: Props) {
               onClick={() => router.push(`/learn/${subject.slug}`)}
               className="flex-1 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
             >
-              Keep going
+              Practice again
             </button>
             <button
               onClick={() => router.push('/dashboard')}
               className="flex-1 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
-              Back to dashboard
+              Dashboard and next skill
             </button>
           </div>
         </div>

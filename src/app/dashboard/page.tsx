@@ -112,7 +112,7 @@ export default async function DashboardPage() {
                 <div>
                   <h2 className="text-xl font-semibold text-gray-800">{subject.title}</h2>
                   {onboardingBySubject.get(subject.id) && (
-                    <p className="mt-1 text-sm text-gray-500">We will pick your next small step for you.</p>
+                    <p className="mt-1 text-sm text-gray-500">We will pick your next small step for you, one skill at a time.</p>
                   )}
                 </div>
                 {onboardingBySubject.get(subject.id) ? (
@@ -170,10 +170,11 @@ export default async function DashboardPage() {
                       </div>
                       <div className="mt-3 rounded-lg bg-white/80 px-3 py-3 text-sm text-gray-700 ring-1 ring-blue-100">
                         <p className="font-medium text-gray-900">What happens next</p>
-                        <p className="mt-1">
-                          You will answer a short set of questions. Then we will decide whether to keep practising this skill,
-                          bring it back again later, or move you on when you are ready.
-                        </p>
+                        <ol className="mt-1 list-decimal space-y-1 pl-5">
+                          <li>You will answer a short set of questions.</li>
+                          <li>We will check whether this skill needs another short round or is ready to leave for later.</li>
+                          <li>When you are ready, we will move you on to the next skill for you.</li>
+                        </ol>
                       </div>
                     </div>
                   )}
