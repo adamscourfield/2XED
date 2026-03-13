@@ -65,7 +65,7 @@ export function LearnSession({ subject, skill, items, userId }: Props) {
             placeholder={type === 'SHORT_NUMERIC' ? 'Enter a number' : 'Type your answer'}
           />
           {type === 'SHORT_TEXT' && (
-            <p className="text-sm text-gray-500">Use clear words. Commas and “and” are both okay.</p>
+            <p className="text-sm text-gray-500">Use clear words. You can use commas or “and”.</p>
           )}
         </div>
       );
@@ -77,7 +77,7 @@ export function LearnSession({ subject, skill, items, userId }: Props) {
           choices={options}
           value={selectedAnswer}
           onChange={setSelectedAnswer}
-          emptyPrompt="Put the answer cards here in the right order."
+          emptyPrompt="Move the magnets here in the right order."
           helperText="Drag to move them, or tap one to add it."
         />
       );
@@ -162,14 +162,18 @@ export function LearnSession({ subject, skill, items, userId }: Props) {
           )}
           <div className="rounded-lg border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-900">
             <p className="font-medium">What happens next</p>
-            <p className="mt-1">You will do {items.length} short questions. Then we will pick the best next step for you.</p>
+            <ol className="mt-2 list-decimal space-y-1 pl-5">
+              <li>You will do {items.length} short question{items.length === 1 ? '' : 's'}.</li>
+              <li>We will see if this skill feels steady yet.</li>
+              <li>Then your dashboard will show what to do next.</li>
+            </ol>
           </div>
           <div className="flex gap-3">
             <button
               onClick={() => setPhase('session')}
               className="flex-1 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors"
             >
-              Start next skill ({items.length} questions)
+              Start now ({items.length} question{items.length === 1 ? '' : 's'})
             </button>
             <button
               onClick={() => router.push('/dashboard')}
@@ -190,7 +194,7 @@ export function LearnSession({ subject, skill, items, userId }: Props) {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-500">One question at a time</p>
-              <p className="text-xs text-gray-400">Each question is a new go.</p>
+              <p className="text-xs text-gray-400">If one feels hard, the next one is a fresh start.</p>
             </div>
             <div className="text-right">
               <p className="text-sm text-gray-500">
@@ -215,11 +219,11 @@ export function LearnSession({ subject, skill, items, userId }: Props) {
           {currentItemContent && (
             <p className="text-sm text-gray-500">
               {currentItemContent.type === 'SHORT_NUMERIC'
-                ? 'Type your answer as a number.'
+                ? 'Type a number.'
                 : currentItemContent.type === 'SHORT_TEXT'
-                  ? 'Type your answer clearly.'
+                  ? 'Type your answer.'
                   : currentItemContent.type === 'ORDER'
-                    ? 'Put the answers in the right order.'
+                    ? 'Put them in the right order.'
                     : 'Pick one answer.'}
             </p>
           )}
@@ -246,11 +250,11 @@ export function LearnSession({ subject, skill, items, userId }: Props) {
         <div className="max-w-lg w-full bg-white rounded-xl border border-gray-200 p-8 space-y-6">
           <div className={`rounded-xl border px-5 py-4 ${outcomeTone === 'green' ? 'border-green-200 bg-green-50' : outcomeTone === 'amber' ? 'border-amber-200 bg-amber-50' : 'border-blue-200 bg-blue-50'}`}>
             <p className={`text-sm font-semibold ${outcomeTone === 'green' ? 'text-green-700' : outcomeTone === 'amber' ? 'text-amber-700' : 'text-blue-700'}`}>
-              This set is done
+              Session complete
             </p>
-            <h1 className="mt-1 text-2xl font-bold text-gray-900">Nice work — you finished it.</h1>
+            <h1 className="mt-1 text-2xl font-bold text-gray-900">Nice work. You finished this set.</h1>
             <p className="mt-2 text-sm text-gray-700">
-              We have enough to choose your next step. You do not need to get everything right straight away.
+              We have enough to choose your next step. You do not need to get every question right at once.
             </p>
           </div>
 
@@ -259,18 +263,17 @@ export function LearnSession({ subject, skill, items, userId }: Props) {
               {masteryPct}%
             </span>
             <p className="text-gray-500 mt-2">
-              {correctCount} out of {results.length} right
+              {correctCount} out of {results.length} correct
             </p>
           </div>
 
           <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
             <p className="text-sm font-semibold text-gray-900">What happens next</p>
-            <p className="mt-2 text-sm text-gray-700">
-              We will use this set to choose whether to practise this skill again soon, come back to it later, or move on.
-            </p>
-            <p className="mt-2 text-sm text-gray-600">
-              If it still feels tricky, that is okay. The next step will stay short and focused.
-            </p>
+            <ol className="mt-2 list-decimal space-y-2 pl-5 text-sm text-gray-700">
+              <li>This set is saved.</li>
+              <li>Your dashboard will show what to do next.</li>
+              <li>If this still feels hard, that is okay. The next set will stay short.</li>
+            </ol>
           </div>
 
           <div className="space-y-2">
@@ -288,13 +291,13 @@ export function LearnSession({ subject, skill, items, userId }: Props) {
               onClick={() => router.push(`/learn/${subject.slug}`)}
               className="flex-1 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
             >
-              Do the next set
+              Practice again
             </button>
             <button
               onClick={() => router.push('/dashboard')}
               className="flex-1 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
-              Back to dashboard
+              Dashboard and next skill
             </button>
           </div>
         </div>

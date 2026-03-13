@@ -35,7 +35,7 @@ describe('LearnSession short entry rendering', () => {
       />
     );
 
-    fireEvent.click(screen.getByRole('button', { name: /start next skill/i }));
+    fireEvent.click(screen.getByRole('button', { name: /start now/i }));
 
     const input = screen.getByPlaceholderText(/enter a number/i);
     expect(input).toBeTruthy();
@@ -63,11 +63,11 @@ describe('LearnSession short entry rendering', () => {
       />
     );
 
-    fireEvent.click(screen.getByRole('button', { name: /start next skill/i }));
+    fireEvent.click(screen.getByRole('button', { name: /start now/i }));
 
     const input = screen.getByPlaceholderText(/type your answer/i);
     expect(input).toBeTruthy();
-    expect(screen.getByText(/use clear words\. commas and “and” are both okay\./i)).toBeTruthy();
+    expect(screen.getByText(/use clear words\. you can use commas or “and”\./i)).toBeTruthy();
 
     const submit = screen.getByRole('button', { name: /^finish for now$/i });
     expect(submit).toHaveProperty('disabled', true);
@@ -92,9 +92,9 @@ describe('LearnSession short entry rendering', () => {
       />
     );
 
-    fireEvent.click(screen.getByRole('button', { name: /start next skill/i }));
+    fireEvent.click(screen.getByRole('button', { name: /start now/i }));
 
-    expect(screen.getByText(/arrange the fridge magnets into the correct order/i)).toBeTruthy();
+    expect(screen.getByText(/move the magnets here in the right order/i)).toBeTruthy();
 
     const submit = screen.getByRole('button', { name: /^finish for now$/i });
     expect(submit).toHaveProperty('disabled', true);

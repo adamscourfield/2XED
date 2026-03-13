@@ -30,22 +30,22 @@ export default async function DiagnosticIntroPage({ params }: Props) {
       <div className="max-w-lg w-full bg-white rounded-xl border border-gray-200 p-8 space-y-6">
         <div>
           <p className="text-sm text-blue-600 font-medium mb-1">{subject.title}</p>
-          <h1 className="text-2xl font-bold text-gray-900">Find the right starting point</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Let&apos;s find where to start</h1>
           <p className="text-gray-500 mt-2 text-sm">
-            This short quiz helps us choose where to start. Just have a go at each question.
+            This short quiz helps us find the right place for you. Just try each question.
           </p>
         </div>
         <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900">
           <p className="font-semibold">What to expect</p>
           <ul className="mt-2 space-y-1 list-disc list-inside text-blue-900/90">
             <li>Usually 12 to 25 questions</li>
-            <li>Short questions, one at a time</li>
-            <li>It may finish early when we have enough information</li>
+            <li>It checks a few different maths skills</li>
+            <li>It may finish early if we already know enough</li>
           </ul>
         </div>
         {sessionData && (
           <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-800">
-            You already started this quiz ({sessionData.itemsSeen} answered).
+            You have an in-progress diagnostic ({sessionData.itemsSeen} questions answered).
           </div>
         )}
         <div className="flex gap-3">
@@ -53,7 +53,7 @@ export default async function DiagnosticIntroPage({ params }: Props) {
             href={`/diagnostic/${subjectSlug}/run`}
             className="flex-1 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors text-center"
           >
-            {sessionData ? 'Carry on' : 'Start'}
+            {sessionData ? 'Resume quiz' : 'Start quiz'}
           </Link>
           <Link
             href="/dashboard"

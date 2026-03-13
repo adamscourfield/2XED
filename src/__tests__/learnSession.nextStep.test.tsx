@@ -48,9 +48,9 @@ describe('LearnSession clear next-step UX', () => {
     );
 
     // Intro always offers a clear next step.
-    expect(screen.getByRole('button', { name: /start next skill/i })).toBeTruthy();
+    expect(screen.getByRole('button', { name: /start now/i })).toBeTruthy();
 
-    fireEvent.click(screen.getByRole('button', { name: /start next skill/i }));
+    fireEvent.click(screen.getByRole('button', { name: /start now/i }));
 
     // Session step is explicit.
     const finish = screen.getByRole('button', { name: /finish for now/i });

@@ -30,7 +30,7 @@ export function DiagnosticRunClient({ subject, skill, item, sessionId, itemsSeen
           onChange={(e) => setSelectedAnswer(e.target.value)}
           inputMode={type === 'SHORT_NUMERIC' ? 'decimal' : 'text'}
           className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 text-gray-700 focus:border-blue-500 focus:outline-none"
-          placeholder={type === 'SHORT_NUMERIC' ? 'Type a number' : 'Type your answer'}
+          placeholder={type === 'SHORT_NUMERIC' ? 'Enter a number' : 'Type your answer'}
         />
       );
     }
@@ -41,7 +41,7 @@ export function DiagnosticRunClient({ subject, skill, item, sessionId, itemsSeen
           choices={itemContent.choices}
           value={selectedAnswer}
           onChange={setSelectedAnswer}
-          emptyPrompt="Put the answer cards here in the right order."
+          emptyPrompt="Move the magnets here in the right order."
           helperText="Drag to move them, or tap one to add it."
         />
       );
@@ -94,7 +94,7 @@ export function DiagnosticRunClient({ subject, skill, item, sessionId, itemsSeen
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm text-gray-500">One question at a time</p>
-            <p className="text-xs text-gray-400">Just have a go. This helps us find the right starting point.</p>
+            <p className="text-xs text-gray-400">Just try each one. This helps us find the right place to start.</p>
           </div>
           <span className="text-sm text-gray-400">
             {itemsSeen + 1} / {maxItems} max
@@ -110,11 +110,11 @@ export function DiagnosticRunClient({ subject, skill, item, sessionId, itemsSeen
         <h2 className="text-lg font-semibold text-gray-900">{item.question}</h2>
         <p className="text-sm text-gray-500">
           {itemContent.type === 'SHORT_NUMERIC'
-            ? 'Type your answer as a number.'
+            ? 'Type a number.'
             : itemContent.type === 'SHORT_TEXT'
-              ? 'Type your answer clearly.'
+              ? 'Type your answer.'
               : itemContent.type === 'ORDER'
-                ? 'Put the answers in the right order.'
+                ? 'Put them in the right order.'
                 : 'Pick one answer.'}
         </p>
         {renderAnswerInput(itemContent.type)}
@@ -123,7 +123,7 @@ export function DiagnosticRunClient({ subject, skill, item, sessionId, itemsSeen
           disabled={!selectedAnswer || submitting}
           className="w-full py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 font-medium transition-colors"
         >
-          {submitting ? 'Checking…' : 'Check and go on'}
+          {submitting ? 'Saving…' : 'Check and go on'}
         </button>
       </div>
     </main>

@@ -41,7 +41,7 @@ describe('LearnSession rendering', () => {
       />
     );
 
-    fireEvent.click(screen.getByRole('button', { name: /start next skill/i }));
+    fireEvent.click(screen.getByRole('button', { name: /start now/i }));
 
     expect(screen.getByRole('button', { name: '11' })).toBeTruthy();
     expect(screen.getByRole('button', { name: '12' })).toBeTruthy();
@@ -69,7 +69,7 @@ describe('LearnSession rendering', () => {
       />
     );
 
-    fireEvent.click(screen.getByRole('button', { name: /start next skill/i }));
+    fireEvent.click(screen.getByRole('button', { name: /start now/i }));
 
     expect(screen.getByText(/this question has no options yet/i)).toBeTruthy();
     expect(screen.getByRole('button', { name: /finish for now/i })).toHaveProperty('disabled', true);

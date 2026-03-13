@@ -110,16 +110,16 @@ export function BaselineRunClient({ subjectSlug }: { subjectSlug: string }) {
           answer: selectedAnswer,
         }),
       });
-      if (!res.ok) throw new Error('Could not save your answer. Try again.');
+      if (!res.ok) throw new Error('Could not save your answer. Tap Next again.');
       await loadNext(sessionId);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Could not save your answer. Try again.');
+      setError(e instanceof Error ? e.message : 'Could not save your answer. Tap Next again.');
     } finally {
       setSubmitting(false);
     }
   }
 
-  if (loading) return <div className="p-8 text-sm text-slate-600">Getting your questions ready…</div>;
+  if (loading) return <div className="p-8 text-sm text-slate-600">Getting your baseline ready…</div>;
   if (error) return <div className="p-8 text-sm text-rose-600">{error}</div>;
   if (!item) return <div className="p-8 text-sm text-slate-600">Loading your next question…</div>;
 
@@ -129,7 +129,7 @@ export function BaselineRunClient({ subjectSlug }: { subjectSlug: string }) {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-slate-700">Let&apos;s start with a few quick questions</p>
-            <p className="text-xs text-slate-500">One question at a time. Just have a go.</p>
+            <p className="text-xs text-slate-500">One question at a time. Just try each one.</p>
           </div>
           <span className="text-sm text-slate-500">{Math.min(itemsSeen + 1, maxItems)} / {maxItems}</span>
         </div>
@@ -146,8 +146,8 @@ export function BaselineRunClient({ subjectSlug }: { subjectSlug: string }) {
               : answerType === 'TRUE_FALSE'
                 ? 'Pick true or false.'
                 : answerType === 'SHORT_NUMERIC'
-                  ? 'Type your answer as a number.'
-                  : 'Type your answer clearly.'}
+                  ? 'Type a number.'
+                  : 'Type your answer.'}
           </p>
         </div>
 
@@ -159,7 +159,7 @@ export function BaselineRunClient({ subjectSlug }: { subjectSlug: string }) {
           {answerType === 'MCQ' ? (
             parsedOptions.choices.length === 0 ? (
               <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
-                This question is still being set up.
+                This question has no options yet.
               </p>
             ) : (
               parsedOptions.choices.map((option, i) => (
@@ -196,10 +196,10 @@ export function BaselineRunClient({ subjectSlug }: { subjectSlug: string }) {
                 type="text"
                 value={selectedAnswer}
                 onChange={(e) => setSelectedAnswer(e.target.value)}
-                placeholder={answerType === 'SHORT_NUMERIC' ? 'Type a number' : 'Type your answer'}
+                placeholder={answerType === 'SHORT_NUMERIC' ? 'Enter a number' : 'Type your answer'}
                 className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none ring-0 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
               />
-              {answerType === 'SHORT_TEXT' && <p className="text-xs text-slate-600">Use clear words. Commas and “and” are both okay.</p>}
+              {answerType === 'SHORT_TEXT' && <p className="text-xs text-slate-600">Use clear words. You can use commas or “and”.</p>}
             </div>
           )}
         </div>
