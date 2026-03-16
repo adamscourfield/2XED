@@ -5,6 +5,7 @@
 
 # testing
 /coverage
+docs/qa/content-ingestion-staging/publish-audit-*.json
 
 # next.js
 /.next/
