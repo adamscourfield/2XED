@@ -30,8 +30,15 @@ export async function GET() {
 
   const skillRows = skills.map((skill) => {
     const linkedItems = skill.items.map((link) => link.item);
-    const realItems = linkedItems.filter((item) => !item.question.includes('Placeholder question'));
-    const placeholderItems = linkedItems.filter((item) => item.question.includes('Placeholder question'));
+    const realItems: typeof linkedItems = [];
+    const placeholderItems: typeof linkedItems = [];
+    for (const item of linkedItems) {
+      if (item.question.includes('Placeholder question')) {
+        placeholderItems.push(item);
+      } else {
+        realItems.push(item);
+      }
+    }
 
     const itemTypes: Record<string, number> = {};
     for (const item of realItems) {
@@ -66,7 +73,7 @@ export async function GET() {
   });
 
   // Group by strand
-  const strandMap = new Map<string, typeof skillRows>();
+  const strandMap = new Map<string, (typeof skillRows)[number][]>();
   for (const row of skillRows) {
     const list = strandMap.get(row.strand) ?? [];
     list.push(row);
