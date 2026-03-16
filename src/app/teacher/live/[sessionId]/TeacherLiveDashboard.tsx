@@ -85,11 +85,12 @@ export function TeacherLiveDashboard({ sessionId }: Props) {
     fetchState();
   }, [fetchState]);
 
+  const currentStatus = state?.status;
   useEffect(() => {
-    if (!state || state.status !== 'ACTIVE') return;
+    if (!currentStatus || currentStatus !== 'ACTIVE') return;
     const id = setInterval(fetchState, 3000);
     return () => clearInterval(id);
-  }, [state?.status, fetchState]);
+  }, [currentStatus, fetchState]);
 
   function handleStatusChange(newStatus: 'ACTIVE' | 'PAUSED' | 'COMPLETED') {
     setState((prev) => prev ? { ...prev, status: newStatus } : prev);

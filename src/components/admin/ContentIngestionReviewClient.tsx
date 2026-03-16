@@ -13,7 +13,7 @@ export function ContentIngestionReviewClient({ batches, entriesByBatch }: Props)
   const [severityFilter, setSeverityFilter] = useState<'ALL' | 'ERROR' | 'WARNING'>('ALL');
   const [publishState, setPublishState] = useState<'idle' | 'saving' | 'done' | 'failed'>('idle');
 
-  const currentEntries = entriesByBatch[selectedBatch] ?? [];
+  const currentEntries = useMemo(() => entriesByBatch[selectedBatch] ?? [], [entriesByBatch, selectedBatch]);
   const filteredEntries = useMemo(() => {
     return currentEntries.filter((entry) => {
       if (severityFilter === 'ERROR') return entry.issues.some((issue) => issue.severity === 'error');

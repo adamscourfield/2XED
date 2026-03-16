@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { hasCompletedOnboardingDiagnostic } from '@/features/learn/onboarding';
 import { selectNextSkill } from '@/features/learn/nextSkill';
 import { LearningPageShell } from '@/components/LearningPageShell';
+import { SignOutButton } from '@/components/SignOutButton';
 
 function formatDate(value: Date) {
   return new Intl.DateTimeFormat('en-GB', {
@@ -51,13 +52,7 @@ export default async function DashboardPage() {
         title="Teacher Dashboard"
         subtitle={session.user.name ?? session.user.email ?? 'Teacher account'}
         maxWidthClassName="max-w-3xl"
-        actions={
-          <form action="/api/auth/signout" method="POST">
-            <button type="submit" className="anx-btn-secondary px-3 py-2 text-xs sm:text-sm">
-              Sign out
-            </button>
-          </form>
-        }
+        actions={<SignOutButton />}
         meta={
           <div className="flex flex-wrap items-center gap-2">
             <span className="anx-chip">Teacher view</span>
@@ -158,13 +153,7 @@ export default async function DashboardPage() {
       title="My Dashboard"
       subtitle={`Welcome back, ${session.user.name ?? session.user.email}`}
       maxWidthClassName="max-w-5xl"
-      actions={
-        <form action="/api/auth/signout" method="POST">
-          <button type="submit" className="anx-btn-secondary px-3 py-2 text-xs sm:text-sm">
-            Sign out
-          </button>
-        </form>
-      }
+      actions={<SignOutButton />}
       meta={
         <div className="flex flex-wrap items-center gap-2">
           <span className="anx-chip">{subjects.length} subject{subjects.length !== 1 ? 's' : ''}</span>
