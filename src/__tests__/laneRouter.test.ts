@@ -5,6 +5,7 @@ vi.mock('@/db/prisma', () => ({
   prisma: {
     liveParticipant: {
       findUnique: vi.fn(),
+      findMany: vi.fn().mockResolvedValue([]),
       update: vi.fn().mockResolvedValue({}),
     },
     laneTransition: {
@@ -47,16 +48,23 @@ import { assignLane, checkReteachThreshold, handleHandback } from '@/lib/live/la
 import { prisma } from '@/db/prisma';
 import type { DiagnosticAttempt } from '@/lib/live/lane-router';
 
+const mockFindUnique = prisma.liveParticipant.findUnique as ReturnType<typeof vi.fn>;
+const mockFindMany = (prisma.liveParticipant as any).findMany as ReturnType<typeof vi.fn>;
+const mockSessionUpdate = prisma.liveSession.update as ReturnType<typeof vi.fn>;
+
 beforeEach(() => {
   vi.clearAllMocks();
 
   // Default mock for participant lookup
-  (prisma.liveParticipant.findUnique as ReturnType<typeof vi.fn>).mockResolvedValue({
+  mockFindUnique.mockResolvedValue({
     id: 'part-1',
     studentUserId: 'student-1',
     liveSessionId: 'session-1',
     session: { skillId: 'skill-1' },
   });
+
+  // Default: no participants (for checkReteachThreshold)
+  mockFindMany.mockResolvedValue([]);
 });
 
 describe('assignLane', () => {
@@ -174,49 +182,52 @@ describe('assignLane', () => {
 
 describe('checkReteachThreshold', () => {
   it('does not set reteach alert when fewer than threshold in Lane 3', async () => {
-    (prisma.liveParticipant.findUnique as ReturnType<typeof vi.fn>).mockResolvedValue(null);
-    (prisma.liveSession.update as ReturnType<typeof vi.fn>).mockResolvedValue({});
-
     // 2 out of 10 in Lane 3 = 20% < 35%
-    const mockParticipants = [
+    mockFindMany.mockResolvedValue([
       ...Array(8).fill(null).map(() => ({ currentLane: 'LANE_1', isUnexpectedFailure: false, laneAssignedAt: new Date() })),
       ...Array(2).fill(null).map(() => ({ currentLane: 'LANE_3', isUnexpectedFailure: false, laneAssignedAt: new Date() })),
-    ];
+    ]);
 
-    // Mock findMany to return participants
-    const originalFindMany = prisma.liveParticipant.findUnique;
-    vi.spyOn(prisma, 'liveParticipant', 'get').mockReturnValue({
-      ...prisma.liveParticipant,
-      findMany: vi.fn().mockResolvedValue(mockParticipants),
-    } as any);
+    await checkReteachThreshold('session-1');
 
-    // We need to re-import or just call the function directly
-    // Since prisma is mocked at module level, we'll use a different approach
-    // Let's just test checkReteachThreshold directly
-    // This requires re-mocking liveParticipant.findMany
-
-    // Actually, let's test the threshold logic more simply
-    expect(2 / 10).toBeLessThan(0.35);
+    expect(mockSessionUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: { reteachAlert: false },
+      })
+    );
   });
 
-  it('sets reteach alert when >= 50% in Lane 3 and all expected failures', () => {
-    // 5 out of 10 = 50% >= 50%
-    // allExpected = true → threshold = 0.50
-    const lane3Count = 5;
-    const total = 10;
-    const allExpected = true;
-    const threshold = allExpected ? 0.50 : 0.35;
-    expect(lane3Count / total).toBeGreaterThanOrEqual(threshold);
+  it('sets reteach alert when >= 50% in Lane 3 and all expected failures', async () => {
+    // 5 out of 10 = 50% >= 50% (allExpected=true => threshold=0.50)
+    mockFindMany.mockResolvedValue([
+      ...Array(5).fill(null).map(() => ({ currentLane: 'LANE_1', isUnexpectedFailure: false, laneAssignedAt: new Date() })),
+      ...Array(5).fill(null).map(() => ({ currentLane: 'LANE_3', isUnexpectedFailure: false, laneAssignedAt: new Date() })),
+    ]);
+
+    await checkReteachThreshold('session-1');
+
+    expect(mockSessionUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: { reteachAlert: true },
+      })
+    );
   });
 
-  it('sets reteach alert when >= 35% in Lane 3 with unexpected failures', () => {
-    // 4 out of 10 = 40% >= 35%
-    // allExpected = false → threshold = 0.35
-    const lane3Count = 4;
-    const total = 10;
-    const allExpected = false;
-    const threshold = allExpected ? 0.50 : 0.35;
-    expect(lane3Count / total).toBeGreaterThanOrEqual(threshold);
+  it('sets reteach alert when >= 35% in Lane 3 with unexpected failures', async () => {
+    // 4 out of 10 = 40% >= 35% (allExpected=false => threshold=0.35)
+    mockFindMany.mockResolvedValue([
+      ...Array(6).fill(null).map(() => ({ currentLane: 'LANE_1', isUnexpectedFailure: false, laneAssignedAt: new Date() })),
+      ...Array(3).fill(null).map(() => ({ currentLane: 'LANE_3', isUnexpectedFailure: false, laneAssignedAt: new Date() })),
+      { currentLane: 'LANE_3', isUnexpectedFailure: true, laneAssignedAt: new Date() },
+    ]);
+
+    await checkReteachThreshold('session-1');
+
+    expect(mockSessionUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: { reteachAlert: true },
+      })
+    );
   });
 });
 
