@@ -76,6 +76,34 @@ enum LiveSessionStatus {
   COMPLETED
 }
 
+enum LiveSessionPhase {
+  DIAGNOSTIC
+  EXPLANATION
+  SHADOW_CHECK
+  REVIEW
+}
+
+enum StudentLane {
+  LANE_1
+  LANE_2
+  LANE_3
+}
+
+enum EscalationReason {
+  SHADOW_CHECK_FAILED
+  ANCHOR_FAILED
+  MISCONCEPTION_FAILED
+  SCAFFOLDED_CORRECT
+  MANUAL_TEACHER
+}
+
+enum LaneTransitionType {
+  ASSIGNED
+  ESCALATED
+  HANDED_BACK
+  RESOLVED
+}
+
 enum ItemReviewStatus {
   OPEN
   RESOLVED
@@ -417,6 +445,10 @@ model ExplanationRoute {
   guidedPrompt         String
   guidedAnswer         String
   isActive             Boolean           @default(true)
+  defaultPriorityRank  Int               @default(0)
+  animationSchema      Json?
+  animationVersion     String?
+  animationGeneratedAt DateTime?
   createdAt            DateTime          @default(now())
   updatedAt            DateTime          @updatedAt
   skill                  Skill                     @relation(fields: [skillId], references: [id])
@@ -622,6 +654,8 @@ model LiveSession {
   subjectId     String
   skillId       String?
   status        LiveSessionStatus @default(LOBBY)
+  phase         LiveSessionPhase  @default(DIAGNOSTIC)
+  reteachAlert  Boolean           @default(false)
   joinCode      String            @unique
   startedAt     DateTime?
   endedAt       DateTime?
@@ -634,19 +668,29 @@ model LiveSession {
   skill         Skill?            @relation(fields: [skillId], references: [id])
   participants  LiveParticipant[]
   liveAttempts  LiveAttempt[]
+  transitions   LaneTransition[]
 }
 
 model LiveParticipant {
-  id            String      @id @default(cuid())
-  liveSessionId String
-  studentUserId String
-  joinedAt      DateTime    @default(now())
-  isActive      Boolean     @default(true)
+  id                    String            @id @default(cuid())
+  liveSessionId         String
+  studentUserId         String
+  currentLane           StudentLane       @default(LANE_3)
+  currentExplanationId  String?
+  escalationReason      EscalationReason?
+  isUnexpectedFailure   Boolean           @default(false)
+  holdingAtFinalCheck   Boolean           @default(false)
+  joinedAt              DateTime          @default(now())
+  isActive              Boolean           @default(true)
+  lastActiveAt          DateTime          @default(now())
+  laneAssignedAt        DateTime?
 
-  session       LiveSession @relation(fields: [liveSessionId], references: [id], onDelete: Cascade)
-  student       User        @relation(fields: [studentUserId], references: [id], onDelete: Cascade)
+  session               LiveSession       @relation(fields: [liveSessionId], references: [id], onDelete: Cascade)
+  student               User              @relation(fields: [studentUserId], references: [id], onDelete: Cascade)
+  transitions           LaneTransition[]
 
   @@unique([liveSessionId, studentUserId])
+  @@index([liveSessionId, currentLane])
 }
 
 model LiveAttempt {
@@ -667,4 +711,22 @@ model LiveAttempt {
 
   @@index([liveSessionId, skillId])
   @@index([liveSessionId, studentUserId])
+}
+
+model LaneTransition {
+  id              String             @id @default(cuid())
+  liveSessionId   String
+  participantId   String
+  studentUserId   String
+  fromLane        StudentLane?
+  toLane          StudentLane
+  transitionType  LaneTransitionType
+  reason          EscalationReason?
+  triggeredBy     String?
+  createdAt       DateTime           @default(now())
+
+  session         LiveSession        @relation(fields: [liveSessionId], references: [id], onDelete: Cascade)
+  participant     LiveParticipant    @relation(fields: [participantId], references: [id], onDelete: Cascade)
+
+  @@index([liveSessionId, createdAt])
 }
