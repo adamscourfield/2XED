@@ -15,6 +15,8 @@ const attemptSchema = z.object({
   isLast: z.boolean(),
   totalItems: z.number(),
   previousResults: z.array(z.object({ itemId: z.string(), correct: z.boolean() })),
+  routeType: z.enum(['A', 'B', 'C']).optional(),
+  questionIndex: z.number().optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -31,7 +33,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid input' }, { status: 400 });
   }
 
-  const { itemId, skillId, subjectId, answer, isLast, totalItems, previousResults } = parsed.data;
+  const { itemId, skillId, subjectId, answer, isLast, totalItems, previousResults, routeType } = parsed.data;
 
   const item = await prisma.item.findUnique({ where: { id: itemId } });
   if (!item) {
@@ -80,6 +82,63 @@ export async function POST(req: NextRequest) {
     const mode = isDueReview ? 'REVIEW' : 'PRACTICE';
 
     await updateSkillMastery(userId, skillId, subjectId, correctCount, totalItems, mode);
+
+    const accuracy = totalItems > 0 ? correctCount / totalItems : 0;
+
+    await emitEvent({
+      name: 'route_completed',
+      actorUserId: userId,
+      studentUserId: userId,
+      subjectId,
+      skillId,
+      payload: { skillId, subjectId, routeType, totalItems, correctCount, accuracy },
+    });
+
+    const allCorrect = correctCount === totalItems;
+    const allWrong = correctCount === 0;
+
+    if (allCorrect) {
+      await emitEvent({
+        name: 'shadow_pair_passed',
+        actorUserId: userId,
+        studentUserId: userId,
+        subjectId,
+        skillId,
+        payload: { skillId, subjectId, routeType, pairSize: totalItems, correctCount },
+      });
+    } else if (allWrong) {
+      await emitEvent({
+        name: 'shadow_pair_failed',
+        actorUserId: userId,
+        studentUserId: userId,
+        subjectId,
+        skillId,
+        payload: { skillId, subjectId, routeType, pairSize: totalItems, correctCount },
+      });
+
+      if (routeType === 'C') {
+        await prisma.interventionFlag.upsert({
+          where: { userId_skillId: { userId, skillId } },
+          update: { lastSeenAt: new Date(), isResolved: false },
+          create: {
+            userId,
+            subjectId,
+            skillId,
+            reason: 'Shadow pair failed on route C',
+            isResolved: false,
+          },
+        });
+
+        await emitEvent({
+          name: 'intervention_flagged',
+          actorUserId: userId,
+          studentUserId: userId,
+          subjectId,
+          skillId,
+          payload: { skillId, reason: 'Shadow pair failed on route C' },
+        });
+      }
+    }
   }
 
   return NextResponse.json({ correct });

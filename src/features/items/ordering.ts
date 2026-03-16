@@ -1,6 +1,11 @@
 const ORDER_PROMPT_RE =
   /(\border\b|\bput in order\b|\barrange\b|\bascending order\b|\bdescending order\b|\bcorrect ascending order\b|\bcorrect descending order\b|\bfrom smallest to largest\b|\bfrom largest to smallest\b|\bsmallest to largest\b|\blargest to smallest\b|\bhighest to lowest\b|\blowest to highest\b|\bcoldest to warmest\b|\bwarmest to coldest\b|\bleft to right on a number line\b|\bin descending order\b|\bin ascending order\b)/i;
 
+const WRONG_ORDER_RE = /\bwrong\s+order\b|\bincorrect\s+order\b/i;
+
+const STRONG_ORDER_SIGNAL_RE =
+  /\bput in order\b|\barrange\b|\bascending order\b|\bdescending order\b|\bfrom smallest to largest\b|\bfrom largest to smallest\b|\bsmallest to largest\b|\blargest to smallest\b|\bhighest to lowest\b|\blowest to highest\b|\bin ascending order\b|\bin descending order\b/i;
+
 function cleanOrderingStem(question: string): string {
   return question
     .replace(/^\s*\[[^\]]+\]\s*/, '')
@@ -34,7 +39,11 @@ function extractComparableTokens(question: string): string[] {
 }
 
 export function isOrderingPrompt(question: string): boolean {
-  return ORDER_PROMPT_RE.test(cleanOrderingStem(question));
+  const stem = cleanOrderingStem(question);
+  if (WRONG_ORDER_RE.test(stem)) {
+    return STRONG_ORDER_SIGNAL_RE.test(stem);
+  }
+  return ORDER_PROMPT_RE.test(stem);
 }
 
 export function extractOrderingChoices(question: string, answer?: string): string[] {
