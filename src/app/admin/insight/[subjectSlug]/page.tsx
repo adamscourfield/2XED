@@ -207,6 +207,9 @@ export default async function InsightDashboardPage({ params, searchParams }: Pro
             <a href={`/admin/content/${subject.slug}`} className="text-blue-600 hover:underline">
               → Content Verification
             </a>
+            <a href="/admin/content-audit" className="text-blue-600 hover:underline">
+              → Content Audit
+            </a>
             <a href="/admin/interventions" className="text-blue-600 hover:underline">
               → Interventions
             </a>
