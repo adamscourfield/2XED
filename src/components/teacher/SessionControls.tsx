@@ -12,7 +12,7 @@ interface Props {
 }
 
 const statusBadge: Record<string, string> = {
-  LOBBY: 'bg-gray-100 text-gray-700',
+  LOBBY: 'bg-gray-100 text-[color:var(--anx-text-secondary)]',
   ACTIVE: 'bg-green-100 text-green-800',
   PAUSED: 'bg-amber-100 text-amber-800',
   COMPLETED: 'bg-red-100 text-red-700',
@@ -65,27 +65,27 @@ export function SessionControls({
   }
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-4 rounded-lg border border-gray-200 bg-white p-4">
+    <div className="flex flex-wrap items-center justify-between gap-4 anx-card p-4">
       <div className="flex flex-wrap items-center gap-4">
         <div>
-          <span className="block text-xs text-gray-500">Join Code</span>
+          <span className="block text-xs text-[color:var(--anx-text-muted)]">Join Code</span>
           <span className="text-2xl font-bold tracking-widest text-indigo-600">{joinCode}</span>
         </div>
         <div>
-          <span className="block text-xs text-gray-500">Status</span>
+          <span className="block text-xs text-[color:var(--anx-text-muted)]">Status</span>
           <span className={`inline-block rounded px-2 py-0.5 text-xs font-semibold ${statusBadge[status]}`}>
             {status}
           </span>
         </div>
         {startedAt && (
           <div>
-            <span className="block text-xs text-gray-500">Elapsed</span>
-            <span className="text-sm font-mono text-gray-700">{formatElapsed(elapsed)}</span>
+            <span className="block text-xs text-[color:var(--anx-text-muted)]">Elapsed</span>
+            <span className="text-sm font-mono text-[color:var(--anx-text-secondary)]">{formatElapsed(elapsed)}</span>
           </div>
         )}
         <div>
-          <span className="block text-xs text-gray-500">Students</span>
-          <span className="text-sm font-semibold text-gray-700">{participantCount}</span>
+          <span className="block text-xs text-[color:var(--anx-text-muted)]">Students</span>
+          <span className="text-sm font-semibold text-[color:var(--anx-text-secondary)]">{participantCount}</span>
         </div>
       </div>
       <div className="flex gap-2">

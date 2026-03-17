@@ -18,24 +18,21 @@ function formatDate(value: Date) {
 function progressTone(masteryPct: number) {
   if (masteryPct >= 80) {
     return {
-      text: 'text-emerald-700',
-      chip: 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200',
-      bar: 'bg-emerald-500',
+      chip: 'anx-badge anx-badge-green',
+      barColor: 'var(--anx-success)',
     };
   }
 
   if (masteryPct >= 50) {
     return {
-      text: 'text-amber-700',
-      chip: 'bg-amber-50 text-amber-700 ring-1 ring-amber-200',
-      bar: 'bg-amber-500',
+      chip: 'anx-badge anx-badge-amber',
+      barColor: 'var(--anx-warning)',
     };
   }
 
   return {
-    text: 'text-rose-700',
-    chip: 'bg-rose-50 text-rose-700 ring-1 ring-rose-200',
-    bar: 'bg-rose-400',
+    chip: 'anx-badge anx-badge-red',
+    barColor: 'var(--anx-danger)',
   };
 }
 
@@ -60,7 +57,7 @@ export default async function DashboardPage() {
           </div>
         }
       >
-        <div className="anx-card p-6 text-sm text-slate-700">
+        <div className="anx-card p-6 text-sm text-[color:var(--anx-text-secondary)]">
           Teacher accounts can sign in successfully. Student learning routes are hidden for this role.
         </div>
       </LearningPageShell>
@@ -168,9 +165,9 @@ export default async function DashboardPage() {
             <div className="border-b border-[color:var(--anx-border)] bg-[color:var(--anx-surface-soft)] px-5 py-4">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Keep learning</p>
-                  <h2 className="mt-1 text-xl font-semibold text-slate-900">{subject.title}</h2>
-                  <p className="mt-1 text-sm text-slate-600">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[color:var(--anx-text-muted)]">Keep learning</p>
+                  <h2 className="mt-1 text-xl font-semibold text-[color:var(--anx-text)]">{subject.title}</h2>
+                  <p className="mt-1 text-sm text-[color:var(--anx-text-secondary)]">
                     {onboardingComplete
                       ? 'We will keep your next step clear and easy to follow.'
                       : 'Start with a short quiz so we can choose the right place for you.'}
@@ -189,10 +186,10 @@ export default async function DashboardPage() {
             </div>
 
             <div className="grid gap-3 px-5 py-5 sm:grid-cols-3">
-              <div className="rounded-xl border border-slate-200 bg-white p-4">
-                <p className="text-xs font-medium text-slate-500">Due now</p>
-                <p className="mt-2 text-2xl font-semibold text-slate-900">{onboardingComplete ? dueNowCount : '—'}</p>
-                <p className="mt-1 text-sm text-slate-600">
+              <div className="anx-stat">
+                <p className="anx-stat-label">Due now</p>
+                <p className="anx-stat-value">{onboardingComplete ? dueNowCount : '—'}</p>
+                <p className="mt-1 text-sm text-[color:var(--anx-text-secondary)]">
                   {onboardingComplete
                     ? dueNowCount > 0
                       ? `${dueNowCount} skill${dueNowCount !== 1 ? 's are' : ' is'} ready now.`
@@ -201,25 +198,25 @@ export default async function DashboardPage() {
                 </p>
               </div>
 
-              <div className="rounded-xl border border-slate-200 bg-white p-4">
-                <p className="text-xs font-medium text-slate-500">Progress so far</p>
-                <p className="mt-2 text-2xl font-semibold text-slate-900">{onboardingComplete ? `${averageMastery}%` : 'Not started'}</p>
+              <div className="anx-stat">
+                <p className="anx-stat-label">Progress so far</p>
+                <p className="anx-stat-value">{onboardingComplete ? `${averageMastery}%` : 'Not started'}</p>
                 <div className="mt-3 anx-progress-track">
                   <div className="anx-progress-bar" style={{ width: `${onboardingComplete ? averageMastery : 0}%` }} />
                 </div>
-                <p className="mt-2 text-sm text-slate-600">
+                <p className="mt-2 text-sm text-[color:var(--anx-text-secondary)]">
                   {onboardingComplete
                     ? `${startedSkills} of ${subject.skills.length} skills started.`
                     : 'Your progress will show here once you begin.'}
                 </p>
               </div>
 
-              <div className="rounded-xl border border-slate-200 bg-white p-4">
-                <p className="text-xs font-medium text-slate-500">Next step</p>
+              <div className="anx-stat">
+                <p className="anx-stat-label">Next step</p>
                 {onboardingComplete && nextSkill ? (
                   <>
-                    <p className="mt-2 text-base font-semibold text-slate-900">{nextSkill.name}</p>
-                    <p className="mt-1 text-sm text-slate-600">
+                    <p className="mt-2 text-base font-semibold text-[color:var(--anx-text)]">{nextSkill.name}</p>
+                    <p className="mt-1 text-sm text-[color:var(--anx-text-secondary)]">
                       {nextSkillStarted
                         ? nextSkillIsDue
                           ? 'Ready now for a short set.'
@@ -233,8 +230,8 @@ export default async function DashboardPage() {
                   </>
                 ) : (
                   <>
-                    <p className="mt-2 text-base font-semibold text-slate-900">Start your quiz</p>
-                    <p className="mt-1 text-sm text-slate-600">
+                    <p className="mt-2 text-base font-semibold text-[color:var(--anx-text)]">Start your quiz</p>
+                    <p className="mt-1 text-sm text-[color:var(--anx-text-secondary)]">
                       It helps us choose the right level and your first lesson.
                     </p>
                     <div className="mt-3 flex flex-wrap gap-2">
@@ -247,15 +244,15 @@ export default async function DashboardPage() {
             </div>
 
             {onboardingComplete && nextSkill && (
-              <div className="border-t border-[color:var(--anx-border)] bg-slate-50/80 px-5 py-4">
+              <div className="border-t border-[color:var(--anx-border)] bg-[var(--anx-surface-soft)] px-5 py-4">
                 <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                   <div>
-                    <p className="text-sm font-semibold text-slate-900">What happens next</p>
-                    <p className="mt-1 text-sm text-slate-600">
+                    <p className="text-sm font-semibold text-[color:var(--anx-text)]">What happens next</p>
+                    <p className="mt-1 text-sm text-[color:var(--anx-text-secondary)]">
                       You will do a short set of questions. Then we will choose the best next step for you.
                     </p>
                   </div>
-                  <div className="flex flex-wrap gap-2 text-xs text-slate-600">
+                  <div className="flex flex-wrap gap-2 text-xs text-[color:var(--anx-text-secondary)]">
                     <span className="anx-chip">{completedEnoughSkills} secure</span>
                     <span className="anx-chip">{subject.skills.length - completedEnoughSkills} still building</span>
                   </div>
@@ -268,10 +265,10 @@ export default async function DashboardPage() {
             <div className="anx-card overflow-hidden">
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[color:var(--anx-border)] bg-[color:var(--anx-surface-soft)] px-5 py-3">
                 <div>
-                  <h3 className="text-sm font-semibold text-slate-900">Skill overview</h3>
-                  <p className="text-xs text-slate-500">See your progress and what is ready next.</p>
+                  <h3 className="text-sm font-semibold text-[color:var(--anx-text)]">Skill overview</h3>
+                  <p className="text-xs text-[color:var(--anx-text-muted)]">See your progress and what is ready next.</p>
                 </div>
-                {dueNowCount > 0 && <span className="anx-chip bg-amber-50 text-amber-700 ring-1 ring-amber-200">{dueNowCount} due now</span>}
+                {dueNowCount > 0 && <span className="anx-badge anx-badge-amber">{dueNowCount} due now</span>}
               </div>
 
               <div className="space-y-3 px-5 py-4">
@@ -282,26 +279,26 @@ export default async function DashboardPage() {
                   const tone = progressTone(masteryPct);
 
                   return (
-                    <div key={skill.id} className={`rounded-xl border p-4 ${isDue ? 'border-amber-200 bg-amber-50/40' : 'border-slate-200 bg-white'}`}>
+                    <div key={skill.id} className={`rounded-xl border p-4 ${isDue ? 'border-[color:var(--anx-warning)] bg-[var(--anx-warning-soft)]' : 'border-[color:var(--anx-border)] bg-white'}`}>
                       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                         <div>
                           <div className="flex flex-wrap items-center gap-2">
-                            <span className="font-medium text-slate-800">{skill.name}</span>
-                            <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ${tone.chip}`}>
+                            <span className="font-medium text-[color:var(--anx-text)]">{skill.name}</span>
+                            <span className={tone.chip}>
                               {masteryPct}% mastery
                             </span>
-                            {isDue && <span className="anx-chip bg-amber-50 text-amber-700 ring-1 ring-amber-200">Due now</span>}
+                            {isDue && <span className="anx-badge anx-badge-amber">Due now</span>}
                           </div>
-                          <p className="mt-2 text-sm text-slate-600">
+                          <p className="mt-2 text-sm text-[color:var(--anx-text-secondary)]">
                             {mastery?.lastPracticedAt
                               ? `Last practised ${formatDate(new Date(mastery.lastPracticedAt))}`
                               : 'Not started yet.'}
                           </p>
                         </div>
-                        <div className="text-left text-xs text-slate-500 sm:text-right">
+                        <div className="text-left text-xs text-[color:var(--anx-text-muted)] sm:text-right">
                           {mastery?.nextReviewAt ? (
                             isDue ? (
-                              <span className="font-medium text-amber-700">Ready now</span>
+                              <span className="font-medium" style={{ color: 'var(--anx-warning)' }}>Ready now</span>
                             ) : (
                               <span>Next review {formatDate(new Date(mastery.nextReviewAt))}</span>
                             )
@@ -311,7 +308,7 @@ export default async function DashboardPage() {
                         </div>
                       </div>
                       <div className="mt-3 anx-progress-track">
-                        <div className={tone.bar} style={{ width: `${masteryPct}%`, height: '100%' }} />
+                        <div className="anx-progress-bar" style={{ width: `${masteryPct}%`, background: tone.barColor }} />
                       </div>
                     </div>
                   );
@@ -323,7 +320,7 @@ export default async function DashboardPage() {
       ))}
 
       {subjects.length === 0 && (
-        <div className="anx-card px-6 py-16 text-center text-slate-500">
+        <div className="anx-card px-6 py-16 text-center text-[color:var(--anx-text-muted)]">
           <p>No subjects available yet.</p>
         </div>
       )}
@@ -332,9 +329,9 @@ export default async function DashboardPage() {
         <section className="anx-card p-5">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-purple-600">Admin tools</p>
-              <h2 className="mt-1 text-lg font-semibold text-slate-900">Operational dashboards</h2>
-              <p className="mt-1 text-sm text-slate-600">Jump straight to insight and intervention views.</p>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] " style={{ color: 'var(--anx-primary)' }}>Admin tools</p>
+              <h2 className="mt-1 text-lg font-semibold text-[color:var(--anx-text)]">Operational dashboards</h2>
+              <p className="mt-1 text-sm text-[color:var(--anx-text-secondary)]">Jump straight to insight and intervention views.</p>
             </div>
             <div className="flex flex-wrap gap-3">
               <Link href="/admin/insight/ks3-maths" className="anx-btn-primary">

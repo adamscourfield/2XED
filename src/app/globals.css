@@ -246,6 +246,35 @@
     color: #dc2626;
   }
 
+  /* ── Callout boxes ────────────────────────────── */
+  .anx-callout-info {
+    @apply rounded-xl border px-4 py-3 text-sm;
+    border-color: rgba(61, 99, 255, 0.2);
+    background: var(--anx-primary-soft);
+    color: #1a3a9e;
+  }
+
+  .anx-callout-warning {
+    @apply rounded-xl border px-4 py-3 text-sm;
+    border-color: rgba(245, 158, 11, 0.25);
+    background: var(--anx-warning-soft);
+    color: #92400e;
+  }
+
+  .anx-callout-success {
+    @apply rounded-xl border px-4 py-3 text-sm;
+    border-color: rgba(16, 185, 129, 0.2);
+    background: var(--anx-success-soft);
+    color: #065f46;
+  }
+
+  .anx-callout-danger {
+    @apply rounded-xl border px-4 py-3 text-sm;
+    border-color: rgba(239, 68, 68, 0.2);
+    background: var(--anx-danger-soft);
+    color: #dc2626;
+  }
+
   /* ── Divider ───────────────────────────────────── */
   .anx-divider {
     @apply border-t;

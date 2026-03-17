@@ -183,8 +183,8 @@ export default async function InsightDashboardPage() {
   const strandEntries = Array.from(strandMap.entries()).sort(([a], [b]) => a.localeCompare(b));
 
   return (
-    <main className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-5xl mx-auto px-4 space-y-10">
+    <main className="anx-shell">
+      <div className="mx-auto w-full max-w-5xl space-y-10">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-gray-900">Insight Dashboard — KS3 Maths</h1>
           <div className="flex items-center gap-4 text-sm">
