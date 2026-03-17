@@ -18,20 +18,20 @@ function formatDate(value: Date) {
 function progressTone(masteryPct: number) {
   if (masteryPct >= 80) {
     return {
-      chip: 'anx-badge anx-badge-green',
+      badge: 'anx-badge anx-badge-green',
       barColor: 'var(--anx-success)',
     };
   }
 
   if (masteryPct >= 50) {
     return {
-      chip: 'anx-badge anx-badge-amber',
+      badge: 'anx-badge anx-badge-amber',
       barColor: 'var(--anx-warning)',
     };
   }
 
   return {
-    chip: 'anx-badge anx-badge-red',
+    badge: 'anx-badge anx-badge-red',
     barColor: 'var(--anx-danger)',
   };
 }
@@ -284,7 +284,7 @@ export default async function DashboardPage() {
                         <div>
                           <div className="flex flex-wrap items-center gap-2">
                             <span className="font-medium text-[color:var(--anx-text)]">{skill.name}</span>
-                            <span className={tone.chip}>
+                            <span className={tone.badge}>
                               {masteryPct}% mastery
                             </span>
                             {isDue && <span className="anx-badge anx-badge-amber">Due now</span>}

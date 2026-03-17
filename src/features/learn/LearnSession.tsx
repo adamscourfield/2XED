@@ -239,12 +239,28 @@ export function LearnSession({ subject, skill, items, userId }: Props) {
   if (phase === 'results') {
     const correctCount = results.filter((r) => r.correct).length;
     const masteryPct = Math.round((correctCount / results.length) * 100);
-    const outcomeTone = masteryPct >= 80 ? 'success' : masteryPct >= 50 ? 'warning' : 'info';
+
+    let outcomeTone: 'success' | 'warning' | 'info';
+    if (masteryPct >= 80) outcomeTone = 'success';
+    else if (masteryPct >= 50) outcomeTone = 'warning';
+    else outcomeTone = 'info';
+
+    const calloutClass = {
+      success: 'anx-callout-success',
+      warning: 'anx-callout-warning',
+      info: 'anx-callout-info',
+    }[outcomeTone];
+
+    const scoreColor = {
+      success: 'var(--anx-success)',
+      warning: 'var(--anx-warning)',
+      info: 'var(--anx-primary)',
+    }[outcomeTone];
 
     return (
       <main className="anx-shell flex items-center justify-center">
         <div className="anx-panel w-full max-w-lg p-8 space-y-6">
-          <div className={outcomeTone === 'success' ? 'anx-callout-success' : outcomeTone === 'warning' ? 'anx-callout-warning' : 'anx-callout-info'}>
+          <div className={calloutClass}>
             <p className="font-semibold">
               Session complete
             </p>
@@ -255,7 +271,7 @@ export function LearnSession({ subject, skill, items, userId }: Props) {
           </div>
 
           <div className="text-center py-1">
-            <span className="text-5xl font-bold" style={{ color: masteryPct >= 80 ? 'var(--anx-success)' : masteryPct >= 50 ? 'var(--anx-warning)' : 'var(--anx-primary)' }}>
+            <span className="text-5xl font-bold" style={{ color: scoreColor }}>
               {masteryPct}%
             </span>
             <p className="mt-2" style={{ color: 'var(--anx-text-muted)' }}>
