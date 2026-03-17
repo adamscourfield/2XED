@@ -30,18 +30,26 @@ interface Subject {
   slug: string;
 }
 
+interface GamificationSummary {
+  xp: number;
+  tokens: number;
+  streakDays: number;
+  activeDaysThisWeek: number;
+}
+
 interface Props {
   subject: Subject;
   skill: Skill;
   items: Item[];
   userId: string;
+  gamification?: GamificationSummary;
 }
 
 type Phase = 'intro' | 'session' | 'results';
 
 const SHOW_DEBUG = process.env.NEXT_PUBLIC_SHOW_DEBUG === 'true';
 
-export function LearnSession({ subject, skill, items, userId }: Props) {
+export function LearnSession({ subject, skill, items, userId, gamification }: Props) {
   const [phase, setPhase] = useState<Phase>('intro');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState('');
@@ -245,10 +253,16 @@ export function LearnSession({ subject, skill, items, userId }: Props) {
     else if (masteryPct >= 50) outcomeTone = 'warning';
     else outcomeTone = 'info';
 
-    const calloutClass = {
-      success: 'anx-callout-success',
-      warning: 'anx-callout-warning',
-      info: 'anx-callout-info',
+    const headlineText = {
+      success: 'Congratulations!',
+      warning: 'Good effort!',
+      info: 'Keep going!',
+    }[outcomeTone];
+
+    const subtitleText = {
+      success: `Great job! You have done really well on ${skill.name}.`,
+      warning: `Nice try on ${skill.name}. A little more practice and you will have it.`,
+      info: `You are building up ${skill.name}. The next set will help.`,
     }[outcomeTone];
 
     const scoreColor = {
@@ -257,59 +271,78 @@ export function LearnSession({ subject, skill, items, userId }: Props) {
       info: 'var(--anx-primary)',
     }[outcomeTone];
 
+    const ringEmoji = {
+      success: '🏆',
+      warning: '💪',
+      info: '📚',
+    }[outcomeTone];
+
+    const xpEarned = gamification?.xp ?? 0;
+
     return (
       <main className="anx-shell flex items-center justify-center">
-        <div className="anx-panel w-full max-w-lg p-8 space-y-6">
-          <div className={calloutClass}>
-            <p className="font-semibold">
-              Session complete
-            </p>
-            <h1 className="mt-1 text-2xl font-bold" style={{ color: 'var(--anx-text)' }}>Nice work. You finished this set.</h1>
-            <p className="mt-2 text-sm" style={{ color: 'var(--anx-text-secondary)' }}>
-              We have enough to choose your next step. You do not need to get every question right at once.
+        <div className="anx-panel w-full max-w-md p-8 space-y-6 text-center anx-slide-up">
+          {/* Celebration ring */}
+          <div className="anx-reward-ring">
+            <div className="anx-reward-stars">
+              <span className="anx-reward-star">⭐</span>
+              <span className="anx-reward-star">✨</span>
+              <span className="anx-reward-star">🌟</span>
+              <span className="anx-reward-star">⭐</span>
+              <span className="anx-reward-star">✨</span>
+              <span className="anx-reward-star">🌟</span>
+            </div>
+            <span className="text-5xl">{ringEmoji}</span>
+          </div>
+
+          {/* Score */}
+          <div>
+            <p className="text-sm font-medium" style={{ color: 'var(--anx-text-muted)' }}>Your Score</p>
+            <p className="text-4xl font-bold" style={{ color: scoreColor }}>
+              {correctCount}/{results.length}
             </p>
           </div>
 
-          <div className="text-center py-1">
-            <span className="text-5xl font-bold" style={{ color: scoreColor }}>
-              {masteryPct}%
-            </span>
-            <p className="mt-2" style={{ color: 'var(--anx-text-muted)' }}>
-              {correctCount} out of {results.length} correct
-            </p>
+          {/* Headline */}
+          <div>
+            <h1 className="text-2xl font-bold" style={{ color: 'var(--anx-text)' }}>{headlineText}</h1>
+            <p className="mt-2 text-sm" style={{ color: 'var(--anx-text-secondary)' }}>{subtitleText}</p>
           </div>
 
-          <div className="anx-surface-muted p-4">
-            <p className="text-sm font-semibold" style={{ color: 'var(--anx-text)' }}>What happens next</p>
-            <ol className="mt-2 list-decimal space-y-2 pl-5 text-sm" style={{ color: 'var(--anx-text-secondary)' }}>
-              <li>This set is saved.</li>
-              <li>Your dashboard will show what to do next.</li>
-              <li>If this still feels hard, that is okay. The next set will stay short.</li>
-            </ol>
-          </div>
+          {/* XP badge */}
+          {xpEarned > 0 && (
+            <div className="flex justify-center">
+              <span className="anx-xp-badge">🏅 {xpEarned} XP</span>
+            </div>
+          )}
 
-          <div className="space-y-2">
+          {/* Question results */}
+          <div className="flex justify-center gap-2">
             {results.map((r, i) => (
-              <div key={r.itemId} className="flex items-center gap-3 text-sm">
-                <span className="w-5 h-5 rounded-full flex items-center justify-center text-white text-xs font-bold" style={{ background: r.correct ? 'var(--anx-success)' : 'var(--anx-danger)' }}>
-                  {r.correct ? '✓' : '✗'}
-                </span>
-                <span style={{ color: 'var(--anx-text-secondary)' }}>Question {i + 1}</span>
-              </div>
+              <span
+                key={r.itemId}
+                className="flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold text-white"
+                style={{ background: r.correct ? 'var(--anx-success)' : 'var(--anx-danger)' }}
+                title={`Question ${i + 1}: ${r.correct ? 'Correct' : 'Incorrect'}`}
+              >
+                {r.correct ? '✓' : '✗'}
+              </span>
             ))}
           </div>
-          <div className="flex gap-3">
-            <button
-              onClick={() => router.push(`/learn/${subject.slug}`)}
-              className="anx-btn-secondary flex-1 py-3"
-            >
-              Practice again
-            </button>
+
+          {/* Actions */}
+          <div className="space-y-3 pt-2">
             <button
               onClick={() => router.push('/dashboard')}
-              className="anx-btn-primary flex-1 py-3"
+              className="anx-btn-primary w-full py-3"
             >
-              Dashboard and next skill
+              Back to Home
+            </button>
+            <button
+              onClick={() => router.push(`/learn/${subject.slug}`)}
+              className="anx-btn-secondary w-full py-3"
+            >
+              Practice again
             </button>
           </div>
         </div>

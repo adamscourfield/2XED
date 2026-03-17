@@ -7,6 +7,10 @@ import { hasCompletedOnboardingDiagnostic } from '@/features/learn/onboarding';
 import { selectNextSkill } from '@/features/learn/nextSkill';
 import { LearningPageShell } from '@/components/LearningPageShell';
 import { SignOutButton } from '@/components/SignOutButton';
+import { getUserGamificationSummary } from '@/features/gamification/gamificationService';
+
+const MAX_RECENT_ATTEMPTS = 20;
+const MAX_RECENT_SESSIONS = 5;
 
 function formatDate(value: Date) {
   return new Intl.DateTimeFormat('en-GB', {
@@ -76,6 +80,44 @@ export default async function DashboardPage() {
       },
     },
   });
+
+  const gamification = await getUserGamificationSummary(userId);
+
+  const recentAttempts = await prisma.attempt.findMany({
+    where: { userId },
+    orderBy: { createdAt: 'desc' },
+    take: MAX_RECENT_ATTEMPTS,
+    include: {
+      item: {
+        include: {
+          skills: {
+            include: { skill: { include: { subject: true } } },
+          },
+        },
+      },
+    },
+  });
+
+  /* Group recent attempts into the last completed session per subject */
+  const recentBySubject = new Map<string, { subjectTitle: string; subjectSlug: string; total: number; correct: number; date: Date }>();
+  for (const attempt of recentAttempts) {
+    const firstSkill = attempt.item.skills[0]?.skill;
+    if (!firstSkill?.subject) continue;
+    const subId = firstSkill.subject.id;
+    if (!recentBySubject.has(subId)) {
+      recentBySubject.set(subId, {
+        subjectTitle: firstSkill.subject.title,
+        subjectSlug: firstSkill.subject.slug,
+        total: 0,
+        correct: 0,
+        date: attempt.createdAt,
+      });
+    }
+    const entry = recentBySubject.get(subId)!;
+    entry.total += 1;
+    if (attempt.correct) entry.correct += 1;
+  }
+  const recentSessions = Array.from(recentBySubject.values()).slice(0, MAX_RECENT_SESSIONS);
 
   const now = new Date();
   const onboardingBySubject = new Map<string, boolean>();
@@ -147,18 +189,89 @@ export default async function DashboardPage() {
 
   return (
     <LearningPageShell
-      title="My Dashboard"
-      subtitle={`Welcome back, ${session.user.name ?? session.user.email}`}
+      title={`Hi, ${session.user.name ?? session.user.email}`}
+      subtitle="Ready to learn"
       maxWidthClassName="max-w-5xl"
-      actions={<SignOutButton />}
-      meta={
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="anx-chip">{subjects.length} subject{subjects.length !== 1 ? 's' : ''}</span>
-          <span className="anx-chip">One step at a time</span>
-          <span className="anx-chip">Due work first</span>
+      actions={
+        <div className="flex items-center gap-3">
+          <span className="anx-xp-badge">🏅 {gamification.xp} XP</span>
+          <SignOutButton />
         </div>
       }
     >
+      {/* Hero banner */}
+      <div className="anx-card overflow-hidden" style={{ background: 'linear-gradient(135deg, var(--anx-primary) 0%, #5578ff 100%)' }}>
+        <div className="px-6 py-6 text-white">
+          <h2 className="text-xl font-bold">Keep Learning</h2>
+          <p className="mt-1 text-sm opacity-90">Start your next session and earn more XP.</p>
+          <div className="mt-4">
+            {subjectCards.length > 0 && subjectCards[0].onboardingComplete ? (
+              <Link href={`/learn/${subjectCards[0].subject.slug}`} className="inline-flex items-center gap-1 rounded-lg bg-white px-4 py-2 text-sm font-semibold" style={{ color: 'var(--anx-primary)' }}>
+                Get Started →
+              </Link>
+            ) : subjectCards.length > 0 ? (
+              <Link href={`/diagnostic/${subjectCards[0].subject.slug}`} className="inline-flex items-center gap-1 rounded-lg bg-white px-4 py-2 text-sm font-semibold" style={{ color: 'var(--anx-primary)' }}>
+                Get Started →
+              </Link>
+            ) : null}
+          </div>
+        </div>
+      </div>
+
+      {/* Categories */}
+      {subjectCards.length > 0 && (
+        <section className="space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="text-base font-semibold" style={{ color: 'var(--anx-text)' }}>Categories</h3>
+          </div>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+            {subjectCards.map(({ subject, onboardingComplete, averageMastery }) => (
+              <Link
+                key={subject.id}
+                href={onboardingComplete ? `/learn/${subject.slug}` : `/diagnostic/${subject.slug}`}
+                className="anx-category-card"
+              >
+                <span className="text-2xl mb-2">
+                  {subject.slug.includes('maths') ? '📐' : subject.slug.includes('english') ? '📖' : '📘'}
+                </span>
+                <span className="text-sm font-semibold" style={{ color: 'var(--anx-text)' }}>{subject.title}</span>
+                {onboardingComplete && (
+                  <span className="mt-1 text-xs" style={{ color: 'var(--anx-text-muted)' }}>{averageMastery}% mastery</span>
+                )}
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Recent activity */}
+      {recentSessions.length > 0 && (
+        <section className="space-y-3">
+          <h3 className="text-base font-semibold" style={{ color: 'var(--anx-text)' }}>Recent</h3>
+          <div className="space-y-2">
+            {recentSessions.map((rs) => {
+              const pct = rs.total > 0 ? Math.round((rs.correct / rs.total) * 100) : 0;
+              const isComplete = pct >= 80;
+              return (
+                <Link key={rs.subjectSlug} href={`/learn/${rs.subjectSlug}`} className="anx-card flex items-center gap-4 px-4 py-3">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-xl text-lg" style={{ background: 'var(--anx-primary-soft)' }}>
+                    {rs.subjectSlug.includes('maths') ? '📐' : rs.subjectSlug.includes('english') ? '📖' : '📘'}
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold" style={{ color: 'var(--anx-text)' }}>{rs.subjectTitle}</p>
+                    <p className="text-xs" style={{ color: 'var(--anx-text-muted)' }}>{rs.total} questions</p>
+                  </div>
+                  <span className={isComplete ? 'anx-badge anx-badge-green' : 'anx-badge anx-badge-amber'}>
+                    {isComplete ? 'Completed' : 'In progress'}
+                  </span>
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      {/* Detailed subject cards */}
       {subjectCards.map(({ subject, onboardingComplete, startedSkills, completedEnoughSkills, averageMastery, nextSkill, nextSkillStarted, nextSkillIsDue, dueNowCount }) => (
         <section key={subject.id} className="space-y-4">
           <div className="anx-card overflow-hidden">
