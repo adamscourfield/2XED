@@ -21,6 +21,12 @@ const PACK_FILES = [
   'docs/unit-mapping/review-pack-phase1-n2-9-to-n2-13.jsonl',
   'docs/unit-mapping/review-pack-phase1-n2-14-to-n2-16.jsonl',
   'docs/unit-mapping/review-pack-phase1-n3-1-to-n3-3.jsonl',
+  'docs/unit-mapping/review-pack-phase1-n3-4-to-n3-6.jsonl',
+  'docs/unit-mapping/review-pack-phase1-n3-7-to-n3-9.jsonl',
+  'docs/unit-mapping/review-pack-phase1-n3-10-to-n3-13.jsonl',
+  'docs/unit-mapping/review-pack-phase1-n3-14-to-n3-17.jsonl',
+  'docs/unit-mapping/review-pack-phase1-n3-18-to-n3-21.jsonl',
+  'docs/unit-mapping/review-pack-phase1-n3-22-to-n3-24.jsonl',
 ] as const;
 
 const PHASE1_SKILL_META: Record<string, { name: string; strand: string; sortOrder: number }> = {
@@ -58,6 +64,27 @@ const PHASE1_SKILL_META: Record<string, { name: string; strand: string; sortOrde
   'N3.1': { name: 'Properties of multiplication and division', strand: 'MULT', sortOrder: 310 },
   'N3.2': { name: 'Mental strategies for multiplication and division', strand: 'MULT', sortOrder: 320 },
   'N3.3': { name: 'Multiply and divide by powers of 10', strand: 'MULT', sortOrder: 330 },
+  'N3.4': { name: 'Multiplication (without carrying)', strand: 'MULT', sortOrder: 340 },
+  'N3.5': { name: 'Multiplication (with carrying)', strand: 'MULT', sortOrder: 350 },
+  'N3.6': { name: 'Area of rectangles, parallelograms, triangles and compound shapes', strand: 'MULT', sortOrder: 360 },
+  'N3.7': { name: 'Short division (without remainder carrying)', strand: 'MULT', sortOrder: 370 },
+  'N3.8': { name: 'Short division (with remainder carrying)', strand: 'MULT', sortOrder: 380 },
+  'N3.9': { name: 'Order of operations (BIDMAS)', strand: 'MULT', sortOrder: 390 },
+  'N3.10': { name: 'Multiples', strand: 'MULT', sortOrder: 400 },
+  'N3.11': { name: 'Factors', strand: 'MULT', sortOrder: 410 },
+  'N3.12': { name: 'Lowest common multiple (LCM)', strand: 'MULT', sortOrder: 420 },
+  'N3.13': { name: 'Highest common factor (HCF)', strand: 'MULT', sortOrder: 430 },
+  'N3.14': { name: 'Metric unit conversions', strand: 'MULT', sortOrder: 440 },
+  'N3.15': { name: 'Multiply a decimal by a whole number', strand: 'MULT', sortOrder: 450 },
+  'N3.16': { name: 'Multiply a decimal by a decimal', strand: 'MULT', sortOrder: 460 },
+  'N3.17': { name: 'Multiply by 0.1 and 0.01', strand: 'MULT', sortOrder: 470 },
+  'N3.18': { name: 'Short division with integer remainders', strand: 'MULT', sortOrder: 480 },
+  'N3.19': { name: 'Short division giving a decimal answer', strand: 'MULT', sortOrder: 490 },
+  'N3.20': { name: 'Divide by a decimal', strand: 'MULT', sortOrder: 500 },
+  'N3.21': { name: 'Find a missing length using area', strand: 'MULT', sortOrder: 510 },
+  'N3.22': { name: 'Mean of a data set', strand: 'MULT', sortOrder: 520 },
+  'N3.23': { name: 'Squares, cubes and roots', strand: 'MULT', sortOrder: 530 },
+  'N3.24': { name: 'Prime numbers', strand: 'MULT', sortOrder: 540 },
 };
 
 type Phase1Row = MappingRow & {
