@@ -315,14 +315,16 @@ The taxonomy drafted in `misconception-tag-taxonomy-v1.md` is confirmed as accur
 
 Based on this review, the correct Phase 1 work order is:
 
-### Step 1 — Fix what exists (N1.1–N1.5)
-Run QA audit on the 30-item banks for N1.1–N1.5. Key fixes:
-- N1.3: Audit for near-duplicates (136 items is suspicious)
-- N1.5: Add SHORT_NUMERIC items alongside MCQ
-- N1.10, N1.12: Add SHORT_NUMERIC items, reduce MCQ dominance
+### Step 1 — Fix what exists (N1.1–N1.5) ✓ DONE
+- N1.3: `prisma/prune-n1-3-legacy-items.ts` written — archives the 136 legacy items (57 MCQ violating format rules). Run after tonight's import: `npx ts-node prisma/prune-n1-3-legacy-items.ts --dry-run` then without `--dry-run`.
+- N1.5: 4 SHORT_NUMERIC items added in `review-pack-phase1-n1-5-topup.jsonl` (even-count median, harder unordered sets, FAILURE_TO_ORDER reteach).
+- N1.9 / N1.10: already covered by the existing n1-9-to-n1-12 review pack (5 items each, DB 17 each → 22 post-import ✓).
 
-### Step 2 — Top up (N1.6, N1.9, N1.10, N1.12)
-Author missing items using slide examples as the number source.
+### Step 2 — Top up (N1.6, N1.11, N1.12) ✓ DONE
+- N1.6: 12 items in `review-pack-phase1-n1-6-topup.jsonl` — post-import total: 19.
+- N1.11: 11 items in `review-pack-phase1-n1-11-to-n1-12-topup.jsonl` — post-import total: 15.
+- N1.12: 3 items in same file — post-import total: 20 ✓.
+- N1.9 and N1.10 did not need new authoring (covered by the existing pack).
 
 ### Step 3 — Import N2.1–N2.13 ✓ READY
 All 53 items are authored in three review packs and referenced in `prisma/import-phase1-unit1.ts`. Run `npm run db:import:phase1-unit1` to load them.
