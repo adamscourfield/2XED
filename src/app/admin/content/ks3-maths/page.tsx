@@ -77,8 +77,8 @@ export default async function AdminContentKSMathsPage() {
   );
 
   return (
-    <main className="min-h-screen bg-gray-50 py-8">
-      <div className="mx-auto max-w-7xl px-4 space-y-8">
+    <main className="anx-shell">
+      <div className="mx-auto w-full max-w-7xl space-y-8">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Question QA Lab</h1>

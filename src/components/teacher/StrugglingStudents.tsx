@@ -80,14 +80,14 @@ export function StrugglingStudents({ participants, sessionAttempts = [], skills 
 
   if (struggling.length === 0) {
     return (
-      <div className="rounded-lg border border-gray-200 bg-white p-4 text-sm text-gray-500">
+      <div className="anx-card p-4 text-sm text-[color:var(--anx-text-muted)]">
         No students currently flagged as struggling.
       </div>
     );
   }
 
   return (
-    <div className="overflow-hidden rounded-lg border border-gray-200 bg-white">
+    <div className="anx-card overflow-hidden">
       <table className="min-w-full text-sm">
         <thead className="bg-gray-50">
           <tr>

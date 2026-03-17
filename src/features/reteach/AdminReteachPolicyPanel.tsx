@@ -38,7 +38,7 @@ export function AdminReteachPolicyPanel() {
   }, []);
 
   if (!policy) {
-    return <div className="rounded-xl border border-gray-200 bg-white p-4 text-sm text-gray-500">Loading Phase 9 thresholds…</div>;
+    return <div className="anx-card p-4 text-sm" style={{ color: 'var(--anx-text-muted)' }}>Loading Phase 9 thresholds…</div>;
   }
 
   async function save() {
@@ -60,14 +60,14 @@ export function AdminReteachPolicyPanel() {
   }
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-4">
-      <h2 className="text-sm font-semibold text-gray-900">Phase 9 Threshold Controls</h2>
-      <p className="mt-1 text-xs text-gray-600">Tune reteach triggers and gate thresholds without redeploying.</p>
+    <div className="anx-card p-4">
+      <h2 className="text-sm font-semibold text-[color:var(--anx-text)]">Phase 9 Threshold Controls</h2>
+      <p className="mt-1 text-xs text-[color:var(--anx-text-secondary)]">Tune reteach triggers and gate thresholds without redeploying.</p>
       <div className="mt-3">
-        <label className="text-xs text-gray-600">
+        <label className="text-xs text-[color:var(--anx-text-secondary)]">
           <div className="mb-1">Policy version</div>
           <select
-            className="w-full max-w-xs rounded border border-gray-300 px-2 py-1 text-sm text-gray-800"
+            className="anx-input max-w-xs"
             value={policy.policyVersion}
             onChange={(e) =>
               setPolicy((prev) =>
@@ -82,10 +82,10 @@ export function AdminReteachPolicyPanel() {
       </div>
       <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {numericFields.map((field) => (
-          <label key={String(field.key)} className="text-xs text-gray-600">
+          <label key={String(field.key)} className="text-xs text-[color:var(--anx-text-secondary)]">
             <div className="mb-1">{field.label}</div>
             <input
-              className="w-full rounded border border-gray-300 px-2 py-1 text-sm text-gray-800"
+              className="anx-input"
               type="number"
               step={field.step ?? '0.01'}
               value={policy[field.key] as number}
@@ -101,11 +101,11 @@ export function AdminReteachPolicyPanel() {
           type="button"
           onClick={save}
           disabled={saving}
-          className="rounded-lg bg-indigo-600 px-3 py-2 text-xs font-semibold text-white disabled:opacity-60"
+          className="anx-btn-primary text-xs"
         >
           {saving ? 'Saving…' : 'Save thresholds'}
         </button>
-        {message && <p className="text-xs text-gray-600">{message}</p>}
+        {message && <p className="text-xs text-[color:var(--anx-text-secondary)]">{message}</p>}
       </div>
     </div>
   );

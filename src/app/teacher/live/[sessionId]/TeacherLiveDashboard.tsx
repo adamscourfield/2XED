@@ -102,7 +102,7 @@ export function TeacherLiveDashboard({ sessionId }: Props) {
   }
 
   if (!state) {
-    return <div className="p-8 text-gray-500">Loading session…</div>;
+    return <div className="p-8 text-[color:var(--anx-text-muted)]">Loading session…</div>;
   }
 
   const skills: SkillMeta[] = state.skill ? [state.skill] : [];
@@ -120,22 +120,22 @@ export function TeacherLiveDashboard({ sessionId }: Props) {
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <div>
-          <h2 className="mb-2 text-sm font-semibold text-gray-700">Response Counters</h2>
+          <h2 className="mb-2 text-sm font-semibold text-[color:var(--anx-text-secondary)]">Response Counters</h2>
           <ResponseCounter responseSummary={state.responseSummary} skills={skills} />
         </div>
         <div>
-          <h2 className="mb-2 text-sm font-semibold text-gray-700">Explanation Recommender</h2>
+          <h2 className="mb-2 text-sm font-semibold text-[color:var(--anx-text-secondary)]">Explanation Recommender</h2>
           <ExplanationRecommender recommendedExplanation={state.recommendedExplanation} />
         </div>
       </div>
 
       <div>
-        <h2 className="mb-2 text-sm font-semibold text-gray-700">Class Heatmap</h2>
+        <h2 className="mb-2 text-sm font-semibold text-[color:var(--anx-text-secondary)]">Class Heatmap</h2>
         <ClassHeatmap participants={state.participants} skills={skills} />
       </div>
 
       <div>
-        <h2 className="mb-2 text-sm font-semibold text-gray-700">Struggling Students</h2>
+        <h2 className="mb-2 text-sm font-semibold text-[color:var(--anx-text-secondary)]">Struggling Students</h2>
         <StrugglingStudents participants={state.participants} skills={skills} />
       </div>
     </div>

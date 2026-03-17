@@ -82,20 +82,20 @@ export default async function DiagnosticCompletePage({ params, searchParams }: P
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="max-w-lg w-full bg-white rounded-xl border border-gray-200 p-8 space-y-6 text-center">
+    <main className="anx-shell flex items-center justify-center">
+      <div className="anx-panel w-full max-w-lg p-8 space-y-6 text-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">You&apos;re ready to start</h1>
-          <p className="text-gray-500 mt-2">
+          <h1 className="text-2xl font-bold" style={{ color: 'var(--anx-text)' }}>You&apos;re ready to start</h1>
+          <p className="mt-2" style={{ color: 'var(--anx-text-muted)' }}>
             You answered {diagSession.itemsSeen} question{diagSession.itemsSeen !== 1 ? 's' : ''}. We now know a good place to begin.
           </p>
         </div>
-        <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-800">
+        <div className="anx-callout-info">
           Your first step is ready. We will guide you to the next skill.
         </div>
         <Link
           href={`/learn/${subjectSlug}`}
-          className="block w-full py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors"
+          className="anx-btn-primary block w-full py-3"
         >
           Go to my next skill
         </Link>
