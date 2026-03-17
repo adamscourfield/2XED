@@ -5,6 +5,7 @@ import { prisma } from '@/db/prisma';
 import { LearnSession } from '@/features/learn/LearnSession';
 import { hasCompletedOnboardingDiagnostic } from '@/features/learn/onboarding';
 import { selectNextSkill } from '@/features/learn/nextSkill';
+import { getUserGamificationSummary } from '@/features/gamification/gamificationService';
 
 const QUESTIONS_PER_SESSION = 3;
 
@@ -72,12 +73,15 @@ export default async function LearnPage({ params }: Props) {
     .slice(0, QUESTIONS_PER_SESSION)
     .map(({ attempts, ...item }) => item);
 
+  const gamification = await getUserGamificationSummary(userId);
+
   return (
     <LearnSession
       subject={subject}
       skill={targetSkill}
       items={items}
       userId={userId}
+      gamification={gamification}
     />
   );
 }

@@ -62,13 +62,11 @@ describe('LearnSession clear next-step UX', () => {
     fireEvent.click(finish);
 
     await waitFor(() => {
-      expect(screen.getByText(/session complete/i)).toBeTruthy();
+      expect(screen.getByText(/congratulations/i)).toBeTruthy();
     });
-
-    expect(screen.getAllByText(/what happens next/i).length).toBeGreaterThan(0);
 
     // Results always provide clear next actions.
     expect(screen.getByRole('button', { name: /practice again/i })).toBeTruthy();
-    expect(screen.getByRole('button', { name: /dashboard/i })).toBeTruthy();
+    expect(screen.getByRole('button', { name: /back to home/i })).toBeTruthy();
   });
 });

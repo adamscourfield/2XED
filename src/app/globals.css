@@ -319,13 +319,81 @@
     animation: anxSlideUp 400ms ease-out;
   }
 
+  /* ── Reward celebration ───────────────────────── */
+  .anx-reward-ring {
+    @apply relative mx-auto flex items-center justify-center rounded-full;
+    width: 180px;
+    height: 180px;
+    background: radial-gradient(circle, rgba(61, 99, 255, 0.06) 40%, rgba(61, 99, 255, 0.02) 70%, transparent 100%);
+    animation: anxRewardPulse 2s ease-in-out infinite;
+  }
+
+  .anx-reward-ring::before {
+    content: '';
+    position: absolute;
+    inset: -6px;
+    border-radius: 9999px;
+    border: 3px solid transparent;
+    border-top-color: var(--anx-primary);
+    border-right-color: var(--anx-primary);
+    animation: anxRewardSpin 3s linear infinite;
+  }
+
+  .anx-reward-stars {
+    @apply pointer-events-none absolute inset-0;
+  }
+
+  .anx-reward-star {
+    @apply absolute text-lg;
+    animation: anxStarFloat 2s ease-in-out infinite;
+  }
+
+  .anx-reward-star:nth-child(1) { top: 5%; left: 10%; animation-delay: 0s; }
+  .anx-reward-star:nth-child(2) { top: 0; right: 15%; animation-delay: 0.3s; }
+  .anx-reward-star:nth-child(3) { bottom: 10%; left: 5%; animation-delay: 0.6s; }
+  .anx-reward-star:nth-child(4) { bottom: 5%; right: 8%; animation-delay: 0.9s; }
+  .anx-reward-star:nth-child(5) { top: 30%; left: -5%; animation-delay: 1.2s; }
+  .anx-reward-star:nth-child(6) { top: 25%; right: -3%; animation-delay: 0.4s; }
+
+  .anx-xp-badge {
+    @apply inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm font-semibold;
+    background: linear-gradient(135deg, rgba(61, 99, 255, 0.08) 0%, rgba(96, 165, 250, 0.12) 100%);
+    border-color: rgba(61, 99, 255, 0.2);
+    color: var(--anx-primary);
+  }
+
+  /* ── Dashboard category card ───────────────────── */
+  .anx-category-card {
+    @apply flex flex-col items-center justify-center rounded-xl border p-4 text-center transition-all duration-200;
+    border-color: var(--anx-border);
+    background: var(--anx-surface);
+    min-height: 100px;
+  }
+
+  .anx-category-card:hover {
+    border-color: var(--anx-primary);
+    background: var(--anx-primary-soft);
+    box-shadow: var(--anx-shadow-md);
+    transform: translateY(-2px);
+  }
+
+  /* ── Chip / tag (already used inline, now standardized) ── */
+  .anx-chip {
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium;
+    background: var(--anx-primary-soft);
+    color: var(--anx-primary);
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .anx-pulse-correct,
     .anx-shake-incorrect,
     .anx-route-complete,
     .anx-status-glow,
     .anx-fade-in,
-    .anx-slide-up {
+    .anx-slide-up,
+    .anx-reward-ring,
+    .anx-reward-ring::before,
+    .anx-reward-star {
       animation: none;
       transition: opacity 150ms ease-out;
     }
@@ -371,4 +439,19 @@
 @keyframes anxSlideUp {
   0% { opacity: 0; transform: translateY(8px); }
   100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes anxRewardPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+}
+
+@keyframes anxRewardSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes anxStarFloat {
+  0%, 100% { transform: translateY(0) scale(1); opacity: 0.7; }
+  50% { transform: translateY(-6px) scale(1.15); opacity: 1; }
 }
