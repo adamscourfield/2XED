@@ -336,5 +336,5 @@ All three skills are authored (12 items in `review-pack-phase1-n2-14-to-n2-16.js
 ### Step 6 — Author N3.1–N3.3 ✓ DONE
 All three skills are authored (12 items in `review-pack-phase1-n3-1-to-n3-3.jsonl`) and included in the import script.
 
-### Step 7 — Extract + Author N3.4–N3.24
-Run extractor on Part B CORE slides for N3.4–N3.24, then begin authoring.
+### Step 7 — Extract + Author N3.4–N3.24 ✓ DONE
+All 21 skills are authored (84 items across six review packs: N3.4–N3.6, N3.7–N3.9, N3.10–N3.13, N3.14–N3.17, N3.18–N3.21, N3.22–N3.24) and included in the import script.
