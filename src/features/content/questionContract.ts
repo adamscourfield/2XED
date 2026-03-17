@@ -8,6 +8,7 @@ export const CanonicalQuestionFormatSchema = z.enum([
   'SHORT_TEXT',
   'NUMERIC',
   'ORDER_SEQUENCE',
+  'MULTI_SELECT',
 ]);
 
 export type CanonicalQuestionFormat = z.infer<typeof CanonicalQuestionFormatSchema>;
@@ -19,6 +20,7 @@ const LegacyQuestionFormatSchema = z.enum([
   'MULTI_STEP',
   'MATCH',
   'OTHER',
+  'MULTI_SELECT',
 ]);
 
 const QuestionFormatSchema = z.union([CanonicalQuestionFormatSchema, LegacyQuestionFormatSchema]).optional();
@@ -119,6 +121,7 @@ export function inferCanonicalQuestionFormat(
   if (format === 'MCQ') return 'SINGLE_CHOICE';
   if (format === 'SHORT') return lcAnswer === 'true' || lcAnswer === 'false' ? 'TRUE_FALSE' : 'SHORT_TEXT';
   if (format === 'MATCH') return 'ORDER_SEQUENCE';
+  if (format === 'MULTI_SELECT') return 'MULTI_SELECT';
 
   if (lcAnswer === 'true' || lcAnswer === 'false') {
     return 'TRUE_FALSE';
@@ -204,6 +207,7 @@ export function deriveStoredItemFromMapping(row: MappingRow): {
     SHORT_TEXT: 'SHORT_TEXT',
     NUMERIC: 'SHORT_NUMERIC',
     ORDER_SEQUENCE: 'ORDER',
+    MULTI_SELECT: 'MULTI_SELECT',
   };
 
   return {
@@ -246,6 +250,17 @@ export function getItemContractIssues(item: StoredItemContract): ContractIssue[]
 
   if (content.type === 'SHORT_TEXT' && content.acceptedAnswers.length === 0) {
     issues.push({ code: 'short_missing_answers', message: 'Short-answer items need at least one accepted answer.', severity: 'error' });
+  }
+
+  if (content.type === 'MULTI_SELECT') {
+    if (content.choices.length < 2) {
+      issues.push({ code: 'multi_select_min_choices', message: 'Multi-select items need at least two unique choices.', severity: 'error' });
+    }
+    const answerValues = normalizeAnswer(content.canonicalAnswer).split('|');
+    const missingAnswers = answerValues.filter((answer) => !normalizedChoiceSet.has(answer));
+    if (missingAnswers.length > 0) {
+      issues.push({ code: 'multi_select_missing_answer', message: 'One or more correct answers are not present in the choice list.', severity: 'error' });
+    }
   }
 
   if (content.type === 'ORDER') {
