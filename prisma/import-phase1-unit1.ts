@@ -19,6 +19,8 @@ const PACK_FILES = [
   'docs/unit-mapping/review-pack-phase1-n2-1-to-n2-4.jsonl',
   'docs/unit-mapping/review-pack-phase1-n2-5-to-n2-8.jsonl',
   'docs/unit-mapping/review-pack-phase1-n2-9-to-n2-13.jsonl',
+  'docs/unit-mapping/review-pack-phase1-n2-14-to-n2-16.jsonl',
+  'docs/unit-mapping/review-pack-phase1-n3-1-to-n3-3.jsonl',
 ] as const;
 
 const PHASE1_SKILL_META: Record<string, { name: string; strand: string; sortOrder: number }> = {
@@ -50,6 +52,12 @@ const PHASE1_SKILL_META: Record<string, { name: string; strand: string; sortOrde
   'N2.11': { name: 'Perimeter of rectangles and parallelograms', strand: 'PER', sortOrder: 260 },
   'N2.12': { name: 'Perimeter of an isosceles triangle or an isosceles trapezium', strand: 'PER', sortOrder: 270 },
   'N2.13': { name: 'Perimeter of a compound shape', strand: 'PER', sortOrder: 280 },
+  'N2.14': { name: 'Solve problems involving tables and timetables', strand: 'DATA', sortOrder: 290 },
+  'N2.15': { name: 'Solve problems involving frequency trees', strand: 'DATA', sortOrder: 295 },
+  'N2.16': { name: 'Add and subtract numbers given in standard form', strand: 'NOT', sortOrder: 300 },
+  'N3.1': { name: 'Properties of multiplication and division', strand: 'MULT', sortOrder: 310 },
+  'N3.2': { name: 'Mental strategies for multiplication and division', strand: 'MULT', sortOrder: 320 },
+  'N3.3': { name: 'Multiply and divide by powers of 10', strand: 'MULT', sortOrder: 330 },
 };
 
 type Phase1Row = MappingRow & {

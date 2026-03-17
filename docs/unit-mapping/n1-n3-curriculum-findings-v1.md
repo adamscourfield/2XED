@@ -238,6 +238,8 @@ N2.14–N2.16 (tables/timetables, frequency trees, standard form) have **no revi
 **N3 is entirely unstarted in the authoring pipeline.** All 24 skills need authoring from scratch. Slide content is available for N3.1–N3.3 from Part B Foundation extraction.
 
 ### N3.1 — Properties of Multiplication and Division
+**Status:** AUTHORED — 4 items in `review-pack-phase1-n3-1-to-n3-3.jsonl`
+
 **Slide approach:** Bar models → multiplication facts → division facts → number families (fact families)
 
 **Worked examples from slides:**
@@ -252,6 +254,8 @@ N2.14–N2.16 (tables/timetables, frequency trees, standard form) have **no revi
 ---
 
 ### N3.2 — Mental Strategies for Multiplication and Division
+**Status:** AUTHORED — 4 items in `review-pack-phase1-n3-1-to-n3-3.jsonl`
+
 **Slide approach:** Times table listing strategy up to 12×12; fluency through pattern recognition
 
 **Examples from slides:** Full 2×, 4×, 6× tables listed with fill-in gaps
@@ -259,6 +263,8 @@ N2.14–N2.16 (tables/timetables, frequency trees, standard form) have **no revi
 ---
 
 ### N3.3 — Multiply and Divide by Powers of 10
+**Status:** AUTHORED — 4 items in `review-pack-phase1-n3-1-to-n3-3.jsonl`
+
 **Slide approach:** Digit movement method (not "add zeros")
 
 **Rule stated in slides:** "Multiply → digits move LEFT. Divide → digits move RIGHT."
@@ -327,8 +333,8 @@ All six skills are now authored (29 items across three review packs) and include
 ### Step 5 — Author N2.14–N2.16
 Tables/timetables, frequency trees, and standard form. Need slide extraction first.
 
-### Step 6 — Author N3.1–N3.3
-Slide evidence is available. Can begin authoring immediately.
+### Step 6 — Author N3.1–N3.3 ✓ DONE
+All three skills are authored (12 items in `review-pack-phase1-n3-1-to-n3-3.jsonl`) and included in the import script.
 
 ### Step 7 — Extract + Author N3.4–N3.24
 Run extractor on Part B CORE slides for N3.4–N3.24, then begin authoring.
