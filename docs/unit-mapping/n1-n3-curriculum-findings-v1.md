@@ -121,16 +121,16 @@ These come directly from the slide structure and authoring notes — override ge
 ---
 
 ### N1.7 — Compare decimals using =, ≠, <, >, ≤, ≥
-**Status:** AUTHOR_FROM_SCRATCH (0 items)
+**Status:** AUTHORED — 7 items in `review-pack-phase1-n1-6-to-n1-8.jsonl`
 
-**Approach:** Mirror N1.3 structure. Key error to target: `pv_m7_decimal_ordering` — treating 0.9 < 0.12 because 9 < 12.
+**Approach:** Mirrors N1.3 structure. Targets `pv_m7_decimal_ordering` — treating 0.9 < 0.12 because 9 < 12.
 
 ---
 
 ### N1.8 — Order a list of decimals
-**Status:** AUTHOR_FROM_SCRATCH (0 items)
+**Status:** AUTHORED — 6 items in `review-pack-phase1-n1-6-to-n1-8.jsonl`
 
-**Approach:** Mirror N1.4. Use `ORDER_SEQUENCE`. Must include decimals with different numbers of decimal places (e.g. 0.3, 0.31, 0.09) to expose `pv_m7_decimal_ordering`.
+**Approach:** Mirrors N1.4 using `ORDER_SEQUENCE`. Includes decimals with different numbers of decimal places (e.g. 0.3, 0.31, 0.09) to expose `pv_m7_decimal_ordering`.
 
 ---
 
@@ -156,9 +156,9 @@ These come directly from the slide structure and authoring notes — override ge
 ---
 
 ### N1.11 — Position decimals on a number line
-**Status:** AUTHOR_FROM_SCRATCH (0 items)
+**Status:** AUTHORED — 4 items in `review-pack-phase1-n1-9-to-n1-12.jsonl`
 
-**App note:** Skill name includes "incl midpoint using a calculator" — ensure some items require finding the midpoint between two decimals, not just placing a given decimal.
+**App note:** Skill name includes "incl midpoint using a calculator" — items include finding the midpoint between two decimals, not just placing a given decimal.
 
 ---
 
@@ -177,23 +177,23 @@ These come directly from the slide structure and authoring notes — override ge
 ---
 
 ### N1.13 — Position negatives on a number line
-**Status:** AUTHOR_FROM_SCRATCH (0 items)
+**Status:** AUTHORED — 4 items in `review-pack-phase1-n1-13-to-n1-15.jsonl`
 
-**Approach:** Mirror N1.9 but extend range to −10 through +10. Misconception: `pv_m6_negative_ordering`.
+**Approach:** Mirrors N1.9 with range extended to −10 through +10. Targets `pv_m6_negative_ordering`.
 
 ---
 
 ### N1.14 — Compare negatives using =, ≠, <, >, ≤, ≥
-**Status:** AUTHOR_FROM_SCRATCH (0 items)
+**Status:** AUTHORED — 4 items in `review-pack-phase1-n1-13-to-n1-15.jsonl`
 
-**Approach:** Mirror N1.3/N1.7. Key comparison: −3 vs −7, −5 vs 0, −1 vs −9. Misconception: `pv_m6_negative_ordering`.
+**Approach:** Mirrors N1.3/N1.7. Includes comparisons: −3 vs −7, −5 vs 0, −1 vs −9. Targets `pv_m6_negative_ordering`.
 
 ---
 
 ### N1.15 — Order any integers, negatives and decimals
-**Status:** AUTHOR_FROM_SCRATCH (0 items)
+**Status:** AUTHORED — 4 items in `review-pack-phase1-n1-13-to-n1-15.jsonl`
 
-**Approach:** Synthesis of N1.4, N1.8, N1.14. Mixed lists like {−3, 0.5, −0.2, 2, −1.5}. Use `ORDER_SEQUENCE`.
+**Approach:** Synthesis of N1.4, N1.8, N1.14. Uses mixed lists like {−3, 0.5, −0.2, 2, −1.5} with `ORDER_SEQUENCE`.
 
 ---
 
@@ -318,11 +318,11 @@ Run QA audit on the 30-item banks for N1.1–N1.5. Key fixes:
 ### Step 2 — Top up (N1.6, N1.9, N1.10, N1.12)
 Author missing items using slide examples as the number source.
 
-### Step 3 — Import N2.1–N2.13
-These are authored in review packs but not in the DB. Import before writing anything new for N2.
+### Step 3 — Import N2.1–N2.13 ✓ READY
+All 53 items are authored in three review packs and referenced in `prisma/import-phase1-unit1.ts`. Run `npm run db:import:phase1-unit1` to load them.
 
-### Step 4 — Author N1.7, N1.8, N1.11, N1.13, N1.14, N1.15
-Six N1 skills are entirely missing. Author using the same numbers and style as the surrounding N1 skills.
+### Step 4 — Author N1.7, N1.8, N1.11, N1.13, N1.14, N1.15 ✓ DONE
+All six skills are now authored (29 items across three review packs) and included in the import script. No further authoring needed.
 
 ### Step 5 — Author N2.14–N2.16
 Tables/timetables, frequency trees, and standard form. Need slide extraction first.
