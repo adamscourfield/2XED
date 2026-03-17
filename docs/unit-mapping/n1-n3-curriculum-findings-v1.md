@@ -330,8 +330,8 @@ All 53 items are authored in three review packs and referenced in `prisma/import
 ### Step 4 — Author N1.7, N1.8, N1.11, N1.13, N1.14, N1.15 ✓ DONE
 All six skills are now authored (29 items across three review packs) and included in the import script. No further authoring needed.
 
-### Step 5 — Author N2.14–N2.16
-Tables/timetables, frequency trees, and standard form. Need slide extraction first.
+### Step 5 — Author N2.14–N2.16 ✓ DONE
+All three skills are authored (12 items in `review-pack-phase1-n2-14-to-n2-16.jsonl`) and included in the import script.
 
 ### Step 6 — Author N3.1–N3.3 ✓ DONE
 All three skills are authored (12 items in `review-pack-phase1-n3-1-to-n3-3.jsonl`) and included in the import script.
