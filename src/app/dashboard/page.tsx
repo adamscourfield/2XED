@@ -9,6 +9,9 @@ import { LearningPageShell } from '@/components/LearningPageShell';
 import { SignOutButton } from '@/components/SignOutButton';
 import { getUserGamificationSummary } from '@/features/gamification/gamificationService';
 
+const MAX_RECENT_ATTEMPTS = 20;
+const MAX_RECENT_SESSIONS = 5;
+
 function formatDate(value: Date) {
   return new Intl.DateTimeFormat('en-GB', {
     day: 'numeric',
@@ -83,7 +86,7 @@ export default async function DashboardPage() {
   const recentAttempts = await prisma.attempt.findMany({
     where: { userId },
     orderBy: { createdAt: 'desc' },
-    take: 20,
+    take: MAX_RECENT_ATTEMPTS,
     include: {
       item: {
         include: {
@@ -114,7 +117,7 @@ export default async function DashboardPage() {
     entry.total += 1;
     if (attempt.correct) entry.correct += 1;
   }
-  const recentSessions = Array.from(recentBySubject.values()).slice(0, 5);
+  const recentSessions = Array.from(recentBySubject.values()).slice(0, MAX_RECENT_SESSIONS);
 
   const now = new Date();
   const onboardingBySubject = new Map<string, boolean>();
