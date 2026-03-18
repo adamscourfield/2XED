@@ -1,0 +1,491 @@
+# ANAXI-LEARN — YEAR 7 ENGLISH NODE PACK (FOUNDATION SET)
+# Version: 1.0
+
+# MVP ANSWER MODES
+# 1. mcq                = single best answer            → MCQ
+# 2. multi_select       = select all correct answers     → MULTI_SELECT
+# 3. evidence_select    = select best quotation/detail   → MCQ
+# 4. ordering_tiles     = build best structure/sequence  → ORDER
+# 5. short_response     = 1–2 sentence guided free text  → SHORT_TEXT
+# 6. improve_rewrite    = improve a weak sentence/answer → SHORT_TEXT
+
+# DESIGN PRINCIPLES
+# - The engine tracks recurring curriculum routines, not generic skills.
+# - Every node should use multiple evidence types.
+# - English mastery is mixed-evidence, not binary.
+# - Keep answer modes fixed and reusable.
+# - Long open essays are out of scope for MVP.
+
+---
+nodes:
+
+  # ──────────────────────────────────────────────
+  # NODE 1 — Y7-CON-03
+  # ──────────────────────────────────────────────
+  - code: Y7-CON-03
+    strand: Character, Theme & Concepts
+    name: Explain how a character is presented
+    core_skill: Move from detail -> inference -> explanation
+    units: [Wolves, Tempest, Gothic, Mythology]
+    prerequisites: [Y7-INF-02, Y7-INF-05, Y7-CON-01]
+    difficulty: core
+
+    explanation_bank:
+      - id: Y7-CON-03-EXP-A
+        type: direct
+        title: How to explain character presentation
+        content_markdown: |
+          Writers do not always tell us directly what a character is like.
+          Readers often have to infer character from actions, dialogue, and description.
+
+          To explain character presentation:
+          1. Notice a revealing detail
+          2. Select evidence
+          3. Explain what it suggests
+          4. Use precise character vocabulary
+
+          Good answers move beyond retelling and say what the detail shows.
+
+      - id: Y7-CON-03-EXP-B
+        type: worked_example
+        title: Worked example
+        content_markdown: |
+          Stimulus:
+          "Miss Slighcarp smiled coldly as she locked the door behind the children."
+
+          Model thinking:
+          - "smiled coldly" suggests lack of warmth
+          - "locked the door" suggests control and restriction
+
+          Model answer:
+          Miss Slighcarp is presented as controlling and cruel because she locks the door, suggesting she wants power over the children.
+
+      - id: Y7-CON-03-EXP-C
+        type: weak_vs_strong
+        title: Weak vs strong
+        content_markdown: |
+          Weak:
+          Miss Slighcarp is mean because she locks the door.
+
+          Why weak:
+          - vague adjective
+          - little development
+          - no explanation of effect
+
+          Strong:
+          Miss Slighcarp is presented as controlling because she locks the door, suggesting she wants to trap the children and restrict their freedom.
+
+          Why strong:
+          - precise adjective
+          - evidence linked to meaning
+          - clear explanation
+
+    misconceptions:
+      - code: MCP-SUMMARY
+        label: Summary instead of analysis
+        detection_rule: Response retells what happened without saying what it suggests
+        intervention_hint: Add scaffold "This suggests the character is..."
+      - code: MCP-NO-EVIDENCE
+        label: Unsupported claim
+        detection_rule: Character claim made with no detail or quotation
+        intervention_hint: Force evidence_select before short_response
+      - code: MCP-VAGUE
+        label: Vague character vocabulary
+        detection_rule: Uses generic words like mean / nice / bad without precision
+        intervention_hint: Offer stronger adjective bank
+      - code: MCP-DROP-QUOTE
+        label: Quote dropped in
+        detection_rule: Includes evidence but no explanation
+        intervention_hint: Prompt with "This shows..." or "This suggests..."
+      - code: MCP-OVERGENERALISE
+        label: Overgeneralised inference
+        detection_rule: Claim goes beyond text detail
+        intervention_hint: Ask learner to anchor explanation to one word or action
+
+    mastery_model:
+      objective_accuracy_threshold: 0.85
+      min_objective_questions: 5
+      evidence_selection_threshold: 0.80
+      short_response_secure_count: 2
+      rewrite_success_required: 1
+      mastery_levels:
+        - { level: 0, label: Not attempted, description: No usable evidence }
+        - { level: 1, label: Recognition only, description: Can identify simple character clues }
+        - { level: 2, label: Partial, description: Can identify and sometimes infer but explanation is weak }
+        - { level: 3, label: Secure, description: Can explain character presentation clearly with evidence }
+        - { level: 4, label: Fluent, description: Can transfer across texts and question types }
+
+    spaced_review:
+      level_1_days: 1
+      level_2_days: 3
+      level_3_days: 7
+      level_4_days: 14
+
+  # ──────────────────────────────────────────────
+  # NODE 2 — Y7-ANA-04
+  # ──────────────────────────────────────────────
+  - code: Y7-ANA-04
+    strand: Analytical Writing
+    name: Explain evidence clearly
+    core_skill: Move from quotation/detail -> precise explanation of meaning
+    units: [Wolves, Tempest, Gothic, Mythology]
+    prerequisites: [Y7-ANA-02, Y7-INF-05, Y7-CON-03]
+    difficulty: core
+
+    explanation_bank:
+      - id: Y7-ANA-04-EXP-A
+        type: direct
+        title: How to explain evidence
+        content_markdown: |
+          Explaining evidence means saying what a quotation or detail shows.
+
+          A weak answer stops at the quotation.
+          A strong answer explains:
+          - what the detail suggests
+          - what this reveals about character/theme/idea
+          - why it matters
+
+          Formula:
+          Evidence -> explanation -> bigger meaning
+
+      - id: Y7-ANA-04-EXP-B
+        type: worked_example
+        title: Worked example
+        content_markdown: |
+          Quotation:
+          "The room was swallowed by darkness."
+
+          Weak:
+          This is dark.
+
+          Strong:
+          The image of the room being "swallowed" by darkness suggests the setting feels threatening and overpowering, creating fear for the reader.
+
+      - id: Y7-ANA-04-EXP-C
+        type: weak_vs_strong
+        title: Weak vs strong
+        content_markdown: |
+          Weak:
+          This shows it is scary.
+
+          Strong:
+          This suggests the setting feels dangerous and oppressive because the darkness seems to take control of the room.
+
+          Stronger answers:
+          - use precise vocabulary
+          - explain the effect
+          - move beyond obvious labels
+
+    misconceptions:
+      - code: MCP-LABEL-ONLY
+        label: Labels effect without explaining
+        detection_rule: Says "this is scary/sad" with no development
+        intervention_hint: Prompt with "What exactly makes it feel that way?"
+      - code: MCP-QUOTE-REPEAT
+        label: Repeats quotation instead of explaining
+        detection_rule: Paraphrases or copies evidence only
+        intervention_hint: Ban reuse of key quoted word in first clause of answer
+      - code: MCP-GENERIC-EFFECT
+        label: Generic effect language
+        detection_rule: Uses vague phrases like interesting / effective
+        intervention_hint: Provide precise effect stems
+      - code: MCP-NO-BIGGER-MEANING
+        label: Stops too early
+        detection_rule: Explains word/action but not character/theme/reader impact
+        intervention_hint: Add second sentence stem "This also reveals..."
+      - code: MCP-MISREAD
+        label: Misreads evidence
+        detection_rule: Explanation conflicts with quotation
+        intervention_hint: Return learner to evidence_select task first
+
+    mastery_model:
+      objective_accuracy_threshold: 0.85
+      min_objective_questions: 5
+      evidence_selection_threshold: 0.80
+      short_response_secure_count: 2
+      rewrite_success_required: 1
+      mastery_levels:
+        - { level: 0, label: Not attempted, description: No usable evidence }
+        - { level: 1, label: Recognition only, description: Can spot stronger and weaker explanations }
+        - { level: 2, label: Partial, description: Can explain simply but remains generic }
+        - { level: 3, label: Secure, description: Can explain evidence clearly and precisely }
+        - { level: 4, label: Fluent, description: Can transfer across unfamiliar texts and effects }
+
+    spaced_review:
+      level_1_days: 1
+      level_2_days: 3
+      level_3_days: 7
+      level_4_days: 14
+
+  # ──────────────────────────────────────────────
+  # NODE 3 — Y7-CON-05
+  # ──────────────────────────────────────────────
+  - code: Y7-CON-05
+    strand: Character, Theme & Concepts
+    name: Explain how a moment links to a theme
+    core_skill: Move from event/detail -> thematic meaning
+    units: [Wolves, Tempest, Gothic, Mythology]
+    prerequisites: [Y7-CON-04, Y7-ANA-04]
+    difficulty: core
+
+    explanation_bank:
+      - id: Y7-CON-05-EXP-A
+        type: direct
+        title: How to explain theme
+        content_markdown: |
+          A theme is a big idea that appears across a text, such as power, fear, loyalty, injustice, or deception.
+
+          To explain theme:
+          1. Identify the moment or evidence
+          2. Name the theme
+          3. Explain how the moment develops that theme
+
+          Strong answers do not just spot the theme word.
+          They explain how the text builds that idea.
+
+      - id: Y7-CON-05-EXP-B
+        type: worked_example
+        title: Worked example
+        content_markdown: |
+          Evidence:
+          "Caliban is ordered and controlled by Prospero."
+
+          Model:
+          This links to the theme of power because Prospero uses authority and control to dominate Caliban, showing that power in the play is unequal and oppressive.
+
+      - id: Y7-CON-05-EXP-C
+        type: weak_vs_strong
+        title: Weak vs strong
+        content_markdown: |
+          Weak:
+          This is about power.
+
+          Strong:
+          This moment links to the theme of power because Prospero controls Caliban, showing that power in the play is used to dominate rather than protect.
+
+          Stronger answers:
+          - identify the theme
+          - explain the relationship
+          - say what the moment reveals about that theme
+
+    misconceptions:
+      - code: MCP-THEME-SPOTTING
+        label: Theme spotting only
+        detection_rule: Names theme without explanation
+        intervention_hint: Ask "How does this moment develop that idea?"
+      - code: MCP-EVENT-ONLY
+        label: Event summary only
+        detection_rule: Retells what happens with no conceptual link
+        intervention_hint: Force theme selection first
+      - code: MCP-WRONG-THEME
+        label: Theme mismatch
+        detection_rule: Chosen theme not supported by evidence
+        intervention_hint: Add compare-two-themes task
+      - code: MCP-TOO-BROAD
+        label: Broad abstract claim
+        detection_rule: Uses vague statements like "life is hard"
+        intervention_hint: Constrain to approved Year 7 theme bank
+      - code: MCP-NO-DEVELOPMENT
+        label: Theme identified but not developed
+        detection_rule: One-clause answer only
+        intervention_hint: Require second clause beginning "showing that..."
+
+    mastery_model:
+      objective_accuracy_threshold: 0.85
+      min_objective_questions: 5
+      evidence_selection_threshold: 0.80
+      short_response_secure_count: 2
+      rewrite_success_required: 1
+      mastery_levels:
+        - { level: 0, label: Not attempted, description: No usable evidence }
+        - { level: 1, label: Recognition only, description: Can identify likely themes }
+        - { level: 2, label: Partial, description: Can connect moments to themes simply }
+        - { level: 3, label: Secure, description: Can explain how moments develop themes }
+        - { level: 4, label: Fluent, description: Can transfer across units and unfamiliar extracts }
+
+    spaced_review:
+      level_1_days: 1
+      level_2_days: 3
+      level_3_days: 7
+      level_4_days: 14
+
+  # ──────────────────────────────────────────────
+  # NODE 4 — Y7-WRT-04
+  # ──────────────────────────────────────────────
+  - code: Y7-WRT-04
+    strand: Creative Writing
+    name: Show emotion instead of telling it directly
+    core_skill: Replace flat emotional labels with action, behaviour, and physical detail
+    units: [Gothic]
+    prerequisites: [Y7-INF-02, Y7-WRT-01]
+    difficulty: core
+
+    explanation_bank:
+      - id: Y7-WRT-04-EXP-A
+        type: direct
+        title: What show not tell means
+        content_markdown: |
+          "Telling" is when a writer names an emotion directly:
+          - She was scared.
+          - He was angry.
+
+          "Showing" is when a writer reveals emotion through:
+          - body language
+          - action
+          - facial expression
+          - voice
+          - sensory detail
+
+          Showing makes writing more vivid and atmospheric.
+
+      - id: Y7-WRT-04-EXP-B
+        type: worked_example
+        title: Worked example
+        content_markdown: |
+          Tell:
+          She was scared.
+
+          Show:
+          Her breath shortened as her fingers tightened around the candle.
+
+          Why stronger:
+          - reveals fear through physical reaction
+          - creates mood
+          - sounds more like real narrative writing
+
+      - id: Y7-WRT-04-EXP-C
+        type: weak_vs_strong
+        title: Weak vs strong
+        content_markdown: |
+          Weak:
+          He was angry.
+
+          Strong:
+          His jaw tightened and his voice sharpened as he stepped forward.
+
+          Stronger writing:
+          - avoids naming the emotion
+          - uses physical signs
+          - creates a clearer picture
+
+    misconceptions:
+      - code: MCP-DIRECT-LABEL
+        label: Emotion named directly
+        detection_rule: Uses sad / scared / angry / happy as the main description
+        intervention_hint: Prompt for body language or physical reaction
+      - code: MCP-OVERWRITE
+        label: Too many dramatic details
+        detection_rule: Excessive adjectives and effects reduce clarity
+        intervention_hint: Limit learner to one action + one physical detail
+      - code: MCP-CLICHE
+        label: Cliched description
+        detection_rule: Uses over-familiar phrases like heart pounding in every answer
+        intervention_hint: Offer alternative sensory stems
+      - code: MCP-NO-EMOTION-SIGNAL
+        label: Detail does not actually imply emotion
+        detection_rule: Added action is neutral or irrelevant
+        intervention_hint: Ask what a reader would infer
+      - code: MCP-FLAT-REVISION
+        label: Rewrite is minimally improved
+        detection_rule: Replaces one word only
+        intervention_hint: Force two-part rewrite action + physical sign
+
+    mastery_model:
+      objective_accuracy_threshold: 0.85
+      min_objective_questions: 5
+      evidence_selection_threshold: 0.80
+      short_response_secure_count: 2
+      rewrite_success_required: 2
+      mastery_levels:
+        - { level: 0, label: Not attempted, description: No usable evidence }
+        - { level: 1, label: Recognition only, description: Can recognise examples of showing }
+        - { level: 2, label: Partial, description: Can attempt a rewrite but often still tells directly }
+        - { level: 3, label: Secure, description: Can show emotion clearly through detail }
+        - { level: 4, label: Fluent, description: Can transfer the craft move into own descriptive writing }
+
+    spaced_review:
+      level_1_days: 1
+      level_2_days: 3
+      level_3_days: 7
+      level_4_days: 14
+
+# ──────────────────────────────────────────────
+# IMPLEMENTATION RULES
+# ──────────────────────────────────────────────
+implementation:
+  fixed_answer_modes:
+    - mcq
+    - multi_select
+    - evidence_select
+    - ordering_tiles
+    - short_response
+    - improve_rewrite
+
+  node_session_flow:
+    - explanation selection (A/B/C chosen adaptively or default A)
+    - 1 objective check
+    - 1 evidence task
+    - 1 structured task
+    - 1 short response
+    - 1 improve/rewrite
+    - compute node-level mastery update
+
+  mastery_update_logic:
+    scoring_weights:
+      mcq: 1.0
+      multi_select: 1.0
+      evidence_select: 1.0
+      ordering_tiles: 1.25
+      short_response_secure: 2.0
+      improve_rewrite_secure: 2.0
+    promotion_rules:
+      level_1: objective accuracy >= 60%
+      level_2: objective accuracy >= 75% and at least 1 acceptable short response
+      level_3: full mastery thresholds met
+      level_4: Level 3 met across 2 different texts/contexts
+
+  short_response_marking:
+    strategy: rules-based first, teacher override later
+    stored_fields:
+      - raw_response
+      - auto_score
+      - matched_keywords
+      - teacher_override (nullable)
+
+  content_authoring_rules:
+    required_per_node:
+      explanations: 3
+      misconceptions: 5
+      questions: 6
+      answer_modes: 4
+      mastery_model: required
+    prohibited:
+      - one question type only
+      - essay-only evidence
+      - vague success criteria
+
+  analytics_per_attempt:
+    - user_id
+    - node_code
+    - question_id
+    - mode
+    - correctness
+    - response_text (nullable)
+    - matched_rubric_features
+    - misconception_triggered (nullable)
+    - timestamp
+    - text_context
+
+  teacher_dashboard:
+    - current mastery level
+    - strongest mode
+    - weakest mode
+    - dominant misconception
+    - last reviewed date
+    - transfer status
+
+  next_build_priority:
+    - Y7-ANA-06 Build paragraph plan
+    - Y7-ANA-07 Write analytical paragraph
+    - Y7-CRA-02 Explain how setting creates atmosphere
+    - Y7-CON-02 Explicit vs implicit characterisation

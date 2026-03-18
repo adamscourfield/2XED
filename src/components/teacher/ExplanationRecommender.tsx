@@ -27,7 +27,7 @@ export function ExplanationRecommender({ recommendedExplanation }: Props) {
 
   if (!recommendedExplanation) {
     return (
-      <div className="rounded-lg border border-gray-200 bg-white p-4 text-sm text-gray-500">
+      <div className="anx-card p-4 text-sm text-[color:var(--anx-text-muted)]">
         No explanation recommendation available yet.
       </div>
     );
@@ -36,7 +36,7 @@ export function ExplanationRecommender({ recommendedExplanation }: Props) {
   const badgeClass = routeTypeBadge[recommendedExplanation.routeType] ?? 'bg-gray-100 text-gray-800';
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-4">
+    <div className="anx-card p-4">
       <div className="mb-2 flex items-start justify-between gap-2">
         <div>
           <span className={`inline-block rounded px-2 py-0.5 text-xs font-semibold ${badgeClass}`}>
@@ -56,7 +56,7 @@ export function ExplanationRecommender({ recommendedExplanation }: Props) {
           <span className="text-xs font-medium text-green-600">✓ Delivered</span>
         )}
       </div>
-      <p className="mb-2 text-sm text-gray-700">{recommendedExplanation.misconceptionSummary}</p>
+      <p className="mb-2 text-sm text-[color:var(--anx-text-secondary)]">{recommendedExplanation.misconceptionSummary}</p>
       <button
         onClick={() => setExampleOpen(!exampleOpen)}
         className="text-xs text-blue-600 hover:underline"
@@ -64,7 +64,7 @@ export function ExplanationRecommender({ recommendedExplanation }: Props) {
         {exampleOpen ? 'Hide worked example ▲' : 'Show worked example ▼'}
       </button>
       {exampleOpen && (
-        <div className="mt-2 rounded bg-gray-50 p-3 text-sm text-gray-700 whitespace-pre-wrap">
+        <div className="mt-2 rounded bg-gray-50 p-3 text-sm text-[color:var(--anx-text-secondary)] whitespace-pre-wrap">
           {recommendedExplanation.workedExample}
         </div>
       )}
