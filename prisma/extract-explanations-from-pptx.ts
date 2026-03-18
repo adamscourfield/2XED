@@ -469,9 +469,9 @@ async function upsertRoutes(content: ParsedSkillContent, routes: RouteData[]): P
 
       // Use SHORT type for steps that aren't MCQ (avoids option validation issues)
       const validated = validateExplanationStepWrite({
-        checkpointQuestion: stepDef.checkpointQuestion,
+        checkpointQuestion: stepDef.checkpointQuestion || `Answer a question about ${stepDef.title}.`,
         checkpointOptions: undefined,
-        checkpointAnswer: stepDef.checkpointAnswer,
+        checkpointAnswer: stepDef.checkpointAnswer || 'See explanation above.',
         questionType: 'SHORT',
       });
 
