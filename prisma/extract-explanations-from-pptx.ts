@@ -268,6 +268,22 @@ interface RouteData {
   }>;
 }
 
+/**
+ * Guarantees a non-empty, trimmed checkpointAnswer.  Candidate values are
+ * tried in order — the first one that is a non-empty string after trimming
+ * wins.  If every candidate is null/undefined/empty/whitespace-only the
+ * ultimate fallback (which embeds the skill code) is used.
+ */
+function safeCheckpointAnswer(skillCode: string, ...candidates: (string | null | undefined)[]): string {
+  for (const c of candidates) {
+    if (typeof c === 'string') {
+      const trimmed = c.trim();
+      if (trimmed.length > 0) return trimmed;
+    }
+  }
+  return `Review the method for ${skillCode}.`;
+}
+
 function buildRoutes(content: ParsedSkillContent): RouteData[] {
   const { skillCode, title, steps, idoExample, definition, characteristics, nonExamples, introText, learningOutcome, objectives } = content;
 
@@ -295,7 +311,7 @@ function buildRoutes(content: ParsedSkillContent): RouteData[] {
         explanation: stepsText.substring(0, 500),
         stepType: 'visual_demo',
         checkpointQuestion: idoExample ?? `What is the first step for ${skillLabel}?`,
-        checkpointAnswer: steps[0] || 'Follow the steps above.',
+        checkpointAnswer: safeCheckpointAnswer(skillCode, steps[0], 'Follow the steps above.'),
       },
       {
         stepOrder: 2,
@@ -303,7 +319,7 @@ function buildRoutes(content: ParsedSkillContent): RouteData[] {
         explanation: `Apply the method: ${stepsText.substring(0, 300)}`,
         stepType: 'guided_action',
         checkpointQuestion: idoExample ?? `Use the method to solve a ${skillLabel} problem.`,
-        checkpointAnswer: steps[0] || 'Follow the steps.',
+        checkpointAnswer: safeCheckpointAnswer(skillCode, steps[0], 'Follow the steps.'),
       },
       {
         stepOrder: 3,
@@ -311,7 +327,7 @@ function buildRoutes(content: ParsedSkillContent): RouteData[] {
         explanation: `Transfer the same method to a new ${skillLabel} question.`,
         stepType: 'transfer_check',
         checkpointQuestion: `Apply what you have learned about ${skillLabel}.`,
-        checkpointAnswer: steps[0] || 'Use the method above.',
+        checkpointAnswer: safeCheckpointAnswer(skillCode, steps[0], 'Use the method above.'),
       },
     ],
   };
@@ -344,7 +360,7 @@ function buildRoutes(content: ParsedSkillContent): RouteData[] {
         checkpointQuestion: definition
           ? `Which of the following best describes: "${definition.substring(0, 100)}"?`
           : `What is the key idea behind ${skillLabel}?`,
-        checkpointAnswer: definition?.split('.')[0]?.trim() || skillLabel,
+        checkpointAnswer: safeCheckpointAnswer(skillCode, definition?.split('.')[0]?.trim(), skillLabel),
       },
       {
         stepOrder: 2,
@@ -399,7 +415,7 @@ function buildRoutes(content: ParsedSkillContent): RouteData[] {
         explanation: `The correct approach for ${skillLabel}: ${stepsText.substring(0, 300)}`,
         stepType: 'guided_action',
         checkpointQuestion: `Now apply the correct method for ${skillLabel}.`,
-        checkpointAnswer: steps[0] || 'Follow the correct steps.',
+        checkpointAnswer: safeCheckpointAnswer(skillCode, steps[0], 'Follow the correct steps.'),
       },
       {
         stepOrder: 3,
@@ -407,7 +423,7 @@ function buildRoutes(content: ParsedSkillContent): RouteData[] {
         explanation: `Make sure you avoid the common error when working with ${skillLabel}.`,
         stepType: 'transfer_check',
         checkpointQuestion: `Solve a ${skillLabel} problem using the correct method.`,
-        checkpointAnswer: steps[0] || 'Use the method above.',
+        checkpointAnswer: safeCheckpointAnswer(skillCode, steps[0], 'Use the method above.'),
       },
     ],
   };
@@ -467,11 +483,15 @@ async function upsertRoutes(content: ParsedSkillContent, routes: RouteData[]): P
     for (const stepDef of route.steps) {
       const itId = stepDef.stepOrder === 1 ? itSelect.id : itCompare.id;
 
+      // Defensive: ensure checkpoint fields are non-empty before validation
+      const answer = stepDef.checkpointAnswer?.trim() || `Review the method for ${content.skillCode}.`;
+      const question = stepDef.checkpointQuestion?.trim() || `What have you learned about ${content.skillCode}?`;
+
       // Use SHORT type for steps that aren't MCQ (avoids option validation issues)
       const validated = validateExplanationStepWrite({
-        checkpointQuestion: stepDef.checkpointQuestion,
+        checkpointQuestion: question,
         checkpointOptions: undefined,
-        checkpointAnswer: stepDef.checkpointAnswer,
+        checkpointAnswer: answer,
         questionType: 'SHORT',
       });
 
