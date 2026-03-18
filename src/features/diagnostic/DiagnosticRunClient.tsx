@@ -29,7 +29,7 @@ export function DiagnosticRunClient({ subject, skill, item, sessionId, itemsSeen
           value={selectedAnswer}
           onChange={(e) => setSelectedAnswer(e.target.value)}
           inputMode={type === 'SHORT_NUMERIC' ? 'decimal' : 'text'}
-          className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 text-gray-700 focus:border-blue-500 focus:outline-none"
+          className="anx-input"
           placeholder={type === 'SHORT_NUMERIC' ? 'Enter a number' : 'Type your answer'}
         />
       );
@@ -53,11 +53,7 @@ export function DiagnosticRunClient({ subject, skill, item, sessionId, itemsSeen
           <button
             key={i}
             onClick={() => setSelectedAnswer(option)}
-            className={`w-full text-left px-4 py-3 rounded-lg border-2 transition-colors ${
-              selectedAnswer === option
-                ? 'border-blue-500 bg-blue-50 text-blue-800'
-                : 'border-gray-200 hover:border-gray-300 text-gray-700'
-            }`}
+            className={`anx-option ${selectedAnswer === option ? 'anx-option-selected' : ''}`}
           >
             {option}
           </button>
@@ -89,26 +85,26 @@ export function DiagnosticRunClient({ subject, skill, item, sessionId, itemsSeen
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="max-w-lg w-full bg-white rounded-xl border border-gray-200 p-8 space-y-6">
+    <main className="anx-shell flex items-center justify-center">
+      <div className="anx-panel w-full max-w-lg p-8 space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm text-gray-500">One question at a time</p>
-            <p className="text-xs text-gray-400">Just try each one. This helps us find the right place to start.</p>
+            <p className="text-sm" style={{ color: 'var(--anx-text-muted)' }}>One question at a time</p>
+            <p className="text-xs" style={{ color: 'var(--anx-text-faint)' }}>Just try each one. This helps us find the right place to start.</p>
           </div>
-          <span className="text-sm text-gray-400">
+          <span className="text-sm" style={{ color: 'var(--anx-text-faint)' }}>
             {itemsSeen + 1} / {maxItems} max
           </span>
         </div>
-        <div className="w-full h-1.5 bg-gray-100 rounded-full">
+        <div className="anx-progress-track">
           <div
-            className="h-full bg-blue-500 rounded-full transition-all"
+            className="anx-progress-bar"
             style={{ width: `${((itemsSeen + 1) / maxItems) * 100}%` }}
           />
         </div>
         <ItemVisualPanel item={item} primarySkillCode={skill.code} />
-        <h2 className="text-lg font-semibold text-gray-900">{item.question}</h2>
-        <p className="text-sm text-gray-500">
+        <h2 className="text-lg font-semibold" style={{ color: 'var(--anx-text)' }}>{item.question}</h2>
+        <p className="text-sm" style={{ color: 'var(--anx-text-muted)' }}>
           {itemContent.type === 'SHORT_NUMERIC'
             ? 'Type a number.'
             : itemContent.type === 'SHORT_TEXT'
@@ -121,7 +117,7 @@ export function DiagnosticRunClient({ subject, skill, item, sessionId, itemsSeen
         <button
           onClick={submitAnswer}
           disabled={!selectedAnswer || submitting}
-          className="w-full py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 font-medium transition-colors"
+          className="anx-btn-primary w-full py-3"
         >
           {submitting ? 'Saving…' : 'Check and go on'}
         </button>

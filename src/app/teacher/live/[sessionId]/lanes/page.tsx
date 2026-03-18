@@ -30,7 +30,7 @@ export default function TeacherLanesPage({ params }: Props) {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 p-6">
+    <main className="anx-shell">
       <div className="mx-auto max-w-6xl space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-gray-900">Live Session — Lane View</h1>

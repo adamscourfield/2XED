@@ -75,20 +75,20 @@ export function NewLiveSessionForm({ classrooms, subjects, skillsBySubject }: Pr
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+    <form onSubmit={handleSubmit} className="anx-panel space-y-5 p-6">
       {error && (
-        <div className="rounded bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div>
+        <div className="anx-callout-danger">{error}</div>
       )}
 
       <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700" htmlFor="classroom">
+        <label className="mb-1 block text-sm font-medium" style={{ color: 'var(--anx-text-secondary)' }} htmlFor="classroom">
           Classroom
         </label>
         <select
           id="classroom"
           value={classroomId}
           onChange={(e) => setClassroomId(e.target.value)}
-          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="anx-input"
           required
         >
           <option value="">Select classroom…</option>
@@ -101,14 +101,14 @@ export function NewLiveSessionForm({ classrooms, subjects, skillsBySubject }: Pr
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700" htmlFor="subject">
+        <label className="mb-1 block text-sm font-medium" style={{ color: 'var(--anx-text-secondary)' }} htmlFor="subject">
           Subject
         </label>
         <select
           id="subject"
           value={subjectId}
           onChange={(e) => { setSubjectId(e.target.value); setSkillId(''); }}
-          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="anx-input"
           required
         >
           <option value="">Select subject…</option>
@@ -119,15 +119,15 @@ export function NewLiveSessionForm({ classrooms, subjects, skillsBySubject }: Pr
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700" htmlFor="skill">
-          Skill <span className="text-gray-400">(optional)</span>
+        <label className="mb-1 block text-sm font-medium" style={{ color: 'var(--anx-text-secondary)' }} htmlFor="skill">
+          Skill <span style={{ color: 'var(--anx-text-faint)' }}>(optional)</span>
         </label>
         <select
           id="skill"
           value={skillId}
           onChange={(e) => setSkillId(e.target.value)}
           disabled={!subjectId}
-          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:bg-gray-50 disabled:text-gray-400"
+          className="anx-input disabled:opacity-50"
         >
           <option value="">All skills / no specific skill</option>
           {skillsForSubject.map((s) => (
@@ -141,7 +141,7 @@ export function NewLiveSessionForm({ classrooms, subjects, skillsBySubject }: Pr
       <button
         type="submit"
         disabled={loading}
-        className="w-full rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-50"
+        className="anx-btn-primary w-full"
       >
         {loading ? 'Creating…' : 'Create Session'}
       </button>

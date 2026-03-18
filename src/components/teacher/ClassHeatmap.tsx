@@ -37,14 +37,14 @@ const bandClasses: Record<string, string> = {
 export function ClassHeatmap({ participants, skills }: Props) {
   if (participants.length === 0) {
     return (
-      <div className="rounded-lg border border-gray-200 bg-white p-6 text-center text-sm text-gray-500">
+      <div className="anx-card p-6 text-center text-sm text-[color:var(--anx-text-muted)]">
         No students have joined yet.
       </div>
     );
   }
 
   return (
-    <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
+    <div className="anx-card overflow-x-auto">
       <table className="min-w-full">
         <thead>
           <tr>
