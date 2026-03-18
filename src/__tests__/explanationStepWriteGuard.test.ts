@@ -55,4 +55,41 @@ describe('validateExplanationStepWrite', () => {
       })
     ).toThrow(/TRUE_FALSE requires True\/False options and answer/i);
   });
+
+  it('accepts SHORT steps with no options (PPTX extract pattern)', () => {
+    // Matches the N3.15 pattern: steps exist but no I-do and no definition
+    const out = validateExplanationStepWrite({
+      checkpointQuestion: 'What is the first step for N3.15?',
+      checkpointAnswer: 'Multiply the numbers to make them integers',
+      questionType: 'SHORT',
+    });
+
+    expect(out.questionType).toBe('SHORT');
+    expect(out.checkpointAnswer).toBe('Multiply the numbers to make them integers');
+    expect(out.checkpointOptions.options).toHaveLength(0);
+  });
+
+  it('accepts SHORT steps with undefined options', () => {
+    const out = validateExplanationStepWrite({
+      checkpointQuestion: 'Apply your knowledge',
+      checkpointOptions: undefined,
+      checkpointAnswer: 'See explanation above.',
+      questionType: 'SHORT',
+    });
+
+    expect(out.questionType).toBe('SHORT');
+    expect(out.checkpointAnswer).toBe('See explanation above.');
+  });
+
+  it('accepts SHORT steps with skill code as answer', () => {
+    // When definition is null, safeCheckpointAnswer falls back to skillLabel
+    const out = validateExplanationStepWrite({
+      checkpointQuestion: 'What is the key idea behind N3.15?',
+      checkpointAnswer: 'N3.15',
+      questionType: 'SHORT',
+    });
+
+    expect(out.questionType).toBe('SHORT');
+    expect(out.checkpointAnswer).toBe('N3.15');
+  });
 });
