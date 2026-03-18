@@ -30,18 +30,26 @@ interface Subject {
   slug: string;
 }
 
+interface GamificationSummary {
+  xp: number;
+  tokens: number;
+  streakDays: number;
+  activeDaysThisWeek: number;
+}
+
 interface Props {
   subject: Subject;
   skill: Skill;
   items: Item[];
   userId: string;
+  gamification?: GamificationSummary;
 }
 
 type Phase = 'intro' | 'session' | 'results';
 
 const SHOW_DEBUG = process.env.NEXT_PUBLIC_SHOW_DEBUG === 'true';
 
-export function LearnSession({ subject, skill, items, userId }: Props) {
+export function LearnSession({ subject, skill, items, userId, gamification }: Props) {
   const [phase, setPhase] = useState<Phase>('intro');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState('');
@@ -61,11 +69,11 @@ export function LearnSession({ subject, skill, items, userId }: Props) {
             value={selectedAnswer}
             onChange={(e) => setSelectedAnswer(e.target.value)}
             inputMode={type === 'SHORT_NUMERIC' ? 'decimal' : 'text'}
-            className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 text-gray-700 focus:border-blue-500 focus:outline-none"
+            className="anx-input"
             placeholder={type === 'SHORT_NUMERIC' ? 'Enter a number' : 'Type your answer'}
           />
           {type === 'SHORT_TEXT' && (
-            <p className="text-sm text-gray-500">Use clear words. You can use commas or “and”.</p>
+            <p className="text-sm" style={{ color: 'var(--anx-text-muted)' }}>Use clear words. You can use commas or “and”.</p>
           )}
         </div>
       );
@@ -86,19 +94,15 @@ export function LearnSession({ subject, skill, items, userId }: Props) {
     return (
       <div className="space-y-3">
         {options.length === 0 ? (
-          <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+          <div className="anx-callout-warning">
             This question has no options yet.
-          </p>
+          </div>
         ) : (
           options.map((option, i) => (
             <button
               key={i}
               onClick={() => setSelectedAnswer(option)}
-              className={`w-full text-left px-4 py-3 rounded-lg border-2 transition-colors ${
-                selectedAnswer === option
-                  ? 'border-blue-500 bg-blue-50 text-blue-800'
-                  : 'border-gray-200 hover:border-gray-300 text-gray-700'
-              }`}
+              className={`anx-option ${selectedAnswer === option ? 'anx-option-selected' : ''}`}
             >
               {option}
             </button>
@@ -141,26 +145,26 @@ export function LearnSession({ subject, skill, items, userId }: Props) {
 
   if (phase === 'intro') {
     return (
-      <main className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="max-w-lg w-full bg-white rounded-xl border border-gray-200 p-8 space-y-6">
+      <main className="anx-shell flex items-center justify-center">
+        <div className="anx-panel w-full max-w-lg p-8 space-y-6">
           <div>
-            <p className="text-sm text-blue-600 font-medium mb-1">{subject.title}</p>
-            <h1 className="text-2xl font-bold text-gray-900">{skill.name}</h1>
+            <p className="text-sm font-medium mb-1" style={{ color: 'var(--anx-primary)' }}>{subject.title}</p>
+            <h1 className="text-2xl font-bold" style={{ color: 'var(--anx-text)' }}>{skill.name}</h1>
             {SHOW_DEBUG && (
-              <p className="text-xs text-gray-400 mt-1">
+              <p className="text-xs mt-1" style={{ color: 'var(--anx-text-faint)' }}>
                 {skill.code} · {skill.strand}
               </p>
             )}
           </div>
           {sanitizeStudentCopy(skill.intro) && (
-            <div className="prose prose-sm text-gray-600">
+            <div className="prose prose-sm" style={{ color: 'var(--anx-text-secondary)' }}>
               <p>{sanitizeStudentCopy(skill.intro)}</p>
             </div>
           )}
           {sanitizeStudentCopy(skill.description) && !sanitizeStudentCopy(skill.intro) && (
-            <p className="text-gray-600">{sanitizeStudentCopy(skill.description)}</p>
+            <p style={{ color: 'var(--anx-text-secondary)' }}>{sanitizeStudentCopy(skill.description)}</p>
           )}
-          <div className="rounded-lg border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-900">
+          <div className="anx-callout-info">
             <p className="font-medium">What happens next</p>
             <ol className="mt-2 list-decimal space-y-1 pl-5">
               <li>You will do {items.length} short question{items.length === 1 ? '' : 's'}.</li>
@@ -171,13 +175,13 @@ export function LearnSession({ subject, skill, items, userId }: Props) {
           <div className="flex gap-3">
             <button
               onClick={() => setPhase('session')}
-              className="flex-1 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors"
+              className="anx-btn-primary flex-1 py-3"
             >
               Start now ({items.length} question{items.length === 1 ? '' : 's'})
             </button>
             <button
               onClick={() => router.push('/dashboard')}
-              className="px-4 py-3 border border-gray-300 text-gray-600 rounded-lg hover:bg-gray-50 transition-colors"
+              className="anx-btn-secondary px-4 py-3"
             >
               Back
             </button>
@@ -189,35 +193,35 @@ export function LearnSession({ subject, skill, items, userId }: Props) {
 
   if (phase === 'session' && currentItem) {
     return (
-      <main className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="max-w-lg w-full bg-white rounded-xl border border-gray-200 p-8 space-y-6">
+      <main className="anx-shell flex items-center justify-center">
+        <div className="anx-panel w-full max-w-lg p-8 space-y-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500">One question at a time</p>
-              <p className="text-xs text-gray-400">If one feels hard, the next one is a fresh start.</p>
+              <p className="text-sm" style={{ color: 'var(--anx-text-muted)' }}>One question at a time</p>
+              <p className="text-xs" style={{ color: 'var(--anx-text-faint)' }}>If one feels hard, the next one is a fresh start.</p>
             </div>
             <div className="text-right">
-              <p className="text-sm text-gray-500">
+              <p className="text-sm" style={{ color: 'var(--anx-text-muted)' }}>
                 {skill.name}
                 {SHOW_DEBUG && (
-                  <span className="ml-2 text-xs text-gray-400">[{skill.code}]</span>
+                  <span className="ml-2 text-xs" style={{ color: 'var(--anx-text-faint)' }}>[{skill.code}]</span>
                 )}
               </p>
-              <span className="text-sm text-gray-400">
+              <span className="text-sm" style={{ color: 'var(--anx-text-faint)' }}>
                 {currentIndex + 1} / {items.length}
               </span>
             </div>
           </div>
-          <div className="w-full h-1.5 bg-gray-100 rounded-full">
+          <div className="anx-progress-track">
             <div
-              className="h-full bg-blue-500 rounded-full transition-all"
+              className="anx-progress-bar"
               style={{ width: `${((currentIndex + 1) / items.length) * 100}%` }}
             />
           </div>
           <ItemVisualPanel item={currentItem} primarySkillCode={skill.code} />
-          <h2 className="text-lg font-semibold text-gray-900">{currentItem.question}</h2>
+          <h2 className="text-lg font-semibold" style={{ color: 'var(--anx-text)' }}>{currentItem.question}</h2>
           {currentItemContent && (
-            <p className="text-sm text-gray-500">
+            <p className="text-sm" style={{ color: 'var(--anx-text-muted)' }}>
               {currentItemContent.type === 'SHORT_NUMERIC'
                 ? 'Type a number.'
                 : currentItemContent.type === 'SHORT_TEXT'
@@ -231,7 +235,7 @@ export function LearnSession({ subject, skill, items, userId }: Props) {
           <button
             onClick={submitAnswer}
             disabled={!selectedAnswer || submitting}
-            className="w-full py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 font-medium transition-colors"
+            className="anx-btn-primary w-full py-3"
           >
             {submitting ? 'Checking…' : currentIndex < items.length - 1 ? 'Check and go on' : 'Finish for now'}
           </button>
@@ -243,61 +247,102 @@ export function LearnSession({ subject, skill, items, userId }: Props) {
   if (phase === 'results') {
     const correctCount = results.filter((r) => r.correct).length;
     const masteryPct = Math.round((correctCount / results.length) * 100);
-    const outcomeTone = masteryPct >= 80 ? 'green' : masteryPct >= 50 ? 'amber' : 'blue';
+
+    let outcomeTone: 'success' | 'warning' | 'info';
+    if (masteryPct >= 80) outcomeTone = 'success';
+    else if (masteryPct >= 50) outcomeTone = 'warning';
+    else outcomeTone = 'info';
+
+    const headlineText = {
+      success: 'Congratulations!',
+      warning: 'Good effort!',
+      info: 'Keep going!',
+    }[outcomeTone];
+
+    const subtitleText = {
+      success: `Great job! You have done really well on ${skill.name}.`,
+      warning: `Nice try on ${skill.name}. A little more practice and you will have it.`,
+      info: `You are building up ${skill.name}. The next set will help.`,
+    }[outcomeTone];
+
+    const scoreColor = {
+      success: 'var(--anx-success)',
+      warning: 'var(--anx-warning)',
+      info: 'var(--anx-primary)',
+    }[outcomeTone];
+
+    const ringEmoji = {
+      success: '🏆',
+      warning: '💪',
+      info: '📚',
+    }[outcomeTone];
+
+    const xpEarned = gamification?.xp ?? 0;
 
     return (
-      <main className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="max-w-lg w-full bg-white rounded-xl border border-gray-200 p-8 space-y-6">
-          <div className={`rounded-xl border px-5 py-4 ${outcomeTone === 'green' ? 'border-green-200 bg-green-50' : outcomeTone === 'amber' ? 'border-amber-200 bg-amber-50' : 'border-blue-200 bg-blue-50'}`}>
-            <p className={`text-sm font-semibold ${outcomeTone === 'green' ? 'text-green-700' : outcomeTone === 'amber' ? 'text-amber-700' : 'text-blue-700'}`}>
-              Session complete
-            </p>
-            <h1 className="mt-1 text-2xl font-bold text-gray-900">Nice work. You finished this set.</h1>
-            <p className="mt-2 text-sm text-gray-700">
-              We have enough to choose your next step. You do not need to get every question right at once.
+      <main className="anx-shell flex items-center justify-center">
+        <div className="anx-panel w-full max-w-md p-8 space-y-6 text-center anx-slide-up">
+          {/* Celebration ring */}
+          <div className="anx-reward-ring">
+            <div className="anx-reward-stars">
+              <span className="anx-reward-star">⭐</span>
+              <span className="anx-reward-star">✨</span>
+              <span className="anx-reward-star">🌟</span>
+              <span className="anx-reward-star">⭐</span>
+              <span className="anx-reward-star">✨</span>
+              <span className="anx-reward-star">🌟</span>
+            </div>
+            <span className="text-5xl">{ringEmoji}</span>
+          </div>
+
+          {/* Score */}
+          <div>
+            <p className="text-sm font-medium" style={{ color: 'var(--anx-text-muted)' }}>Your Score</p>
+            <p className="text-4xl font-bold" style={{ color: scoreColor }}>
+              {correctCount}/{results.length}
             </p>
           </div>
 
-          <div className="text-center py-1">
-            <span className={`text-5xl font-bold ${masteryPct >= 80 ? 'text-green-600' : masteryPct >= 50 ? 'text-yellow-500' : 'text-blue-600'}`}>
-              {masteryPct}%
-            </span>
-            <p className="text-gray-500 mt-2">
-              {correctCount} out of {results.length} correct
-            </p>
+          {/* Headline */}
+          <div>
+            <h1 className="text-2xl font-bold" style={{ color: 'var(--anx-text)' }}>{headlineText}</h1>
+            <p className="mt-2 text-sm" style={{ color: 'var(--anx-text-secondary)' }}>{subtitleText}</p>
           </div>
 
-          <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
-            <p className="text-sm font-semibold text-gray-900">What happens next</p>
-            <ol className="mt-2 list-decimal space-y-2 pl-5 text-sm text-gray-700">
-              <li>This set is saved.</li>
-              <li>Your dashboard will show what to do next.</li>
-              <li>If this still feels hard, that is okay. The next set will stay short.</li>
-            </ol>
-          </div>
+          {/* XP badge */}
+          {xpEarned > 0 && (
+            <div className="flex justify-center">
+              <span className="anx-xp-badge">🏅 {xpEarned} XP</span>
+            </div>
+          )}
 
-          <div className="space-y-2">
+          {/* Question results */}
+          <div className="flex justify-center gap-2">
             {results.map((r, i) => (
-              <div key={r.itemId} className="flex items-center gap-3 text-sm">
-                <span className={`w-5 h-5 rounded-full flex items-center justify-center text-white text-xs font-bold ${r.correct ? 'bg-green-500' : 'bg-red-400'}`}>
-                  {r.correct ? '✓' : '✗'}
-                </span>
-                <span className="text-gray-600">Question {i + 1}</span>
-              </div>
+              <span
+                key={r.itemId}
+                className="flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold text-white"
+                style={{ background: r.correct ? 'var(--anx-success)' : 'var(--anx-danger)' }}
+                title={`Question ${i + 1}: ${r.correct ? 'Correct' : 'Incorrect'}`}
+              >
+                {r.correct ? '✓' : '✗'}
+              </span>
             ))}
           </div>
-          <div className="flex gap-3">
-            <button
-              onClick={() => router.push(`/learn/${subject.slug}`)}
-              className="flex-1 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              Practice again
-            </button>
+
+          {/* Actions */}
+          <div className="space-y-3 pt-2">
             <button
               onClick={() => router.push('/dashboard')}
-              className="flex-1 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="anx-btn-primary w-full py-3"
             >
-              Dashboard and next skill
+              Back to Home
+            </button>
+            <button
+              onClick={() => router.push(`/learn/${subject.slug}`)}
+              className="anx-btn-secondary w-full py-3"
+            >
+              Practice again
             </button>
           </div>
         </div>

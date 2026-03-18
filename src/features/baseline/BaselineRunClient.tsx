@@ -119,27 +119,27 @@ export function BaselineRunClient({ subjectSlug }: { subjectSlug: string }) {
     }
   }
 
-  if (loading) return <div className="p-8 text-sm text-slate-600">Getting your baseline ready…</div>;
-  if (error) return <div className="p-8 text-sm text-rose-600">{error}</div>;
-  if (!item) return <div className="p-8 text-sm text-slate-600">Loading your next question…</div>;
+  if (loading) return <div className="p-8 text-sm" style={{ color: 'var(--anx-text-secondary)' }}>Getting your baseline ready…</div>;
+  if (error) return <div className="p-8 text-sm" style={{ color: 'var(--anx-danger)' }}>{error}</div>;
+  if (!item) return <div className="p-8 text-sm" style={{ color: 'var(--anx-text-secondary)' }}>Loading your next question…</div>;
 
   return (
     <main className="anx-shell flex items-center justify-center">
       <div className="anx-panel w-full max-w-2xl space-y-6 p-7 sm:p-8">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-medium text-slate-700">Let&apos;s start with a few quick questions</p>
-            <p className="text-xs text-slate-500">One question at a time. Just try each one.</p>
+            <p className="text-sm font-medium text-[color:var(--anx-text-secondary)]">Let&apos;s start with a few quick questions</p>
+            <p className="text-xs text-[color:var(--anx-text-muted)]">One question at a time. Just try each one.</p>
           </div>
-          <span className="text-sm text-slate-500">{Math.min(itemsSeen + 1, maxItems)} / {maxItems}</span>
+          <span className="text-sm text-[color:var(--anx-text-muted)]">{Math.min(itemsSeen + 1, maxItems)} / {maxItems}</span>
         </div>
 
         <div className="anx-progress-track">
           <div className="anx-progress-bar" style={{ width: `${(Math.min(itemsSeen + 1, maxItems) / maxItems) * 100}%` }} />
         </div>
 
-        <div className="rounded-2xl border border-blue-100 bg-blue-50/60 px-5 py-4 text-sm text-slate-700 sm:px-6">
-          <p className="font-semibold text-slate-900">What to do</p>
+        <div className="anx-callout-info px-5 py-4 sm:px-6">
+          <p className="font-semibold text-[color:var(--anx-text)]">What to do</p>
           <p className="mt-1">
             {answerType === 'MCQ'
               ? 'Pick one answer.'
@@ -151,16 +151,16 @@ export function BaselineRunClient({ subjectSlug }: { subjectSlug: string }) {
           </p>
         </div>
 
-        <div className="rounded-2xl border-2 border-blue-100 bg-white px-5 py-6 sm:px-6 sm:py-7">
-          <h2 className="text-2xl font-bold leading-tight text-slate-900 sm:text-3xl">{questionText}</h2>
+        <div className="anx-surface-muted px-5 py-6 sm:px-6 sm:py-7">
+          <h2 className="text-2xl font-bold leading-tight text-[color:var(--anx-text)] sm:text-3xl">{questionText}</h2>
         </div>
 
         <div className="space-y-3">
           {answerType === 'MCQ' ? (
             parsedOptions.choices.length === 0 ? (
-              <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+              <div className="anx-callout-warning">
                 This question has no options yet.
-              </p>
+              </div>
             ) : (
               parsedOptions.choices.map((option, i) => (
                 <button
@@ -188,7 +188,7 @@ export function BaselineRunClient({ subjectSlug }: { subjectSlug: string }) {
                   False
                 </button>
               </div>
-              <p className="text-xs text-slate-600">Tap true or false.</p>
+              <p className="text-xs text-[color:var(--anx-text-secondary)]">Tap true or false.</p>
             </div>
           ) : (
             <div className="space-y-2">
@@ -197,9 +197,9 @@ export function BaselineRunClient({ subjectSlug }: { subjectSlug: string }) {
                 value={selectedAnswer}
                 onChange={(e) => setSelectedAnswer(e.target.value)}
                 placeholder={answerType === 'SHORT_NUMERIC' ? 'Enter a number' : 'Type your answer'}
-                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none ring-0 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
+                className="anx-input"
               />
-              {answerType === 'SHORT_TEXT' && <p className="text-xs text-slate-600">Use clear words. You can use commas or “and”.</p>}
+              {answerType === 'SHORT_TEXT' && <p className="text-xs text-[color:var(--anx-text-secondary)]">Use clear words. You can use commas or “and”.</p>}
             </div>
           )}
         </div>
