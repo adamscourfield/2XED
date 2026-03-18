@@ -295,7 +295,7 @@ function buildRoutes(content: ParsedSkillContent): RouteData[] {
         explanation: stepsText.substring(0, 500),
         stepType: 'visual_demo',
         checkpointQuestion: idoExample ?? `What is the first step for ${skillLabel}?`,
-        checkpointAnswer: steps[0] ?? 'Follow the steps above.',
+        checkpointAnswer: steps[0] || 'Follow the steps above.',
       },
       {
         stepOrder: 2,
@@ -303,7 +303,7 @@ function buildRoutes(content: ParsedSkillContent): RouteData[] {
         explanation: `Apply the method: ${stepsText.substring(0, 300)}`,
         stepType: 'guided_action',
         checkpointQuestion: idoExample ?? `Use the method to solve a ${skillLabel} problem.`,
-        checkpointAnswer: steps[0] ?? 'Follow the steps.',
+        checkpointAnswer: steps[0] || 'Follow the steps.',
       },
       {
         stepOrder: 3,
@@ -311,7 +311,7 @@ function buildRoutes(content: ParsedSkillContent): RouteData[] {
         explanation: `Transfer the same method to a new ${skillLabel} question.`,
         stepType: 'transfer_check',
         checkpointQuestion: `Apply what you have learned about ${skillLabel}.`,
-        checkpointAnswer: steps[0] ?? 'Use the method above.',
+        checkpointAnswer: steps[0] || 'Use the method above.',
       },
     ],
   };
@@ -344,7 +344,7 @@ function buildRoutes(content: ParsedSkillContent): RouteData[] {
         checkpointQuestion: definition
           ? `Which of the following best describes: "${definition.substring(0, 100)}"?`
           : `What is the key idea behind ${skillLabel}?`,
-        checkpointAnswer: definition?.split('.')[0] ?? skillLabel,
+        checkpointAnswer: definition?.split('.')[0]?.trim() || skillLabel,
       },
       {
         stepOrder: 2,
@@ -399,7 +399,7 @@ function buildRoutes(content: ParsedSkillContent): RouteData[] {
         explanation: `The correct approach for ${skillLabel}: ${stepsText.substring(0, 300)}`,
         stepType: 'guided_action',
         checkpointQuestion: `Now apply the correct method for ${skillLabel}.`,
-        checkpointAnswer: steps[0] ?? 'Follow the correct steps.',
+        checkpointAnswer: steps[0] || 'Follow the correct steps.',
       },
       {
         stepOrder: 3,
@@ -407,7 +407,7 @@ function buildRoutes(content: ParsedSkillContent): RouteData[] {
         explanation: `Make sure you avoid the common error when working with ${skillLabel}.`,
         stepType: 'transfer_check',
         checkpointQuestion: `Solve a ${skillLabel} problem using the correct method.`,
-        checkpointAnswer: steps[0] ?? 'Use the method above.',
+        checkpointAnswer: steps[0] || 'Use the method above.',
       },
     ],
   };
