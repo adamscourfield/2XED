@@ -50,8 +50,8 @@ async function main() {
     orderBy: { code: 'asc' },
   });
 
-  const skillsWithRoutes = skills.filter(s => s.explanationRoutes.length > 0);
-  const skillsWithoutRoutes = skills.filter(s => s.explanationRoutes.length === 0);
+  const skillsWithRoutes = skills.filter((s: typeof skills[number]) => s.explanationRoutes.length > 0);
+  const skillsWithoutRoutes = skills.filter((s: typeof skills[number]) => s.explanationRoutes.length === 0);
 
   // ── 2. Per-skill route completeness ───────────────────────────────────────
   const missingRoutes: { code: string; title: string | null; missing: string[] }[] = [];

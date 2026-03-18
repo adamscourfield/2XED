@@ -30,6 +30,7 @@ const PACK_FILES = [
   'docs/unit-mapping/review-pack-phase1-n3-14-to-n3-17.jsonl',
   'docs/unit-mapping/review-pack-phase1-n3-18-to-n3-21.jsonl',
   'docs/unit-mapping/review-pack-phase1-n3-22-to-n3-24.jsonl',
+  'docs/unit-mapping/review-pack-phase1-n4-1-to-n4-9.jsonl',
 ] as const;
 
 const PHASE1_SKILL_META: Record<string, { name: string; strand: string; sortOrder: number }> = {
@@ -88,6 +89,15 @@ const PHASE1_SKILL_META: Record<string, { name: string; strand: string; sortOrde
   'N3.22': { name: 'Mean of a data set', strand: 'MULT', sortOrder: 520 },
   'N3.23': { name: 'Squares, cubes and roots', strand: 'MULT', sortOrder: 530 },
   'N3.24': { name: 'Prime numbers', strand: 'MULT', sortOrder: 540 },
+  'N4.1': { name: 'Understand a fraction as part of a whole and locate simple fractions on a number line', strand: 'FDP', sortOrder: 600 },
+  'N4.2': { name: 'Generate equivalent fractions', strand: 'FDP', sortOrder: 610 },
+  'N4.3': { name: 'Simplify a fraction using factors/HCF', strand: 'FDP', sortOrder: 620 },
+  'N4.4': { name: 'Convert a fraction to a decimal (terminating decimals)', strand: 'FDP', sortOrder: 630 },
+  'N4.5': { name: 'Convert a decimal to a fraction (simple/terminating)', strand: 'FDP', sortOrder: 640 },
+  'N4.6': { name: 'Convert a decimal to a percentage and a percentage to a decimal', strand: 'FDP', sortOrder: 650 },
+  'N4.7': { name: 'Convert a fraction to a percentage (via decimal or equivalence to /100)', strand: 'FDP', sortOrder: 660 },
+  'N4.8': { name: 'Compare and order fractions, decimals and percentages', strand: 'FDP', sortOrder: 670 },
+  'N4.9': { name: 'Find a percentage of an amount (using non-calculator-friendly methods)', strand: 'FDP', sortOrder: 680 },
 };
 
 type Phase1Row = MappingRow & {

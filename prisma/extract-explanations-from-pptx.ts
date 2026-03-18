@@ -36,7 +36,24 @@ const PPTX_FILES = [
   path.join(CURRICULUM_DIR, 'Unit 1 - Applications of Numeracy/(PART A) N1-3 Secondary Ready - Applications of Numeracy (FOUNDATION Not Meeting Expected Standard).pptx'),
   path.join(CURRICULUM_DIR, 'Unit 1 - Applications of Numeracy/(PART B) N1-3 Secondary Ready - Applications of Numeracy (CORE Meeting Expected Standard).pptx'),
   path.join(CURRICULUM_DIR, 'Unit 1 - Applications of Numeracy/(PART B) N1-3 Secondary Ready - Applications of Numeracy (FOUNDATION Not Meeting Expected Standard).pptx'),
+  path.join(CURRICULUM_DIR, '08. N6 - Fractions, Decimals, Percentages/08. N6 Fractions Decimals Percentages.pptx'),
 ];
+
+// Map PPTX skill codes to app skill codes (e.g. N6.x in FDP booklet → N4.x in app)
+const SKILL_CODE_ALIAS: Record<string, string> = {
+  'N6.1': 'N4.5',  // Decimal → fraction conversions
+  'N6.2': 'N4.5',  // More decimal-fraction conversions (maps to same N4.5; will be skipped if already written)
+  'N6.3': 'N4.4',  // Key equivalences / fraction→decimal fluency
+  'N6.4': 'N4.4',  // Converting fractions to decimals (1)
+  'N6.5': 'N4.4',  // Fractions and recurring decimals
+  'N6.6': 'N4.4',  // Converting fractions to decimals (3) — depth
+  'N6.7': 'N4.6',  // Introduction to percentages (equivalence)
+  'N6.8': 'N4.6',  // Converting decimals to percentages
+  'N6.9': 'N4.7',  // Converting fractions↔percentages
+  'N6.10': 'N4.8', // Ordering fractions, decimals and percentages
+  'N6.11': 'N4.9', // One number as a percentage of another (non-calc)
+  'N6.12': 'N4.9', // Finding percentages of amounts (non-calc)
+};
 
 // ─── XML helpers ──────────────────────────────────────────────────────────────
 
@@ -107,7 +124,8 @@ function groupSlidesBySkill(slideData: Array<{ slide: number; tokens: string[] }
     // Detect skill header: "Subtopic N1.3" or "SUBTOPIC N1.3"
     const skillMatch = text.match(/\bsubtopic\s+(N\d+\.\d+)\b/i);
     if (skillMatch) {
-      const code = skillMatch[1].toUpperCase();
+      const raw = skillMatch[1].toUpperCase();
+      const code = SKILL_CODE_ALIAS[raw] ?? raw;
 
       // Only start a new group if the code changed
       if (!current || current.skillCode !== code) {
