@@ -28,7 +28,7 @@ async function main() {
     select: {
       id: true,
       code: true,
-      title: true,
+      name: true,
       explanationRoutes: {
         select: {
           id: true,
@@ -61,7 +61,7 @@ async function main() {
     const presentTypes = skill.explanationRoutes.map(r => r.routeType);
     const missing = EXPECTED_ROUTES.filter(r => !presentTypes.includes(r));
     if (missing.length > 0) {
-      missingRoutes.push({ code: skill.code, title: skill.title, missing });
+      missingRoutes.push({ code: skill.code, title: skill.name, missing });
     }
     for (const route of skill.explanationRoutes) {
       if (route.steps.length < EXPECTED_STEPS_PER_ROUTE) {
@@ -126,7 +126,7 @@ async function main() {
     console.log('  ⚠️  SKILLS WITH NO EXPLANATION ROUTES');
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     for (const s of skillsWithoutRoutes) {
-      console.log(`  ${s.code.padEnd(10)}  ${s.title ?? '(no title)'}`);
+      console.log(`  ${s.code.padEnd(10)}  ${s.name ?? '(no name)'}`);
     }
     console.log();
   }
