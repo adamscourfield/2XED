@@ -144,10 +144,23 @@ function parseSkillContent(group: SkillSlides): ParsedSkillContent {
   const allTokens: string[] = group.slides.flatMap((s) => s.tokens);
 
   // Title: "Subtopic N1.X – Title text"
+  // The title may be in the same token as the header ("Subtopic N3.15 – Decimal Multiplication")
+  // or in a separate PPTX text run immediately after the header token.
   const titleRaw = allTokens.find((t) => /subtopic\s+N\d+\.\d+\s*[–-]/i.test(t));
-  const title = titleRaw
+  let title = titleRaw
     ? titleRaw.replace(/^subtopic\s+N\d+\.\d+\s*[–-]\s*/i, '').trim() || null
     : null;
+
+  if (!title && titleRaw) {
+    const idx = allTokens.indexOf(titleRaw);
+    if (idx !== -1 && idx + 1 < allTokens.length) {
+      const next = allTokens[idx + 1];
+      if (next && next.length > 3 && !/^\d+[\s)]*$/.test(next) &&
+          !/^(Steps|Example\s|Independent|Objectives|LEARNING|Keywords|Non\s)/i.test(next)) {
+        title = next.trim();
+      }
+    }
+  }
 
   // Objectives: tokens after "Objectives:" until next recognisable section
   const objStart = allTokens.findIndex((t) => /^objectives:?$/i.test(t));
@@ -360,7 +373,7 @@ function buildRoutes(content: ParsedSkillContent): RouteData[] {
         checkpointQuestion: definition
           ? `Which of the following best describes: "${definition.substring(0, 100)}"?`
           : `What is the key idea behind ${skillLabel}?`,
-        checkpointAnswer: safeCheckpointAnswer(skillCode, definition?.split('.')[0]?.trim(), skillLabel),
+        checkpointAnswer: safeCheckpointAnswer(skillCode, definition?.split('.')[0]?.trim(), learningOutcome, skillLabel),
       },
       {
         stepOrder: 2,
