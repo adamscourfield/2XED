@@ -370,7 +370,7 @@ function buildRoutes(content: ParsedSkillContent): RouteData[] {
         checkpointQuestion: learningOutcome
           ? `True or false: ${learningOutcome}`
           : `Can you identify an example of ${skillLabel}?`,
-        checkpointAnswer: safeCheckpointAnswer(skillCode, learningOutcome ? 'True' : 'Yes'),
+        checkpointAnswer: learningOutcome ? 'True' : 'Yes',
       },
       {
         stepOrder: 3,
@@ -378,7 +378,7 @@ function buildRoutes(content: ParsedSkillContent): RouteData[] {
         explanation: `Use your understanding of ${skillLabel} to solve a problem.`,
         stepType: 'transfer_check',
         checkpointQuestion: `Apply your knowledge of ${skillLabel} to a new situation.`,
-        checkpointAnswer: safeCheckpointAnswer(skillCode, 'See explanation above.'),
+        checkpointAnswer: 'See explanation above.',
       },
     ],
   };
@@ -407,7 +407,7 @@ function buildRoutes(content: ParsedSkillContent): RouteData[] {
         checkpointQuestion: nonExamples.length > 0
           ? `Is this correct: "${nonExamples[0]}"? True or false?`
           : `Is this approach to ${skillLabel} correct? True or false?`,
-        checkpointAnswer: safeCheckpointAnswer(skillCode, 'False'),
+        checkpointAnswer: 'False',
       },
       {
         stepOrder: 2,
