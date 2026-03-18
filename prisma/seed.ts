@@ -4,7 +4,7 @@ import bcrypt from 'bcryptjs';
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('🌱 Seeding KS3 Maths (Number + FDP)...');
+  console.log('🌱 Seeding KS3 Maths (Number + FDP + Fractions + Probability)...');
 
   // 1️⃣ Demo student
   const hashedPassword = await bcrypt.hash('password123', 10);
@@ -114,6 +114,32 @@ async function main() {
     { code: 'N4.7',  name: 'Convert a fraction to a percentage (via decimal or equivalence to /100)',                strand: 'FDP', isStretch: false, sortOrder: 660 },
     { code: 'N4.8',  name: 'Compare and order fractions, decimals and percentages',                                  strand: 'FDP', isStretch: false, sortOrder: 670 },
     { code: 'N4.9',  name: 'Find a percentage of an amount (using non-calculator-friendly methods)',                  strand: 'FDP', isStretch: false, sortOrder: 680 },
+    // ── N5: Fractions ──────────────────────────────────────────────────────────
+    { code: 'N5.1',  name: 'Concept of a fraction — shading shapes, bar models, placing on a number line',            strand: 'FRA', isStretch: false, sortOrder: 700  },
+    { code: 'N5.2',  name: 'Equivalent fractions: generating, showing equivalence, finding missing numbers',          strand: 'FRA', isStretch: false, sortOrder: 710  },
+    { code: 'N5.3',  name: 'Place fractions on a number line; compare and order fractions',                           strand: 'FRA', isStretch: false, sortOrder: 720  },
+    { code: 'N5.4',  name: 'Simplify fractions',                                                                      strand: 'FRA', isStretch: false, sortOrder: 730  },
+    { code: 'N5.5',  name: 'Express one quantity as a fraction of another',                                           strand: 'FRA', isStretch: false, sortOrder: 740  },
+    { code: 'N5.6',  name: 'Convert between mixed numbers and improper fractions; write integers as fractions',       strand: 'FRA', isStretch: false, sortOrder: 750  },
+    { code: 'N5.7',  name: 'Add fractions (same then different denominators)',                                        strand: 'FRA', isStretch: false, sortOrder: 760  },
+    { code: 'N5.8',  name: 'Subtract fractions (same then different denominators)',                                   strand: 'FRA', isStretch: false, sortOrder: 770  },
+    { code: 'N5.9',  name: 'Add fractions with mixed numbers (same then different denominators)',                     strand: 'FRA', isStretch: false, sortOrder: 780  },
+    { code: 'N5.10', name: 'Subtract fractions with mixed numbers (same then different denominators)',                strand: 'FRA', isStretch: false, sortOrder: 790  },
+    { code: 'N5.11', name: 'Fractions with negatives (addition and subtraction)',                                     strand: 'FRA', isStretch: true,  sortOrder: 800  },
+    { code: 'N5.12', name: 'Order of operations with fractions (addition and subtraction, no multiply/divide)',       strand: 'FRA', isStretch: true,  sortOrder: 810  },
+    // ── S1: Probability ────────────────────────────────────────────────────────
+    { code: 'S1.1',  name: 'Use the vocabulary of probability and the probability scale',                             strand: 'PRO', isStretch: false, sortOrder: 900  },
+    { code: 'S1.2',  name: 'Understand that probabilities sum to 1 (using fractions, decimals and percentages)',      strand: 'PRO', isStretch: false, sortOrder: 910  },
+    { code: 'S1.3',  name: 'Calculate the probability of a single event',                                            strand: 'PRO', isStretch: false, sortOrder: 920  },
+    { code: 'S1.4',  name: 'Construct sample space diagrams for two events',                                         strand: 'PRO', isStretch: false, sortOrder: 930  },
+    { code: 'S1.5',  name: 'Calculate probabilities from sample space diagrams for two events',                       strand: 'PRO', isStretch: false, sortOrder: 940  },
+    { code: 'S1.6',  name: 'Identify and represent sets',                                                             strand: 'PRO', isStretch: false, sortOrder: 950  },
+    { code: 'S1.7',  name: 'Create Venn diagrams where all information is given',                                     strand: 'PRO', isStretch: false, sortOrder: 960  },
+    { code: 'S1.8',  name: 'Interpret Venn diagrams where all information is given',                                  strand: 'PRO', isStretch: false, sortOrder: 970  },
+    { code: 'S1.9',  name: 'Understand the intersection of sets to interpret and create Venn diagrams',              strand: 'PRO', isStretch: false, sortOrder: 980  },
+    { code: 'S1.10', name: 'Understand the union of sets to interpret and create Venn diagrams',                     strand: 'PRO', isStretch: false, sortOrder: 990  },
+    { code: 'S1.11', name: 'Calculate probability from Venn diagrams',                                               strand: 'PRO', isStretch: false, sortOrder: 1000 },
+    { code: 'S1.12', name: 'The complement of a set',                                                                strand: 'PRO', isStretch: true,  sortOrder: 1010 },
   ];
 
   // 4️⃣ Upsert skills and build code→id map
@@ -245,6 +271,48 @@ async function main() {
     { parentCode: 'N2.5',  childCode: 'N4.9',  weight: 1 },
     { parentCode: 'N3.5',  childCode: 'N4.9',  weight: 1 },
     { parentCode: 'N4.6',  childCode: 'N4.9',  weight: 1 },
+    // ── N5 (Fractions) prereqs ──────────────────────────────────────────────
+    { parentCode: 'N4.1',  childCode: 'N5.1',  weight: 1 },
+    { parentCode: 'N5.1',  childCode: 'N5.2',  weight: 1 },
+    { parentCode: 'N4.2',  childCode: 'N5.2',  weight: 1 },
+    { parentCode: 'N5.2',  childCode: 'N5.3',  weight: 1 },
+    { parentCode: 'N5.2',  childCode: 'N5.4',  weight: 1 },
+    { parentCode: 'N4.3',  childCode: 'N5.4',  weight: 1 },
+    { parentCode: 'N5.1',  childCode: 'N5.5',  weight: 1 },
+    { parentCode: 'N5.4',  childCode: 'N5.5',  weight: 1 },
+    { parentCode: 'N5.1',  childCode: 'N5.6',  weight: 1 },
+    { parentCode: 'N5.2',  childCode: 'N5.6',  weight: 1 },
+    { parentCode: 'N5.4',  childCode: 'N5.7',  weight: 1 },
+    { parentCode: 'N3.12', childCode: 'N5.7',  weight: 1 },
+    { parentCode: 'N5.7',  childCode: 'N5.8',  weight: 1 },
+    { parentCode: 'N5.6',  childCode: 'N5.9',  weight: 1 },
+    { parentCode: 'N5.7',  childCode: 'N5.9',  weight: 1 },
+    { parentCode: 'N5.6',  childCode: 'N5.10', weight: 1 },
+    { parentCode: 'N5.8',  childCode: 'N5.10', weight: 1 },
+    { parentCode: 'N5.8',  childCode: 'N5.11', weight: 1 },
+    { parentCode: 'N1.13', childCode: 'N5.11', weight: 1 },
+    { parentCode: 'N5.7',  childCode: 'N5.12', weight: 1 },
+    { parentCode: 'N5.8',  childCode: 'N5.12', weight: 1 },
+    { parentCode: 'N3.9',  childCode: 'N5.12', weight: 1 },
+    // ── S1 (Probability) prereqs ────────────────────────────────────────────
+    { parentCode: 'N5.7',  childCode: 'S1.1',  weight: 1 },
+    { parentCode: 'N4.6',  childCode: 'S1.1',  weight: 1 },
+    { parentCode: 'S1.1',  childCode: 'S1.2',  weight: 1 },
+    { parentCode: 'N5.7',  childCode: 'S1.2',  weight: 1 },
+    { parentCode: 'S1.2',  childCode: 'S1.3',  weight: 1 },
+    { parentCode: 'S1.3',  childCode: 'S1.4',  weight: 1 },
+    { parentCode: 'S1.4',  childCode: 'S1.5',  weight: 1 },
+    { parentCode: 'S1.3',  childCode: 'S1.5',  weight: 1 },
+    { parentCode: 'S1.1',  childCode: 'S1.6',  weight: 1 },
+    { parentCode: 'S1.6',  childCode: 'S1.7',  weight: 1 },
+    { parentCode: 'S1.7',  childCode: 'S1.8',  weight: 1 },
+    { parentCode: 'S1.8',  childCode: 'S1.9',  weight: 1 },
+    { parentCode: 'S1.8',  childCode: 'S1.10', weight: 1 },
+    { parentCode: 'S1.9',  childCode: 'S1.11', weight: 1 },
+    { parentCode: 'S1.10', childCode: 'S1.11', weight: 1 },
+    { parentCode: 'S1.3',  childCode: 'S1.11', weight: 1 },
+    { parentCode: 'S1.10', childCode: 'S1.12', weight: 1 },
+    { parentCode: 'S1.2',  childCode: 'S1.12', weight: 1 },
   ];
 
   for (const edge of prereqEdges) {
