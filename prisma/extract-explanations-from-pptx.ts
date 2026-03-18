@@ -431,6 +431,45 @@ function buildRoutes(content: ParsedSkillContent): RouteData[] {
   return [routeA, routeB, routeC];
 }
 
+// ─── Step validation helper ───────────────────────────────────────────────────
+
+/**
+ * Wraps validateExplanationStepWrite with defensive fallbacks and detailed
+ * error context.  If validation still fails after applying fallbacks the error
+ * message includes the skill code, route type, step order and actual field
+ * values so the exact payload that failed is visible in the log output.
+ */
+function validateStepForSkill(
+  skillCode: string,
+  routeType: string,
+  stepDef: RouteData['steps'][number],
+) {
+  // Defensive: ensure checkpoint fields are non-empty before validation
+  const answer = (typeof stepDef.checkpointAnswer === 'string' ? stepDef.checkpointAnswer.trim() : '')
+    || `Review the method for ${skillCode}.`;
+  const question = (typeof stepDef.checkpointQuestion === 'string' ? stepDef.checkpointQuestion.trim() : '')
+    || `What have you learned about ${skillCode}?`;
+
+  try {
+    return validateExplanationStepWrite({
+      checkpointQuestion: question,
+      checkpointOptions: undefined,
+      checkpointAnswer: answer,
+      questionType: 'SHORT',
+    });
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    throw new Error(
+      `Validation failed for ${skillCode} route ${routeType} step ${stepDef.stepOrder}: ${msg}\n` +
+      `  raw checkpointQuestion : ${JSON.stringify(stepDef.checkpointQuestion)}\n` +
+      `  raw checkpointAnswer   : ${JSON.stringify(stepDef.checkpointAnswer)}\n` +
+      `  resolved question      : ${JSON.stringify(question)}\n` +
+      `  resolved answer        : ${JSON.stringify(answer)}\n` +
+      `  stepType               : ${stepDef.stepType}`,
+    );
+  }
+}
+
 // ─── DB upsert ────────────────────────────────────────────────────────────────
 
 async function upsertRoutes(content: ParsedSkillContent, routes: RouteData[]): Promise<void> {
@@ -483,17 +522,7 @@ async function upsertRoutes(content: ParsedSkillContent, routes: RouteData[]): P
     for (const stepDef of route.steps) {
       const itId = stepDef.stepOrder === 1 ? itSelect.id : itCompare.id;
 
-      // Defensive: ensure checkpoint fields are non-empty before validation
-      const answer = stepDef.checkpointAnswer?.trim() || `Review the method for ${content.skillCode}.`;
-      const question = stepDef.checkpointQuestion?.trim() || `What have you learned about ${content.skillCode}?`;
-
-      // Use SHORT type for steps that aren't MCQ (avoids option validation issues)
-      const validated = validateExplanationStepWrite({
-        checkpointQuestion: question,
-        checkpointOptions: undefined,
-        checkpointAnswer: answer,
-        questionType: 'SHORT',
-      });
+      const validated = validateStepForSkill(content.skillCode, route.routeType, stepDef);
 
       const dbStep = await prisma.explanationStep.upsert({
         where: {
@@ -581,7 +610,13 @@ async function main() {
 
       if (DRY_RUN) {
         console.log(`     [DRY] Would upsert ${routes.length} routes`);
-        routes.forEach((r) => console.log(`       Route ${r.routeType}: "${r.misconceptionSummary.substring(0, 80)}"`));
+        for (const r of routes) {
+          console.log(`       Route ${r.routeType}: "${r.misconceptionSummary.substring(0, 80)}"`);
+          // Validate steps even during dry run to catch errors early
+          for (const stepDef of r.steps) {
+            validateStepForSkill(content.skillCode, r.routeType, stepDef);
+          }
+        }
       } else {
         await upsertRoutes(content, routes);
         written.add(code);
