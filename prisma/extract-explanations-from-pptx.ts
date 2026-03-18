@@ -146,7 +146,7 @@ function parseSkillContent(group: SkillSlides): ParsedSkillContent {
   // Title: "Subtopic N1.X – Title text"
   const titleRaw = allTokens.find((t) => /subtopic\s+N\d+\.\d+\s*[–-]/i.test(t));
   const title = titleRaw
-    ? titleRaw.replace(/^subtopic\s+N\d+\.\d+\s*[–-]\s*/i, '').trim()
+    ? titleRaw.replace(/^subtopic\s+N\d+\.\d+\s*[–-]\s*/i, '').trim() || null
     : null;
 
   // Objectives: tokens after "Objectives:" until next recognisable section
@@ -271,7 +271,7 @@ interface RouteData {
 function buildRoutes(content: ParsedSkillContent): RouteData[] {
   const { skillCode, title, steps, idoExample, definition, characteristics, nonExamples, introText, learningOutcome, objectives } = content;
 
-  const skillLabel = title ?? skillCode;
+  const skillLabel = title || skillCode;
 
   // ── Route A: Procedural (Steps-based) ──────────────────────────────────────
   const stepsText = steps.length > 0

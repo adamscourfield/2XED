@@ -25,6 +25,26 @@ describe('validateExplanationStepWrite', () => {
     ).toThrow(/answer must be present in options/i);
   });
 
+  it('rejects empty checkpointAnswer', () => {
+    expect(() =>
+      validateExplanationStepWrite({
+        checkpointQuestion: 'What is the key idea?',
+        checkpointAnswer: '',
+        questionType: 'SHORT',
+      })
+    ).toThrow(/checkpointAnswer is required/i);
+  });
+
+  it('rejects whitespace-only checkpointAnswer', () => {
+    expect(() =>
+      validateExplanationStepWrite({
+        checkpointQuestion: 'What is the key idea?',
+        checkpointAnswer: '   ',
+        questionType: 'SHORT',
+      })
+    ).toThrow(/checkpointAnswer is required/i);
+  });
+
   it('rejects malformed TRUE_FALSE writes', () => {
     expect(() =>
       validateExplanationStepWrite({
