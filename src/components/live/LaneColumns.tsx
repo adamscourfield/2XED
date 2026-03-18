@@ -102,7 +102,7 @@ export function LaneColumns({ lane1, lane2, lane3, onHandback }: LaneColumnsProp
                 {onHandback && (
                   <button
                     onClick={() => onHandback(student.studentUserId)}
-                    className="mt-2 w-full rounded bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-indigo-700"
+                    className="anx-btn-primary mt-2 w-full text-xs"
                   >
                     Hand back to app
                   </button>

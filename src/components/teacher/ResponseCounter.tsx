@@ -21,7 +21,7 @@ interface Props {
 export function ResponseCounter({ responseSummary, skills }: Props) {
   if (skills.length === 0) {
     return (
-      <div className="rounded-lg border border-gray-200 bg-white p-4 text-sm text-gray-500">
+      <div className="anx-card p-4 text-sm text-[color:var(--anx-text-muted)]">
         No skills tracked yet.
       </div>
     );
@@ -39,12 +39,12 @@ export function ResponseCounter({ responseSummary, skills }: Props) {
         const pctCorrect = answered > 0 ? Math.round((correct / answered) * 100) : 0;
 
         return (
-          <div key={skill.id} className="rounded-lg border border-gray-200 bg-white p-4">
+          <div key={skill.id} className="anx-card p-4">
             <div className="mb-1 flex items-center justify-between">
               <span className="text-sm font-semibold text-gray-800">
                 {skill.code} — {skill.name}
               </span>
-              <span className="text-xs text-gray-500">
+              <span className="text-xs text-[color:var(--anx-text-muted)]">
                 {answered} / {total} answered
               </span>
             </div>
@@ -69,7 +69,7 @@ export function ResponseCounter({ responseSummary, skills }: Props) {
               </div>
             )}
             {answered > 0 && (
-              <div className="mt-1 text-xs text-gray-500">
+              <div className="mt-1 text-xs text-[color:var(--anx-text-muted)]">
                 {correct} correct ({pctCorrect}%)
               </div>
             )}

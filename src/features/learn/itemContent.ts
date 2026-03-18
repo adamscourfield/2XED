@@ -1,6 +1,6 @@
 import { extractOrderingChoices, isOrderingPrompt } from '@/features/items/ordering';
 
-export type ItemInteractionType = 'MCQ' | 'TRUE_FALSE' | 'SHORT_TEXT' | 'SHORT_NUMERIC' | 'ORDER';
+export type ItemInteractionType = 'MCQ' | 'TRUE_FALSE' | 'SHORT_TEXT' | 'SHORT_NUMERIC' | 'ORDER' | 'MULTI_SELECT';
 
 export interface ItemContent {
   type: ItemInteractionType;
@@ -127,6 +127,7 @@ function inferInteractionType(item: {
   if (normalized === 'SHORT_NUMERIC' || normalized === 'NUMERIC') return 'SHORT_NUMERIC';
   if (normalized === 'SHORT_TEXT') return 'SHORT_TEXT';
   if (normalized === 'MCQ') return 'MCQ';
+  if (normalized === 'MULTI_SELECT') return 'MULTI_SELECT';
 
   return (item.type as ItemInteractionType) || 'MCQ';
 }
@@ -166,6 +167,8 @@ export function getAnswerFormatHint(type: string, question: string, options?: un
       return 'Enter digits only, without extra words.';
     case 'ORDER':
       return 'Drag the values into the correct order.';
+    case 'MULTI_SELECT':
+      return 'Select all correct answers.';
     case 'SHORT_TEXT':
       return 'Type a short answer using words or symbols only as needed.';
     default:
