@@ -170,7 +170,15 @@ async function main() {
         answer: derived.answer,
         options: derived.options,
       });
-      const hardIssues = issues.filter((issue) => issue.severity === 'error');
+      // ORDER contract errors arise when the stem triggers ordering detection but the
+      // question was authored as SHORT format (free-text answer). Downgrade to SHORT_TEXT.
+      const orderIssues = issues.filter((i) => i.severity === 'error' && (i.code === 'order_min_choices' || i.code === 'order_missing_answer_values'));
+      if (orderIssues.length > 0) {
+        console.warn(`  [WARN] ${row.source.question_ref}: ordering contract mismatch — importing as SHORT_TEXT`);
+        derived.type = 'SHORT_TEXT';
+        derived.options = { choices: [], acceptedAnswers: derived.options.acceptedAnswers };
+      }
+      const hardIssues = issues.filter((issue) => issue.severity === 'error' && !orderIssues.includes(issue));
       if (hardIssues.length > 0) {
         throw new Error(
           `Invalid mapped question ${row.source.question_ref}: ${hardIssues.map((issue) => issue.message).join('; ')}`
