@@ -1590,7 +1590,9 @@ async function main() {
   console.log('\n✅ ensured explanation routes for A1.1–A1.12');
 }
 
-// Only execute when run directly (not when imported by tests/other modules)
+// Only execute when run directly (not when imported by tests/other modules).
+// We guard on DATABASE_URL rather than require.main because vitest transforms
+// to ESM where CommonJS module globals are unavailable.
 if (process.env.DATABASE_URL) {
   main().catch(console.error).finally(() => prisma.$disconnect());
 }

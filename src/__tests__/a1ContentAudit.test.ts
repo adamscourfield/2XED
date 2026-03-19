@@ -236,7 +236,13 @@ describe('A1.1–A1.12 route model alignment', () => {
 /* ── 5. Language appropriateness ─────────────────────────────────────────── */
 
 describe('A1.1–A1.12 language appropriateness (KS3)', () => {
-  /** Words that would be too advanced / technical for Year 7–9 students */
+  /**
+   * Terms beyond the KS3 (Key Stage 3, Years 7–9, ages 11–14) curriculum.
+   * The A1 skills cover algebraic fundamentals up to sequences, so anything
+   * at GCSE-higher or A-level is flagged.  Based on the DfE Mathematics
+   * programme of study for KS3 and the skills mapping in
+   * docs/unit-mapping/maths-subtopic-master-list.md.
+   */
   const INAPPROPRIATE_TERMS = [
     'polynomial',
     'quadratic',
