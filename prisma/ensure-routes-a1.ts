@@ -1,11 +1,13 @@
 /**
  * ensure-routes-a1.ts
  *
- * Seeds explanation routes (A / B / C) for A1.1 — Algebraic terminology.
+ * Seeds explanation routes (A / B / C) for:
+ *   A1.1 — Algebraic terminology
+ *   A1.2 — Algebraic notation / basic collecting like terms
  *
- * Scoped to A1.1 only (the full A1.1–A1.19 range was too large for a
+ * Scoped to a small batch (the full A1.1–A1.19 range was too large for a
  * single generation run and caused timeouts).  Additional A1 skills
- * can be added in follow-up files.
+ * can be added in follow-up passes.
  *
  * Run:
  *   ts-node -r tsconfig-paths/register --compiler-options '{"module":"CommonJS"}' prisma/ensure-routes-a1.ts
@@ -156,6 +158,127 @@ const SKILL_ROUTES: Record<string, RouteDef[]> = {
       ],
     },
   ],
+
+  /* ──────────────────────────────────────────────────────────────────────
+   * A1.2 — Algebraic notation / basic collecting like terms
+   *   e.g. ab for a×b, 3y for y+y+y and 3×y, a² for a×a, a/b for ÷
+   * ────────────────────────────────────────────────────────────────────── */
+  'A1.2': [
+    {
+      routeType: 'A',
+      misconceptionSummary:
+        'Students do not recognise that multiplication signs are omitted in algebra: ab means a × b, and 3y means 3 × y, not "thirty-something".',
+      workedExample:
+        'In algebra we leave out the × sign. So a × b is written ab, 3 × y is written 3y, and 2 × a × b is written 2ab. The number always goes first.',
+      guidedPrompt: 'Write 5 × m × n using algebraic notation.',
+      guidedAnswer: '5mn',
+      steps: [
+        {
+          stepOrder: 1,
+          title: 'Multiplication is invisible',
+          explanation:
+            'In algebra we drop the × sign. a × b becomes ab. 4 × x becomes 4x. The number (coefficient) is always written first, then the letters in alphabetical order.',
+          checkpointQuestion: 'Write 7 × p using algebraic notation.',
+          checkpointOptions: ['7p', '7 × p', 'p7'],
+          checkpointAnswer: '7p',
+        },
+        {
+          stepOrder: 2,
+          title: 'Multiple variables',
+          explanation:
+            'When multiplying several letters, write them next to each other in alphabetical order: a × c × b = abc. If there is a number it goes first: 2 × b × a = 2ab.',
+          checkpointQuestion: 'Simplify 3 × c × a into algebraic notation.',
+          checkpointOptions: ['3ca', '3ac', 'ca3'],
+          checkpointAnswer: '3ac',
+        },
+        {
+          stepOrder: 3,
+          title: '1 × and the invisible coefficient',
+          explanation:
+            'We never write 1 in front of a variable: 1 × y is just y, 1 × a × b is just ab. Similarly, a × 1 is still just a.',
+          checkpointQuestion: 'Simplify 1 × k × m.',
+          checkpointOptions: ['1km', 'km', 'mk'],
+          checkpointAnswer: 'km',
+        },
+      ],
+    },
+    {
+      routeType: 'B',
+      misconceptionSummary:
+        'Students struggle with index (power) notation — they may write a × a as 2a instead of a², or confuse a² with 2a.',
+      workedExample:
+        'a × a means a is multiplied by itself, so we write a². This is different from 2a which means a + a (two lots of a). Similarly b × b × b = b³.',
+      guidedPrompt: 'Write y × y × y using index notation.',
+      guidedAnswer: 'y³',
+      steps: [
+        {
+          stepOrder: 1,
+          title: 'What does a² mean?',
+          explanation:
+            'a² means a × a (a multiplied by itself). The small raised number is called the index or power. It tells you how many times the base is multiplied.',
+          checkpointQuestion: 'What does m² mean?',
+          checkpointOptions: ['m + m', 'm × 2', 'm × m'],
+          checkpointAnswer: 'm × m',
+        },
+        {
+          stepOrder: 2,
+          title: 'a² is not the same as 2a',
+          explanation:
+            '2a means 2 × a (or a + a). a² means a × a. For example if a = 5: 2a = 10, but a² = 25. They are very different!',
+          checkpointQuestion: 'If x = 4, what is x²?',
+          checkpointOptions: ['8', '16', '44'],
+          checkpointAnswer: '16',
+        },
+        {
+          stepOrder: 3,
+          title: 'Higher powers',
+          explanation:
+            'a³ means a × a × a (cubed). The pattern continues: a⁴ = a × a × a × a. You can also have coefficients: 3a² means 3 × a × a.',
+          checkpointQuestion: 'Write n × n × n × n using index notation.',
+          checkpointOptions: ['4n', 'n⁴', 'n × 4'],
+          checkpointAnswer: 'n⁴',
+        },
+      ],
+    },
+    {
+      routeType: 'C',
+      misconceptionSummary:
+        'Students struggle with division notation in algebra — they do not connect a ÷ b with the fraction a/b, or misread the numerator and denominator.',
+      workedExample:
+        'In algebra, a ÷ b is written as a/b (a fraction). The top of the fraction is the numerator and the bottom is the denominator. So x ÷ 3 = x/3.',
+      guidedPrompt: 'Write p ÷ 5 using algebraic fraction notation.',
+      guidedAnswer: 'p/5',
+      steps: [
+        {
+          stepOrder: 1,
+          title: 'Division becomes a fraction',
+          explanation:
+            'In algebra we replace ÷ with a fraction bar. a ÷ b is written a/b. The value before ÷ goes on top (numerator) and the value after goes on the bottom (denominator).',
+          checkpointQuestion: 'Write y ÷ 4 as a fraction.',
+          checkpointOptions: ['4/y', 'y/4', '4y'],
+          checkpointAnswer: 'y/4',
+        },
+        {
+          stepOrder: 2,
+          title: 'Expressions on top and bottom',
+          explanation:
+            'The numerator or denominator can be a whole expression. For example (2x + 1) ÷ 3 is written as (2x + 1)/3.',
+          checkpointQuestion: 'How do you write (a + b) ÷ 2 as a fraction?',
+          checkpointOptions: ['2/(a + b)', '(a + b)/2', 'a + b/2'],
+          checkpointAnswer: '(a + b)/2',
+        },
+        {
+          stepOrder: 3,
+          title: 'Putting notation together',
+          explanation:
+            'Algebraic notation combines all these rules. 3 × a × a ÷ b is written 3a²/b — multiplication invisible, index for repeated variable, fraction for division.',
+          checkpointQuestion: 'Which is the correct algebraic form of 2 × x × x ÷ y?',
+          checkpointOptions: ['2x²/y', '2x/y²', 'x²/2y'],
+          checkpointAnswer: '2x²/y',
+        },
+      ],
+    },
+  ],
 };
 
 async function main() {
@@ -227,7 +350,7 @@ async function main() {
     }
   }
 
-  console.log('\n✅ ensured explanation routes for A1.1');
+  console.log('\n✅ ensured explanation routes for A1.1, A1.2');
 }
 
 main().catch(console.error).finally(() => prisma.$disconnect());

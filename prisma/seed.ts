@@ -142,7 +142,7 @@ async function main() {
     { code: 'S1.12', name: 'The complement of a set',                                                                strand: 'PRO', isStretch: true,  sortOrder: 1010 },
     // ── A1: Algebra ────────────────────────────────────────────────────────────
     { code: 'A1.1',  name: 'Algebraic terminology (e.g. term, expression, coefficient)',                               strand: 'ALG', isStretch: false, sortOrder: 1100 },
-    { code: 'A1.2',  name: 'Algebraic notation and conventions (juxtaposition, coefficient, index)',                  strand: 'ALG', isStretch: false, sortOrder: 1110 },
+    { code: 'A1.2',  name: 'Algebraic notation and basic collecting like terms (juxtaposition, index, fraction)',    strand: 'ALG', isStretch: false, sortOrder: 1110 },
     { code: 'A1.3',  name: 'Substitution into expressions',                                                           strand: 'ALG', isStretch: false, sortOrder: 1120 },
     { code: 'A1.4',  name: 'Simplify expressions by collecting like terms',                                           strand: 'ALG', isStretch: false, sortOrder: 1130 },
     { code: 'A1.5',  name: 'Multiply a single term over a bracket (expand)',                                          strand: 'ALG', isStretch: false, sortOrder: 1140 },
