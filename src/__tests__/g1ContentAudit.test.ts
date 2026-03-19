@@ -1,7 +1,6 @@
 /**
  * g1ContentAudit.test.ts
  *
- * Comprehensive audit of G1.1, G1.1b, G1.2, G1.3 explanation routes.
  * Comprehensive audit of G1.1, G1.1b, G1.2, G1.3, G1.4, G1.5, G1.6, G1.7, G1.8, G1.9, G1.10 explanation routes.
  * Validates:
  *   1. Structure  — every skill has 3 routes (A/B/C), each with 3 steps
@@ -20,7 +19,6 @@ import { SKILL_ROUTES, type RouteDef, type StepDef } from '../../prisma/ensure-r
 
 /* ── Constants ───────────────────────────────────────────────────────────── */
 
-const G1_CODES = ['G1.1', 'G1.1b', 'G1.2', 'G1.3'];
 const G1_CODES = ['G1.1', 'G1.1b', 'G1.2', 'G1.3', 'G1.4', 'G1.5', 'G1.6', 'G1.7', 'G1.8', 'G1.9', 'G1.10'];
 
 const EXPECTED_ROUTE_TYPES = ['A', 'B', 'C'];
@@ -38,7 +36,6 @@ const MIN_WORKED_EXAMPLE_LENGTH = 30;
  * Skills whose animation visuals should favour step_procedure
  * (geometry angles — procedural step_reveal for protractor/angle instructions).
  */
-const GEOMETRY_PROCEDURE_SKILLS = ['G1.1', 'G1.1b', 'G1.2', 'G1.3'];
 const GEOMETRY_PROCEDURE_SKILLS = ['G1.1', 'G1.1b', 'G1.2', 'G1.3', 'G1.4', 'G1.5', 'G1.6', 'G1.7', 'G1.8', 'G1.9', 'G1.10'];
 
 /* ── Helpers ─────────────────────────────────────────────────────────────── */
@@ -49,8 +46,6 @@ function unique(arr: string[]): string[] {
 
 /* ── 1. Structural completeness ──────────────────────────────────────────── */
 
-describe('G1.1–G1.3 structural completeness', () => {
-  it('contains exactly the 4 expected skill codes', () => {
 describe('G1.1–G1.10 structural completeness', () => {
   it('contains exactly the 11 expected skill codes', () => {
     const presentCodes = Object.keys(SKILL_ROUTES).sort((a, b) => {
@@ -92,7 +87,6 @@ describe('G1.1–G1.10 structural completeness', () => {
 
 /* ── 2. Write-guard validation ───────────────────────────────────────────── */
 
-describe('G1.1–G1.3 write-guard validation', () => {
 describe('G1.1–G1.10 write-guard validation', () => {
   for (const code of G1_CODES) {
     for (const route of SKILL_ROUTES[code]) {
@@ -121,7 +115,6 @@ describe('G1.1–G1.10 write-guard validation', () => {
 
 /* ── 3. Question quality ─────────────────────────────────────────────────── */
 
-describe('G1.1–G1.3 question quality', () => {
 describe('G1.1–G1.10 question quality', () => {
   for (const code of G1_CODES) {
     for (const route of SKILL_ROUTES[code]) {
@@ -184,7 +177,6 @@ describe('G1.1–G1.10 question quality', () => {
 
 /* ── 4. Route model audit ────────────────────────────────────────────────── */
 
-describe('G1.1–G1.3 route model alignment', () => {
 describe('G1.1–G1.10 route model alignment', () => {
   /**
    * Route A = procedural (step-by-step method)
@@ -232,7 +224,6 @@ describe('G1.1–G1.10 route model alignment', () => {
 
 /* ── 5. Language appropriateness ─────────────────────────────────────────── */
 
-describe('G1.1–G1.3 language appropriateness (KS3)', () => {
 describe('G1.1–G1.10 language appropriateness (KS3)', () => {
   /**
    * Terms beyond KS3 (Key Stage 3, Years 7–9, ages 11–14).
@@ -272,7 +263,6 @@ describe('G1.1–G1.10 language appropriateness (KS3)', () => {
 
 /* ── 6. Animation compatibility ──────────────────────────────────────────── */
 
-describe('G1.1–G1.3 animation compatibility', () => {
 describe('G1.1–G1.10 animation compatibility', () => {
   /**
    * Verify that the content is compatible with the available animation
@@ -288,8 +278,6 @@ describe('G1.1–G1.10 animation compatibility', () => {
       for (const route of routes) {
         // Geometry worked examples should mention angle-related terms
         const hasGeometryContent =
-          /angle|degree|°|protractor|acute|obtuse|reflex|right|vertex|arm|notation|∠/.test(route.workedExample) ||
-          /angle|degree|°|protractor|acute|obtuse|reflex|right|vertex|arm|notation|∠/.test(route.misconceptionSummary);
           /angle|degree|°|protractor|acute|obtuse|reflex|right|vertex|arm|notation|∠|straight|line|point|triangle|opposite|sum|180|360|quadrilateral|polygon|interior|exterior|diagonal/.test(route.workedExample) ||
           /angle|degree|°|protractor|acute|obtuse|reflex|right|vertex|arm|notation|∠|straight|line|point|triangle|opposite|sum|180|360|quadrilateral|polygon|interior|exterior|diagonal/.test(route.misconceptionSummary);
         expect(
@@ -303,7 +291,6 @@ describe('G1.1–G1.10 animation compatibility', () => {
 
 /* ── 7. Mathematical correctness spot-checks ─────────────────────────────── */
 
-describe('G1.1–G1.3 mathematical correctness', () => {
 describe('G1.1–G1.10 mathematical correctness', () => {
   // G1.1 — Angle classification
   it('G1.1 Route A Step 2: 135° is obtuse', () => {

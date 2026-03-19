@@ -1,8 +1,6 @@
 /**
  * n6ContentAudit.test.ts
  *
- * Comprehensive audit of N6.1–N6.12 explanation routes.
- * Comprehensive audit of N6.1–N6.5 explanation routes.
  * Comprehensive audit of N6.1–N6.20 explanation routes.
  * Validates:
  *   1. Structure  — every skill has 3 routes (A/B/C), each with 3 steps
@@ -21,8 +19,6 @@ import { SKILL_ROUTES, type RouteDef, type StepDef } from '../../prisma/ensure-r
 
 /* ── Constants ───────────────────────────────────────────────────────────── */
 
-const N6_CODES = ['N6.1', 'N6.2', 'N6.3', 'N6.4', 'N6.5', 'N6.6', 'N6.7', 'N6.8', 'N6.9', 'N6.10', 'N6.11', 'N6.12'];
-const N6_CODES = ['N6.1', 'N6.2', 'N6.3', 'N6.4', 'N6.5'];
 const N6_CODES = ['N6.1', 'N6.2', 'N6.3', 'N6.4', 'N6.5', 'N6.6', 'N6.7', 'N6.8', 'N6.9', 'N6.10', 'N6.11', 'N6.12', 'N6.13', 'N6.14', 'N6.15', 'N6.16', 'N6.17', 'N6.18', 'N6.19', 'N6.20'];
 
 const EXPECTED_ROUTE_TYPES = ['A', 'B', 'C'];
@@ -37,12 +33,6 @@ const MIN_MISCONCEPTION_LENGTH = 30;
 const MIN_WORKED_EXAMPLE_LENGTH = 30;
 
 /**
- * N6.1–N6.7 cover fraction arithmetic, N6.8–N6.9 cover recurring decimals,
- * and N6.10–N6.12 cover percentages. All content should reference
- * fraction_bar, area_model, bar_model, or step_reveal animation visuals.
- */
-const N6_FRACTION_AND_PERCENTAGE_SKILLS = ['N6.1', 'N6.2', 'N6.3', 'N6.4', 'N6.5', 'N6.6', 'N6.7', 'N6.8', 'N6.9', 'N6.10', 'N6.11', 'N6.12'];
-const FRACTION_ARITHMETIC_SKILLS = ['N6.1', 'N6.2', 'N6.3', 'N6.4', 'N6.5'];
  * N6.1–N6.7 cover fraction arithmetic, N6.8–N6.9 cover recurring decimals,
  * N6.10–N6.12 cover percentages, N6.13–N6.15 cover reverse/compound/contextual
  * percentages, N6.16–N6.18 cover ratio and proportion, and N6.19–N6.20 cover
@@ -59,10 +49,6 @@ function unique(arr: string[]): string[] {
 
 /* ── 1. Structural completeness ──────────────────────────────────────────── */
 
-describe('N6.1–N6.12 structural completeness', () => {
-  it('contains exactly the 12 expected skill codes', () => {
-describe('N6.1–N6.5 structural completeness', () => {
-  it('contains exactly the 5 expected skill codes', () => {
 describe('N6.1–N6.20 structural completeness', () => {
   it('contains exactly the 20 expected skill codes', () => {
     const presentCodes = Object.keys(SKILL_ROUTES).sort((a, b) => {
@@ -103,8 +89,6 @@ describe('N6.1–N6.20 structural completeness', () => {
 
 /* ── 2. Write-guard validation ───────────────────────────────────────────── */
 
-describe('N6.1–N6.12 write-guard validation', () => {
-describe('N6.1–N6.5 write-guard validation', () => {
 describe('N6.1–N6.20 write-guard validation', () => {
   for (const code of N6_CODES) {
     for (const route of SKILL_ROUTES[code]) {
@@ -133,8 +117,6 @@ describe('N6.1–N6.20 write-guard validation', () => {
 
 /* ── 3. Question quality ─────────────────────────────────────────────────── */
 
-describe('N6.1–N6.12 question quality', () => {
-describe('N6.1–N6.5 question quality', () => {
 describe('N6.1–N6.20 question quality', () => {
   for (const code of N6_CODES) {
     for (const route of SKILL_ROUTES[code]) {
@@ -197,8 +179,6 @@ describe('N6.1–N6.20 question quality', () => {
 
 /* ── 4. Route model audit ────────────────────────────────────────────────── */
 
-describe('N6.1–N6.12 route model alignment', () => {
-describe('N6.1–N6.5 route model alignment', () => {
 describe('N6.1–N6.20 route model alignment', () => {
   /**
    * Route A = procedural (step-by-step method)
@@ -247,8 +227,6 @@ describe('N6.1–N6.20 route model alignment', () => {
 
 /* ── 5. Language appropriateness ─────────────────────────────────────────── */
 
-describe('N6.1–N6.12 language appropriateness (KS3)', () => {
-describe('N6.1–N6.5 language appropriateness (KS3)', () => {
 describe('N6.1–N6.20 language appropriateness (KS3)', () => {
   /**
    * Terms beyond KS3 (Key Stage 3, Years 7–9, ages 11–14).
@@ -288,8 +266,6 @@ describe('N6.1–N6.20 language appropriateness (KS3)', () => {
 
 /* ── 6. Animation compatibility ──────────────────────────────────────────── */
 
-describe('N6.1–N6.12 animation compatibility', () => {
-describe('N6.1–N6.5 animation compatibility', () => {
 describe('N6.1–N6.20 animation compatibility', () => {
   /**
    * Verify that the content is compatible with the available animation
@@ -299,14 +275,6 @@ describe('N6.1–N6.20 animation compatibility', () => {
    * fraction-related terms suitable for fraction_bar and area_model visuals.
    */
 
-  for (const code of N6_FRACTION_AND_PERCENTAGE_SKILLS) {
-    it(`${code} has fraction/percentage content suitable for visual animation primitives`, () => {
-      const routes = SKILL_ROUTES[code];
-      for (const route of routes) {
-        // Fraction/percentage arithmetic worked examples should mention relevant terms
-        const hasFractionContent =
-          /\d+\/\d+|fraction|numerator|denominator|reciprocal|÷|×|multiply|divide|bar|model/.test(route.workedExample) ||
-          /\d+\/\d+|fraction|numerator|denominator|reciprocal|÷|×|multiply|divide|bar|model/.test(route.misconceptionSummary);
   for (const code of N6_FRACTION_AND_PERCENTAGE_SKILLS) {
     it(`${code} has fraction/percentage content suitable for visual animation primitives`, () => {
       const routes = SKILL_ROUTES[code];
@@ -326,8 +294,6 @@ describe('N6.1–N6.20 animation compatibility', () => {
 
 /* ── 7. Mathematical correctness spot-checks ─────────────────────────────── */
 
-describe('N6.1–N6.12 mathematical correctness', () => {
-describe('N6.1–N6.5 mathematical correctness', () => {
 describe('N6.1–N6.20 mathematical correctness', () => {
   // N6.1 — Multiply a fraction by an integer
   it('N6.1 Route A Step 1: numerator of 4/9 × 2 is 8', () => {

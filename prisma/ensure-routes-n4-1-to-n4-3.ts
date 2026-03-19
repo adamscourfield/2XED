@@ -13,9 +13,9 @@ import { validateExplanationStepWrite } from '../src/features/learn/explanationS
 
 const prisma = new PrismaClient();
 
-type RouteType = 'A' | 'B' | 'C';
+export type RouteType = 'A' | 'B' | 'C';
 
-interface StepDef {
+export interface StepDef {
   stepOrder: number;
   title: string;
   explanation: string;
@@ -24,7 +24,7 @@ interface StepDef {
   checkpointAnswer: string;
 }
 
-interface RouteDef {
+export interface RouteDef {
   routeType: RouteType;
   misconceptionSummary: string;
   workedExample: string;
@@ -33,7 +33,7 @@ interface RouteDef {
   steps: StepDef[];
 }
 
-const SKILL_ROUTES: Record<string, RouteDef[]> = {
+export const SKILL_ROUTES: Record<string, RouteDef[]> = {
   'N4.1': [
     {
       routeType: 'A',
@@ -396,4 +396,7 @@ async function main() {
   console.log(`\n✅ ensured explanation routes for N4.1, N4.2, N4.3`);
 }
 
-main().catch(console.error).finally(() => prisma.$disconnect());
+// Only execute when run directly (not when imported by tests/other modules).
+if (process.env.DATABASE_URL) {
+  main().catch(console.error).finally(() => prisma.$disconnect());
+}
