@@ -672,9 +672,9 @@ describe('G1.1–G1.10 step progression and uniqueness', () => {
           expect(explanations.length).toBe(unique(explanations).length);
         });
 
-        it('has unique checkpoint answers within the route (no identical consecutive answers)', () => {
-          // It's acceptable for two steps to have the same answer if they test different things,
-          // but three identical answers in a row suggests copy-paste
+        it('does not have all identical checkpoint answers (guards against copy-paste)', () => {
+          // It's acceptable for two steps to share an answer if they test different things,
+          // but all three being identical suggests copy-paste
           const answers = route.steps.map((s: StepDef) => s.checkpointAnswer);
           const allSame = answers.every((a) => a === answers[0]);
           expect(allSame, `${code} Route ${route.routeType}: all 3 checkpoint answers are identical`).toBe(false);
@@ -805,11 +805,11 @@ describe('G1.1–G1.10 curriculum keyword coverage', () => {
     'G1.1b': /vertex|notation|∠|middle letter/i,
     'G1.2':  /protractor|measure|scale/i,
     'G1.3':  /draw|protractor|baseline/i,
-    'G1.4':  /straight line|180/,
-    'G1.5':  /around a point|360/,
+    'G1.4':  /straight line|180/i,
+    'G1.5':  /around a point|360/i,
     'G1.6':  /vertically opposite|equal/i,
-    'G1.7':  /triangle|180/,
-    'G1.8':  /quadrilateral|360/,
+    'G1.7':  /triangle|180/i,
+    'G1.8':  /quadrilateral|360/i,
     'G1.9':  /polygon|interior|n\s*[−\-–]\s*2/i,
     'G1.10': /exterior|360/i,
   };
