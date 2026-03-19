@@ -6,6 +6,10 @@
  *   G1.1b — Understand angle notation (e.g. ∠ABC) and label angles correctly
  *   G1.2  — Measure angles with a protractor
  *   G1.3  — Draw angles with a protractor
+ *   G1.4  — Angles on a straight line sum to 180°
+ *   G1.5  — Angles around a point sum to 360°
+ *   G1.6  — Vertically opposite angles are equal
+ *   G1.7  — Angles in a triangle sum to 180°
  *
  * Run:
  *   ts-node -r tsconfig-paths/register --compiler-options '{"module":"CommonJS"}' prisma/ensure-routes-g1.ts
@@ -451,6 +455,426 @@ export const SKILL_ROUTES: Record<string, RouteDef[]> = {
       ],
     },
   ],
+
+  /* ──────────────────────────────────────────────────────────────────────
+   * G1.4 — Angles on a straight line sum to 180°
+   * ────────────────────────────────────────────────────────────────────── */
+  'G1.4': [
+    {
+      routeType: 'A',
+      misconceptionSummary: 'Students forget that angles on a straight line must add up to 180° and instead try to guess missing angles without using the rule.',
+      workedExample: 'Two angles sit on a straight line. One is 110°. The other is 180° − 110° = 70°. Always subtract the known angle(s) from 180° to find the missing angle.',
+      guidedPrompt: 'Two angles on a straight line are 65° and x°. Find x.',
+      guidedAnswer: 'x = 180° − 65° = 115°.',
+      steps: [
+        {
+          stepOrder: 1,
+          title: 'The straight-line rule',
+          explanation: 'When two or more angles sit on a straight line (forming a straight angle), they add up to 180°. A straight line is half a full turn, which is 180°. This rule lets you find any missing angle on the line.',
+          checkpointQuestion: 'What do angles on a straight line add up to?',
+          checkpointOptions: ['90°', '180°', '270°', '360°'],
+          checkpointAnswer: '180°',
+        },
+        {
+          stepOrder: 2,
+          title: 'Finding a missing angle',
+          explanation: 'To find a missing angle on a straight line, subtract the known angle(s) from 180°. For example, if one angle is 130°, the missing angle is 180° − 130° = 50°.',
+          checkpointQuestion: 'Angles on a straight line are 130° and x°. What is x?',
+          checkpointOptions: ['40°', '50°', '60°', '130°'],
+          checkpointAnswer: '50°',
+        },
+        {
+          stepOrder: 3,
+          title: 'Multiple angles on a straight line',
+          explanation: 'If three angles sit on a straight line, they still add up to 180°. Subtract all known angles from 180° to find the unknown. For example: 40° + 60° + x° = 180°, so x = 80°.',
+          checkpointQuestion: 'Three angles on a straight line are 40°, 60°, and x°. What is x?',
+          checkpointOptions: ['70°', '80°', '90°', '100°'],
+          checkpointAnswer: '80°',
+        },
+      ],
+    },
+    {
+      routeType: 'B',
+      misconceptionSummary: 'Students do not understand why angles on a straight line total 180° — they apply the rule mechanically without grasping the half-turn concept.',
+      workedExample: 'A full turn is 360°. A straight line is a half turn, so it is 360° ÷ 2 = 180°. Any angles that together make up that half turn must add to 180°.',
+      guidedPrompt: 'Why do angles on a straight line add to 180° rather than some other number?',
+      guidedAnswer: 'A straight line is half of a full turn (360°). Half of 360° is 180°, so any angles forming that half turn must total 180°.',
+      steps: [
+        {
+          stepOrder: 1,
+          title: 'Straight line as a half turn',
+          explanation: 'Think of standing and turning all the way round — that is 360°. A straight line is exactly half a full turn, which is 180°. Any angles that sit along a straight line together make up that half turn.',
+          checkpointQuestion: 'A straight line represents what fraction of a full turn?',
+          checkpointOptions: ['One quarter', 'One half', 'Three quarters'],
+          checkpointAnswer: 'One half',
+        },
+        {
+          stepOrder: 2,
+          title: 'Visualising with a straight angle',
+          explanation: 'Imagine a protractor placed on a straight line — it shows 0° at one end and 180° at the other. All the angles along the straight edge must fit within that 180° range, so together they add up to 180°.',
+          checkpointQuestion: 'True or false: a protractor shows that a straight line spans 180°.',
+          checkpointOptions: ['True', 'False'],
+          checkpointAnswer: 'True',
+        },
+        {
+          stepOrder: 3,
+          title: 'Applying the concept',
+          explanation: 'If two angles share a vertex on a straight line, they are called supplementary angles. Together they complete the half turn: 180°. Knowing one gives you the other by subtraction.',
+          checkpointQuestion: 'Two supplementary angles are a° and 75°. What is a?',
+          checkpointOptions: ['95°', '105°', '115°', '285°'],
+          checkpointAnswer: '105°',
+        },
+      ],
+    },
+    {
+      routeType: 'C',
+      misconceptionSummary: 'Students confuse angles on a straight line (180°) with angles around a point (360°) and use the wrong total.',
+      workedExample: 'A student writes x + 110° = 360° for two angles on a straight line. This is wrong — angles on a straight line sum to 180°, not 360°. The correct equation is x + 110° = 180°, so x = 70°.',
+      guidedPrompt: 'A student says the missing angle on a straight line is 360° − 140° = 220°. What is their mistake?',
+      guidedAnswer: 'They used 360° (angles around a point) instead of 180° (angles on a straight line). The correct answer is 180° − 140° = 40°.',
+      steps: [
+        {
+          stepOrder: 1,
+          title: 'Straight line vs full turn',
+          explanation: 'Angles on a straight line add to 180°. Angles around a point add to 360°. These are two different rules. For a straight line, always subtract from 180°, not 360°.',
+          checkpointQuestion: 'Two angles sit on a straight line. Which total should you use?',
+          checkpointOptions: ['180°', '360°'],
+          checkpointAnswer: '180°',
+        },
+        {
+          stepOrder: 2,
+          title: 'Spotting the error',
+          explanation: 'If a student gets an answer larger than 180° for an angle on a straight line, they have probably used 360° by mistake. An angle on a straight line cannot exceed 180°.',
+          checkpointQuestion: 'A student calculates a missing angle on a straight line as 250°. Is this possible?',
+          checkpointOptions: ['Yes', 'No'],
+          checkpointAnswer: 'No',
+        },
+        {
+          stepOrder: 3,
+          title: 'Practice with the correct rule',
+          explanation: 'Angles on a straight line: 180°. Find the missing angle: 180° − 55° = 125°. Always ask yourself: "Is this on a straight line or around a full point?" before choosing the rule.',
+          checkpointQuestion: 'Angles on a straight line are 55° and x°. What is x?',
+          checkpointOptions: ['115°', '125°', '305°'],
+          checkpointAnswer: '125°',
+        },
+      ],
+    },
+  ],
+
+  /* ──────────────────────────────────────────────────────────────────────
+   * G1.5 — Angles around a point sum to 360°
+   * ────────────────────────────────────────────────────────────────────── */
+  'G1.5': [
+    {
+      routeType: 'A',
+      misconceptionSummary: 'Students forget that all angles around a single point must total 360° and leave out angles or use the wrong total.',
+      workedExample: 'Three angles meet at a point: 120°, 90°, and x°. They must total 360°. So x = 360° − 120° − 90° = 150°.',
+      guidedPrompt: 'Angles around a point are 100°, 80°, and y°. Find y.',
+      guidedAnswer: 'y = 360° − 100° − 80° = 180°.',
+      steps: [
+        {
+          stepOrder: 1,
+          title: 'The full-turn rule',
+          explanation: 'All angles meeting at a single point form a complete turn of 360°. No matter how many angles there are, they must add up to 360°.',
+          checkpointQuestion: 'What do angles around a point add up to?',
+          checkpointOptions: ['180°', '270°', '360°'],
+          checkpointAnswer: '360°',
+        },
+        {
+          stepOrder: 2,
+          title: 'Finding a missing angle',
+          explanation: 'Add all the known angles together, then subtract the total from 360°. For example, 90° + 150° + x° = 360°, so x = 360° − 240° = 120°.',
+          checkpointQuestion: 'Angles around a point are 90°, 150°, and x°. What is x?',
+          checkpointOptions: ['100°', '110°', '120°', '130°'],
+          checkpointAnswer: '120°',
+        },
+        {
+          stepOrder: 3,
+          title: 'Four angles around a point',
+          explanation: 'The same rule applies with four or more angles. Add the known angles, subtract from 360°. For instance: 80° + 70° + 100° + x° = 360°, so x = 110°.',
+          checkpointQuestion: 'Four angles around a point are 80°, 70°, 100°, and x°. What is x?',
+          checkpointOptions: ['90°', '100°', '110°', '120°'],
+          checkpointAnswer: '110°',
+        },
+      ],
+    },
+    {
+      routeType: 'B',
+      misconceptionSummary: 'Students do not connect the 360° rule to the idea of a full rotation and treat it as an arbitrary fact to memorise.',
+      workedExample: 'A full rotation brings you back to where you started — that is 360°. If you divide the space around a point into any number of angles, those pieces must re-combine to give the full rotation of 360°.',
+      guidedPrompt: 'Why do angles around a point add to 360° and not some other number?',
+      guidedAnswer: 'A full turn is 360° by definition. Angles around a point together make a complete turn, so they must total 360°.',
+      steps: [
+        {
+          stepOrder: 1,
+          title: 'A full turn equals 360°',
+          explanation: 'Imagine spinning a pointer all the way round from start back to start. It sweeps through 360°. All the angles around the central point are slices of that full turn, so they add up to 360°.',
+          checkpointQuestion: 'How many degrees is a full turn?',
+          checkpointOptions: ['180°', '270°', '360°'],
+          checkpointAnswer: '360°',
+        },
+        {
+          stepOrder: 2,
+          title: 'Dividing the full turn',
+          explanation: 'Whether the space around a point is split into two angles, three, or ten, the total remains 360°. More angles simply means more slices of the same full turn.',
+          checkpointQuestion: 'True or false: if you split the space around a point into five angles, they still total 360°.',
+          checkpointOptions: ['True', 'False'],
+          checkpointAnswer: 'True',
+        },
+        {
+          stepOrder: 3,
+          title: 'Connecting to straight lines',
+          explanation: 'A straight line is half of a full turn — 180°. Two straight lines through a point create four angles totalling 2 × 180° = 360°. This confirms the full-turn rule.',
+          checkpointQuestion: 'Two straight lines cross at a point, creating four angles. What do those four angles add up to?',
+          checkpointOptions: ['180°', '360°', '720°'],
+          checkpointAnswer: '360°',
+        },
+      ],
+    },
+    {
+      routeType: 'C',
+      misconceptionSummary: 'Students confuse angles around a point (360°) with angles on a straight line (180°) and subtract from 180° instead of 360°.',
+      workedExample: 'A student writes 180° − 100° − 50° = 30° for angles around a point. This is wrong — angles around a point total 360°. The correct answer is 360° − 100° − 50° = 210°.',
+      guidedPrompt: 'A student says the missing angle around a point is 180° − 90° − 60° = 30°. What is their error?',
+      guidedAnswer: 'They subtracted from 180° instead of 360°. The correct answer is 360° − 90° − 60° = 210°.',
+      steps: [
+        {
+          stepOrder: 1,
+          title: 'Which rule to use',
+          explanation: 'Before calculating, identify the diagram. Angles on a straight line → 180°. Angles around a point → 360°. Look at whether the angles sit along one line or surround a point completely.',
+          checkpointQuestion: 'Angles surround a point completely. Which total do you subtract from?',
+          checkpointOptions: ['180°', '360°'],
+          checkpointAnswer: '360°',
+        },
+        {
+          stepOrder: 2,
+          title: 'Checking for impossible answers',
+          explanation: 'If you use 180° for angles around a point, you may get a negative answer or an answer that is far too small. A negative result is a sure sign you have used the wrong rule.',
+          checkpointQuestion: 'A student calculates 180° − 120° − 100° = −40° for angles around a point. What went wrong?',
+          checkpointOptions: ['Used 180° instead of 360°', 'Added the angles incorrectly'],
+          checkpointAnswer: 'Used 180° instead of 360°',
+        },
+        {
+          stepOrder: 3,
+          title: 'Practice choosing the correct rule',
+          explanation: 'For angles around a point: 360° − known angles = missing angle. For angles on a straight line: 180° − known angles = missing angle. Always check: does the diagram show a full turn or a half turn?',
+          checkpointQuestion: 'Angles around a point are 145°, 85°, and x°. What is x?',
+          checkpointOptions: ['50°', '130°', '310°'],
+          checkpointAnswer: '130°',
+        },
+      ],
+    },
+  ],
+
+  /* ──────────────────────────────────────────────────────────────────────
+   * G1.6 — Vertically opposite angles are equal
+   * ────────────────────────────────────────────────────────────────────── */
+  'G1.6': [
+    {
+      routeType: 'A',
+      misconceptionSummary: 'Students do not recognise which angles are vertically opposite and instead try to add them to 180° or 360° without using the equality rule.',
+      workedExample: 'Two straight lines cross. One angle is 70°. The angle directly opposite it is also 70° because vertically opposite angles are equal. The two adjacent angles are each 180° − 70° = 110°.',
+      guidedPrompt: 'Two lines cross. One angle is 40°. What is the vertically opposite angle?',
+      guidedAnswer: 'The vertically opposite angle is also 40° because vertically opposite angles are always equal.',
+      steps: [
+        {
+          stepOrder: 1,
+          title: 'What are vertically opposite angles?',
+          explanation: 'When two straight lines cross, they form four angles. The pairs of angles that are across from each other (not next to each other) are called vertically opposite angles. They are always equal.',
+          checkpointQuestion: 'Two straight lines cross to form four angles. How many pairs of vertically opposite angles are there?',
+          checkpointOptions: ['1', '2', '3', '4'],
+          checkpointAnswer: '2',
+        },
+        {
+          stepOrder: 2,
+          title: 'Using the rule',
+          explanation: 'If you know one angle where two lines cross, the vertically opposite angle is the same. For example, if one angle is 65°, the opposite angle is also 65°.',
+          checkpointQuestion: 'Two lines cross. One angle is 65°. What is the vertically opposite angle?',
+          checkpointOptions: ['25°', '65°', '115°', '295°'],
+          checkpointAnswer: '65°',
+        },
+        {
+          stepOrder: 3,
+          title: 'Finding adjacent angles',
+          explanation: 'The two angles next to a given angle sit on a straight line with it, so they each equal 180° minus the given angle. If one angle is 70°, its neighbours are 180° − 70° = 110°.',
+          checkpointQuestion: 'Two lines cross. One angle is 70°. What is the angle next to it on the same straight line?',
+          checkpointOptions: ['70°', '90°', '110°', '290°'],
+          checkpointAnswer: '110°',
+        },
+      ],
+    },
+    {
+      routeType: 'B',
+      misconceptionSummary: 'Students accept that vertically opposite angles are equal but do not understand why the rule works.',
+      workedExample: 'Angles a and b sit on a straight line: a + b = 180°. Angles b and c also sit on a straight line: b + c = 180°. So a + b = b + c, which means a = c. The two opposite angles must be equal.',
+      guidedPrompt: 'Explain why vertically opposite angles must be equal using the straight-line rule.',
+      guidedAnswer: 'Each pair of adjacent angles sums to 180°. Setting the two sums equal shows the opposite angles are the same.',
+      steps: [
+        {
+          stepOrder: 1,
+          title: 'Adjacent angles and straight lines',
+          explanation: 'When two lines cross, each pair of adjacent angles lies on a straight line and sums to 180°. If angles are a, b, c, d going round, then a + b = 180° and b + c = 180°.',
+          checkpointQuestion: 'Two lines cross giving angles a, b, c, d in order. What does a + b equal?',
+          checkpointOptions: ['90°', '180°', '360°'],
+          checkpointAnswer: '180°',
+        },
+        {
+          stepOrder: 2,
+          title: 'Proving the equality',
+          explanation: 'Since a + b = 180° and b + c = 180°, we get a + b = b + c. Subtract b from both sides: a = c. This proves that vertically opposite angles are always equal.',
+          checkpointQuestion: 'If a + b = 180° and b + c = 180°, what can you conclude about a and c?',
+          checkpointOptions: ['a + c = 180°', 'a = c', 'a + c = 360°'],
+          checkpointAnswer: 'a = c',
+        },
+        {
+          stepOrder: 3,
+          title: 'Applying the proof',
+          explanation: 'The algebraic proof shows the rule is not a coincidence — it must always be true whenever two straight lines cross. Use it with confidence to find unknown angles.',
+          checkpointQuestion: 'Two lines cross. One angle is 125°. What is the vertically opposite angle?',
+          checkpointOptions: ['55°', '125°', '235°'],
+          checkpointAnswer: '125°',
+        },
+      ],
+    },
+    {
+      routeType: 'C',
+      misconceptionSummary: 'Students confuse vertically opposite angles with adjacent angles and incorrectly add them to 180° instead of recognising they are equal.',
+      workedExample: 'A student sees two lines crossing with one angle of 60° and writes the opposite angle as 180° − 60° = 120°. This is wrong — 120° is the adjacent angle. The vertically opposite angle is 60°.',
+      guidedPrompt: 'A student says the angle opposite 50° is 130°. What is their mistake?',
+      guidedAnswer: 'They found the adjacent angle (180° − 50° = 130°) instead of the vertically opposite angle, which is 50°.',
+      steps: [
+        {
+          stepOrder: 1,
+          title: 'Adjacent vs opposite',
+          explanation: 'Adjacent angles are next to each other and add to 180°. Vertically opposite angles are across from each other and are equal. The mistake is applying the adjacent rule to an opposite pair.',
+          checkpointQuestion: 'Vertically opposite angles are always what?',
+          checkpointOptions: ['Supplementary (add to 180°)', 'Equal', 'Complementary (add to 90°)'],
+          checkpointAnswer: 'Equal',
+        },
+        {
+          stepOrder: 2,
+          title: 'Identifying the correct pair',
+          explanation: 'To find vertically opposite angles, look for the angle directly across the crossing point — not next door. If angles are labelled a, b, c, d going round, then a is opposite c, and b is opposite d.',
+          checkpointQuestion: 'Two lines cross giving angles p, q, r, s in order. Which angle is vertically opposite to p?',
+          checkpointOptions: ['q', 'r', 's'],
+          checkpointAnswer: 'r',
+        },
+        {
+          stepOrder: 3,
+          title: 'Correcting the common error',
+          explanation: 'If a student writes 180° minus an angle to find the opposite angle, remind them: 180° minus gives the adjacent angle. The opposite angle is exactly equal. For instance, opposite 35° is 35°, not 145°.',
+          checkpointQuestion: 'Two lines cross. One angle is 35°. What is the vertically opposite angle?',
+          checkpointOptions: ['35°', '145°', '325°'],
+          checkpointAnswer: '35°',
+        },
+      ],
+    },
+  ],
+
+  /* ──────────────────────────────────────────────────────────────────────
+   * G1.7 — Angles in a triangle sum to 180°
+   * ────────────────────────────────────────────────────────────────────── */
+  'G1.7': [
+    {
+      routeType: 'A',
+      misconceptionSummary: 'Students forget that the three interior angles of any triangle must add up to 180° and guess the missing angle rather than calculating it.',
+      workedExample: 'A triangle has angles 50°, 70°, and x°. Since angles in a triangle sum to 180°: x = 180° − 50° − 70° = 60°.',
+      guidedPrompt: 'A triangle has angles 80° and 45°. Find the third angle.',
+      guidedAnswer: 'Third angle = 180° − 80° − 45° = 55°.',
+      steps: [
+        {
+          stepOrder: 1,
+          title: 'The triangle angle-sum rule',
+          explanation: 'The three interior angles of every triangle add up to 180°. This is true for all triangles — equilateral, isosceles, scalene, right-angled, or any other type.',
+          checkpointQuestion: 'What do the three angles in any triangle add up to?',
+          checkpointOptions: ['90°', '180°', '270°', '360°'],
+          checkpointAnswer: '180°',
+        },
+        {
+          stepOrder: 2,
+          title: 'Finding a missing angle',
+          explanation: 'Add the two known angles, then subtract from 180°. For example, angles of 60° and 80°: missing angle = 180° − 60° − 80° = 40°.',
+          checkpointQuestion: 'A triangle has angles 60° and 80°. What is the third angle?',
+          checkpointOptions: ['30°', '40°', '50°', '60°'],
+          checkpointAnswer: '40°',
+        },
+        {
+          stepOrder: 3,
+          title: 'Checking your answer',
+          explanation: 'After finding the missing angle, add all three angles to verify the total is 180°. For example: 50° + 70° + 60° = 180° ✓. If the total is not 180°, re-check your calculation.',
+          checkpointQuestion: 'A triangle has angles 50°, 70°, and 60°. Do these add up correctly?',
+          checkpointOptions: ['Yes', 'No'],
+          checkpointAnswer: 'Yes',
+        },
+      ],
+    },
+    {
+      routeType: 'B',
+      misconceptionSummary: 'Students know the rule but do not understand why the angles in a triangle sum to 180°.',
+      workedExample: 'Tear off the three corners of a paper triangle and place them together — they form a straight line (180°). This demonstrates that the three angles always combine to make a half turn.',
+      guidedPrompt: 'Explain why the angles in a triangle add up to 180° using a visual method.',
+      guidedAnswer: 'Draw a line through one vertex parallel to the opposite side. The three angles of the triangle rearrange along the straight line, proving they sum to 180°.',
+      steps: [
+        {
+          stepOrder: 1,
+          title: 'The torn-corner demonstration',
+          explanation: 'Cut out a triangle and tear off all three corners. Place them point-to-point — they fit together to make a straight line (180°). This physical proof works for any triangle you draw.',
+          checkpointQuestion: 'When you tear off the three corners of a triangle and put them together, what do they form?',
+          checkpointOptions: ['A right angle', 'A straight line', 'A full turn'],
+          checkpointAnswer: 'A straight line',
+        },
+        {
+          stepOrder: 2,
+          title: 'Parallel-line proof',
+          explanation: 'Draw a line through the top vertex parallel to the base. Alternate angles show that the base angles of the triangle sit on either side of the top angle along the straight line. All three angles lie on the line, so they total 180°.',
+          checkpointQuestion: 'True or false: the parallel-line proof relies on alternate angles being equal.',
+          checkpointOptions: ['True', 'False'],
+          checkpointAnswer: 'True',
+        },
+        {
+          stepOrder: 3,
+          title: 'Applying the understanding',
+          explanation: 'Knowing why the rule works builds confidence. Whether the triangle is right-angled, obtuse, or acute, the three angles always rearrange to make a straight line — 180°.',
+          checkpointQuestion: 'A right-angled triangle has one angle of 90° and another of 35°. What is the third angle?',
+          checkpointOptions: ['45°', '55°', '65°'],
+          checkpointAnswer: '55°',
+        },
+      ],
+    },
+    {
+      routeType: 'C',
+      misconceptionSummary: 'Students confuse the angle sum of a triangle (180°) with the angle sum around a point (360°) or incorrectly believe equilateral triangles are the only ones where the rule applies.',
+      workedExample: 'A student writes 360° − 80° − 60° = 220° for the missing angle in a triangle. This is wrong — they used 360° instead of 180°. The correct answer is 180° − 80° − 60° = 40°.',
+      guidedPrompt: 'A student says the missing angle in a triangle with 70° and 50° is 360° − 120° = 240°. What is their error?',
+      guidedAnswer: 'They used 360° instead of 180°. The correct missing angle is 180° − 70° − 50° = 60°.',
+      steps: [
+        {
+          stepOrder: 1,
+          title: 'Triangle angles vs angles around a point',
+          explanation: 'The interior angles of a triangle sum to 180° — not 360°. The 360° rule applies to angles around a point. If a student gets an answer over 180° for a triangle angle, they have used the wrong rule.',
+          checkpointQuestion: 'What do the interior angles of a triangle always sum to?',
+          checkpointOptions: ['180°', '360°'],
+          checkpointAnswer: '180°',
+        },
+        {
+          stepOrder: 2,
+          title: 'The rule applies to all triangles',
+          explanation: 'Some students think the 180° rule only applies to equilateral or right-angled triangles. In fact, every triangle — no matter its shape — has angles that sum to exactly 180°.',
+          checkpointQuestion: 'True or false: the angle-sum rule of 180° only works for equilateral triangles.',
+          checkpointOptions: ['True', 'False'],
+          checkpointAnswer: 'False',
+        },
+        {
+          stepOrder: 3,
+          title: 'Practise finding the missing angle',
+          explanation: 'Always subtract the two known angles from 180° to find the third angle of a triangle. Check: all three must total 180°. For example: 45° + 75° + x° = 180°, so x = 60°.',
+          checkpointQuestion: 'A triangle has angles 45° and 75°. What is the third angle?',
+          checkpointOptions: ['50°', '55°', '60°', '65°'],
+          checkpointAnswer: '60°',
+        },
+      ],
+    },
+  ],
 };
 
 async function main() {
@@ -522,7 +946,7 @@ async function main() {
     }
   }
 
-  console.log('\n✅ ensured explanation routes for G1.1, G1.1b, G1.2, G1.3');
+  console.log('\n✅ ensured explanation routes for G1.1, G1.1b, G1.2, G1.3, G1.4, G1.5, G1.6, G1.7');
 }
 
 // Only execute when run directly (not when imported by tests/other modules).

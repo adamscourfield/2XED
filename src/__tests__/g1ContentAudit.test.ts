@@ -1,7 +1,7 @@
 /**
  * g1ContentAudit.test.ts
  *
- * Comprehensive audit of G1.1, G1.1b, G1.2, G1.3 explanation routes.
+ * Comprehensive audit of G1.1, G1.1b, G1.2, G1.3, G1.4, G1.5, G1.6, G1.7 explanation routes.
  * Validates:
  *   1. Structure  — every skill has 3 routes (A/B/C), each with 3 steps
  *   2. Questions  — pass the write-guard; MCQ answer is in options; no duplicates
@@ -19,7 +19,7 @@ import { SKILL_ROUTES, type RouteDef, type StepDef } from '../../prisma/ensure-r
 
 /* ── Constants ───────────────────────────────────────────────────────────── */
 
-const G1_CODES = ['G1.1', 'G1.1b', 'G1.2', 'G1.3'];
+const G1_CODES = ['G1.1', 'G1.1b', 'G1.2', 'G1.3', 'G1.4', 'G1.5', 'G1.6', 'G1.7'];
 
 const EXPECTED_ROUTE_TYPES = ['A', 'B', 'C'];
 const EXPECTED_STEPS_PER_ROUTE = 3;
@@ -36,7 +36,7 @@ const MIN_WORKED_EXAMPLE_LENGTH = 30;
  * Skills whose animation visuals should favour step_procedure
  * (geometry angles — procedural step_reveal for protractor/angle instructions).
  */
-const GEOMETRY_PROCEDURE_SKILLS = ['G1.1', 'G1.1b', 'G1.2', 'G1.3'];
+const GEOMETRY_PROCEDURE_SKILLS = ['G1.1', 'G1.1b', 'G1.2', 'G1.3', 'G1.4', 'G1.5', 'G1.6', 'G1.7'];
 
 /* ── Helpers ─────────────────────────────────────────────────────────────── */
 
@@ -46,8 +46,8 @@ function unique(arr: string[]): string[] {
 
 /* ── 1. Structural completeness ──────────────────────────────────────────── */
 
-describe('G1.1–G1.3 structural completeness', () => {
-  it('contains exactly the 4 expected skill codes', () => {
+describe('G1.1–G1.7 structural completeness', () => {
+  it('contains exactly the 8 expected skill codes', () => {
     const presentCodes = Object.keys(SKILL_ROUTES).sort((a, b) => {
       // Sort numerically, with 'b' suffix handled
       const aNum = parseFloat(a.replace('G1.', '').replace('b', '.5'));
@@ -87,7 +87,7 @@ describe('G1.1–G1.3 structural completeness', () => {
 
 /* ── 2. Write-guard validation ───────────────────────────────────────────── */
 
-describe('G1.1–G1.3 write-guard validation', () => {
+describe('G1.1–G1.7 write-guard validation', () => {
   for (const code of G1_CODES) {
     for (const route of SKILL_ROUTES[code]) {
       for (const step of route.steps) {
@@ -115,7 +115,7 @@ describe('G1.1–G1.3 write-guard validation', () => {
 
 /* ── 3. Question quality ─────────────────────────────────────────────────── */
 
-describe('G1.1–G1.3 question quality', () => {
+describe('G1.1–G1.7 question quality', () => {
   for (const code of G1_CODES) {
     for (const route of SKILL_ROUTES[code]) {
       describe(`${code} Route ${route.routeType}`, () => {
@@ -177,7 +177,7 @@ describe('G1.1–G1.3 question quality', () => {
 
 /* ── 4. Route model audit ────────────────────────────────────────────────── */
 
-describe('G1.1–G1.3 route model alignment', () => {
+describe('G1.1–G1.7 route model alignment', () => {
   /**
    * Route A = procedural (step-by-step method)
    * Route B = conceptual / visual (understanding the "why")
@@ -224,7 +224,7 @@ describe('G1.1–G1.3 route model alignment', () => {
 
 /* ── 5. Language appropriateness ─────────────────────────────────────────── */
 
-describe('G1.1–G1.3 language appropriateness (KS3)', () => {
+describe('G1.1–G1.7 language appropriateness (KS3)', () => {
   /**
    * Terms beyond KS3 (Key Stage 3, Years 7–9, ages 11–14).
    * G1 covers angles and protractor use — anything at GCSE-higher
@@ -263,7 +263,7 @@ describe('G1.1–G1.3 language appropriateness (KS3)', () => {
 
 /* ── 6. Animation compatibility ──────────────────────────────────────────── */
 
-describe('G1.1–G1.3 animation compatibility', () => {
+describe('G1.1–G1.7 animation compatibility', () => {
   /**
    * Verify that the content is compatible with the available animation
    * visual primitives: step_reveal, rule_callout, result_reveal.
@@ -278,8 +278,8 @@ describe('G1.1–G1.3 animation compatibility', () => {
       for (const route of routes) {
         // Geometry worked examples should mention angle-related terms
         const hasGeometryContent =
-          /angle|degree|°|protractor|acute|obtuse|reflex|right|vertex|arm|notation|∠/.test(route.workedExample) ||
-          /angle|degree|°|protractor|acute|obtuse|reflex|right|vertex|arm|notation|∠/.test(route.misconceptionSummary);
+          /angle|degree|°|protractor|acute|obtuse|reflex|right|vertex|arm|notation|∠|straight|line|point|triangle|opposite|sum|180|360/.test(route.workedExample) ||
+          /angle|degree|°|protractor|acute|obtuse|reflex|right|vertex|arm|notation|∠|straight|line|point|triangle|opposite|sum|180|360/.test(route.misconceptionSummary);
         expect(
           hasGeometryContent,
           `${code} Route ${route.routeType} should contain geometry-related content for animation`,
@@ -291,7 +291,7 @@ describe('G1.1–G1.3 animation compatibility', () => {
 
 /* ── 7. Mathematical correctness spot-checks ─────────────────────────────── */
 
-describe('G1.1–G1.3 mathematical correctness', () => {
+describe('G1.1–G1.7 mathematical correctness', () => {
   // G1.1 — Angle classification
   it('G1.1 Route A Step 2: 135° is obtuse', () => {
     const step = SKILL_ROUTES['G1.1'][0].steps[1]; // Route A, step 2
@@ -357,5 +357,79 @@ describe('G1.1–G1.3 mathematical correctness', () => {
   it('G1.3 Route A Step 3: second arm is drawn with a ruler', () => {
     const step = SKILL_ROUTES['G1.3'][0].steps[2]; // Route A, step 3
     expect(step.checkpointAnswer).toBe('Ruler');
+  });
+
+  // G1.4 — Angles on a straight line
+  it('G1.4 Route A Step 2: 180° − 130° = 50°', () => {
+    const step = SKILL_ROUTES['G1.4'][0].steps[1]; // Route A, step 2
+    expect(step.checkpointAnswer).toBe('50°');
+    expect(180 - 130).toBe(50);
+  });
+
+  it('G1.4 Route A Step 3: 40° + 60° + x° = 180° → x = 80°', () => {
+    const step = SKILL_ROUTES['G1.4'][0].steps[2]; // Route A, step 3
+    expect(step.checkpointAnswer).toBe('80°');
+    expect(180 - 40 - 60).toBe(80);
+  });
+
+  it('G1.4 Route C Step 3: 180° − 55° = 125°', () => {
+    const step = SKILL_ROUTES['G1.4'][2].steps[2]; // Route C, step 3
+    expect(step.checkpointAnswer).toBe('125°');
+    expect(180 - 55).toBe(125);
+  });
+
+  // G1.5 — Angles around a point
+  it('G1.5 Route A Step 2: 360° − 90° − 150° = 120°', () => {
+    const step = SKILL_ROUTES['G1.5'][0].steps[1]; // Route A, step 2
+    expect(step.checkpointAnswer).toBe('120°');
+    expect(360 - 90 - 150).toBe(120);
+  });
+
+  it('G1.5 Route A Step 3: 360° − 80° − 70° − 100° = 110°', () => {
+    const step = SKILL_ROUTES['G1.5'][0].steps[2]; // Route A, step 3
+    expect(step.checkpointAnswer).toBe('110°');
+    expect(360 - 80 - 70 - 100).toBe(110);
+  });
+
+  it('G1.5 Route C Step 3: 360° − 145° − 85° = 130°', () => {
+    const step = SKILL_ROUTES['G1.5'][2].steps[2]; // Route C, step 3
+    expect(step.checkpointAnswer).toBe('130°');
+    expect(360 - 145 - 85).toBe(130);
+  });
+
+  // G1.6 — Vertically opposite angles
+  it('G1.6 Route A Step 2: vertically opposite to 65° is 65°', () => {
+    const step = SKILL_ROUTES['G1.6'][0].steps[1]; // Route A, step 2
+    expect(step.checkpointAnswer).toBe('65°');
+  });
+
+  it('G1.6 Route A Step 3: adjacent to 70° is 110°', () => {
+    const step = SKILL_ROUTES['G1.6'][0].steps[2]; // Route A, step 3
+    expect(step.checkpointAnswer).toBe('110°');
+    expect(180 - 70).toBe(110);
+  });
+
+  it('G1.6 Route C Step 3: vertically opposite to 35° is 35°', () => {
+    const step = SKILL_ROUTES['G1.6'][2].steps[2]; // Route C, step 3
+    expect(step.checkpointAnswer).toBe('35°');
+  });
+
+  // G1.7 — Angles in a triangle
+  it('G1.7 Route A Step 2: 180° − 60° − 80° = 40°', () => {
+    const step = SKILL_ROUTES['G1.7'][0].steps[1]; // Route A, step 2
+    expect(step.checkpointAnswer).toBe('40°');
+    expect(180 - 60 - 80).toBe(40);
+  });
+
+  it('G1.7 Route B Step 3: 180° − 90° − 35° = 55°', () => {
+    const step = SKILL_ROUTES['G1.7'][1].steps[2]; // Route B, step 3
+    expect(step.checkpointAnswer).toBe('55°');
+    expect(180 - 90 - 35).toBe(55);
+  });
+
+  it('G1.7 Route C Step 3: 180° − 45° − 75° = 60°', () => {
+    const step = SKILL_ROUTES['G1.7'][2].steps[2]; // Route C, step 3
+    expect(step.checkpointAnswer).toBe('60°');
+    expect(180 - 45 - 75).toBe(60);
   });
 });
