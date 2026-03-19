@@ -12,6 +12,8 @@
  *   A1.8  — Solve one-step linear equations
  *   A1.9  — Solve two-step linear equations
  *   A1.10 — Solve equations with unknowns on both sides
+ *   A1.11 — Solve equations involving brackets
+ *   A1.12 — Generate terms of a sequence from a term-to-term rule
  *
  * Run:
  *   ts-node -r tsconfig-paths/register --compiler-options '{"module":"CommonJS"}' prisma/ensure-routes-a1.ts
@@ -1263,6 +1265,257 @@ const SKILL_ROUTES: Record<string, RouteDef[]> = {
       ],
     },
   ],
+
+  /* ──────────────────────────────────────────────────────────────────────
+   * A1.11 — Solve equations involving brackets
+   * ────────────────────────────────────────────────────────────────────── */
+  'A1.11': [
+    {
+      routeType: 'A',
+      misconceptionSummary:
+        'Students skip or incorrectly expand the bracket — for example writing 3(x + 4) = 3x + 4 instead of 3x + 12 — then solve the wrong equation.',
+      workedExample:
+        'Solve 3(x + 4) = 21. Step 1: expand the bracket → 3x + 12 = 21. Step 2: subtract 12 from both sides → 3x = 9. Step 3: divide by 3 → x = 3. Check: 3(3 + 4) = 3 × 7 = 21. ✓',
+      guidedPrompt: 'Solve 4(x + 2) = 28.',
+      guidedAnswer: 'x = 5',
+      steps: [
+        {
+          stepOrder: 1,
+          title: 'Expand the bracket first',
+          explanation:
+            'Multiply each term inside the bracket by the number outside. In 3(x + 4): 3 × x = 3x and 3 × 4 = 12, so 3(x + 4) = 3x + 12.',
+          checkpointQuestion: 'Expand 5(x + 3).',
+          checkpointOptions: ['5x + 3', '5x + 15', '5x + 8'],
+          checkpointAnswer: '5x + 15',
+        },
+        {
+          stepOrder: 2,
+          title: 'Solve the resulting equation',
+          explanation:
+            'After expanding 3(x + 4) = 21 you get 3x + 12 = 21. Now solve: subtract 12 from both sides → 3x = 9, then divide by 3 → x = 3.',
+          checkpointQuestion: 'Solve 2(x + 5) = 16.',
+          checkpointOptions: ['x = 3', 'x = 8', 'x = 6'],
+          checkpointAnswer: 'x = 3',
+        },
+        {
+          stepOrder: 3,
+          title: 'Check by substituting back',
+          explanation:
+            'Always substitute your answer back into the original bracket form. If x = 3: 3(3 + 4) = 3 × 7 = 21 ✓. If the sides do not match, recheck your expansion.',
+          checkpointQuestion: 'Does x = 4 solve 5(x + 1) = 25?',
+          checkpointOptions: ['Yes — 5(4 + 1) = 25', 'No — 5(4 + 1) = 20'],
+          checkpointAnswer: 'Yes — 5(4 + 1) = 25',
+        },
+      ],
+    },
+    {
+      routeType: 'B',
+      misconceptionSummary:
+        'Students do not understand what the bracket means — they treat it as grouping decoration rather than a multiplication instruction, and fail to see each term must be multiplied.',
+      workedExample:
+        'Think of 3(x + 4) as 3 groups of (x + 4). Using an area model: a rectangle with width 3, split into two parts of length x and 4. Areas: 3 × x = 3x and 3 × 4 = 12, total area = 3x + 12.',
+      guidedPrompt: 'Draw an area model for 4(x + 5) and write the expansion.',
+      guidedAnswer: '4x + 20',
+      steps: [
+        {
+          stepOrder: 1,
+          title: 'Brackets mean multiply every term',
+          explanation:
+            '3(x + 4) means "3 lots of (x + 4)". Picture 3 identical envelopes, each containing x + 4. Altogether you have 3 × x + 3 × 4 = 3x + 12. Every term inside must be multiplied.',
+          checkpointQuestion: 'What does 2(x + 7) mean in words?',
+          checkpointOptions: [
+            '2 lots of x plus 7',
+            '2 lots of (x + 7)',
+            '2 plus x plus 7',
+          ],
+          checkpointAnswer: '2 lots of (x + 7)',
+        },
+        {
+          stepOrder: 2,
+          title: 'The area-model picture',
+          explanation:
+            'Draw a rectangle with width 4 and length split into x and 3. Top area = 4x, bottom area = 12. So 4(x + 3) = 4x + 12. This shows why both terms are multiplied.',
+          checkpointQuestion: 'Using an area model, expand 6(x + 2).',
+          checkpointOptions: ['6x + 2', '6x + 12', 'x + 12'],
+          checkpointAnswer: '6x + 12',
+        },
+        {
+          stepOrder: 3,
+          title: 'From model to solving',
+          explanation:
+            'Once you see that 4(x + 3) = 4x + 12, you can solve 4(x + 3) = 32: expand → 4x + 12 = 32, subtract 12 → 4x = 20, divide by 4 → x = 5.',
+          checkpointQuestion: 'Solve 3(x + 6) = 27 by first expanding the bracket.',
+          checkpointOptions: ['x = 3', 'x = 7', 'x = 9'],
+          checkpointAnswer: 'x = 3',
+        },
+      ],
+    },
+    {
+      routeType: 'C',
+      misconceptionSummary:
+        'Students only multiply the first term in the bracket (e.g. 3(x + 4) = 3x + 4) or incorrectly distribute a negative sign (e.g. −2(x − 3) = −2x − 6 instead of −2x + 6).',
+      workedExample:
+        'Common error: 3(x + 4) = 3x + 4. This is WRONG — you must multiply BOTH terms: 3 × x = 3x AND 3 × 4 = 12. Correct: 3x + 12. With negatives: −2(x − 3) = −2 × x + (−2) × (−3) = −2x + 6, NOT −2x − 6.',
+      guidedPrompt: 'A student writes 4(x + 5) = 4x + 5. What is the correct expansion?',
+      guidedAnswer: '4x + 20',
+      steps: [
+        {
+          stepOrder: 1,
+          title: 'Multiply EVERY term inside',
+          explanation:
+            'In 3(x + 4), you must multiply both x and 4 by 3. A common mistake is 3(x + 4) = 3x + 4, which only multiplies the first term. Correct: 3x + 12.',
+          checkpointQuestion: 'What is 5(x + 2)?',
+          checkpointOptions: ['5x + 2', '5x + 10', '5x + 7'],
+          checkpointAnswer: '5x + 10',
+        },
+        {
+          stepOrder: 2,
+          title: 'Watch the negative sign',
+          explanation:
+            'In −2(x − 3): multiply both terms by −2. −2 × x = −2x. −2 × (−3) = +6 (negative × negative = positive). Result: −2x + 6, NOT −2x − 6.',
+          checkpointQuestion: 'Expand −3(x − 4).',
+          checkpointOptions: ['−3x − 12', '−3x + 12', '−3x − 4'],
+          checkpointAnswer: '−3x + 12',
+        },
+        {
+          stepOrder: 3,
+          title: 'Solve after careful expansion',
+          explanation:
+            'Solve 2(x − 3) = 10. Expand correctly: 2x − 6 = 10. Add 6: 2x = 16. Divide by 2: x = 8. Check: 2(8 − 3) = 2 × 5 = 10 ✓.',
+          checkpointQuestion: 'Solve 3(x − 2) = 15.',
+          checkpointOptions: ['x = 5', 'x = 7', 'x = 3'],
+          checkpointAnswer: 'x = 7',
+        },
+      ],
+    },
+  ],
+
+  /* ──────────────────────────────────────────────────────────────────────
+   * A1.12 — Generate terms of a sequence from a term-to-term rule
+   * ────────────────────────────────────────────────────────────────────── */
+  'A1.12': [
+    {
+      routeType: 'A',
+      misconceptionSummary:
+        'Students confuse "term-to-term" with "position-to-term" rules, or make arithmetic errors when applying the rule repeatedly to find successive terms.',
+      workedExample:
+        'First term = 3, rule: add 5. Term 1 = 3. Term 2 = 3 + 5 = 8. Term 3 = 8 + 5 = 13. Term 4 = 13 + 5 = 18. Each new term is found by adding 5 to the previous term.',
+      guidedPrompt: 'First term = 7, rule: add 4. Find the first five terms.',
+      guidedAnswer: '7, 11, 15, 19, 23',
+      steps: [
+        {
+          stepOrder: 1,
+          title: 'Start from the first term',
+          explanation:
+            'A term-to-term rule tells you how to get from one term to the next. You always need a starting term. Given first term = 3 and rule "add 5": Term 1 is 3, then add 5 each time.',
+          checkpointQuestion: 'First term = 10, rule: add 3. What is the second term?',
+          checkpointOptions: ['3', '13', '30'],
+          checkpointAnswer: '13',
+        },
+        {
+          stepOrder: 2,
+          title: 'Apply the rule repeatedly',
+          explanation:
+            'To find more terms, keep applying the same rule to the most recent term. First term 4, rule "add 6": 4, 10, 16, 22, 28. Each term comes from adding 6 to the one before it.',
+          checkpointQuestion: 'First term = 2, rule: add 7. What is the fourth term?',
+          checkpointOptions: ['21', '23', '28'],
+          checkpointAnswer: '23',
+        },
+        {
+          stepOrder: 3,
+          title: 'Rules that subtract or multiply',
+          explanation:
+            'Term-to-term rules can use any operation. First term 100, rule "subtract 8": 100, 92, 84, 76. First term 2, rule "multiply by 3": 2, 6, 18, 54.',
+          checkpointQuestion: 'First term = 5, rule: multiply by 2. What are the first four terms?',
+          checkpointOptions: ['5, 10, 20, 40', '5, 7, 9, 11', '5, 10, 15, 20'],
+          checkpointAnswer: '5, 10, 20, 40',
+        },
+      ],
+    },
+    {
+      routeType: 'B',
+      misconceptionSummary:
+        'Students do not see the connection between consecutive terms — they try to jump to an arbitrary position without building up from the previous term, or confuse the position number with the term value.',
+      workedExample:
+        'Imagine a chain of arrows: 3 →(+5) 8 →(+5) 13 →(+5) 18. Each arrow represents the same operation. To reach the 4th term you must follow the chain from the start — you cannot skip straight there with a term-to-term rule.',
+      guidedPrompt: 'Draw an arrow diagram for first term = 6, rule: add 3, and find the first five terms.',
+      guidedAnswer: '6, 9, 12, 15, 18',
+      steps: [
+        {
+          stepOrder: 1,
+          title: 'Term-to-term means "from one to the next"',
+          explanation:
+            'A term-to-term rule connects each term to its neighbour: T1 → T2 → T3. Think of stepping stones — you must step on each stone in order. The rule is the instruction for each step.',
+          checkpointQuestion: 'In a term-to-term rule, how do you find the 5th term?',
+          checkpointOptions: [
+            'Multiply the rule by 5',
+            'Apply the rule starting from the 4th term',
+            'Add 5 to the first term',
+          ],
+          checkpointAnswer: 'Apply the rule starting from the 4th term',
+        },
+        {
+          stepOrder: 2,
+          title: 'Arrow diagrams',
+          explanation:
+            'First term 10, rule "subtract 4": draw arrows 10 →(−4) 6 →(−4) 2 →(−4) −2. Each arrow shows the same operation. The pattern is visible: the terms decrease by 4 each time.',
+          checkpointQuestion: 'First term = 20, rule: subtract 5. What is the third term?',
+          checkpointOptions: ['10', '15', '5'],
+          checkpointAnswer: '10',
+        },
+        {
+          stepOrder: 3,
+          title: 'Why you cannot skip ahead',
+          explanation:
+            'With a term-to-term rule, you need every previous term to find the next one. First term 3, rule "multiply by 2": 3, 6, 12, 24. You cannot jump to the 4th term without knowing the 3rd.',
+          checkpointQuestion: 'First term = 1, rule: multiply by 3. What is the 5th term?',
+          checkpointOptions: ['15', '81', '27'],
+          checkpointAnswer: '81',
+        },
+      ],
+    },
+    {
+      routeType: 'C',
+      misconceptionSummary:
+        'Students apply the rule to the position number instead of the previous term (e.g. for "add 4", they compute position × 4 instead of adding 4 to the last term), or they reverse/swap the operation.',
+      workedExample:
+        'Common error: first term = 5, rule "add 4". Student writes term 3 = 3 × 4 = 12 (using the position). Correct: term 1 = 5, term 2 = 5 + 4 = 9, term 3 = 9 + 4 = 13. You add 4 to the previous TERM, not to the position.',
+      guidedPrompt: 'A student says term 4 of the sequence (first term = 2, add 3) is 12 because 4 × 3 = 12. What is the correct term 4?',
+      guidedAnswer: '11',
+      steps: [
+        {
+          stepOrder: 1,
+          title: 'Apply the rule to the term, not the position',
+          explanation:
+            'First term = 5, rule "add 4". Term 2 = 5 + 4 = 9 (NOT 2 × 4 = 8). Term 3 = 9 + 4 = 13 (NOT 3 × 4 = 12). Always add to the previous term, not to the position number.',
+          checkpointQuestion: 'First term = 3, rule: add 6. What is term 3?',
+          checkpointOptions: ['18', '15', '9'],
+          checkpointAnswer: '15',
+        },
+        {
+          stepOrder: 2,
+          title: 'Do not reverse the operation',
+          explanation:
+            'If the rule says "subtract 3", you subtract — not add. First term = 20, rule "subtract 3": 20, 17, 14, 11. A common mistake is writing 20, 23, 26, 29 (adding instead of subtracting).',
+          checkpointQuestion: 'First term = 30, rule: subtract 7. What is the third term?',
+          checkpointOptions: ['16', '23', '9'],
+          checkpointAnswer: '16',
+        },
+        {
+          stepOrder: 3,
+          title: 'Check your sequence makes sense',
+          explanation:
+            'After writing your terms, check the difference (or ratio) between consecutive terms matches the rule. Sequence 2, 6, 18, 54 with rule "multiply by 3": 6 ÷ 2 = 3, 18 ÷ 6 = 3, 54 ÷ 18 = 3. ✓',
+          checkpointQuestion: 'A student writes 4, 8, 12, 16 for first term = 4, rule "multiply by 2". Is this correct?',
+          checkpointOptions: [
+            'Yes — each term doubles',
+            'No — the correct sequence is 4, 8, 16, 32',
+          ],
+          checkpointAnswer: 'No — the correct sequence is 4, 8, 16, 32',
+        },
+      ],
+    },
+  ],
 };
 
 async function main() {
@@ -1334,7 +1587,7 @@ async function main() {
     }
   }
 
-  console.log('\n✅ ensured explanation routes for A1.1–A1.10');
+  console.log('\n✅ ensured explanation routes for A1.1–A1.12');
 }
 
 main().catch(console.error).finally(() => prisma.$disconnect());
