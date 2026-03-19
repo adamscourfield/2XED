@@ -2571,6 +2571,7 @@ async function main() {
     }
   }
 
+  console.log('\n✅ ensured explanation routes for N6.1–N6.12');
   console.log('\n✅ ensured explanation routes for N6.1–N6.5');
   console.log('\n✅ ensured explanation routes for N6.1–N6.20');
 }
