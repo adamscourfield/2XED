@@ -403,7 +403,6 @@ async function main() {
     { parentCode: 'N1.3',  childCode: 'G1.1',  weight: 1 },
     { parentCode: 'G1.1',  childCode: 'G1.1b', weight: 1 },
     { parentCode: 'G1.1b', childCode: 'G1.2',  weight: 1 },
-    { parentCode: 'G1.1',  childCode: 'G1.2',  weight: 1 },
     { parentCode: 'G1.2',  childCode: 'G1.3',  weight: 1 },
     { parentCode: 'G1.1',  childCode: 'G1.4',  weight: 1 },
     { parentCode: 'N2.1',  childCode: 'G1.4',  weight: 1 },

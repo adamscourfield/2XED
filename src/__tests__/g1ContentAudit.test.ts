@@ -34,9 +34,9 @@ const MIN_WORKED_EXAMPLE_LENGTH = 30;
 
 /**
  * Skills whose animation visuals should favour step_procedure
- * (geometry angles — step_reveal for protractor/angle instructions).
+ * (geometry angles — procedural step_reveal for protractor/angle instructions).
  */
-const GEOMETRY_STEP_SKILLS = ['G1.1', 'G1.1b', 'G1.2', 'G1.3'];
+const GEOMETRY_PROCEDURE_SKILLS = ['G1.1', 'G1.1b', 'G1.2', 'G1.3'];
 
 /* ── Helpers ─────────────────────────────────────────────────────────────── */
 
@@ -272,7 +272,7 @@ describe('G1.1–G1.3 animation compatibility', () => {
    * visual style — step_reveal for protractor/angle procedures.
    */
 
-  for (const code of GEOMETRY_STEP_SKILLS) {
+  for (const code of GEOMETRY_PROCEDURE_SKILLS) {
     it(`${code} (geometry) has procedural content suitable for step_reveal`, () => {
       const routes = SKILL_ROUTES[code];
       for (const route of routes) {
