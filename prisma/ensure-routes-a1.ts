@@ -6,6 +6,8 @@
  *   A1.2 — Algebraic notation / basic collecting like terms
  *   A1.3 — Substitution into expressions
  *   A1.4 — Simplify expressions by collecting like terms
+ *   A1.5 — Multiply a single term over a bracket (expand)
+ *   A1.6 — Factorise by taking out a common factor
  *
  * Scoped to a small batch (the full A1.1–A1.19 range was too large for a
  * single generation run and caused timeouts).  Additional A1 skills
@@ -523,6 +525,248 @@ const SKILL_ROUTES: Record<string, RouteDef[]> = {
       ],
     },
   ],
+
+  /* ──────────────────────────────────────────────────────────────────────
+   * A1.5 — Multiply a single term over a bracket (expand)
+   *   e.g. 3(x + 2) = 3x + 6
+   * ────────────────────────────────────────────────────────────────────── */
+  'A1.5': [
+    {
+      routeType: 'A',
+      misconceptionSummary:
+        'Students only multiply the term outside the bracket by the first term inside, forgetting to multiply the second term (e.g. 3(x + 2) = 3x + 2 instead of 3x + 6).',
+      workedExample:
+        'Expand 3(x + 2). Multiply 3 by each term inside the bracket: 3 × x = 3x, 3 × 2 = 6. So 3(x + 2) = 3x + 6.',
+      guidedPrompt: 'Expand 4(y + 5).',
+      guidedAnswer: '4y + 20',
+      steps: [
+        {
+          stepOrder: 1,
+          title: 'What does expanding mean?',
+          explanation:
+            'Expanding means removing brackets by multiplying the term outside by every term inside. In 3(x + 2), multiply 3 by x AND by 2.',
+          checkpointQuestion: 'When you expand 5(a + 3), how many multiplications do you perform?',
+          checkpointOptions: ['1', '2', '3'],
+          checkpointAnswer: '2',
+        },
+        {
+          stepOrder: 2,
+          title: 'Multiply each term',
+          explanation:
+            'Expand 2(x + 4): 2 × x = 2x, then 2 × 4 = 8. Write them together: 2x + 8. The sign between the terms stays the same.',
+          checkpointQuestion: 'Expand 3(a + 7).',
+          checkpointOptions: ['3a + 7', '3a + 21', '3a + 10'],
+          checkpointAnswer: '3a + 21',
+        },
+        {
+          stepOrder: 3,
+          title: 'Expanding with subtraction',
+          explanation:
+            'Expand 5(y − 3): 5 × y = 5y, then 5 × 3 = 15. Because the sign is minus, the result is 5y − 15.',
+          checkpointQuestion: 'Expand 4(m − 2).',
+          checkpointOptions: ['4m − 2', '4m + 8', '4m − 8'],
+          checkpointAnswer: '4m − 8',
+        },
+      ],
+    },
+    {
+      routeType: 'B',
+      misconceptionSummary:
+        'Students lose or flip the sign when expanding brackets with negative terms, especially with expressions like −2(x − 3), getting −2x − 6 instead of −2x + 6.',
+      workedExample:
+        'Expand −2(x − 3). Multiply −2 by x = −2x. Multiply −2 by −3 = +6 (negative × negative = positive). So −2(x − 3) = −2x + 6.',
+      guidedPrompt: 'Expand −3(a − 4).',
+      guidedAnswer: '-3a + 12',
+      steps: [
+        {
+          stepOrder: 1,
+          title: 'Expanding with a negative outside',
+          explanation:
+            'When the term outside the bracket is negative, multiply each term by the negative number. Watch the sign rules: negative × positive = negative, negative × negative = positive.',
+          checkpointQuestion: 'What is −2 × 5?',
+          checkpointOptions: ['10', '-10', '7'],
+          checkpointAnswer: '-10',
+        },
+        {
+          stepOrder: 2,
+          title: 'Negative × negative = positive',
+          explanation:
+            'In −4(x − 2): −4 × x = −4x, −4 × (−2) = +8. The second term becomes positive. So −4(x − 2) = −4x + 8.',
+          checkpointQuestion: 'Expand −5(y − 1).',
+          checkpointOptions: ['-5y − 5', '-5y + 5', '-5y − 1'],
+          checkpointAnswer: '-5y + 5',
+        },
+        {
+          stepOrder: 3,
+          title: 'Expanding with a variable outside',
+          explanation:
+            'The term outside can also be a variable: x(x + 3) means x × x + x × 3 = x² + 3x. Multiply as normal, using index rules for x × x.',
+          checkpointQuestion: 'Expand a(a + 5).',
+          checkpointOptions: ['a² + 5', 'a² + 5a', '2a + 5'],
+          checkpointAnswer: 'a² + 5a',
+        },
+      ],
+    },
+    {
+      routeType: 'C',
+      misconceptionSummary:
+        'Students partially expand, multiplying only the first term inside the bracket and leaving the second term unchanged (e.g. 3(x + 4) = 3x + 4 instead of 3x + 12).',
+      workedExample:
+        'Common mistake: 3(x + 4) = 3x + 4. The student only multiplied x by 3 and forgot to multiply 4 by 3. Correct: 3 × x = 3x, 3 × 4 = 12 → 3x + 12.',
+      guidedPrompt: 'A student writes 2(a + 6) = 2a + 6. What is the correct expansion?',
+      guidedAnswer: '2a + 12',
+      steps: [
+        {
+          stepOrder: 1,
+          title: 'Spot the partial-expansion mistake',
+          explanation:
+            'The most common error is only multiplying the first term: 2(x + 5) = 2x + 5. The 5 was not multiplied. Every term inside must be multiplied by the term outside.',
+          checkpointQuestion: 'A student writes 4(n + 3) = 4n + 3. What did they forget?',
+          checkpointOptions: ['To add 4 and n', 'To multiply 3 by 4', 'To square n'],
+          checkpointAnswer: 'To multiply 3 by 4',
+        },
+        {
+          stepOrder: 2,
+          title: 'Sign errors with negatives',
+          explanation:
+            'Another mistake: −3(x − 2) = −3x − 6. The student treated −3 × −2 as negative. Remember: negative × negative = positive. Correct: −3x + 6.',
+          checkpointQuestion: 'What is the correct expansion of −2(y − 4)?',
+          checkpointOptions: ['-2y − 8', '-2y + 8', '-2y − 4'],
+          checkpointAnswer: '-2y + 8',
+        },
+        {
+          stepOrder: 3,
+          title: 'Check by substitution',
+          explanation:
+            'You can check your expansion by substituting a value. For 3(x + 2): let x = 1. Bracket: 3(1 + 2) = 3 × 3 = 9. Expansion: 3(1) + 6 = 3 + 6 = 9. ✓ They match!',
+          checkpointQuestion: 'Check: if x = 2, does 5(x + 1) = 5x + 5?',
+          checkpointOptions: ['Yes — both give 15', 'No — they give different values'],
+          checkpointAnswer: 'Yes — both give 15',
+        },
+      ],
+    },
+  ],
+
+  /* ──────────────────────────────────────────────────────────────────────
+   * A1.6 — Factorise by taking out a common factor
+   *   e.g. 6x + 9 = 3(2x + 3)
+   * ────────────────────────────────────────────────────────────────────── */
+  'A1.6': [
+    {
+      routeType: 'A',
+      misconceptionSummary:
+        'Students do not identify the highest common factor (HCF) of all terms — they may take out a factor that is too small, leaving a partially factorised expression.',
+      workedExample:
+        'Factorise 6x + 9. Find the HCF of 6 and 9 → HCF is 3. Divide each term: 6x ÷ 3 = 2x, 9 ÷ 3 = 3. Write as 3(2x + 3).',
+      guidedPrompt: 'Factorise 8y + 12.',
+      guidedAnswer: '4(2y + 3)',
+      steps: [
+        {
+          stepOrder: 1,
+          title: 'What does factorising mean?',
+          explanation:
+            'Factorising is the reverse of expanding. You find a common factor shared by every term and write it outside a bracket. What remains goes inside the bracket.',
+          checkpointQuestion: 'Factorising is the reverse of which operation?',
+          checkpointOptions: ['Simplifying', 'Expanding', 'Substituting'],
+          checkpointAnswer: 'Expanding',
+        },
+        {
+          stepOrder: 2,
+          title: 'Find the HCF of the coefficients',
+          explanation:
+            'To factorise 10x + 15, find the HCF of 10 and 15 → HCF is 5. Divide each term by 5: 10x ÷ 5 = 2x, 15 ÷ 5 = 3. Result: 5(2x + 3).',
+          checkpointQuestion: 'Factorise 12a + 18.',
+          checkpointOptions: ['2(6a + 9)', '6(2a + 3)', '3(4a + 6)'],
+          checkpointAnswer: '6(2a + 3)',
+        },
+        {
+          stepOrder: 3,
+          title: 'Factorising with variables as common factors',
+          explanation:
+            'If every term contains the same variable, include it in the common factor. For 4x² + 6x: HCF is 2x. 4x² ÷ 2x = 2x, 6x ÷ 2x = 3. Result: 2x(2x + 3).',
+          checkpointQuestion: 'Factorise 3m² + 9m.',
+          checkpointOptions: ['3(m² + 3m)', '3m(m + 3)', 'm(3m + 9)'],
+          checkpointAnswer: '3m(m + 3)',
+        },
+      ],
+    },
+    {
+      routeType: 'B',
+      misconceptionSummary:
+        'Students forget to check their factorisation by re-expanding, so they do not catch errors such as missing terms or wrong signs inside the bracket.',
+      workedExample:
+        'Factorise 15a − 10. HCF of 15 and 10 is 5. 15a ÷ 5 = 3a, 10 ÷ 5 = 2. Keep the minus sign: 5(3a − 2). Check: 5 × 3a = 15a, 5 × (−2) = −10. ✓',
+      guidedPrompt: 'Factorise 14b − 21.',
+      guidedAnswer: '7(2b - 3)',
+      steps: [
+        {
+          stepOrder: 1,
+          title: 'Factorising as reverse expanding',
+          explanation:
+            'Expanding and factorising are opposites. 3(x + 4) expands to 3x + 12. Going backwards: 3x + 12 factorises to 3(x + 4). Always think: what was outside the bracket?',
+          checkpointQuestion: 'If 5(a + 2) = 5a + 10, what does 5a + 10 factorise to?',
+          checkpointOptions: ['5(a + 2)', '5(a + 10)', 'a(5 + 10)'],
+          checkpointAnswer: '5(a + 2)',
+        },
+        {
+          stepOrder: 2,
+          title: 'Keep the minus sign',
+          explanation:
+            'When factorising subtraction expressions, the minus stays inside the bracket. 12x − 8: HCF is 4. 12x ÷ 4 = 3x, 8 ÷ 4 = 2. Result: 4(3x − 2).',
+          checkpointQuestion: 'Factorise 20p − 15.',
+          checkpointOptions: ['5(4p + 3)', '5(4p − 3)', '5(4p − 15)'],
+          checkpointAnswer: '5(4p − 3)',
+        },
+        {
+          stepOrder: 3,
+          title: 'Check by re-expanding',
+          explanation:
+            'Always verify by expanding your answer. If you get 4(2x + 5), expand: 4 × 2x = 8x, 4 × 5 = 20. So 8x + 20. If this matches the original, you are correct.',
+          checkpointQuestion: 'A student factorises 9x + 6 as 3(3x + 3). Check: does 3(3x + 3) expand to 9x + 6?',
+          checkpointOptions: ['Yes', 'No — it gives 9x + 9'],
+          checkpointAnswer: 'No — it gives 9x + 9',
+        },
+      ],
+    },
+    {
+      routeType: 'C',
+      misconceptionSummary:
+        'Students take out a common factor that is not the HCF, leaving an expression that is not fully factorised (e.g. 12x + 8 = 2(6x + 4) instead of 4(3x + 2)).',
+      workedExample:
+        'Common mistake: 12x + 8 = 2(6x + 4). The student took out 2 instead of 4. 6x + 4 can still be factorised further! Correct: HCF is 4, so 4(3x + 2).',
+      guidedPrompt: 'A student factorises 18n + 12 as 2(9n + 6). What is the fully factorised form?',
+      guidedAnswer: '6(3n + 2)',
+      steps: [
+        {
+          stepOrder: 1,
+          title: 'Spot incomplete factorising',
+          explanation:
+            'If you can still find a common factor inside the bracket, you have not fully factorised. 2(6x + 4) → 6x and 4 still share a factor of 2. The HCF of 12 and 8 is 4, not 2.',
+          checkpointQuestion: 'Is 3(6a + 9) fully factorised?',
+          checkpointOptions: ['Yes', 'No — 6a and 9 share a factor of 3'],
+          checkpointAnswer: 'No — 6a and 9 share a factor of 3',
+        },
+        {
+          stepOrder: 2,
+          title: 'Always use the HCF',
+          explanation:
+            'To fully factorise, you must use the highest common factor. For 24x + 16: factors of 24 are 1,2,3,4,6,8,12,24. Factors of 16 are 1,2,4,8,16. HCF is 8. Answer: 8(3x + 2).',
+          checkpointQuestion: 'What is the HCF of 15 and 20?',
+          checkpointOptions: ['3', '5', '10'],
+          checkpointAnswer: '5',
+        },
+        {
+          stepOrder: 3,
+          title: 'Factorise variables fully too',
+          explanation:
+            'For 6x² + 4x, take out the HCF of both numbers AND variables. HCF of 6 and 4 is 2; both terms have at least one x. HCF = 2x. Result: 2x(3x + 2).',
+          checkpointQuestion: 'Factorise 10y² + 5y fully.',
+          checkpointOptions: ['5(2y² + y)', '5y(2y + 1)', 'y(10y + 5)'],
+          checkpointAnswer: '5y(2y + 1)',
+        },
+      ],
+    },
+  ],
 };
 
 async function main() {
@@ -594,7 +838,7 @@ async function main() {
     }
   }
 
-  console.log('\n✅ ensured explanation routes for A1.1, A1.2, A1.3, A1.4');
+  console.log('\n✅ ensured explanation routes for A1.1, A1.2, A1.3, A1.4, A1.5, A1.6');
 }
 
 main().catch(console.error).finally(() => prisma.$disconnect());
