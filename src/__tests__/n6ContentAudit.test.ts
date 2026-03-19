@@ -1,7 +1,7 @@
 /**
  * n6ContentAudit.test.ts
  *
- * Comprehensive audit of N6.1–N6.5 explanation routes.
+ * Comprehensive audit of N6.1–N6.12 explanation routes.
  * Validates:
  *   1. Structure  — every skill has 3 routes (A/B/C), each with 3 steps
  *   2. Questions  — pass the write-guard; MCQ answer is in options; no duplicates
@@ -19,7 +19,7 @@ import { SKILL_ROUTES, type RouteDef, type StepDef } from '../../prisma/ensure-r
 
 /* ── Constants ───────────────────────────────────────────────────────────── */
 
-const N6_CODES = ['N6.1', 'N6.2', 'N6.3', 'N6.4', 'N6.5'];
+const N6_CODES = ['N6.1', 'N6.2', 'N6.3', 'N6.4', 'N6.5', 'N6.6', 'N6.7', 'N6.8', 'N6.9', 'N6.10', 'N6.11', 'N6.12'];
 
 const EXPECTED_ROUTE_TYPES = ['A', 'B', 'C'];
 const EXPECTED_STEPS_PER_ROUTE = 3;
@@ -33,10 +33,11 @@ const MIN_MISCONCEPTION_LENGTH = 30;
 const MIN_WORKED_EXAMPLE_LENGTH = 30;
 
 /**
- * All N6.1–N6.5 skills deal with fraction arithmetic — content should be
- * suitable for fraction_bar, area_model, and step_reveal animation visuals.
+ * N6.1–N6.7 cover fraction arithmetic, N6.8–N6.9 cover recurring decimals,
+ * and N6.10–N6.12 cover percentages. All content should reference
+ * fraction_bar, area_model, bar_model, or step_reveal animation visuals.
  */
-const FRACTION_ARITHMETIC_SKILLS = ['N6.1', 'N6.2', 'N6.3', 'N6.4', 'N6.5'];
+const N6_FRACTION_AND_PERCENTAGE_SKILLS = ['N6.1', 'N6.2', 'N6.3', 'N6.4', 'N6.5', 'N6.6', 'N6.7', 'N6.8', 'N6.9', 'N6.10', 'N6.11', 'N6.12'];
 
 /* ── Helpers ─────────────────────────────────────────────────────────────── */
 
@@ -46,8 +47,8 @@ function unique(arr: string[]): string[] {
 
 /* ── 1. Structural completeness ──────────────────────────────────────────── */
 
-describe('N6.1–N6.5 structural completeness', () => {
-  it('contains exactly the 5 expected skill codes', () => {
+describe('N6.1–N6.12 structural completeness', () => {
+  it('contains exactly the 12 expected skill codes', () => {
     const presentCodes = Object.keys(SKILL_ROUTES).sort((a, b) => {
       const aNum = parseFloat(a.replace('N6.', ''));
       const bNum = parseFloat(b.replace('N6.', ''));
@@ -86,7 +87,7 @@ describe('N6.1–N6.5 structural completeness', () => {
 
 /* ── 2. Write-guard validation ───────────────────────────────────────────── */
 
-describe('N6.1–N6.5 write-guard validation', () => {
+describe('N6.1–N6.12 write-guard validation', () => {
   for (const code of N6_CODES) {
     for (const route of SKILL_ROUTES[code]) {
       for (const step of route.steps) {
@@ -114,7 +115,7 @@ describe('N6.1–N6.5 write-guard validation', () => {
 
 /* ── 3. Question quality ─────────────────────────────────────────────────── */
 
-describe('N6.1–N6.5 question quality', () => {
+describe('N6.1–N6.12 question quality', () => {
   for (const code of N6_CODES) {
     for (const route of SKILL_ROUTES[code]) {
       describe(`${code} Route ${route.routeType}`, () => {
@@ -176,7 +177,7 @@ describe('N6.1–N6.5 question quality', () => {
 
 /* ── 4. Route model audit ────────────────────────────────────────────────── */
 
-describe('N6.1–N6.5 route model alignment', () => {
+describe('N6.1–N6.12 route model alignment', () => {
   /**
    * Route A = procedural (step-by-step method)
    * Route B = conceptual / visual (understanding the "why")
@@ -224,7 +225,7 @@ describe('N6.1–N6.5 route model alignment', () => {
 
 /* ── 5. Language appropriateness ─────────────────────────────────────────── */
 
-describe('N6.1–N6.5 language appropriateness (KS3)', () => {
+describe('N6.1–N6.12 language appropriateness (KS3)', () => {
   /**
    * Terms beyond KS3 (Key Stage 3, Years 7–9, ages 11–14).
    * N6 covers fraction arithmetic — anything at GCSE-higher
@@ -263,7 +264,7 @@ describe('N6.1–N6.5 language appropriateness (KS3)', () => {
 
 /* ── 6. Animation compatibility ──────────────────────────────────────────── */
 
-describe('N6.1–N6.5 animation compatibility', () => {
+describe('N6.1–N6.12 animation compatibility', () => {
   /**
    * Verify that the content is compatible with the available animation
    * visual primitives: fraction_bar, area_model, step_reveal.
@@ -272,14 +273,14 @@ describe('N6.1–N6.5 animation compatibility', () => {
    * fraction-related terms suitable for fraction_bar and area_model visuals.
    */
 
-  for (const code of FRACTION_ARITHMETIC_SKILLS) {
-    it(`${code} (fraction arithmetic) has fraction-based content suitable for fraction_bar / area_model / step_reveal`, () => {
+  for (const code of N6_FRACTION_AND_PERCENTAGE_SKILLS) {
+    it(`${code} has fraction/percentage content suitable for visual animation primitives`, () => {
       const routes = SKILL_ROUTES[code];
       for (const route of routes) {
-        // Fraction arithmetic worked examples should mention fraction-related terms
+        // Fraction/percentage arithmetic worked examples should mention relevant terms
         const hasFractionContent =
-          /\d+\/\d+|fraction|numerator|denominator|reciprocal|÷|×|multiply|divide|bar|model/.test(route.workedExample) ||
-          /\d+\/\d+|fraction|numerator|denominator|reciprocal|÷|×|multiply|divide|bar|model/.test(route.misconceptionSummary);
+          /\d+\/\d+|fraction|numerator|denominator|reciprocal|÷|×|multiply|divide|bar|model|percent|%|increase|decrease|recurring|decimal/.test(route.workedExample) ||
+          /\d+\/\d+|fraction|numerator|denominator|reciprocal|÷|×|multiply|divide|bar|model|percent|%|increase|decrease|recurring|decimal/.test(route.misconceptionSummary);
         expect(
           hasFractionContent,
           `${code} Route ${route.routeType} should contain fraction-related content for animation`,
@@ -291,7 +292,7 @@ describe('N6.1–N6.5 animation compatibility', () => {
 
 /* ── 7. Mathematical correctness spot-checks ─────────────────────────────── */
 
-describe('N6.1–N6.5 mathematical correctness', () => {
+describe('N6.1–N6.12 mathematical correctness', () => {
   // N6.1 — Multiply a fraction by an integer
   it('N6.1 Route A Step 1: numerator of 4/9 × 2 is 8', () => {
     const step = SKILL_ROUTES['N6.1'][0].steps[0]; // Route A, step 1
@@ -487,5 +488,205 @@ describe('N6.1–N6.5 mathematical correctness', () => {
       'No — 1/3 is smaller than 2/3, so the answer should be less than 1',
     );
     expect((1 / 3) / (2 / 3)).toBeLessThan(1);
+  });
+
+  // N6.6 — Multiply and divide with mixed numbers
+  it('N6.6 Route A Step 1: 3 2/5 = 17/5', () => {
+    const step = SKILL_ROUTES['N6.6'][0].steps[0];
+    expect(step.checkpointAnswer).toBe('17/5');
+    expect(3 * 5 + 2).toBe(17);
+  });
+
+  it('N6.6 Route A Step 2: 1 1/3 × 3/4 = 4/3 × 3/4 = 1', () => {
+    const step = SKILL_ROUTES['N6.6'][0].steps[1];
+    expect(step.checkpointAnswer).toBe('1');
+    expect((4 * 3) / (3 * 4)).toBe(1);
+  });
+
+  it('N6.6 Route A Step 3: 1 1/2 ÷ 1/4 = 3/2 × 4 = 6', () => {
+    const step = SKILL_ROUTES['N6.6'][0].steps[2];
+    expect(step.checkpointAnswer).toBe('6');
+    expect((3 / 2) / (1 / 4)).toBe(6);
+  });
+
+  it('N6.6 Route C Step 2: 1 1/2 × 2 1/3 = 3 1/2', () => {
+    const step = SKILL_ROUTES['N6.6'][2].steps[1];
+    expect(step.checkpointAnswer).toBe('3 1/2');
+    expect((3 / 2) * (7 / 3)).toBeCloseTo(3.5);
+  });
+
+  it('N6.6 Route C Step 3: 2 1/4 × 1 1/3 = 3', () => {
+    const step = SKILL_ROUTES['N6.6'][2].steps[2];
+    expect(step.checkpointAnswer).toBe('3');
+    expect((9 / 4) * (4 / 3)).toBe(3);
+  });
+
+  // N6.7 — Order of operations with fractions
+  it('N6.7 Route A Step 1: (1/4 + 1/2) × 2/3 = 1/2', () => {
+    const step = SKILL_ROUTES['N6.7'][0].steps[0];
+    expect(step.checkpointAnswer).toBe('1/2');
+    expect((1 / 4 + 1 / 2) * (2 / 3)).toBeCloseTo(0.5);
+  });
+
+  it('N6.7 Route A Step 2: 3/4 − 1/2 × 1/3 = 7/12', () => {
+    const step = SKILL_ROUTES['N6.7'][0].steps[1];
+    expect(step.checkpointAnswer).toBe('7/12');
+    expect(3 / 4 - (1 / 2) * (1 / 3)).toBeCloseTo(7 / 12);
+  });
+
+  it('N6.7 Route A Step 3: (1/3 + 1/6) × 2 = 1', () => {
+    const step = SKILL_ROUTES['N6.7'][0].steps[2];
+    expect(step.checkpointAnswer).toBe('1');
+    expect((1 / 3 + 1 / 6) * 2).toBeCloseTo(1);
+  });
+
+  it('N6.7 Route C Step 1: 1/4 + 1/2 × 2/3 = 7/12', () => {
+    const step = SKILL_ROUTES['N6.7'][2].steps[0];
+    expect(step.checkpointAnswer).toBe('7/12');
+    expect(1 / 4 + (1 / 2) * (2 / 3)).toBeCloseTo(7 / 12);
+  });
+
+  // N6.8 — Convert a recurring decimal to a fraction
+  it('N6.8 Route A Step 2: if x = 0.777..., 10x − x = 7', () => {
+    const step = SKILL_ROUTES['N6.8'][0].steps[1];
+    expect(step.checkpointAnswer).toBe('7');
+  });
+
+  it('N6.8 Route A Step 3: 0.222... = 2/9', () => {
+    const step = SKILL_ROUTES['N6.8'][0].steps[2];
+    expect(step.checkpointAnswer).toBe('2/9');
+    expect(2 / 9).toBeCloseTo(0.2222, 3);
+  });
+
+  it('N6.8 Route B Step 2: 0.777... = 7/9', () => {
+    const step = SKILL_ROUTES['N6.8'][1].steps[1];
+    expect(step.checkpointAnswer).toBe('7/9');
+    expect(7 / 9).toBeCloseTo(0.7778, 3);
+  });
+
+  it('N6.8 Route C Step 2: 0.272727... = 27/99 = 3/11', () => {
+    const step = SKILL_ROUTES['N6.8'][2].steps[1];
+    expect(step.checkpointAnswer).toBe('3/11');
+    expect(27 / 99).toBeCloseTo(3 / 11);
+  });
+
+  // N6.9 — Recognise recurring decimals from fraction division
+  it('N6.9 Route A Step 3: 7/20 terminates', () => {
+    const step = SKILL_ROUTES['N6.9'][0].steps[2];
+    expect(step.checkpointAnswer).toBe('Terminate');
+    expect(7 / 20).toBe(0.35);
+  });
+
+  it('N6.9 Route B Step 1: 3/25 terminates', () => {
+    const step = SKILL_ROUTES['N6.9'][1].steps[0];
+    expect(step.checkpointAnswer).toBe('3/25');
+  });
+
+  it('N6.9 Route B Step 2: 5/12 recurs', () => {
+    const step = SKILL_ROUTES['N6.9'][1].steps[1];
+    expect(step.checkpointAnswer).toBe('Recur');
+  });
+
+  // N6.10 — Find a percentage of an amount
+  it('N6.10 Route A Step 1: 1% of 320 = 3.2', () => {
+    const step = SKILL_ROUTES['N6.10'][0].steps[0];
+    expect(step.checkpointAnswer).toBe('3.2');
+    expect(320 / 100).toBe(3.2);
+  });
+
+  it('N6.10 Route A Step 2: 15% of 200 = 30', () => {
+    const step = SKILL_ROUTES['N6.10'][0].steps[1];
+    expect(step.checkpointAnswer).toBe('30');
+    expect(200 * 0.15).toBe(30);
+  });
+
+  it('N6.10 Route A Step 3: £80 jacket reduced by 15% = £68', () => {
+    const step = SKILL_ROUTES['N6.10'][0].steps[2];
+    expect(step.checkpointAnswer).toBe('£68');
+    expect(80 - 80 * 0.15).toBe(68);
+  });
+
+  it('N6.10 Route B Step 2: 40% of 350 = 140', () => {
+    const step = SKILL_ROUTES['N6.10'][1].steps[1];
+    expect(step.checkpointAnswer).toBe('140');
+    expect(350 * 0.4).toBe(140);
+  });
+
+  it('N6.10 Route C Step 2: 40% of 250 = 100', () => {
+    const step = SKILL_ROUTES['N6.10'][2].steps[1];
+    expect(step.checkpointAnswer).toBe('100');
+    expect(250 * 0.4).toBe(100);
+  });
+
+  // N6.11 — Express one quantity as a percentage of another
+  it('N6.11 Route A Step 2: 9 out of 36 = 25%', () => {
+    const step = SKILL_ROUTES['N6.11'][0].steps[1];
+    expect(step.checkpointAnswer).toBe('25%');
+    expect((9 / 36) * 100).toBe(25);
+  });
+
+  it('N6.11 Route A Step 3: 21 out of 28 = 75%', () => {
+    const step = SKILL_ROUTES['N6.11'][0].steps[2];
+    expect(step.checkpointAnswer).toBe('75%');
+    expect((21 / 28) * 100).toBe(75);
+  });
+
+  it('N6.11 Route B Step 2: 7/20 = 35%', () => {
+    const step = SKILL_ROUTES['N6.11'][1].steps[1];
+    expect(step.checkpointAnswer).toBe('35%');
+    expect((7 / 20) * 100).toBe(35);
+  });
+
+  it('N6.11 Route C Step 2: 8 out of 32 = 25%', () => {
+    const step = SKILL_ROUTES['N6.11'][2].steps[1];
+    expect(step.checkpointAnswer).toBe('25%');
+    expect((8 / 32) * 100).toBe(25);
+  });
+
+  // N6.12 — Percentage increase and decrease
+  it('N6.12 Route A Step 1: 25% of 360 = 90', () => {
+    const step = SKILL_ROUTES['N6.12'][0].steps[0];
+    expect(step.checkpointAnswer).toBe('90');
+    expect(360 * 0.25).toBe(90);
+  });
+
+  it('N6.12 Route A Step 2: decrease 500 by 12% = 440', () => {
+    const step = SKILL_ROUTES['N6.12'][0].steps[1];
+    expect(step.checkpointAnswer).toBe('440');
+    expect(500 - 500 * 0.12).toBe(440);
+  });
+
+  it('N6.12 Route A Step 3: £200 bike reduced by 10% then 5% = £171', () => {
+    const step = SKILL_ROUTES['N6.12'][0].steps[2];
+    expect(step.checkpointAnswer).toBe('£171');
+    expect(200 * 0.9 * 0.95).toBe(171);
+  });
+
+  it('N6.12 Route B Step 1: 35% increase → multiplier 1.35', () => {
+    const step = SKILL_ROUTES['N6.12'][1].steps[0];
+    expect(step.checkpointAnswer).toBe('1.35');
+  });
+
+  it('N6.12 Route B Step 2: 30% decrease → multiplier 0.70', () => {
+    const step = SKILL_ROUTES['N6.12'][1].steps[1];
+    expect(step.checkpointAnswer).toBe('0.70');
+  });
+
+  it('N6.12 Route B Step 3: increase 80 by 5% = 84', () => {
+    const step = SKILL_ROUTES['N6.12'][1].steps[2];
+    expect(step.checkpointAnswer).toBe('84');
+    expect(80 * 1.05).toBe(84);
+  });
+
+  it('N6.12 Route C Step 2: increase 400 by 20% = 480', () => {
+    const step = SKILL_ROUTES['N6.12'][2].steps[1];
+    expect(step.checkpointAnswer).toBe('480');
+    expect(400 * 1.2).toBe(480);
+  });
+
+  it('N6.12 Route C Step 3: decrease 250 by 20% = 200', () => {
+    const step = SKILL_ROUTES['N6.12'][2].steps[2];
+    expect(step.checkpointAnswer).toBe('200');
+    expect(250 * 0.8).toBe(200);
   });
 });
