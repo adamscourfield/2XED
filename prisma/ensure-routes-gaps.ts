@@ -328,7 +328,7 @@ export const SKILL_ROUTES: Record<string, RouteDef[]> = {
       guidedPrompt: 'Calculate 32 × 21 using long multiplication.',
       guidedAnswer: '672',
       steps: [
-        { stepOrder: 1, title: 'Multiply by units digit', explanation: 'Multiply the top number by the units digit of the bottom number. Write the result on the first row.', checkpointQuestion: '23 × 3 = ?', checkpointAnswer: '69' },
+        { stepOrder: 1, title: 'Multiply by units digit', explanation: 'Multiply the top number by the units digit of the bottom number. Write the result on the first row.', checkpointQuestion: 'What is 23 × 3?', checkpointAnswer: '69' },
         { stepOrder: 2, title: 'Multiply by tens digit', explanation: 'Multiply the top number by the tens digit. Place a zero placeholder in the units column before writing the result.', checkpointQuestion: '23 × 10 = ?', checkpointAnswer: '230' },
         { stepOrder: 3, title: 'Add the partial products', explanation: 'Add the two partial products to get the final answer.', checkpointQuestion: 'Calculate 23 × 13 using long multiplication.', checkpointAnswer: '299' },
       ],
@@ -354,7 +354,7 @@ export const SKILL_ROUTES: Record<string, RouteDef[]> = {
       steps: [
         { stepOrder: 1, title: 'The zero placeholder rule', explanation: 'When multiplying by the tens digit, always write a 0 in the units column before the partial product. This shifts the value into the tens.', checkpointQuestion: 'When multiplying 34 by the tens digit 2 (from 24), what placeholder goes in the units column?', checkpointAnswer: '0' },
         { stepOrder: 2, title: 'Why the placeholder matters', explanation: 'Multiplying 34 × 2 gives 68. But we are multiplying by 20, not 2. The placeholder zero makes it 680.', checkpointQuestion: '34 × 20 = ?', checkpointAnswer: '680' },
-        { stepOrder: 3, title: 'Full example', explanation: 'Complete both rows then add.', checkpointQuestion: 'Calculate 32 × 12 using long multiplication.', checkpointAnswer: '384' },
+        { stepOrder: 3, title: 'Full example', explanation: 'Complete both partial-product rows and then add them together to find the final answer.', checkpointQuestion: 'Calculate 32 × 12 using long multiplication.', checkpointAnswer: '384' },
       ],
     },
   ],
@@ -381,7 +381,7 @@ export const SKILL_ROUTES: Record<string, RouteDef[]> = {
       guidedAnswer: 'Multiply the digit first, then add the carry. Do not add carry before multiplying.',
       steps: [
         { stepOrder: 1, title: 'Multiply first, then add carry', explanation: 'Always multiply the digit by the multiplier first. Add the carry digit AFTER multiplying, not before.', checkpointQuestion: 'In 38 × 5: multiply 3 × 5 first. What is it?', checkpointAnswer: '15' },
-        { stepOrder: 2, title: 'Then add the carry', explanation: 'Then add the carry: 15 + 4 = 19.', checkpointQuestion: 'If 3 × 5 = 15 and carry = 4, what is the full value?', checkpointAnswer: '19' },
+        { stepOrder: 2, title: 'Then add the carry', explanation: 'After multiplying the digit, add the carry from the previous step: 15 + 4 = 19.', checkpointQuestion: 'If 3 × 5 = 15 and carry = 4, what is the full value?', checkpointAnswer: '19' },
         { stepOrder: 3, title: 'Full calculation', explanation: 'Combine both steps to complete the multiplication.', checkpointQuestion: 'Calculate 78 × 4.', checkpointAnswer: '312' },
       ],
     },
@@ -409,7 +409,7 @@ export const SKILL_ROUTES: Record<string, RouteDef[]> = {
       guidedAnswer: '40 cm²',
       steps: [
         { stepOrder: 1, title: 'Area = length × width', explanation: 'Area is the space inside a 2D shape. For a rectangle: Area = length × width. Units are squared (e.g. cm²).', checkpointQuestion: 'What is the area of a rectangle 7 cm × 3 cm?', checkpointAnswer: '21 cm²' },
-        { stepOrder: 2, title: 'Area of a triangle', explanation: 'Area of a triangle = ½ × base × height.', checkpointQuestion: 'What is the area of a triangle with base 10 cm and height 6 cm?', checkpointAnswer: '30 cm²' },
+        { stepOrder: 2, title: 'Area of a triangle', explanation: 'Area of a triangle = ½ × base × perpendicular height. Remember to halve the product.', checkpointQuestion: 'What is the area of a triangle with base 10 cm and height 6 cm?', checkpointAnswer: '30 cm²' },
         { stepOrder: 3, title: 'Area of a compound shape', explanation: 'Split the compound shape into rectangles/triangles. Find each area separately, then add (or subtract if one is removed).', checkpointQuestion: 'An L-shape is made from two rectangles: 4×6 and 2×3. What is the total area?', checkpointAnswer: '30 cm²' },
       ],
     },
@@ -484,7 +484,7 @@ export const SKILL_ROUTES: Record<string, RouteDef[]> = {
     {
       routeType: 'A',
       misconceptionSummary: 'Students do not write the remainder as a fraction or decimal when needed.',
-      workedExample: '17 ÷ 5 = 3 r2 = 3 and 2/5.',
+      workedExample: '17 ÷ 5 = 3 remainder 2 = 3 and 2/5 as a mixed number.',
       guidedPrompt: 'Calculate 23 ÷ 4. Write any remainder as a fraction.',
       guidedAnswer: '5 r3 = 5¾',
       steps: [
@@ -507,14 +507,14 @@ export const SKILL_ROUTES: Record<string, RouteDef[]> = {
     },
     {
       routeType: 'C',
-      misconceptionSummary: 'Students get the remainder right but lose track of carrying in multi-digit examples.',
+      misconceptionSummary: 'Students forget to carry the remainder correctly in multi-digit short division with remainders.',
       workedExample: '185 ÷ 4: 1÷4=0r1, 18÷4=4r2, 25÷4=6r1 → 46r1.',
       guidedPrompt: 'Calculate 195 ÷ 7 using short division.',
       guidedAnswer: '27 r6.',
       steps: [
         { stepOrder: 1, title: 'Track remainders carefully', explanation: 'At each step, note the remainder and combine it with the next digit before dividing. Write the carry clearly above the next digit.', checkpointQuestion: 'In 185 ÷ 4: 1÷4=0 r1. The carried 1 joins the next digit 8 to make…?', checkpointAnswer: '18.' },
         { stepOrder: 2, title: 'Continue through all digits', explanation: '18÷4=4 r2; carry 2 to next digit: 25÷4=6 r1. Write 46 remainder 1.', checkpointQuestion: 'Complete: 185 ÷ 4 = ?', checkpointAnswer: '46 remainder 1.' },
-        { stepOrder: 3, title: 'Verify', explanation: 'Check: 46 × 4 + 1 = 184 + 1 = 185 ✓.', checkpointQuestion: 'Verify 195 ÷ 7 = 27 r6.', checkpointAnswer: '27 × 7 + 6 = 189 + 6 = 195 ✓.' },
+        { stepOrder: 3, title: 'Verify', explanation: 'Always verify by checking: quotient × divisor + remainder = dividend. 46 × 4 + 1 = 185 ✓.', checkpointQuestion: 'Verify 195 ÷ 7 = 27 r6.', checkpointAnswer: '27 × 7 + 6 = 189 + 6 = 195 ✓.' },
       ],
     },
   ],
@@ -542,7 +542,7 @@ export const SKILL_ROUTES: Record<string, RouteDef[]> = {
       steps: [
         { stepOrder: 1, title: 'Short division layout', explanation: 'Write divisor outside the bracket and dividend inside. Write the quotient digit above each dividend digit.', checkpointQuestion: 'Set up and begin 73 ÷ 6: 7 ÷ 6 = ?', checkpointAnswer: '1 r 1.' },
         { stepOrder: 2, title: 'Carry and continue', explanation: 'Carry the remainder 1 to join the next digit (3), making 13. Then 13 ÷ 6 = 2 r1.', checkpointQuestion: 'Complete: 73 ÷ 6 = ?', checkpointAnswer: '12 r 1.' },
-        { stepOrder: 3, title: 'Verify', explanation: 'Check: 12 × 6 + 1 = 73 ✓.', checkpointQuestion: 'Verify 73 ÷ 6 = 12 r1 using multiplication.', checkpointAnswer: '12 × 6 + 1 = 72 + 1 = 73 ✓.' },
+        { stepOrder: 3, title: 'Verify', explanation: 'Always verify: quotient × divisor + remainder = dividend. Check: 12 × 6 + 1 = 73 ✓.', checkpointQuestion: 'Verify 73 ÷ 6 = 12 r1 using multiplication.', checkpointAnswer: '12 × 6 + 1 = 72 + 1 = 73 ✓.' },
       ],
     },
     {
@@ -554,7 +554,7 @@ export const SKILL_ROUTES: Record<string, RouteDef[]> = {
       steps: [
         { stepOrder: 1, title: 'Never discard a remainder mid-calculation', explanation: 'Every intermediate remainder must be carried to the next digit. Dropping a remainder gives a wrong final answer.', checkpointQuestion: 'In 156 ÷ 7: 1÷7=0 r1. The 1 is carried to join which digit?', checkpointAnswer: '5, making 15.' },
         { stepOrder: 2, title: 'Continue with carries', explanation: '15÷7=2 r1; carry 1 → 16÷7=2 r2. Final answer: 22 remainder 2.', checkpointQuestion: 'Complete: 156 ÷ 7 = ?', checkpointAnswer: '22 r 2.' },
-        { stepOrder: 3, title: 'Verification', explanation: '22 × 7 + 2 = 154 + 2 = 156 ✓.', checkpointQuestion: 'Verify 156 ÷ 7 = 22 r2.', checkpointAnswer: '22 × 7 + 2 = 156 ✓.' },
+        { stepOrder: 3, title: 'Verification', explanation: 'Always check: quotient × divisor + remainder = dividend. 22 × 7 + 2 = 154 + 2 = 156 ✓.', checkpointQuestion: 'Verify 156 ÷ 7 = 22 r2.', checkpointAnswer: '22 × 7 + 2 = 156 ✓.' },
       ],
     },
   ],
@@ -582,7 +582,7 @@ export const SKILL_ROUTES: Record<string, RouteDef[]> = {
       steps: [
         { stepOrder: 1, title: 'Quotient decimal point placement', explanation: 'The decimal point in the quotient appears directly above the decimal point you add to the dividend when you continue past a remainder.', checkpointQuestion: 'In 15 ÷ 4, after the integer part (3), where does the decimal go?', checkpointAnswer: 'After the 3: 3.___.' },
         { stepOrder: 2, title: 'Continue and place correctly', explanation: 'Remainder 3 → 30 ÷ 4 = 7 r2 → 20 ÷ 4 = 5. Quotient: 3.75.', checkpointQuestion: 'Calculate 15 ÷ 4 as a decimal.', checkpointAnswer: '3.75' },
-        { stepOrder: 3, title: 'Verify', explanation: 'Check: 3.75 × 4 = 15 ✓.', checkpointQuestion: 'Calculate 11 ÷ 4 as a decimal.', checkpointAnswer: '2.75' },
+        { stepOrder: 3, title: 'Verify', explanation: 'Multiply the decimal answer back by the divisor to verify: 3.75 × 4 = 15 ✓.', checkpointQuestion: 'Calculate 11 ÷ 4 as a decimal.', checkpointAnswer: '2.75' },
       ],
     },
     {

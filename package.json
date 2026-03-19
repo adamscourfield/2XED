@@ -20,6 +20,8 @@
     "db:ensure:routes:a1": "ts-node -r tsconfig-paths/register --compiler-options '{\"module\":\"CommonJS\"}' prisma/ensure-routes-a1.ts",
     "db:ensure:routes:g1": "ts-node -r tsconfig-paths/register --compiler-options '{\"module\":\"CommonJS\"}' prisma/ensure-routes-g1.ts",
     "db:ensure:routes:n6": "ts-node -r tsconfig-paths/register --compiler-options '{\"module\":\"CommonJS\"}' prisma/ensure-routes-n6.ts",
+    "db:ensure:routes:n4": "ts-node -r tsconfig-paths/register --compiler-options '{\"module\":\"CommonJS\"}' prisma/ensure-routes-n4-1-to-n4-3.ts",
+    "db:ensure:routes:gaps": "ts-node -r tsconfig-paths/register --compiler-options '{\"module\":\"CommonJS\"}' prisma/ensure-routes-gaps.ts",
     "db:extract:explanations": "ts-node -r tsconfig-paths/register --compiler-options '{\"module\":\"CommonJS\"}' prisma/extract-explanations-from-pptx.ts",
     "db:normalize:step-question-types": "ts-node -r tsconfig-paths/register --compiler-options '{\"module\":\"CommonJS\"}' prisma/normalize-explanation-step-question-types.ts",
     "db:normalize:item-routing-purpose": "ts-node -r tsconfig-paths/register --compiler-options '{\"module\":\"CommonJS\"}' prisma/normalize-item-routing-purpose.ts",
