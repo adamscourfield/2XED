@@ -162,6 +162,7 @@ async function main() {
     { code: 'A1.19', name: 'Form and solve equations from context (word problems)',                                   strand: 'ALG', isStretch: true,  sortOrder: 1280 },
     // ── G1: Angles and polygons ────────────────────────────────────────────────
     { code: 'G1.1',  name: 'Identify and name types of angles (acute, right, obtuse, reflex)',                        strand: 'GEO', isStretch: false, sortOrder: 1300 },
+    { code: 'G1.1b', name: 'Understand angle notation (e.g. ∠ABC) and label angles correctly',                        strand: 'GEO', isStretch: false, sortOrder: 1305 },
     { code: 'G1.2',  name: 'Measure angles with a protractor',                                                        strand: 'GEO', isStretch: false, sortOrder: 1310 },
     { code: 'G1.3',  name: 'Draw angles with a protractor',                                                           strand: 'GEO', isStretch: false, sortOrder: 1320 },
     { code: 'G1.4',  name: 'Angles on a straight line sum to 180°',                                                  strand: 'GEO', isStretch: false, sortOrder: 1330 },
@@ -400,6 +401,8 @@ async function main() {
     { parentCode: 'A1.7',  childCode: 'A1.19', weight: 1 },
     // ── G1 (Angles & polygons) prereqs ──────────────────────────────────────
     { parentCode: 'N1.3',  childCode: 'G1.1',  weight: 1 },
+    { parentCode: 'G1.1',  childCode: 'G1.1b', weight: 1 },
+    { parentCode: 'G1.1b', childCode: 'G1.2',  weight: 1 },
     { parentCode: 'G1.1',  childCode: 'G1.2',  weight: 1 },
     { parentCode: 'G1.2',  childCode: 'G1.3',  weight: 1 },
     { parentCode: 'G1.1',  childCode: 'G1.4',  weight: 1 },

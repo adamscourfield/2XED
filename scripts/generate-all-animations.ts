@@ -49,6 +49,7 @@ function getVisualStyle(skillCode: string): VisualStyle {
     if (sub === 9) return 'step_procedure'; // percentage of amount
   }
   if (strand === 'A1') return 'expression_steps';  // algebra — show_expression + step_reveal
+  if (strand === 'G1') return 'step_procedure';    // geometry angles — step_reveal for protractor/angle procedures
   return 'step_procedure';
 }
 
