@@ -4,6 +4,10 @@
  * Seeds explanation routes (A / B / C) for:
  *   A1.1 — Algebraic terminology
  *   A1.2 — Algebraic notation / basic collecting like terms
+ *   A1.3 — Substitution into expressions
+ *   A1.4 — Simplify expressions by collecting like terms
+ *   A1.5 — Multiply a single term over a bracket (expand)
+ *   A1.6 — Factorise by taking out a common factor
  *
  * Scoped to a small batch (the full A1.1–A1.19 range was too large for a
  * single generation run and caused timeouts).  Additional A1 skills
@@ -279,6 +283,490 @@ const SKILL_ROUTES: Record<string, RouteDef[]> = {
       ],
     },
   ],
+
+  /* ──────────────────────────────────────────────────────────────────────
+   * A1.3 — Substitution into expressions
+   *   e.g. find the value of 3a + 2 when a = 4
+   * ────────────────────────────────────────────────────────────────────── */
+  'A1.3': [
+    {
+      routeType: 'A',
+      misconceptionSummary:
+        'Students forget that a number next to a variable means multiplication, so they concatenate digits instead of multiplying (e.g. 2a when a = 3 becomes "23" instead of 6).',
+      workedExample:
+        'Find the value of 3a + 2 when a = 4. Replace a with 4: 3 × 4 + 2 = 12 + 2 = 14.',
+      guidedPrompt: 'Find the value of 5b − 1 when b = 3.',
+      guidedAnswer: '14',
+      steps: [
+        {
+          stepOrder: 1,
+          title: 'What does substitution mean?',
+          explanation:
+            'Substitution means replacing a variable (letter) with a given number. If a = 5, then everywhere you see a you write 5 instead.',
+          checkpointQuestion: 'If x = 7, what do you replace x with?',
+          checkpointOptions: ['0', '7', 'x'],
+          checkpointAnswer: '7',
+        },
+        {
+          stepOrder: 2,
+          title: 'Remember invisible multiplication',
+          explanation:
+            'When a number is written next to a variable, it means multiply. So 3a means 3 × a. If a = 4, then 3a = 3 × 4 = 12. Do NOT write 34.',
+          checkpointQuestion: 'What is the value of 2n when n = 6?',
+          checkpointOptions: ['26', '12', '8'],
+          checkpointAnswer: '12',
+        },
+        {
+          stepOrder: 3,
+          title: 'Substitute into a full expression',
+          explanation:
+            'Replace every variable, then follow the order of operations. For 4m + 3 when m = 2: replace m → 4 × 2 + 3 = 8 + 3 = 11.',
+          checkpointQuestion: 'Find the value of 3x + 5 when x = 3.',
+          checkpointOptions: ['11', '14', '35'],
+          checkpointAnswer: '14',
+        },
+      ],
+    },
+    {
+      routeType: 'B',
+      misconceptionSummary:
+        'Students do not apply the correct order of operations after substituting, especially when the expression involves brackets or powers.',
+      workedExample:
+        'Find the value of 2(a + 3) when a = 5. Replace a: 2(5 + 3) = 2 × 8 = 16. Work out the bracket first, then multiply.',
+      guidedPrompt: 'Find the value of 3(y − 2) when y = 6.',
+      guidedAnswer: '12',
+      steps: [
+        {
+          stepOrder: 1,
+          title: 'Substitute then use BIDMAS',
+          explanation:
+            'After substituting, use the order of operations (BIDMAS): Brackets first, then Indices, then Division/Multiplication, then Addition/Subtraction.',
+          checkpointQuestion: 'In 2(a + 1) when a = 4, what do you work out first?',
+          checkpointOptions: ['2 × a', 'a + 1', '2 × 1'],
+          checkpointAnswer: 'a + 1',
+        },
+        {
+          stepOrder: 2,
+          title: 'Substituting into expressions with powers',
+          explanation:
+            'a² means a × a. If a = 3, then a² = 3 × 3 = 9. Be careful: 2a² means 2 × a² = 2 × 9 = 18, not (2a)² = 36.',
+          checkpointQuestion: 'What is the value of x² when x = 5?',
+          checkpointOptions: ['10', '25', '52'],
+          checkpointAnswer: '25',
+        },
+        {
+          stepOrder: 3,
+          title: 'Multi-variable substitution',
+          explanation:
+            'If an expression has more than one variable, replace each one with its given value. For 2a + 3b when a = 4 and b = 2: 2 × 4 + 3 × 2 = 8 + 6 = 14.',
+          checkpointQuestion: 'Find the value of a + 2b when a = 5 and b = 3.',
+          checkpointOptions: ['11', '8', '16'],
+          checkpointAnswer: '11',
+        },
+      ],
+    },
+    {
+      routeType: 'C',
+      misconceptionSummary:
+        'Students concatenate the coefficient and the substituted value instead of multiplying (e.g. 2a with a = 3 → "23" instead of 6).',
+      workedExample:
+        'Common mistake: 2a when a = 3 → students write 23. Correct: 2a means 2 × a, so 2 × 3 = 6.',
+      guidedPrompt: 'Find the value of 4p when p = 5. Show it means 4 × 5.',
+      guidedAnswer: '20',
+      steps: [
+        {
+          stepOrder: 1,
+          title: 'Spot the mistake: concatenation',
+          explanation:
+            'A common error is joining digits: 2a when a = 3 → "23". This is wrong because 2a means 2 × a, so the answer is 2 × 3 = 6.',
+          checkpointQuestion: 'A student says 5n = 54 when n = 4. What should it be?',
+          checkpointOptions: ['54', '20', '9'],
+          checkpointAnswer: '20',
+        },
+        {
+          stepOrder: 2,
+          title: 'Negative substitution pitfall',
+          explanation:
+            'When substituting a negative number, use brackets. If a = −2, then 3a = 3 × (−2) = −6. Without brackets you might lose the sign.',
+          checkpointQuestion: 'What is 4x when x = −3?',
+          checkpointOptions: ['12', '-12', '43'],
+          checkpointAnswer: '-12',
+        },
+        {
+          stepOrder: 3,
+          title: 'Double-check with a real context',
+          explanation:
+            'The perimeter of a square is 4s. If s = 7 cm, the perimeter is 4 × 7 = 28 cm. Substitution always means multiply when a number is next to a letter.',
+          checkpointQuestion: 'The perimeter of a square is 4s. What is the perimeter when s = 9?',
+          checkpointOptions: ['49', '36', '13'],
+          checkpointAnswer: '36',
+        },
+      ],
+    },
+  ],
+
+  /* ──────────────────────────────────────────────────────────────────────
+   * A1.4 — Simplify expressions by collecting like terms
+   *   e.g. 3a + 2b + 5a = 8a + 2b
+   * ────────────────────────────────────────────────────────────────────── */
+  'A1.4': [
+    {
+      routeType: 'A',
+      misconceptionSummary:
+        'Students do not correctly identify like terms — they add coefficients of terms with different variables (e.g. 3a + 2b = 5ab).',
+      workedExample:
+        'Simplify 3a + 2b + 5a. Like terms share the same variable: 3a and 5a are like terms. 3a + 5a = 8a. So the answer is 8a + 2b.',
+      guidedPrompt: 'Simplify 4x + 3y + 2x.',
+      guidedAnswer: '6x + 3y',
+      steps: [
+        {
+          stepOrder: 1,
+          title: 'What are like terms?',
+          explanation:
+            'Like terms have exactly the same variable(s). 3a and 5a are like terms. 3a and 2b are NOT like terms because the variables are different.',
+          checkpointQuestion: 'Which pair are like terms?',
+          checkpointOptions: ['3a and 2b', '4x and 7x', '5m and 5n'],
+          checkpointAnswer: '4x and 7x',
+        },
+        {
+          stepOrder: 2,
+          title: 'Collecting like terms',
+          explanation:
+            'To simplify, add or subtract the coefficients of like terms. Keep the variable the same: 2y + 6y = 8y. Only combine terms with matching variables.',
+          checkpointQuestion: 'Simplify 5p + 3p.',
+          checkpointOptions: ['8p', '15p', '8p²'],
+          checkpointAnswer: '8p',
+        },
+        {
+          stepOrder: 3,
+          title: 'Simplify a full expression',
+          explanation:
+            'Collect each group of like terms separately. For 3a + 4b + 2a + b: group a-terms → 3a + 2a = 5a; group b-terms → 4b + b = 5b. Result: 5a + 5b.',
+          checkpointQuestion: 'Simplify 2m + 3n + 5m + n.',
+          checkpointOptions: ['7m + 4n', '11mn', '7m + 3n'],
+          checkpointAnswer: '7m + 4n',
+        },
+      ],
+    },
+    {
+      routeType: 'B',
+      misconceptionSummary:
+        'Students struggle with non-linear like terms — they may treat a² and a as like terms, or fail to recognise that a² and b² are unlike.',
+      workedExample:
+        'Simplify 2a² + 3a + a². a² and a are NOT like terms (different powers). Group a²-terms: 2a² + a² = 3a². Result: 3a² + 3a.',
+      guidedPrompt: 'Simplify 4x² + 2x + x².',
+      guidedAnswer: '5x² + 2x',
+      steps: [
+        {
+          stepOrder: 1,
+          title: 'Same variable, different power = unlike',
+          explanation:
+            'a and a² are NOT like terms. Like terms must have the same variable raised to the same power. 3a and 5a are like terms. 3a² and 5a² are like terms. 3a and 5a² are NOT.',
+          checkpointQuestion: 'Are 2x and 4x² like terms?',
+          checkpointOptions: ['Yes', 'No'],
+          checkpointAnswer: 'No',
+        },
+        {
+          stepOrder: 2,
+          title: 'Collecting non-linear terms',
+          explanation:
+            'Group terms by their variable and power. For 3a² + 2a + a² + 5a: a²-group → 3a² + a² = 4a²; a-group → 2a + 5a = 7a. Result: 4a² + 7a.',
+          checkpointQuestion: 'Simplify 5y² + 3y + 2y².',
+          checkpointOptions: ['10y³', '7y² + 3y', '7y + 5y²'],
+          checkpointAnswer: '7y² + 3y',
+        },
+        {
+          stepOrder: 3,
+          title: 'Perimeter context: collecting like terms',
+          explanation:
+            'A rectangle has sides 3a and 2b. Perimeter = 3a + 2b + 3a + 2b. Collect like terms: 3a + 3a = 6a, 2b + 2b = 4b. Perimeter = 6a + 4b.',
+          checkpointQuestion: 'A triangle has sides 2x, 3x and 5. What is the perimeter?',
+          checkpointOptions: ['10x', '5x + 5', '5x + 10'],
+          checkpointAnswer: '5x + 5',
+        },
+      ],
+    },
+    {
+      routeType: 'C',
+      misconceptionSummary:
+        'Students combine unlike terms into a single product (e.g. 3a + 2b = 5ab) or forget to carry the sign when collecting like terms.',
+      workedExample:
+        'Common mistake: 3a + 2b = 5ab. This is wrong — you cannot add unlike terms. 3a + 2b stays as 3a + 2b. Only like terms can be combined.',
+      guidedPrompt: 'A student writes 4x + 3y = 7xy. Explain why this is wrong and give the correct answer.',
+      guidedAnswer: '4x + 3y',
+      steps: [
+        {
+          stepOrder: 1,
+          title: 'You cannot add unlike terms',
+          explanation:
+            'A common mistake is to add 3a + 2b and get 5ab. This is wrong because a and b are different variables. 3a + 2b cannot be simplified further.',
+          checkpointQuestion: 'Can 6m + 2n be simplified?',
+          checkpointOptions: ['Yes, to 8mn', 'Yes, to 8m', 'No, it cannot be simplified'],
+          checkpointAnswer: 'No, it cannot be simplified',
+        },
+        {
+          stepOrder: 2,
+          title: 'Watch the signs',
+          explanation:
+            'When collecting like terms, carry the sign. In 5a − 2a + 3b − b: a-terms → 5a − 2a = 3a; b-terms → 3b − b = 2b. Result: 3a + 2b.',
+          checkpointQuestion: 'Simplify 7x − 3x.',
+          checkpointOptions: ['4x', '10x', '4'],
+          checkpointAnswer: '4x',
+        },
+        {
+          stepOrder: 3,
+          title: 'Putting it all together: spot and fix errors',
+          explanation:
+            'Check each step: identify like terms, group them, combine coefficients, and keep the sign. Never multiply coefficients of added terms.',
+          checkpointQuestion: 'A student simplifies 2a + 3b + 4a as 9ab. What is the correct answer?',
+          checkpointOptions: ['9ab', '6a + 3b', '6ab + 3b'],
+          checkpointAnswer: '6a + 3b',
+        },
+      ],
+    },
+  ],
+
+  /* ──────────────────────────────────────────────────────────────────────
+   * A1.5 — Multiply a single term over a bracket (expand)
+   *   e.g. 3(x + 2) = 3x + 6
+   * ────────────────────────────────────────────────────────────────────── */
+  'A1.5': [
+    {
+      routeType: 'A',
+      misconceptionSummary:
+        'Students only multiply the term outside the bracket by the first term inside, forgetting to multiply the second term (e.g. 3(x + 2) = 3x + 2 instead of 3x + 6).',
+      workedExample:
+        'Expand 3(x + 2). Multiply 3 by each term inside the bracket: 3 × x = 3x, 3 × 2 = 6. So 3(x + 2) = 3x + 6.',
+      guidedPrompt: 'Expand 4(y + 5).',
+      guidedAnswer: '4y + 20',
+      steps: [
+        {
+          stepOrder: 1,
+          title: 'What does expanding mean?',
+          explanation:
+            'Expanding means removing brackets by multiplying the term outside by every term inside. In 3(x + 2), multiply 3 by x AND by 2.',
+          checkpointQuestion: 'When you expand 5(a + 3), how many multiplications do you perform?',
+          checkpointOptions: ['1', '2', '3'],
+          checkpointAnswer: '2',
+        },
+        {
+          stepOrder: 2,
+          title: 'Multiply each term',
+          explanation:
+            'Expand 2(x + 4): 2 × x = 2x, then 2 × 4 = 8. Write them together: 2x + 8. The sign between the terms stays the same.',
+          checkpointQuestion: 'Expand 3(a + 7).',
+          checkpointOptions: ['3a + 7', '3a + 21', '3a + 10'],
+          checkpointAnswer: '3a + 21',
+        },
+        {
+          stepOrder: 3,
+          title: 'Expanding with subtraction',
+          explanation:
+            'Expand 5(y − 3): 5 × y = 5y, then 5 × 3 = 15. Because the sign is minus, the result is 5y − 15.',
+          checkpointQuestion: 'Expand 4(m − 2).',
+          checkpointOptions: ['4m − 2', '4m + 8', '4m − 8'],
+          checkpointAnswer: '4m − 8',
+        },
+      ],
+    },
+    {
+      routeType: 'B',
+      misconceptionSummary:
+        'Students lose or flip the sign when expanding brackets with negative terms, especially with expressions like −2(x − 3), getting −2x − 6 instead of −2x + 6.',
+      workedExample:
+        'Expand −2(x − 3). Multiply −2 by x = −2x. Multiply −2 by −3 = +6 (negative × negative = positive). So −2(x − 3) = −2x + 6.',
+      guidedPrompt: 'Expand −3(a − 4).',
+      guidedAnswer: '-3a + 12',
+      steps: [
+        {
+          stepOrder: 1,
+          title: 'Expanding with a negative outside',
+          explanation:
+            'When the term outside the bracket is negative, multiply each term by the negative number. Watch the sign rules: negative × positive = negative, negative × negative = positive.',
+          checkpointQuestion: 'What is −2 × 5?',
+          checkpointOptions: ['10', '-10', '7'],
+          checkpointAnswer: '-10',
+        },
+        {
+          stepOrder: 2,
+          title: 'Negative × negative = positive',
+          explanation:
+            'In −4(x − 2): −4 × x = −4x, −4 × (−2) = +8. The second term becomes positive. So −4(x − 2) = −4x + 8.',
+          checkpointQuestion: 'Expand −5(y − 1).',
+          checkpointOptions: ['-5y − 5', '-5y + 5', '-5y − 1'],
+          checkpointAnswer: '-5y + 5',
+        },
+        {
+          stepOrder: 3,
+          title: 'Expanding with a variable outside',
+          explanation:
+            'The term outside can also be a variable: x(x + 3) means x × x + x × 3 = x² + 3x. Multiply as normal, using index rules for x × x.',
+          checkpointQuestion: 'Expand a(a + 5).',
+          checkpointOptions: ['a² + 5', 'a² + 5a', '2a + 5'],
+          checkpointAnswer: 'a² + 5a',
+        },
+      ],
+    },
+    {
+      routeType: 'C',
+      misconceptionSummary:
+        'Students partially expand, multiplying only the first term inside the bracket and leaving the second term unchanged (e.g. 3(x + 4) = 3x + 4 instead of 3x + 12).',
+      workedExample:
+        'Common mistake: 3(x + 4) = 3x + 4. The student only multiplied x by 3 and forgot to multiply 4 by 3. Correct: 3 × x = 3x, 3 × 4 = 12 → 3x + 12.',
+      guidedPrompt: 'A student writes 2(a + 6) = 2a + 6. What is the correct expansion?',
+      guidedAnswer: '2a + 12',
+      steps: [
+        {
+          stepOrder: 1,
+          title: 'Spot the partial-expansion mistake',
+          explanation:
+            'The most common error is only multiplying the first term: 2(x + 5) = 2x + 5. The 5 was not multiplied. Every term inside must be multiplied by the term outside.',
+          checkpointQuestion: 'A student writes 4(n + 3) = 4n + 3. What did they forget?',
+          checkpointOptions: ['To add 4 and n', 'To multiply 3 by 4', 'To square n'],
+          checkpointAnswer: 'To multiply 3 by 4',
+        },
+        {
+          stepOrder: 2,
+          title: 'Sign errors with negatives',
+          explanation:
+            'Another mistake: −3(x − 2) = −3x − 6. The student treated −3 × −2 as negative. Remember: negative × negative = positive. Correct: −3x + 6.',
+          checkpointQuestion: 'What is the correct expansion of −2(y − 4)?',
+          checkpointOptions: ['-2y − 8', '-2y + 8', '-2y − 4'],
+          checkpointAnswer: '-2y + 8',
+        },
+        {
+          stepOrder: 3,
+          title: 'Check by substitution',
+          explanation:
+            'You can check your expansion by substituting a value. For 3(x + 2): let x = 1. Bracket: 3(1 + 2) = 3 × 3 = 9. Expansion: 3(1) + 6 = 3 + 6 = 9. ✓ They match!',
+          checkpointQuestion: 'Check: if x = 2, does 5(x + 1) = 5x + 5?',
+          checkpointOptions: ['Yes — both give 15', 'No — they give different values'],
+          checkpointAnswer: 'Yes — both give 15',
+        },
+      ],
+    },
+  ],
+
+  /* ──────────────────────────────────────────────────────────────────────
+   * A1.6 — Factorise by taking out a common factor
+   *   e.g. 6x + 9 = 3(2x + 3)
+   * ────────────────────────────────────────────────────────────────────── */
+  'A1.6': [
+    {
+      routeType: 'A',
+      misconceptionSummary:
+        'Students do not identify the highest common factor (HCF) of all terms — they may take out a factor that is too small, leaving a partially factorised expression.',
+      workedExample:
+        'Factorise 6x + 9. Find the HCF of 6 and 9 → HCF is 3. Divide each term: 6x ÷ 3 = 2x, 9 ÷ 3 = 3. Write as 3(2x + 3).',
+      guidedPrompt: 'Factorise 8y + 12.',
+      guidedAnswer: '4(2y + 3)',
+      steps: [
+        {
+          stepOrder: 1,
+          title: 'What does factorising mean?',
+          explanation:
+            'Factorising is the reverse of expanding. You find a common factor shared by every term and write it outside a bracket. What remains goes inside the bracket.',
+          checkpointQuestion: 'Factorising is the reverse of which operation?',
+          checkpointOptions: ['Simplifying', 'Expanding', 'Substituting'],
+          checkpointAnswer: 'Expanding',
+        },
+        {
+          stepOrder: 2,
+          title: 'Find the HCF of the coefficients',
+          explanation:
+            'To factorise 10x + 15, find the HCF of 10 and 15 → HCF is 5. Divide each term by 5: 10x ÷ 5 = 2x, 15 ÷ 5 = 3. Result: 5(2x + 3).',
+          checkpointQuestion: 'Factorise 12a + 18.',
+          checkpointOptions: ['2(6a + 9)', '6(2a + 3)', '3(4a + 6)'],
+          checkpointAnswer: '6(2a + 3)',
+        },
+        {
+          stepOrder: 3,
+          title: 'Factorising with variables as common factors',
+          explanation:
+            'If every term contains the same variable, include it in the common factor. For 4x² + 6x: HCF is 2x. 4x² ÷ 2x = 2x, 6x ÷ 2x = 3. Result: 2x(2x + 3).',
+          checkpointQuestion: 'Factorise 3m² + 9m.',
+          checkpointOptions: ['3(m² + 3m)', '3m(m + 3)', 'm(3m + 9)'],
+          checkpointAnswer: '3m(m + 3)',
+        },
+      ],
+    },
+    {
+      routeType: 'B',
+      misconceptionSummary:
+        'Students forget to check their factorisation by re-expanding, so they do not catch errors such as missing terms or wrong signs inside the bracket.',
+      workedExample:
+        'Factorise 15a − 10. HCF of 15 and 10 is 5. 15a ÷ 5 = 3a, 10 ÷ 5 = 2. Keep the minus sign: 5(3a − 2). Check: 5 × 3a = 15a, 5 × (−2) = −10. ✓',
+      guidedPrompt: 'Factorise 14b − 21.',
+      guidedAnswer: '7(2b − 3)',
+      steps: [
+        {
+          stepOrder: 1,
+          title: 'Factorising as reverse expanding',
+          explanation:
+            'Expanding and factorising are opposites. 3(x + 4) expands to 3x + 12. Going backwards: 3x + 12 factorises to 3(x + 4). Always think: what was outside the bracket?',
+          checkpointQuestion: 'If 5(a + 2) = 5a + 10, what does 5a + 10 factorise to?',
+          checkpointOptions: ['5(a + 2)', '5(a + 10)', 'a(5 + 10)'],
+          checkpointAnswer: '5(a + 2)',
+        },
+        {
+          stepOrder: 2,
+          title: 'Keep the minus sign',
+          explanation:
+            'When factorising subtraction expressions, the minus stays inside the bracket. 12x − 8: HCF is 4. 12x ÷ 4 = 3x, 8 ÷ 4 = 2. Result: 4(3x − 2).',
+          checkpointQuestion: 'Factorise 20p − 15.',
+          checkpointOptions: ['5(4p + 3)', '5(4p − 3)', '5(4p − 15)'],
+          checkpointAnswer: '5(4p − 3)',
+        },
+        {
+          stepOrder: 3,
+          title: 'Check by re-expanding',
+          explanation:
+            'Always verify by expanding your answer. If you get 4(2x + 5), expand: 4 × 2x = 8x, 4 × 5 = 20. So 8x + 20. If this matches the original, you are correct.',
+          checkpointQuestion: 'A student factorises 9x + 6 as 3(3x + 3). Check: does 3(3x + 3) expand to 9x + 6?',
+          checkpointOptions: ['Yes', 'No — it gives 9x + 9'],
+          checkpointAnswer: 'No — it gives 9x + 9',
+        },
+      ],
+    },
+    {
+      routeType: 'C',
+      misconceptionSummary:
+        'Students take out a common factor that is not the HCF, leaving an expression that is not fully factorised (e.g. 12x + 8 = 2(6x + 4) instead of 4(3x + 2)).',
+      workedExample:
+        'Common mistake: 12x + 8 = 2(6x + 4). The student took out 2 instead of 4. 6x + 4 can still be factorised further! Correct: HCF is 4, so 4(3x + 2).',
+      guidedPrompt: 'A student factorises 18n + 12 as 2(9n + 6). What is the fully factorised form?',
+      guidedAnswer: '6(3n + 2)',
+      steps: [
+        {
+          stepOrder: 1,
+          title: 'Spot incomplete factorising',
+          explanation:
+            'If you can still find a common factor inside the bracket, you have not fully factorised. 2(6x + 4) → 6x and 4 still share a factor of 2. The HCF of 12 and 8 is 4, not 2.',
+          checkpointQuestion: 'Is 3(6a + 9) fully factorised?',
+          checkpointOptions: ['Yes', 'No — 6a and 9 share a factor of 3'],
+          checkpointAnswer: 'No — 6a and 9 share a factor of 3',
+        },
+        {
+          stepOrder: 2,
+          title: 'Always use the HCF',
+          explanation:
+            'To fully factorise, you must use the highest common factor. For 24x + 16: factors of 24 are 1,2,3,4,6,8,12,24. Factors of 16 are 1,2,4,8,16. HCF is 8. Answer: 8(3x + 2).',
+          checkpointQuestion: 'What is the HCF of 15 and 20?',
+          checkpointOptions: ['3', '5', '10'],
+          checkpointAnswer: '5',
+        },
+        {
+          stepOrder: 3,
+          title: 'Factorise variables fully too',
+          explanation:
+            'For 6x² + 4x, take out the HCF of both numbers AND variables. HCF of 6 and 4 is 2; both terms have at least one x. HCF = 2x. Result: 2x(3x + 2).',
+          checkpointQuestion: 'Factorise 10y² + 5y fully.',
+          checkpointOptions: ['5(2y² + y)', '5y(2y + 1)', 'y(10y + 5)'],
+          checkpointAnswer: '5y(2y + 1)',
+        },
+      ],
+    },
+  ],
 };
 
 async function main() {
@@ -350,7 +838,7 @@ async function main() {
     }
   }
 
-  console.log('\n✅ ensured explanation routes for A1.1, A1.2');
+  console.log('\n✅ ensured explanation routes for A1.1, A1.2, A1.3, A1.4, A1.5, A1.6');
 }
 
 main().catch(console.error).finally(() => prisma.$disconnect());

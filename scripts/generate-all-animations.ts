@@ -48,6 +48,7 @@ function getVisualStyle(skillCode: string): VisualStyle {
     if (sub === 8) return 'number_line';   // ordering FDP → number line
     if (sub === 9) return 'step_procedure'; // percentage of amount
   }
+  if (strand === 'A1') return 'expression_steps';  // algebra — show_expression + step_reveal
   return 'step_procedure';
 }
 
