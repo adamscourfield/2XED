@@ -697,7 +697,7 @@ const SKILL_ROUTES: Record<string, RouteDef[]> = {
       workedExample:
         'Factorise 15a − 10. HCF of 15 and 10 is 5. 15a ÷ 5 = 3a, 10 ÷ 5 = 2. Keep the minus sign: 5(3a − 2). Check: 5 × 3a = 15a, 5 × (−2) = −10. ✓',
       guidedPrompt: 'Factorise 14b − 21.',
-      guidedAnswer: '7(2b - 3)',
+      guidedAnswer: '7(2b − 3)',
       steps: [
         {
           stepOrder: 1,
