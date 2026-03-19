@@ -6,13 +6,6 @@
  *   G1.1b — Understand angle notation (e.g. ∠ABC) and label angles correctly
  *   G1.2  — Measure angles with a protractor
  *   G1.3  — Draw angles with a protractor
- *   G1.4  — Angles on a straight line sum to 180°
- *   G1.5  — Angles around a point sum to 360°
- *   G1.6  — Vertically opposite angles are equal
- *   G1.7  — Angles in a triangle sum to 180°
- *   G1.8  — Angles in a quadrilateral sum to 360°
- *   G1.9  — Interior angle sum of any polygon
- *   G1.10 — Exterior angles of any polygon sum to 360°; regular polygon calculations
  *
  * Run:
  *   ts-node -r tsconfig-paths/register --compiler-options '{"module":"CommonJS"}' prisma/ensure-routes-g1.ts
@@ -1264,6 +1257,7 @@ async function main() {
     }
   }
 
+  console.log('\n✅ ensured explanation routes for G1.1, G1.1b, G1.2, G1.3');
   console.log('\n✅ ensured explanation routes for G1.1, G1.1b, G1.2, G1.3, G1.4, G1.5, G1.6, G1.7, G1.8, G1.9, G1.10');
 }
 
