@@ -2,16 +2,16 @@
  * ensure-routes-a1.ts
  *
  * Seeds explanation routes (A / B / C) for:
- *   A1.1 — Algebraic terminology
- *   A1.2 — Algebraic notation / basic collecting like terms
- *   A1.3 — Substitution into expressions
- *   A1.4 — Simplify expressions by collecting like terms
- *   A1.5 — Multiply a single term over a bracket (expand)
- *   A1.6 — Factorise by taking out a common factor
- *
- * Scoped to a small batch (the full A1.1–A1.19 range was too large for a
- * single generation run and caused timeouts).  Additional A1 skills
- * can be added in follow-up passes.
+ *   A1.1  — Algebraic terminology
+ *   A1.2  — Algebraic notation / basic collecting like terms
+ *   A1.3  — Substitution into expressions
+ *   A1.4  — Simplify expressions by collecting like terms
+ *   A1.5  — Multiply a single term over a bracket (expand)
+ *   A1.6  — Factorise by taking out a common factor
+ *   A1.7  — Write expressions and formulae from worded descriptions
+ *   A1.8  — Solve one-step linear equations
+ *   A1.9  — Solve two-step linear equations
+ *   A1.10 — Solve equations with unknowns on both sides
  *
  * Run:
  *   ts-node -r tsconfig-paths/register --compiler-options '{"module":"CommonJS"}' prisma/ensure-routes-a1.ts
@@ -767,6 +767,502 @@ const SKILL_ROUTES: Record<string, RouteDef[]> = {
       ],
     },
   ],
+
+  /* ──────────────────────────────────────────────────────────────────────
+   * A1.7 — Write expressions and formulae from worded descriptions
+   *   e.g. "I think of a number, double it and add 3" → 2n + 3
+   * ────────────────────────────────────────────────────────────────────── */
+  'A1.7': [
+    {
+      routeType: 'A',
+      misconceptionSummary:
+        'Students struggle to translate everyday language into algebraic expressions — they confuse the order of operations or use the wrong operation for words like "more than", "less than" and "product of".',
+      workedExample:
+        '"I think of a number n, multiply it by 4 and subtract 7." Multiply first: 4 × n = 4n. Then subtract 7: 4n − 7. So the expression is 4n − 7.',
+      guidedPrompt: '"I think of a number n, triple it and add 5." Write an expression.',
+      guidedAnswer: '3n + 5',
+      steps: [
+        {
+          stepOrder: 1,
+          title: 'Match words to operations',
+          explanation:
+            '"Add" means +, "subtract" means −, "multiply" or "times" means ×, "divide" or "share" means ÷. "Double" means × 2, "triple" means × 3, "halve" means ÷ 2.',
+          checkpointQuestion: 'Which operation does the word "product" indicate?',
+          checkpointOptions: ['Addition', 'Subtraction', 'Multiplication'],
+          checkpointAnswer: 'Multiplication',
+        },
+        {
+          stepOrder: 2,
+          title: 'Build the expression step by step',
+          explanation:
+            '"Think of a number n, double it and add 6." Step 1: double n → 2n. Step 2: add 6 → 2n + 6. Work through each instruction in order.',
+          checkpointQuestion: '"Think of a number n, multiply by 5 and subtract 2." Which expression is correct?',
+          checkpointOptions: ['5n − 2', '5 − 2n', '2n − 5'],
+          checkpointAnswer: '5n − 2',
+        },
+        {
+          stepOrder: 3,
+          title: 'Write a formula from a context',
+          explanation:
+            'A taxi charges £3 plus £2 per mile. If m = number of miles and C = total cost, the formula is C = 2m + 3. The variable part (2m) comes from the rate and the constant (3) is the fixed charge.',
+          checkpointQuestion: 'A gym charges £10 joining fee plus £5 per visit. If v = visits and T = total cost, what is the formula?',
+          checkpointOptions: ['T = 5v + 10', 'T = 10v + 5', 'T = 15v'],
+          checkpointAnswer: 'T = 5v + 10',
+        },
+      ],
+    },
+    {
+      routeType: 'B',
+      misconceptionSummary:
+        'Students write the terms in the wrong order (e.g. n5 instead of 5n) or confuse when a situation requires addition versus multiplication, especially with phrases like "5 more than n" vs "5 times n".',
+      workedExample:
+        '"5 more than a number n" means n + 5 (not 5n). "5 times a number n" means 5n (not n + 5). The phrase "more than" signals addition; "times" signals multiplication.',
+      guidedPrompt: 'Write an expression for "8 less than a number n".',
+      guidedAnswer: 'n − 8',
+      steps: [
+        {
+          stepOrder: 1,
+          title: '"More than" versus "times"',
+          explanation:
+            '"3 more than n" → n + 3. "3 times n" → 3n. They look similar in English but are completely different operations. Read the key word carefully.',
+          checkpointQuestion: 'What does "7 more than y" translate to?',
+          checkpointOptions: ['7y', 'y + 7', 'y − 7'],
+          checkpointAnswer: 'y + 7',
+        },
+        {
+          stepOrder: 2,
+          title: '"Less than" means subtract — but watch the order',
+          explanation:
+            '"4 less than n" means n − 4 (not 4 − n). The value we subtract FROM (n) comes first, then the amount we subtract (4) comes second. Think of it as: start with n, then take away 4.',
+          checkpointQuestion: 'Write "6 less than p" as an expression.',
+          checkpointOptions: ['6 − p', 'p − 6', 'p + 6'],
+          checkpointAnswer: 'p − 6',
+        },
+        {
+          stepOrder: 3,
+          title: 'Combining operations in context',
+          explanation:
+            '"A number is doubled and then 3 is subtracted." Let the number be x. Doubled: 2x. Subtract 3: 2x − 3. Each instruction becomes one algebraic step.',
+          checkpointQuestion: '"A number y is halved and then 4 is added." Write the expression.',
+          checkpointOptions: ['y/2 + 4', '4y/2', 'y + 4/2'],
+          checkpointAnswer: 'y/2 + 4',
+        },
+      ],
+    },
+    {
+      routeType: 'C',
+      misconceptionSummary:
+        'Students reverse the subtraction order (writing 5 − n instead of n − 5 for "5 less than n") or drop the constant term entirely, producing incomplete expressions.',
+      workedExample:
+        'Common mistake: "5 less than n" → 5 − n. This reverses the subtraction. Correct: start with n and subtract 5 → n − 5. Check: if n = 10, "5 less than 10" is 5, and 10 − 5 = 5. ✓',
+      guidedPrompt: 'A student writes "3 less than m" as 3 − m. What is the correct expression?',
+      guidedAnswer: 'm − 3',
+      steps: [
+        {
+          stepOrder: 1,
+          title: 'Spot the reversed subtraction',
+          explanation:
+            '"5 less than n" means start from n and go down by 5 → n − 5. A common error is writing 5 − n. Try n = 10: "5 less than 10" = 5, and 10 − 5 = 5. ✓ But 5 − 10 = −5. ✗',
+          checkpointQuestion: 'A student writes "7 less than x" as 7 − x. What should it be?',
+          checkpointOptions: ['7 − x', 'x − 7', 'x + 7'],
+          checkpointAnswer: 'x − 7',
+        },
+        {
+          stepOrder: 2,
+          title: 'Dropping the constant',
+          explanation:
+            '"Double a number and add 3" → 2n + 3. Some students write just 2n, forgetting the "+ 3". Every part of the sentence must appear in the expression.',
+          checkpointQuestion: '"Triple a number and subtract 1." Which expression is complete?',
+          checkpointOptions: ['3n', '3n − 1', 'n − 1'],
+          checkpointAnswer: '3n − 1',
+        },
+        {
+          stepOrder: 3,
+          title: 'Check by substitution',
+          explanation:
+            'You can always check an expression by substituting a value. "I think of 4, double it and add 3." Working: 2 × 4 + 3 = 11. Does 2n + 3 give 11 when n = 4? 2(4) + 3 = 11. ✓',
+          checkpointQuestion: '"Think of a number, multiply by 3, subtract 2." If the number is 5, what should the answer be?',
+          checkpointOptions: ['11', '13', '17'],
+          checkpointAnswer: '13',
+        },
+      ],
+    },
+  ],
+
+  /* ──────────────────────────────────────────────────────────────────────
+   * A1.8 — Solve one-step linear equations
+   *   e.g. x + 5 = 12, 3x = 18, x/4 = 3
+   * ────────────────────────────────────────────────────────────────────── */
+  'A1.8': [
+    {
+      routeType: 'A',
+      misconceptionSummary:
+        'Students perform the inverse operation incorrectly — for example subtracting when they should divide, or applying the operation to only one side of the equation.',
+      workedExample:
+        'Solve x + 5 = 12. To isolate x, subtract 5 from both sides: x + 5 − 5 = 12 − 5 → x = 7. Check: 7 + 5 = 12. ✓',
+      guidedPrompt: 'Solve x + 9 = 14.',
+      guidedAnswer: 'x = 5',
+      steps: [
+        {
+          stepOrder: 1,
+          title: 'What does solving an equation mean?',
+          explanation:
+            'Solving means finding the value of the unknown that makes the equation true. In x + 5 = 12, we need the value of x so that the left side equals the right side.',
+          checkpointQuestion: 'What does it mean to "solve" an equation?',
+          checkpointOptions: [
+            'Simplify the expression',
+            'Find the value of the unknown',
+            'Expand the brackets',
+          ],
+          checkpointAnswer: 'Find the value of the unknown',
+        },
+        {
+          stepOrder: 2,
+          title: 'Use the inverse operation',
+          explanation:
+            'Addition and subtraction are inverse operations. Multiplication and division are inverse operations. To undo "+ 5", subtract 5 from both sides. To undo "× 3", divide both sides by 3.',
+          checkpointQuestion: 'Solve x − 4 = 10.',
+          checkpointOptions: ['x = 6', 'x = 14', 'x = 40'],
+          checkpointAnswer: 'x = 14',
+        },
+        {
+          stepOrder: 3,
+          title: 'Solve multiplication and division equations',
+          explanation:
+            'Solve 3x = 18. The inverse of × 3 is ÷ 3. Divide both sides: 3x ÷ 3 = 18 ÷ 3 → x = 6. Solve x/4 = 3. The inverse of ÷ 4 is × 4. Multiply both sides: x = 12.',
+          checkpointQuestion: 'Solve 5x = 35.',
+          checkpointOptions: ['x = 5', 'x = 7', 'x = 30'],
+          checkpointAnswer: 'x = 7',
+        },
+      ],
+    },
+    {
+      routeType: 'B',
+      misconceptionSummary:
+        'Students do not understand the balance model of equations — they change one side without doing the same to the other, or they guess the answer without a systematic method.',
+      workedExample:
+        'Think of an equation as a balanced scale. x + 3 = 10. If you subtract 3 from the left, you must subtract 3 from the right to keep it balanced: x = 10 − 3 = 7.',
+      guidedPrompt: 'Solve x − 6 = 11 using the balance method.',
+      guidedAnswer: 'x = 17',
+      steps: [
+        {
+          stepOrder: 1,
+          title: 'The balance model',
+          explanation:
+            'An equation is like a set of scales in balance. Whatever you do to one side, you must do to the other. If you add 5 to the left, add 5 to the right too.',
+          checkpointQuestion: 'If you subtract 3 from the left side of an equation, what must you do to the right side?',
+          checkpointOptions: ['Add 3', 'Subtract 3', 'Multiply by 3'],
+          checkpointAnswer: 'Subtract 3',
+        },
+        {
+          stepOrder: 2,
+          title: 'Visualise isolating the unknown',
+          explanation:
+            'In x + 4 = 9, imagine x and 4 on the left pan, 9 on the right. Remove 4 from both pans: left has x, right has 9 − 4 = 5. So x = 5.',
+          checkpointQuestion: 'Solve x + 7 = 20 using the balance model.',
+          checkpointOptions: ['x = 13', 'x = 27', 'x = 7'],
+          checkpointAnswer: 'x = 13',
+        },
+        {
+          stepOrder: 3,
+          title: 'Balance with multiplication and division',
+          explanation:
+            'For 4x = 24, both sides are divided by 4 to keep the balance: x = 6. For x/5 = 3, multiply both sides by 5: x = 15. Always apply the same operation to both sides.',
+          checkpointQuestion: 'Solve x/3 = 8.',
+          checkpointOptions: ['x = 5', 'x = 11', 'x = 24'],
+          checkpointAnswer: 'x = 24',
+        },
+      ],
+    },
+    {
+      routeType: 'C',
+      misconceptionSummary:
+        'Students apply the same operation instead of the inverse (e.g. adding 5 to both sides to solve x + 5 = 12 instead of subtracting 5), or only change one side of the equation.',
+      workedExample:
+        'Common mistake: x + 5 = 12 → add 5 → x + 10 = 17. The student added instead of subtracting. Correct: subtract 5 from both sides → x = 7. Check: 7 + 5 = 12. ✓',
+      guidedPrompt: 'A student solves 2x = 10 by subtracting 2 from both sides, getting 2x − 2 = 8. What should they do instead?',
+      guidedAnswer: 'Divide both sides by 2 to get x = 5',
+      steps: [
+        {
+          stepOrder: 1,
+          title: 'Same operation vs inverse operation',
+          explanation:
+            'To undo an operation you need its inverse — not the same operation again. The inverse of + is −. The inverse of × is ÷. So to solve x + 3 = 10, subtract 3 (don\'t add 3).',
+          checkpointQuestion: 'What is the inverse of multiplication?',
+          checkpointOptions: ['Addition', 'Subtraction', 'Division'],
+          checkpointAnswer: 'Division',
+        },
+        {
+          stepOrder: 2,
+          title: 'Both sides must change',
+          explanation:
+            'A student writes x + 4 = 9 → x = 9. They subtracted 4 from the left but not the right. Correct: x + 4 − 4 = 9 − 4 → x = 5.',
+          checkpointQuestion: 'A student writes x − 3 = 12 → x = 12. What did they forget?',
+          checkpointOptions: [
+            'To subtract 3 from the right side',
+            'To add 3 to the right side',
+            'To multiply both sides by 3',
+          ],
+          checkpointAnswer: 'To add 3 to the right side',
+        },
+        {
+          stepOrder: 3,
+          title: 'Always check your answer',
+          explanation:
+            'Substitute your answer back into the original equation. Solve x + 6 = 15 → x = 9. Check: 9 + 6 = 15. ✓ If it does not match, look for an error in your working.',
+          checkpointQuestion: 'A student says x = 4 solves 3x = 15. Check: does 3 × 4 = 15?',
+          checkpointOptions: ['Yes', 'No — 3 × 4 = 12'],
+          checkpointAnswer: 'No — 3 × 4 = 12',
+        },
+      ],
+    },
+  ],
+
+  /* ──────────────────────────────────────────────────────────────────────
+   * A1.9 — Solve two-step linear equations
+   *   e.g. 2x + 3 = 11, 5x − 4 = 16, (x + 2)/3 = 5
+   * ────────────────────────────────────────────────────────────────────── */
+  'A1.9': [
+    {
+      routeType: 'A',
+      misconceptionSummary:
+        'Students perform the two inverse operations in the wrong order — dividing before subtracting the constant term, leading to incorrect answers.',
+      workedExample:
+        'Solve 2x + 3 = 11. Step 1: subtract 3 from both sides → 2x = 8. Step 2: divide both sides by 2 → x = 4. Check: 2(4) + 3 = 11. ✓',
+      guidedPrompt: 'Solve 3x + 5 = 20.',
+      guidedAnswer: 'x = 5',
+      steps: [
+        {
+          stepOrder: 1,
+          title: 'Deal with the constant first',
+          explanation:
+            'In 2x + 3 = 11, the two operations on x are "× 2" then "+ 3". To undo them, reverse the order: first undo the + 3 (subtract 3), then undo the × 2 (divide by 2).',
+          checkpointQuestion: 'To solve 4x + 7 = 19, which step comes first?',
+          checkpointOptions: ['Divide by 4', 'Subtract 7', 'Add 7'],
+          checkpointAnswer: 'Subtract 7',
+        },
+        {
+          stepOrder: 2,
+          title: 'Complete both steps',
+          explanation:
+            'Solve 5x − 2 = 18. Step 1: add 2 to both sides → 5x = 20. Step 2: divide both sides by 5 → x = 4. Always perform two inverse operations in the correct order.',
+          checkpointQuestion: 'Solve 3x − 1 = 14.',
+          checkpointOptions: ['x = 5', 'x = 4', 'x = 15'],
+          checkpointAnswer: 'x = 5',
+        },
+        {
+          stepOrder: 3,
+          title: 'Equations with division',
+          explanation:
+            'Solve (x + 2)/3 = 5. First undo ÷ 3: multiply both sides by 3 → x + 2 = 15. Then undo + 2: subtract 2 → x = 13. Check: (13 + 2)/3 = 15/3 = 5. ✓',
+          checkpointQuestion: 'Solve (x − 4)/2 = 6.',
+          checkpointOptions: ['x = 16', 'x = 8', 'x = 10'],
+          checkpointAnswer: 'x = 16',
+        },
+      ],
+    },
+    {
+      routeType: 'B',
+      misconceptionSummary:
+        'Students do not see a two-step equation as a "function machine in reverse" — they struggle to visualise which operation was applied first and therefore which to undo last.',
+      workedExample:
+        'Think of 2x + 3 = 11 as a function machine: input x → × 2 → + 3 → output 11. To reverse: 11 → − 3 = 8 → ÷ 2 = 4. So x = 4.',
+      guidedPrompt: 'Use the function-machine method to solve 4x − 1 = 15.',
+      guidedAnswer: 'x = 4',
+      steps: [
+        {
+          stepOrder: 1,
+          title: 'The function machine forwards',
+          explanation:
+            'For 3x + 2 = 17, the forwards machine is: x → × 3 → + 2 → 17. Draw the chain of operations applied to x from left to right.',
+          checkpointQuestion: 'For 5x − 3 = 22, what is the first operation in the forwards machine?',
+          checkpointOptions: ['Subtract 3', 'Multiply by 5', 'Divide by 5'],
+          checkpointAnswer: 'Multiply by 5',
+        },
+        {
+          stepOrder: 2,
+          title: 'Reverse the machine',
+          explanation:
+            'To solve, run the machine backwards using inverse operations. For 3x + 2 = 17: start at 17, subtract 2 → 15, divide by 3 → 5. So x = 5.',
+          checkpointQuestion: 'Reverse the machine for 2x + 7 = 19. What is x?',
+          checkpointOptions: ['x = 6', 'x = 13', 'x = 5'],
+          checkpointAnswer: 'x = 6',
+        },
+        {
+          stepOrder: 3,
+          title: 'Apply the method to subtraction equations',
+          explanation:
+            'Solve 4x − 5 = 11. Forwards: x → × 4 → − 5 → 11. Reverse: 11 → + 5 = 16 → ÷ 4 = 4. So x = 4. Check: 4(4) − 5 = 16 − 5 = 11. ✓',
+          checkpointQuestion: 'Solve 6x − 3 = 33 using the function-machine method.',
+          checkpointOptions: ['x = 5', 'x = 6', 'x = 36'],
+          checkpointAnswer: 'x = 6',
+        },
+      ],
+    },
+    {
+      routeType: 'C',
+      misconceptionSummary:
+        'Students divide before dealing with the constant term (e.g. in 2x + 6 = 14 they divide everything by 2 first and get x + 6 = 7, which gives x = 1 instead of x = 4).',
+      workedExample:
+        'Common mistake: 2x + 6 = 14 → divide by 2 → x + 6 = 7 → x = 1. The error: they divided 14 by 2 but also needed to divide the 6 (which they forgot). Correct method: subtract 6 first → 2x = 8 → x = 4.',
+      guidedPrompt: 'A student solves 3x + 9 = 21 by dividing both sides by 3 first and gets x + 9 = 7. What went wrong and what is the correct answer?',
+      guidedAnswer: 'x = 4',
+      steps: [
+        {
+          stepOrder: 1,
+          title: 'Why order matters',
+          explanation:
+            'In 2x + 6 = 14, if you divide by 2 first you must divide every term: (2x + 6)/2 = 14/2 → x + 3 = 7 → x = 4. Many students forget to divide the 6, getting x + 6 = 7. The safer route is to subtract the constant first.',
+          checkpointQuestion: 'What is the safest first step to solve 4x + 8 = 20?',
+          checkpointOptions: ['Divide both sides by 4', 'Subtract 8 from both sides', 'Subtract 4 from both sides'],
+          checkpointAnswer: 'Subtract 8 from both sides',
+        },
+        {
+          stepOrder: 2,
+          title: 'Forgetting to apply to both sides',
+          explanation:
+            'A student writes 5x + 10 = 30 → 5x = 30 − 10 = 20 → x = 4. Correct! But another student writes 5x + 10 = 30 → 5x = 20 → x = 20. They forgot to divide. Always complete both steps.',
+          checkpointQuestion: 'Solve 3x + 6 = 18.',
+          checkpointOptions: ['x = 4', 'x = 12', 'x = 6'],
+          checkpointAnswer: 'x = 4',
+        },
+        {
+          stepOrder: 3,
+          title: 'Check by substituting back',
+          explanation:
+            'After solving, always substitute your answer back in. Solve 2x + 5 = 13 → 2x = 8 → x = 4. Check: 2(4) + 5 = 8 + 5 = 13. ✓ If it doesn\'t match, retrace your steps.',
+          checkpointQuestion: 'A student says x = 3 solves 4x + 2 = 18. Check: does 4(3) + 2 = 18?',
+          checkpointOptions: ['Yes', 'No — it gives 14'],
+          checkpointAnswer: 'No — it gives 14',
+        },
+      ],
+    },
+  ],
+
+  /* ──────────────────────────────────────────────────────────────────────
+   * A1.10 — Solve equations with unknowns on both sides
+   *   e.g. 5x + 1 = 3x + 9
+   * ────────────────────────────────────────────────────────────────────── */
+  'A1.10': [
+    {
+      routeType: 'A',
+      misconceptionSummary:
+        'Students do not collect the variable terms on one side first — they try to solve by treating each side independently, or they subtract the x-terms incorrectly.',
+      workedExample:
+        'Solve 5x + 1 = 3x + 9. Step 1: subtract 3x from both sides → 2x + 1 = 9. Step 2: subtract 1 from both sides → 2x = 8. Step 3: divide by 2 → x = 4. Check: 5(4) + 1 = 21, 3(4) + 9 = 21. ✓',
+      guidedPrompt: 'Solve 7x + 2 = 4x + 14.',
+      guidedAnswer: 'x = 4',
+      steps: [
+        {
+          stepOrder: 1,
+          title: 'Get the variables on one side',
+          explanation:
+            'When there are x-terms on both sides, start by moving the smaller x-term to the other side. In 5x + 1 = 3x + 9, subtract 3x from both sides to get 2x + 1 = 9.',
+          checkpointQuestion: 'To solve 6x + 3 = 2x + 15, what should you subtract from both sides first?',
+          checkpointOptions: ['6x', '2x', '3'],
+          checkpointAnswer: '2x',
+        },
+        {
+          stepOrder: 2,
+          title: 'Then solve the two-step equation',
+          explanation:
+            'After collecting x-terms: 4x + 3 = 15. This is now a two-step equation. Subtract 3 → 4x = 12. Divide by 4 → x = 3.',
+          checkpointQuestion: 'Solve 8x + 5 = 3x + 25.',
+          checkpointOptions: ['x = 4', 'x = 5', 'x = 6'],
+          checkpointAnswer: 'x = 4',
+        },
+        {
+          stepOrder: 3,
+          title: 'Check both sides',
+          explanation:
+            'Always substitute back into both sides. If x = 4 and the equation is 5x + 1 = 3x + 9: Left = 5(4) + 1 = 21. Right = 3(4) + 9 = 21. Both equal 21 → correct!',
+          checkpointQuestion: 'Does x = 3 solve 4x + 2 = 2x + 8? Check both sides.',
+          checkpointOptions: ['Yes — both sides equal 14', 'No — left = 14, right = 12'],
+          checkpointAnswer: 'Yes — both sides equal 14',
+        },
+      ],
+    },
+    {
+      routeType: 'B',
+      misconceptionSummary:
+        'Students do not understand why they need to collect terms on one side — they see "5x" and "3x" as unrelated quantities rather than the same unknown that can be combined.',
+      workedExample:
+        'Imagine a balance scale: 5 bags of x and 1 on the left, 3 bags of x and 9 on the right. Remove 3 bags from each side → 2 bags and 1 on the left, 9 on the right. Remove 1 from each side → 2 bags = 8 → each bag = 4.',
+      guidedPrompt: 'Use the balance model to solve 6x + 4 = 2x + 20.',
+      guidedAnswer: 'x = 4',
+      steps: [
+        {
+          stepOrder: 1,
+          title: 'Why collect variable terms?',
+          explanation:
+            'In 5x + 1 = 3x + 9, both "5x" and "3x" represent multiples of the same unknown. To find x, we need a simpler equation with x on only one side. Subtracting 3x from both sides achieves this.',
+          checkpointQuestion: 'Why do we subtract 3x from both sides of 5x + 1 = 3x + 9?',
+          checkpointOptions: [
+            'To make the numbers smaller',
+            'To get x-terms on one side only',
+            'To remove the constant',
+          ],
+          checkpointAnswer: 'To get x-terms on one side only',
+        },
+        {
+          stepOrder: 2,
+          title: 'The balance-scale picture',
+          explanation:
+            '4x + 5 = x + 14. Picture 4 bags + 5 on the left, 1 bag + 14 on the right. Remove 1 bag from each side → 3 bags + 5 = 14. Remove 5 from each → 3 bags = 9. Each bag = 3.',
+          checkpointQuestion: 'Solve 5x + 2 = 2x + 11 using the balance model.',
+          checkpointOptions: ['x = 3', 'x = 4', 'x = 9'],
+          checkpointAnswer: 'x = 3',
+        },
+        {
+          stepOrder: 3,
+          title: 'Choosing which side to collect on',
+          explanation:
+            'You can collect x-terms on either side — choose whichever keeps the coefficient positive. In 2x + 10 = 5x + 1, subtract 2x from both sides → 10 = 3x + 1 → 9 = 3x → x = 3.',
+          checkpointQuestion: 'In 3x + 7 = 8x + 2, subtracting 3x from both sides gives?',
+          checkpointOptions: ['7 = 5x + 2', '3x + 5 = 8x', '7 = 11x + 2'],
+          checkpointAnswer: '7 = 5x + 2',
+        },
+      ],
+    },
+    {
+      routeType: 'C',
+      misconceptionSummary:
+        'Students subtract x-terms from one side only, or combine coefficients incorrectly (e.g. 5x − 3x = 15x or 5x − 3x = 2).',
+      workedExample:
+        'Common mistake: 5x + 1 = 3x + 9 → 5x − 3x = 15x. Wrong! When subtracting like terms, subtract the coefficients: 5x − 3x = (5 − 3)x = 2x. Also, subtract from both sides: 5x − 3x + 1 = 3x − 3x + 9 → 2x + 1 = 9.',
+      guidedPrompt: 'A student writes 7x − 2x = 5. What did they do wrong?',
+      guidedAnswer: '7x − 2x = 5x, not 5',
+      steps: [
+        {
+          stepOrder: 1,
+          title: 'Subtracting like terms correctly',
+          explanation:
+            '5x − 3x means "5 lots of x minus 3 lots of x" = 2 lots of x = 2x. You subtract the coefficients (5 − 3 = 2), keeping the x. It is NOT 2 (dropping the x) or 15x (multiplying instead of subtracting).',
+          checkpointQuestion: 'What is 9x − 4x?',
+          checkpointOptions: ['5', '5x', '36x'],
+          checkpointAnswer: '5x',
+        },
+        {
+          stepOrder: 2,
+          title: 'Apply the subtraction to both sides',
+          explanation:
+            'In 6x + 3 = 4x + 11, subtract 4x from BOTH sides: 6x − 4x + 3 = 4x − 4x + 11 → 2x + 3 = 11. A common mistake is only removing 4x from the right.',
+          checkpointQuestion: 'Subtract 2x from both sides of 5x + 1 = 2x + 7. What do you get?',
+          checkpointOptions: ['5x + 1 = 7', '3x + 1 = 7', '3x = 7'],
+          checkpointAnswer: '3x + 1 = 7',
+        },
+        {
+          stepOrder: 3,
+          title: 'Full worked example with check',
+          explanation:
+            'Solve 4x + 3 = x + 12. Subtract x: 3x + 3 = 12. Subtract 3: 3x = 9. Divide by 3: x = 3. Check: 4(3) + 3 = 15, 1(3) + 12 = 15. ✓',
+          checkpointQuestion: 'Solve 6x + 2 = 3x + 11.',
+          checkpointOptions: ['x = 3', 'x = 4', 'x = 9'],
+          checkpointAnswer: 'x = 3',
+        },
+      ],
+    },
+  ],
 };
 
 async function main() {
@@ -838,7 +1334,7 @@ async function main() {
     }
   }
 
-  console.log('\n✅ ensured explanation routes for A1.1, A1.2, A1.3, A1.4, A1.5, A1.6');
+  console.log('\n✅ ensured explanation routes for A1.1–A1.10');
 }
 
 main().catch(console.error).finally(() => prisma.$disconnect());
