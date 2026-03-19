@@ -691,4 +691,278 @@ describe('N6.1–N6.20 mathematical correctness', () => {
     expect(step.checkpointAnswer).toBe('200');
     expect(250 * 0.8).toBe(200);
   });
+
+  // N6.13 — Reverse percentages
+  it('N6.13 Route A Step 1: multiplier for 25% increase = 1.25', () => {
+    const step = SKILL_ROUTES['N6.13'][0].steps[0];
+    expect(step.checkpointAnswer).toBe('1.25');
+  });
+
+  it('N6.13 Route A Step 2: £84 after 20% increase → original = £70', () => {
+    const step = SKILL_ROUTES['N6.13'][0].steps[1];
+    expect(step.checkpointAnswer).toBe('£70');
+    expect(84 / 1.2).toBe(70);
+  });
+
+  it('N6.13 Route A Step 3: £91 after 30% increase → original = £70', () => {
+    const step = SKILL_ROUTES['N6.13'][0].steps[2];
+    expect(step.checkpointAnswer).toBe('£70');
+    expect(91 / 1.3).toBe(70);
+  });
+
+  it('N6.13 Route B Step 2: if 1% = £0.80 then 100% = £80', () => {
+    const step = SKILL_ROUTES['N6.13'][1].steps[1];
+    expect(step.checkpointAnswer).toBe('£80');
+    expect(0.80 * 100).toBe(80);
+  });
+
+  it('N6.13 Route B Step 3: £68 after 15% decrease → original = £80', () => {
+    const step = SKILL_ROUTES['N6.13'][1].steps[2];
+    expect(step.checkpointAnswer).toBe('£80');
+    expect(68 / 0.85).toBe(80);
+  });
+
+  it('N6.13 Route C Step 2: £91 after 30% increase → original = £70', () => {
+    const step = SKILL_ROUTES['N6.13'][2].steps[1];
+    expect(step.checkpointAnswer).toBe('£70');
+    expect(91 / 1.3).toBe(70);
+  });
+
+  // N6.14 — Repeated percentage change (compound)
+  it('N6.14 Route A Step 1: multiplier for 10% decrease = 0.90', () => {
+    const step = SKILL_ROUTES['N6.14'][0].steps[0];
+    expect(step.checkpointAnswer).toBe('0.90');
+  });
+
+  it('N6.14 Route A Step 2: £1000 at 5% for 2 years = £1102.50', () => {
+    const step = SKILL_ROUTES['N6.14'][0].steps[1];
+    expect(step.checkpointAnswer).toBe('£1102.50');
+    expect(1000 * 1.05 * 1.05).toBe(1102.5);
+  });
+
+  it('N6.14 Route A Step 3: £500 at 10% for 3 years = £665.50', () => {
+    const step = SKILL_ROUTES['N6.14'][0].steps[2];
+    expect(step.checkpointAnswer).toBe('£665.50');
+    expect(500 * 1.1 * 1.1 * 1.1).toBeCloseTo(665.5);
+  });
+
+  it('N6.14 Route B Step 2: interest in 2nd year on £1050 at 5% = £52.50', () => {
+    const step = SKILL_ROUTES['N6.14'][1].steps[1];
+    expect(step.checkpointAnswer).toBe('£52.50');
+    expect(1050 * 0.05).toBe(52.5);
+  });
+
+  it('N6.14 Route B Step 3: £12000 car depreciates 10%/yr for 2 years = £9720', () => {
+    const step = SKILL_ROUTES['N6.14'][1].steps[2];
+    expect(step.checkpointAnswer).toBe('£9720');
+    expect(12000 * 0.9 * 0.9).toBe(9720);
+  });
+
+  it('N6.14 Route C Step 2: £12000 depreciates 10%/yr for 2 years = £9720', () => {
+    const step = SKILL_ROUTES['N6.14'][2].steps[1];
+    expect(step.checkpointAnswer).toBe('£9720');
+    expect(12000 * 0.9 * 0.9).toBe(9720);
+  });
+
+  // N6.15 — Express one number as a fraction/percentage in context
+  it('N6.15 Route A Step 1: £15 out of £60 = 15/60', () => {
+    const step = SKILL_ROUTES['N6.15'][0].steps[0];
+    expect(step.checkpointAnswer).toBe('15/60');
+  });
+
+  it('N6.15 Route A Step 2: simplify 30/120 = 1/4', () => {
+    const step = SKILL_ROUTES['N6.15'][0].steps[1];
+    expect(step.checkpointAnswer).toBe('1/4');
+    expect(30 / 120).toBe(0.25);
+  });
+
+  it('N6.15 Route A Step 3: 18 out of 24 = 75%', () => {
+    const step = SKILL_ROUTES['N6.15'][0].steps[2];
+    expect(step.checkpointAnswer).toBe('75%');
+    expect((18 / 24) * 100).toBe(75);
+  });
+
+  it('N6.15 Route B Step 2: 15 ÷ 60 = 0.25', () => {
+    const step = SKILL_ROUTES['N6.15'][1].steps[1];
+    expect(step.checkpointAnswer).toBe('0.25');
+    expect(15 / 60).toBe(0.25);
+  });
+
+  it('N6.15 Route C Step 2: 30 out of 120 = 25%', () => {
+    const step = SKILL_ROUTES['N6.15'][2].steps[1];
+    expect(step.checkpointAnswer).toBe('25%');
+    expect((30 / 120) * 100).toBe(25);
+  });
+
+  // N6.16 — Ratio notation; simplify ratios
+  it('N6.16 Route A Step 1: 250ml : 1 litre = 250 : 1000', () => {
+    const step = SKILL_ROUTES['N6.16'][0].steps[0];
+    expect(step.checkpointAnswer).toBe('250 : 1000');
+  });
+
+  it('N6.16 Route A Step 2: simplify 12 : 18 = 2 : 3', () => {
+    const step = SKILL_ROUTES['N6.16'][0].steps[1];
+    expect(step.checkpointAnswer).toBe('2 : 3');
+    expect(12 / 6).toBe(2);
+    expect(18 / 6).toBe(3);
+  });
+
+  it('N6.16 Route A Step 3: simplify 2/3 : 4/5 = 5 : 6', () => {
+    const step = SKILL_ROUTES['N6.16'][0].steps[2];
+    expect(step.checkpointAnswer).toBe('5 : 6');
+    expect((2 / 3) * 15).toBe(10);
+    expect((4 / 5) * 15).toBe(12);
+    // 10:12 = 5:6
+  });
+
+  it('N6.16 Route B Step 3: simplify 250 : 1000 = 1 : 4', () => {
+    const step = SKILL_ROUTES['N6.16'][1].steps[2];
+    expect(step.checkpointAnswer).toBe('1 : 4');
+    expect(250 / 250).toBe(1);
+    expect(1000 / 250).toBe(4);
+  });
+
+  it('N6.16 Route C Step 2: simplify 12 : 18 = 2 : 3', () => {
+    const step = SKILL_ROUTES['N6.16'][2].steps[1];
+    expect(step.checkpointAnswer).toBe('2 : 3');
+  });
+
+  // N6.17 — Share a quantity in a given ratio
+  it('N6.17 Route A Step 1: total parts in 3 : 5 = 8', () => {
+    const step = SKILL_ROUTES['N6.17'][0].steps[0];
+    expect(step.checkpointAnswer).toBe('8');
+    expect(3 + 5).toBe(8);
+  });
+
+  it('N6.17 Route A Step 2: £120 in 3:5, one part = £15', () => {
+    const step = SKILL_ROUTES['N6.17'][0].steps[1];
+    expect(step.checkpointAnswer).toBe('£15');
+    expect(120 / 8).toBe(15);
+  });
+
+  it('N6.17 Route A Step 3: 200g in 2:3:5, largest = 100g', () => {
+    const step = SKILL_ROUTES['N6.17'][0].steps[2];
+    expect(step.checkpointAnswer).toBe('100 g');
+    expect(200 / 10 * 5).toBe(100);
+  });
+
+  it('N6.17 Route B Step 1: fraction for first person in 3:5 = 3/8', () => {
+    const step = SKILL_ROUTES['N6.17'][1].steps[0];
+    expect(step.checkpointAnswer).toBe('3/8');
+  });
+
+  it('N6.17 Route B Step 2: 360° in 1:2:3, middle = 120°', () => {
+    const step = SKILL_ROUTES['N6.17'][1].steps[1];
+    expect(step.checkpointAnswer).toBe('120°');
+    expect(360 / 6 * 2).toBe(120);
+  });
+
+  it('N6.17 Route C Step 2: £120 in 3:5, Person A = £45', () => {
+    const step = SKILL_ROUTES['N6.17'][2].steps[1];
+    expect(step.checkpointAnswer).toBe('£45');
+    expect(120 / 8 * 3).toBe(45);
+  });
+
+  it('N6.17 Route C Step 3: 360° in 1:2:3, largest = 180°', () => {
+    const step = SKILL_ROUTES['N6.17'][2].steps[2];
+    expect(step.checkpointAnswer).toBe('180°');
+    expect(360 / 6 * 3).toBe(180);
+  });
+
+  // N6.18 — Unitary method
+  it('N6.18 Route A Step 1: 5 pens for £3.50, one pen = £0.70', () => {
+    const step = SKILL_ROUTES['N6.18'][0].steps[0];
+    expect(step.checkpointAnswer).toBe('£0.70');
+    expect(3.5 / 5).toBe(0.7);
+  });
+
+  it('N6.18 Route A Step 2: 8 pens = £5.60', () => {
+    const step = SKILL_ROUTES['N6.18'][0].steps[1];
+    expect(step.checkpointAnswer).toBe('£5.60');
+    expect(0.7 * 8).toBeCloseTo(5.6);
+  });
+
+  it('N6.18 Route A Step 3: recipe for 4 uses 300g, for 6 = 450g', () => {
+    const step = SKILL_ROUTES['N6.18'][0].steps[2];
+    expect(step.checkpointAnswer).toBe('450 g');
+    expect(300 / 4 * 6).toBe(450);
+  });
+
+  it('N6.18 Route B Step 3: 3 workers 12 days, 4 workers = 9 days', () => {
+    const step = SKILL_ROUTES['N6.18'][1].steps[2];
+    expect(step.checkpointAnswer).toBe('9 days');
+    expect(3 * 12 / 4).toBe(9);
+  });
+
+  it('N6.18 Route C Step 2: recipe for 4 uses 300g, for 6 = 450g', () => {
+    const step = SKILL_ROUTES['N6.18'][2].steps[1];
+    expect(step.checkpointAnswer).toBe('450 g');
+    expect(300 / 4 * 6).toBe(450);
+  });
+
+  // N6.19 — Convert between FDP
+  it('N6.19 Route A Step 1: 3/8 = 0.375', () => {
+    const step = SKILL_ROUTES['N6.19'][0].steps[0];
+    expect(step.checkpointAnswer).toBe('0.375');
+    expect(3 / 8).toBe(0.375);
+  });
+
+  it('N6.19 Route A Step 2: 0.35 = 7/20', () => {
+    const step = SKILL_ROUTES['N6.19'][0].steps[1];
+    expect(step.checkpointAnswer).toBe('7/20');
+    expect(35 / 100).toBe(0.35);
+  });
+
+  it('N6.19 Route A Step 3: 7/20 = 35%', () => {
+    const step = SKILL_ROUTES['N6.19'][0].steps[2];
+    expect(step.checkpointAnswer).toBe('35%');
+    expect((7 / 20) * 100).toBe(35);
+  });
+
+  it('N6.19 Route B Step 2: 3/8 = 0.375', () => {
+    const step = SKILL_ROUTES['N6.19'][1].steps[1];
+    expect(step.checkpointAnswer).toBe('0.375');
+    expect(3 / 8).toBe(0.375);
+  });
+
+  it('N6.19 Route C Step 1: 0.35 denominator should be 100', () => {
+    const step = SKILL_ROUTES['N6.19'][2].steps[0];
+    expect(step.checkpointAnswer).toBe('100');
+  });
+
+  it('N6.19 Route C Step 2: 0.35 = 7/20', () => {
+    const step = SKILL_ROUTES['N6.19'][2].steps[1];
+    expect(step.checkpointAnswer).toBe('7/20');
+  });
+
+  // N6.20 — FDP in context
+  it('N6.20 Route A Step 2: 20% off £45 then 10% off = £32.40', () => {
+    const step = SKILL_ROUTES['N6.20'][0].steps[1];
+    expect(step.checkpointAnswer).toBe('£32.40');
+    expect(45 * 0.8 * 0.9).toBe(32.4);
+  });
+
+  it('N6.20 Route A Step 3: buy £80, sell £100 → 25% profit', () => {
+    const step = SKILL_ROUTES['N6.20'][0].steps[2];
+    expect(step.checkpointAnswer).toBe('25%');
+    expect((20 / 80) * 100).toBe(25);
+  });
+
+  it('N6.20 Route B Step 3: buy £80, sell £100 → 25% profit', () => {
+    const step = SKILL_ROUTES['N6.20'][1].steps[2];
+    expect(step.checkpointAnswer).toBe('25%');
+    expect((100 - 80) / 80 * 100).toBe(25);
+  });
+
+  it('N6.20 Route C Step 2: combined multiplier for 20% off then 10% off = 0.72', () => {
+    const step = SKILL_ROUTES['N6.20'][2].steps[1];
+    expect(step.checkpointAnswer).toBe('0.72');
+    expect(0.8 * 0.9).toBeCloseTo(0.72);
+  });
+
+  it('N6.20 Route C Step 3: buy £80, sell £100 → 25% profit', () => {
+    const step = SKILL_ROUTES['N6.20'][2].steps[2];
+    expect(step.checkpointAnswer).toBe('25%');
+    expect((20 / 80) * 100).toBe(25);
+  });
 });
