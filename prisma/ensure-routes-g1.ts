@@ -10,6 +10,9 @@
  *   G1.5  — Angles around a point sum to 360°
  *   G1.6  — Vertically opposite angles are equal
  *   G1.7  — Angles in a triangle sum to 180°
+ *   G1.8  — Angles in a quadrilateral sum to 360°
+ *   G1.9  — Interior angle sum of any polygon
+ *   G1.10 — Exterior angles of any polygon sum to 360°; regular polygon calculations
  *
  * Run:
  *   ts-node -r tsconfig-paths/register --compiler-options '{"module":"CommonJS"}' prisma/ensure-routes-g1.ts
@@ -875,6 +878,321 @@ export const SKILL_ROUTES: Record<string, RouteDef[]> = {
       ],
     },
   ],
+
+  /* ──────────────────────────────────────────────────────────────────────
+   * G1.8 — Angles in a quadrilateral sum to 360°
+   * ────────────────────────────────────────────────────────────────────── */
+  'G1.8': [
+    {
+      routeType: 'A',
+      misconceptionSummary: 'Students forget that the four interior angles of a quadrilateral always add up to 360° and guess or use 180° instead.',
+      workedExample: 'A quadrilateral has angles 90°, 80°, and 110°. The fourth angle = 360° − 90° − 80° − 110° = 80°.',
+      guidedPrompt: 'A quadrilateral has angles 100°, 85°, and 95°. Find the fourth angle.',
+      guidedAnswer: 'Fourth angle = 360° − 100° − 85° − 95° = 80°.',
+      steps: [
+        {
+          stepOrder: 1,
+          title: 'The quadrilateral angle-sum rule',
+          explanation: 'The four interior angles of every quadrilateral add up to 360°. This is true for squares, rectangles, parallelograms, trapeziums, kites, and any other four-sided shape.',
+          checkpointQuestion: 'What do the four interior angles of any quadrilateral add up to?',
+          checkpointOptions: ['180°', '270°', '360°', '540°'],
+          checkpointAnswer: '360°',
+        },
+        {
+          stepOrder: 2,
+          title: 'Finding a missing angle',
+          explanation: 'Add the three known angles, then subtract from 360°. For example, if the angles are 90°, 80°, and 110°: missing angle = 360° − 90° − 80° − 110° = 80°.',
+          checkpointQuestion: 'A quadrilateral has angles 90°, 80°, and 110°. What is the fourth angle?',
+          checkpointOptions: ['70°', '80°', '90°', '100°'],
+          checkpointAnswer: '80°',
+        },
+        {
+          stepOrder: 3,
+          title: 'Checking your answer',
+          explanation: 'After finding the missing angle, add all four to verify the total is 360°. For example: 120° + 60° + 85° + 95° = 360° ✓. If the total is not 360°, re-check your subtraction.',
+          checkpointQuestion: 'A quadrilateral has angles 120°, 60°, and 85°. What is the fourth angle?',
+          checkpointOptions: ['85°', '90°', '95°', '100°'],
+          checkpointAnswer: '95°',
+        },
+      ],
+    },
+    {
+      routeType: 'B',
+      misconceptionSummary: 'Students accept the 360° rule but do not understand why it works or how it connects to the triangle angle-sum rule.',
+      workedExample: 'Any quadrilateral can be split into two triangles by drawing one diagonal. Each triangle has angles summing to 180°, so the quadrilateral total is 2 × 180° = 360°.',
+      guidedPrompt: 'Explain why the angles in a quadrilateral sum to 360° using triangles.',
+      guidedAnswer: 'Draw a diagonal to split the quadrilateral into two triangles. Each triangle has an angle sum of 180°, so the total is 180° + 180° = 360°.',
+      steps: [
+        {
+          stepOrder: 1,
+          title: 'Splitting into triangles',
+          explanation: 'Draw a diagonal across any quadrilateral to divide it into two triangles. Each triangle has interior angles summing to 180°, so the total for the quadrilateral is 180° + 180° = 360°.',
+          checkpointQuestion: 'How many triangles can a quadrilateral be split into by drawing one diagonal?',
+          checkpointOptions: ['1', '2', '3', '4'],
+          checkpointAnswer: '2',
+        },
+        {
+          stepOrder: 2,
+          title: 'Connecting to the triangle rule',
+          explanation: 'Since the quadrilateral becomes two triangles, and each triangle has an angle sum of 180°, the quadrilateral must have an angle sum of 2 × 180° = 360°. This proof works for every quadrilateral.',
+          checkpointQuestion: 'What is 2 × 180°?',
+          checkpointOptions: ['270°', '360°', '540°'],
+          checkpointAnswer: '360°',
+        },
+        {
+          stepOrder: 3,
+          title: 'Applying the understanding',
+          explanation: 'Once you understand that a quadrilateral is two triangles put together, the 360° rule is easy to remember. Use it to find any missing angle in a four-sided shape.',
+          checkpointQuestion: 'A quadrilateral has angles 70°, 110°, and 90°. What is the fourth angle?',
+          checkpointOptions: ['80°', '90°', '100°', '110°'],
+          checkpointAnswer: '90°',
+        },
+      ],
+    },
+    {
+      routeType: 'C',
+      misconceptionSummary: 'Students confuse the quadrilateral angle sum (360°) with the triangle angle sum (180°) and subtract known angles from 180° instead of 360°.',
+      workedExample: 'A student finds the missing angle in a quadrilateral with angles 100°, 90°, and 80° by writing 180° − 100° − 90° − 80° = −90°. They used 180° instead of 360°. The correct answer is 360° − 100° − 90° − 80° = 90°.',
+      guidedPrompt: 'A student writes 180° − 60° − 70° − 80° for a quadrilateral. What is their mistake?',
+      guidedAnswer: 'They used the triangle rule (180°) instead of the quadrilateral rule (360°). The correct calculation is 360° − 60° − 70° − 80° = 150°.',
+      steps: [
+        {
+          stepOrder: 1,
+          title: 'Choosing the right angle sum',
+          explanation: 'Triangles have angles summing to 180°. Quadrilaterals have angles summing to 360°. The most common mistake is using 180° for a four-sided shape. Always count the number of sides first.',
+          checkpointQuestion: 'Which angle sum should you use for a quadrilateral?',
+          checkpointOptions: ['180°', '360°'],
+          checkpointAnswer: '360°',
+        },
+        {
+          stepOrder: 2,
+          title: 'Spotting the error',
+          explanation: 'If your subtraction gives a negative angle or an angle greater than 360°, you have probably used the wrong angle sum. A quadrilateral angle must be between 0° and 360°.',
+          checkpointQuestion: 'A student writes 180° − 100° − 90° − 80° = −90° for a quadrilateral. What went wrong?',
+          checkpointOptions: ['They added instead of subtracting', 'They used 180° instead of 360°', 'They missed an angle'],
+          checkpointAnswer: 'They used 180° instead of 360°',
+        },
+        {
+          stepOrder: 3,
+          title: 'Correcting the calculation',
+          explanation: 'Replace 180° with 360° and redo the subtraction. For angles 100°, 90°, and 80°: 360° − 100° − 90° − 80° = 90°. Check: 100° + 90° + 80° + 90° = 360° ✓.',
+          checkpointQuestion: 'A quadrilateral has angles 100°, 90°, and 80°. What is the correct fourth angle?',
+          checkpointOptions: ['80°', '90°', '100°', '110°'],
+          checkpointAnswer: '90°',
+        },
+      ],
+    },
+  ],
+
+  /* ──────────────────────────────────────────────────────────────────────
+   * G1.9 — Interior angle sum of any polygon
+   * ────────────────────────────────────────────────────────────────────── */
+  'G1.9': [
+    {
+      routeType: 'A',
+      misconceptionSummary: 'Students do not know the formula for the interior angle sum of a polygon or use 180n instead of 180(n − 2).',
+      workedExample: 'A pentagon has 5 sides. Interior angle sum = 180° × (5 − 2) = 180° × 3 = 540°.',
+      guidedPrompt: 'Find the interior angle sum of a hexagon (6 sides).',
+      guidedAnswer: 'Interior angle sum = 180° × (6 − 2) = 180° × 4 = 720°.',
+      steps: [
+        {
+          stepOrder: 1,
+          title: 'The interior angle sum formula',
+          explanation: 'For any polygon with n sides, the sum of the interior angles is 180° × (n − 2). This works because the polygon can be split into (n − 2) triangles, each with angles summing to 180°.',
+          checkpointQuestion: 'What is the formula for the sum of interior angles of an n-sided polygon?',
+          checkpointOptions: ['180° × n', '180° × (n − 1)', '180° × (n − 2)', '360° × n'],
+          checkpointAnswer: '180° × (n − 2)',
+        },
+        {
+          stepOrder: 2,
+          title: 'Applying the formula',
+          explanation: 'For a pentagon (n = 5): angle sum = 180° × (5 − 2) = 180° × 3 = 540°. Always subtract 2 from the number of sides first, then multiply by 180°.',
+          checkpointQuestion: 'What is the interior angle sum of a pentagon (5 sides)?',
+          checkpointOptions: ['360°', '540°', '720°', '900°'],
+          checkpointAnswer: '540°',
+        },
+        {
+          stepOrder: 3,
+          title: 'Finding a missing angle',
+          explanation: 'To find a missing angle in a polygon, first calculate the total interior angle sum, then subtract all known angles. For a hexagon with five angles of 130°, 110°, 120°, 140°, and 100°: missing = 720° − 130° − 110° − 120° − 140° − 100° = 120°.',
+          checkpointQuestion: 'What is the interior angle sum of a hexagon (6 sides)?',
+          checkpointOptions: ['540°', '720°', '900°', '1080°'],
+          checkpointAnswer: '720°',
+        },
+      ],
+    },
+    {
+      routeType: 'B',
+      misconceptionSummary: 'Students memorise the formula without understanding why subtracting 2 is necessary or how triangles relate to the polygon.',
+      workedExample: 'Pick one vertex of a pentagon and draw diagonals to all non-adjacent vertices. This creates 3 triangles. Each has an angle sum of 180°, so the pentagon total is 3 × 180° = 540°. In general, n sides → (n − 2) triangles.',
+      guidedPrompt: 'Explain why a hexagon has an interior angle sum of 720° using triangles.',
+      guidedAnswer: 'From one vertex, draw diagonals to create 4 triangles (6 − 2 = 4). Each triangle sums to 180°, so the hexagon total is 4 × 180° = 720°.',
+      steps: [
+        {
+          stepOrder: 1,
+          title: 'Splitting polygons into triangles',
+          explanation: 'From one vertex of an n-sided polygon, draw diagonals to all non-adjacent vertices. This creates (n − 2) triangles. The angles of these triangles cover all the interior angles of the polygon.',
+          checkpointQuestion: 'How many triangles are formed when diagonals are drawn from one vertex of a pentagon?',
+          checkpointOptions: ['2', '3', '4', '5'],
+          checkpointAnswer: '3',
+        },
+        {
+          stepOrder: 2,
+          title: 'Why we subtract 2',
+          explanation: 'A polygon with n sides produces (n − 2) triangles because two sides of the polygon are already connected to the chosen vertex. The remaining (n − 2) triangles fill the interior. Each contributes 180° to the total.',
+          checkpointQuestion: 'A hexagon (6 sides) splits into how many triangles from one vertex?',
+          checkpointOptions: ['3', '4', '5', '6'],
+          checkpointAnswer: '4',
+        },
+        {
+          stepOrder: 3,
+          title: 'Applying the visual understanding',
+          explanation: 'Knowing the triangle-splitting method helps you derive the formula on the spot. For an octagon (8 sides): 8 − 2 = 6 triangles, so angle sum = 6 × 180° = 1080°.',
+          checkpointQuestion: 'What is the interior angle sum of an octagon (8 sides)?',
+          checkpointOptions: ['720°', '900°', '1080°', '1260°'],
+          checkpointAnswer: '1080°',
+        },
+      ],
+    },
+    {
+      routeType: 'C',
+      misconceptionSummary: 'Students use 180n instead of 180(n − 2), forgetting to subtract 2, which gives an answer that is 360° too large.',
+      workedExample: 'A student calculates the angle sum of a pentagon as 180° × 5 = 900°. This is wrong — they forgot to subtract 2. The correct answer is 180° × (5 − 2) = 180° × 3 = 540°.',
+      guidedPrompt: 'A student says the interior angle sum of a hexagon is 180° × 6 = 1080°. What is their error?',
+      guidedAnswer: 'They used 180° × n instead of 180° × (n − 2). The correct answer is 180° × 4 = 720°.',
+      steps: [
+        {
+          stepOrder: 1,
+          title: 'The common formula mistake',
+          explanation: 'The formula is 180° × (n − 2), not 180° × n. Forgetting to subtract 2 always gives an answer that is exactly 360° too large. If your answer seems too big, check whether you subtracted 2.',
+          checkpointQuestion: 'What must you subtract from n before multiplying by 180° in the polygon angle-sum formula?',
+          checkpointOptions: ['1', '2', '3'],
+          checkpointAnswer: '2',
+        },
+        {
+          stepOrder: 2,
+          title: 'Spotting the error in practice',
+          explanation: 'A student writes the angle sum of a pentagon (5 sides) as 180° × 5 = 900°. The correct calculation is 180° × (5 − 2) = 540°. Notice the difference is exactly 360°.',
+          checkpointQuestion: 'What is the correct interior angle sum of a pentagon?',
+          checkpointOptions: ['360°', '540°', '720°', '900°'],
+          checkpointAnswer: '540°',
+        },
+        {
+          stepOrder: 3,
+          title: 'Quick-check strategy',
+          explanation: 'A triangle (3 sides) has an angle sum of 180°. A quadrilateral (4 sides) has 360°. Check: 180° × (3 − 2) = 180° ✓ and 180° × (4 − 2) = 360° ✓. Use these known facts to verify you are applying the formula correctly.',
+          checkpointQuestion: 'Using the formula 180° × (n − 2), what is the angle sum of a heptagon (7 sides)?',
+          checkpointOptions: ['720°', '900°', '1080°', '1260°'],
+          checkpointAnswer: '900°',
+        },
+      ],
+    },
+  ],
+
+  /* ──────────────────────────────────────────────────────────────────────
+   * G1.10 — Exterior angles of any polygon sum to 360°; regular polygon calculations
+   * ────────────────────────────────────────────────────────────────────── */
+  'G1.10': [
+    {
+      routeType: 'A',
+      misconceptionSummary: 'Students do not know that the exterior angles of any convex polygon always sum to 360°, or they confuse exterior and interior angles.',
+      workedExample: 'A regular hexagon has 6 equal exterior angles. Each exterior angle = 360° ÷ 6 = 60°. Check: the interior angle = 180° − 60° = 120°, and 6 × 120° = 720° ✓.',
+      guidedPrompt: 'Find each exterior angle of a regular pentagon.',
+      guidedAnswer: 'Each exterior angle = 360° ÷ 5 = 72°.',
+      steps: [
+        {
+          stepOrder: 1,
+          title: 'Exterior angles sum to 360°',
+          explanation: 'If you walk around any convex polygon, turning at each vertex by the exterior angle, you make one full turn — 360°. So the exterior angles of any convex polygon always add up to 360°.',
+          checkpointQuestion: 'What do the exterior angles of any convex polygon add up to?',
+          checkpointOptions: ['180°', '360°', '540°', '720°'],
+          checkpointAnswer: '360°',
+        },
+        {
+          stepOrder: 2,
+          title: 'Exterior angles of regular polygons',
+          explanation: 'In a regular polygon all exterior angles are equal. If the polygon has n sides, each exterior angle = 360° ÷ n. For a regular octagon (8 sides): each exterior angle = 360° ÷ 8 = 45°.',
+          checkpointQuestion: 'What is each exterior angle of a regular octagon (8 sides)?',
+          checkpointOptions: ['30°', '40°', '45°', '60°'],
+          checkpointAnswer: '45°',
+        },
+        {
+          stepOrder: 3,
+          title: 'Finding the number of sides',
+          explanation: 'If you know each exterior angle of a regular polygon, divide 360° by it to find the number of sides. For example, if each exterior angle is 40°: n = 360° ÷ 40° = 9 sides.',
+          checkpointQuestion: 'A regular polygon has exterior angles of 40°. How many sides does it have?',
+          checkpointOptions: ['8', '9', '10', '12'],
+          checkpointAnswer: '9',
+        },
+      ],
+    },
+    {
+      routeType: 'B',
+      misconceptionSummary: 'Students know the exterior angle sum is 360° but do not understand why, or cannot link interior and exterior angles at a vertex.',
+      workedExample: 'At each vertex of a polygon, the interior and exterior angles lie on a straight line, so they add up to 180°. Walking around the polygon, each exterior angle represents the turn. A full walk returns you to the start — one full turn of 360°.',
+      guidedPrompt: 'Explain why the exterior angles of any convex polygon sum to 360°.',
+      guidedAnswer: 'Imagine walking along each side and turning through each exterior angle at each vertex. After completing the polygon you face the same direction as the start — a full 360° turn.',
+      steps: [
+        {
+          stepOrder: 1,
+          title: 'Interior and exterior angle pairs',
+          explanation: 'At each vertex, the interior angle and the exterior angle sit on a straight line, so they add up to 180°. If the interior angle is 120°, the exterior angle is 180° − 120° = 60°.',
+          checkpointQuestion: 'An interior angle of a polygon is 150°. What is the corresponding exterior angle?',
+          checkpointOptions: ['30°', '60°', '150°', '210°'],
+          checkpointAnswer: '30°',
+        },
+        {
+          stepOrder: 2,
+          title: 'The walking-around proof',
+          explanation: 'Imagine walking along each edge of a polygon and turning through the exterior angle at each vertex. After visiting every vertex you are back at the start, facing the same direction — you have turned through exactly 360°.',
+          checkpointQuestion: 'True or false: the exterior angle sum of 360° works only for regular polygons.',
+          checkpointOptions: ['True', 'False'],
+          checkpointAnswer: 'False',
+        },
+        {
+          stepOrder: 3,
+          title: 'Linking to interior angles',
+          explanation: 'For a regular polygon with n sides: each exterior angle = 360° ÷ n, so each interior angle = 180° − (360° ÷ n). For a regular pentagon: exterior = 72°, interior = 108°.',
+          checkpointQuestion: 'What is each interior angle of a regular pentagon?',
+          checkpointOptions: ['72°', '90°', '108°', '120°'],
+          checkpointAnswer: '108°',
+        },
+      ],
+    },
+    {
+      routeType: 'C',
+      misconceptionSummary: 'Students confuse interior and exterior angles, using the interior angle where the exterior angle is needed, or forget that interior + exterior = 180° at each vertex.',
+      workedExample: 'A student says the exterior angle of a regular hexagon is 120°. That is actually the interior angle. The exterior angle = 180° − 120° = 60°. Each exterior angle of a regular hexagon is 360° ÷ 6 = 60°.',
+      guidedPrompt: 'A student says the exterior angle of a regular pentagon is 108°. What is their mistake?',
+      guidedAnswer: '108° is the interior angle. The exterior angle = 180° − 108° = 72°, or equivalently 360° ÷ 5 = 72°.',
+      steps: [
+        {
+          stepOrder: 1,
+          title: 'Interior vs exterior',
+          explanation: 'The interior angle is inside the polygon. The exterior angle is formed by extending one side beyond the vertex. They sit on a straight line so they always add up to 180°. Mixing them up is the most common mistake.',
+          checkpointQuestion: 'What do an interior angle and its corresponding exterior angle add up to?',
+          checkpointOptions: ['90°', '180°', '360°'],
+          checkpointAnswer: '180°',
+        },
+        {
+          stepOrder: 2,
+          title: 'Spotting the swap error',
+          explanation: 'If a student says the exterior angle of a regular hexagon is 120°, check: 6 × 120° = 720° ≠ 360°. The sum of exterior angles must be 360°, so each must be 360° ÷ 6 = 60°. The 120° is the interior angle.',
+          checkpointQuestion: 'A regular hexagon has interior angles of 120°. What is each exterior angle?',
+          checkpointOptions: ['60°', '90°', '120°', '240°'],
+          checkpointAnswer: '60°',
+        },
+        {
+          stepOrder: 3,
+          title: 'Using the correct angle',
+          explanation: 'When a question asks for the exterior angle of a regular polygon, use 360° ÷ n. When it asks for the interior angle, use 180° − (360° ÷ n). Always check which angle the question requires.',
+          checkpointQuestion: 'What is each exterior angle of a regular decagon (10 sides)?',
+          checkpointOptions: ['24°', '36°', '45°', '60°'],
+          checkpointAnswer: '36°',
+        },
+      ],
+    },
+  ],
 };
 
 async function main() {
@@ -946,7 +1264,7 @@ async function main() {
     }
   }
 
-  console.log('\n✅ ensured explanation routes for G1.1, G1.1b, G1.2, G1.3, G1.4, G1.5, G1.6, G1.7');
+  console.log('\n✅ ensured explanation routes for G1.1, G1.1b, G1.2, G1.3, G1.4, G1.5, G1.6, G1.7, G1.8, G1.9, G1.10');
 }
 
 // Only execute when run directly (not when imported by tests/other modules).
