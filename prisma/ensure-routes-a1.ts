@@ -833,7 +833,7 @@ const SKILL_ROUTES: Record<string, RouteDef[]> = {
           stepOrder: 2,
           title: '"Less than" means subtract — but watch the order',
           explanation:
-            '"4 less than n" means n − 4 (not 4 − n). The number being subtracted comes second. Think of it as: start with n, then take away 4.',
+            '"4 less than n" means n − 4 (not 4 − n). The value we subtract FROM (n) comes first, then the amount we subtract (4) comes second. Think of it as: start with n, then take away 4.',
           checkpointQuestion: 'Write "6 less than p" as an expression.',
           checkpointOptions: ['6 − p', 'p − 6', 'p + 6'],
           checkpointAnswer: 'p − 6',
@@ -1237,7 +1237,7 @@ const SKILL_ROUTES: Record<string, RouteDef[]> = {
           stepOrder: 1,
           title: 'Subtracting like terms correctly',
           explanation:
-            '5x − 3x means "5 lots of x minus 3 lots of x" = 2 lots of x = 2x. You subtract the coefficients (5 − 3 = 2), keeping the x. It is NOT 5x − 3x = 2 or 15x.',
+            '5x − 3x means "5 lots of x minus 3 lots of x" = 2 lots of x = 2x. You subtract the coefficients (5 − 3 = 2), keeping the x. It is NOT 2 (dropping the x) or 15x (multiplying instead of subtracting).',
           checkpointQuestion: 'What is 9x − 4x?',
           checkpointOptions: ['5', '5x', '36x'],
           checkpointAnswer: '5x',
