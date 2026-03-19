@@ -33,11 +33,11 @@ const MIN_MISCONCEPTION_LENGTH = 30;
 const MIN_WORKED_EXAMPLE_LENGTH = 30;
 
 /**
- * All N6.1–N6.5 skills deal with fraction arithmetic — content should be
- * suitable for fraction_bar, area_model, and step_reveal animation visuals.
- * N6.6–N6.9 extend fraction work; N6.10–N6.12 cover percentages.
+ * N6.1–N6.7 cover fraction arithmetic, N6.8–N6.9 cover recurring decimals,
+ * and N6.10–N6.12 cover percentages. All content should reference
+ * fraction_bar, area_model, bar_model, or step_reveal animation visuals.
  */
-const N6_ANIMATION_COMPATIBLE_SKILLS = ['N6.1', 'N6.2', 'N6.3', 'N6.4', 'N6.5', 'N6.6', 'N6.7', 'N6.8', 'N6.9', 'N6.10', 'N6.11', 'N6.12'];
+const N6_FRACTION_AND_PERCENTAGE_SKILLS = ['N6.1', 'N6.2', 'N6.3', 'N6.4', 'N6.5', 'N6.6', 'N6.7', 'N6.8', 'N6.9', 'N6.10', 'N6.11', 'N6.12'];
 
 /* ── Helpers ─────────────────────────────────────────────────────────────── */
 
@@ -273,8 +273,8 @@ describe('N6.1–N6.12 animation compatibility', () => {
    * fraction-related terms suitable for fraction_bar and area_model visuals.
    */
 
-  for (const code of N6_ANIMATION_COMPATIBLE_SKILLS) {
-    it(`${code} (fraction arithmetic) has fraction-based content suitable for fraction_bar / area_model / step_reveal`, () => {
+  for (const code of N6_FRACTION_AND_PERCENTAGE_SKILLS) {
+    it(`${code} has fraction/percentage content suitable for visual animation primitives`, () => {
       const routes = SKILL_ROUTES[code];
       for (const route of routes) {
         // Fraction/percentage arithmetic worked examples should mention relevant terms
