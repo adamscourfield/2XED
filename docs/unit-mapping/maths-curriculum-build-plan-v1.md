@@ -146,9 +146,9 @@ N5.1–N5.12
 **New primitive needed:** `bar_model` — build before starting N5.
 
 ### Phase 4 — Algebra
-A1.1 (remaining A1.2–A1.19 deferred to follow-up runs)
+A1.1, A1.2 (remaining A1.3–A1.19 deferred to follow-up runs)
 
-All existing primitives sufficient (`show_expression`, `step_reveal`, `rule_callout`). Algebra has the most sub-topics (19) — processing all at once caused timeouts, so routes are seeded incrementally starting with A1.1.
+All existing primitives sufficient (`show_expression`, `step_reveal`, `rule_callout`). Algebra has the most sub-topics (19) — processing all at once caused timeouts, so routes are seeded incrementally.
 
 ### Phase 5 — Geometry
 G1.1–G1.10
