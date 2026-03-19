@@ -214,20 +214,13 @@ describe('N4.1–N4.3 route model alignment', () => {
         lcSummary.includes('do not') ||
         lcSummary.includes('reverse') ||
         lcSummary.includes('drop') ||
-        lcSummary.includes('apply') ||
         lcSummary.includes('forget') ||
         lcSummary.includes('incorrectly') ||
-        lcSummary.includes('only') ||
-        lcSummary.includes('upside') ||
-        lcSummary.includes('alone') ||
-        lcSummary.includes('too early') ||
-        lcSummary.includes('both') ||
-        lcSummary.includes('as well') ||
         lcSummary.includes('swap') ||
-        lcSummary.includes('ignore') ||
+        lcSummary.includes('ignor') ||
         lcSummary.includes('wrong') ||
-        lcSummary.includes('write') ||
-        lcSummary.includes('stop');
+        lcSummary.includes('stop after') ||
+        lcSummary.includes('not multiply');
       expect(hasErrorLanguage, `${code} Route C misconception should reference a specific error pattern`).toBe(true);
     });
   }

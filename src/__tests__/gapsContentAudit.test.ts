@@ -221,22 +221,14 @@ describe('Gaps (N1/N2/N3) route model alignment', () => {
         lcSummary.includes('do not') ||
         lcSummary.includes('reverse') ||
         lcSummary.includes('drop') ||
-        lcSummary.includes('apply') ||
         lcSummary.includes('forget') ||
         lcSummary.includes('incorrectly') ||
-        lcSummary.includes('only') ||
-        lcSummary.includes('upside') ||
-        lcSummary.includes('alone') ||
-        lcSummary.includes('too early') ||
-        lcSummary.includes('both') ||
-        lcSummary.includes('as well') ||
         lcSummary.includes('swap') ||
-        lcSummary.includes('ignore') ||
+        lcSummary.includes('ignor') ||
         lcSummary.includes('wrong') ||
-        lcSummary.includes('add') ||
-        lcSummary.includes('subtract') ||
         lcSummary.includes('omit') ||
-        lcSummary.includes('attach');
+        lcSummary.includes('misplac') ||
+        lcSummary.includes('mix up');
       expect(hasErrorLanguage, `${code} Route C misconception should reference a specific error pattern`).toBe(true);
     });
   }
