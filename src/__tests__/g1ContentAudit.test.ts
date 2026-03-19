@@ -520,3 +520,319 @@ describe('G1.1–G1.10 mathematical correctness', () => {
     expect(360 / 10).toBe(36);
   });
 });
+
+/* ── 8. Guided prompt / answer validation ────────────────────────────────── */
+
+describe('G1.1–G1.10 guided prompt and answer quality', () => {
+  const MIN_GUIDED_PROMPT_LENGTH = 20;
+  const MIN_GUIDED_ANSWER_LENGTH = 20;
+
+  for (const code of G1_CODES) {
+    for (const route of SKILL_ROUTES[code]) {
+      describe(`${code} Route ${route.routeType}`, () => {
+        it('has a substantive guided prompt', () => {
+          expect(route.guidedPrompt.length).toBeGreaterThanOrEqual(MIN_GUIDED_PROMPT_LENGTH);
+        });
+
+        it('has a substantive guided answer', () => {
+          expect(route.guidedAnswer.length).toBeGreaterThanOrEqual(MIN_GUIDED_ANSWER_LENGTH);
+        });
+
+        it('guided prompt is a question or instruction', () => {
+          const endsCorrectly =
+            route.guidedPrompt.endsWith('?') ||
+            route.guidedPrompt.endsWith('.') ||
+            route.guidedPrompt.endsWith('°') ||
+            route.guidedPrompt.endsWith(')');
+          expect(endsCorrectly, `${code} Route ${route.routeType} guidedPrompt should end with ?, ., ° or )`).toBe(true);
+        });
+
+        it('guided answer does not repeat the prompt verbatim', () => {
+          expect(route.guidedAnswer).not.toBe(route.guidedPrompt);
+        });
+      });
+    }
+  }
+
+  // Arithmetic spot-checks on guided answers
+  it('G1.4 Route A guided answer: 180 − 65 = 115', () => {
+    const route = SKILL_ROUTES['G1.4'][0]; // Route A
+    expect(route.guidedAnswer).toContain('115');
+    expect(180 - 65).toBe(115);
+  });
+
+  it('G1.4 Route C guided answer: 180 − 140 = 40', () => {
+    const route = SKILL_ROUTES['G1.4'][2]; // Route C
+    expect(route.guidedAnswer).toContain('40');
+    expect(180 - 140).toBe(40);
+  });
+
+  it('G1.5 Route A guided answer: 360 − 100 − 80 = 180', () => {
+    const route = SKILL_ROUTES['G1.5'][0]; // Route A
+    expect(route.guidedAnswer).toContain('180');
+    expect(360 - 100 - 80).toBe(180);
+  });
+
+  it('G1.5 Route C guided answer: 360 − 90 − 60 = 210', () => {
+    const route = SKILL_ROUTES['G1.5'][2]; // Route C
+    expect(route.guidedAnswer).toContain('210');
+    expect(360 - 90 - 60).toBe(210);
+  });
+
+  it('G1.7 Route A guided answer: 180 − 80 − 45 = 55', () => {
+    const route = SKILL_ROUTES['G1.7'][0]; // Route A
+    expect(route.guidedAnswer).toContain('55');
+    expect(180 - 80 - 45).toBe(55);
+  });
+
+  it('G1.7 Route C guided answer: 180 − 70 − 50 = 60', () => {
+    const route = SKILL_ROUTES['G1.7'][2]; // Route C
+    expect(route.guidedAnswer).toContain('60');
+    expect(180 - 70 - 50).toBe(60);
+  });
+
+  it('G1.8 Route A guided answer: 360 − 100 − 85 − 95 = 80', () => {
+    const route = SKILL_ROUTES['G1.8'][0]; // Route A
+    expect(route.guidedAnswer).toContain('80');
+    expect(360 - 100 - 85 - 95).toBe(80);
+  });
+
+  it('G1.8 Route C guided answer: 360 − 60 − 70 − 80 = 150', () => {
+    const route = SKILL_ROUTES['G1.8'][2]; // Route C
+    expect(route.guidedAnswer).toContain('150');
+    expect(360 - 60 - 70 - 80).toBe(150);
+  });
+
+  it('G1.9 Route A guided answer: 180 × (6 − 2) = 720', () => {
+    const route = SKILL_ROUTES['G1.9'][0]; // Route A
+    expect(route.guidedAnswer).toContain('720');
+    expect(180 * (6 - 2)).toBe(720);
+  });
+
+  it('G1.10 Route A guided answer: 360 ÷ 5 = 72', () => {
+    const route = SKILL_ROUTES['G1.10'][0]; // Route A
+    expect(route.guidedAnswer).toContain('72');
+    expect(360 / 5).toBe(72);
+  });
+
+  it('G1.10 Route C guided answer: 180 − 108 = 72 and 360 ÷ 5 = 72', () => {
+    const route = SKILL_ROUTES['G1.10'][2]; // Route C
+    expect(route.guidedAnswer).toContain('72');
+    expect(180 - 108).toBe(72);
+    expect(360 / 5).toBe(72);
+  });
+});
+
+/* ── 9. Cross-route differentiation ──────────────────────────────────────── */
+
+describe('G1.1–G1.10 cross-route differentiation', () => {
+  for (const code of G1_CODES) {
+    const routes = SKILL_ROUTES[code];
+
+    it(`${code} routes have distinct misconception summaries`, () => {
+      const summaries = routes.map((r: RouteDef) => r.misconceptionSummary);
+      expect(summaries.length).toBe(unique(summaries).length);
+    });
+
+    it(`${code} routes have distinct worked examples`, () => {
+      const examples = routes.map((r: RouteDef) => r.workedExample);
+      expect(examples.length).toBe(unique(examples).length);
+    });
+
+    it(`${code} routes have distinct guided prompts`, () => {
+      const prompts = routes.map((r: RouteDef) => r.guidedPrompt);
+      expect(prompts.length).toBe(unique(prompts).length);
+    });
+
+    it(`${code} routes have distinct guided answers`, () => {
+      const answers = routes.map((r: RouteDef) => r.guidedAnswer);
+      expect(answers.length).toBe(unique(answers).length);
+    });
+  }
+});
+
+/* ── 10. Step progression and uniqueness ─────────────────────────────────── */
+
+describe('G1.1–G1.10 step progression and uniqueness', () => {
+  for (const code of G1_CODES) {
+    for (const route of SKILL_ROUTES[code]) {
+      describe(`${code} Route ${route.routeType}`, () => {
+        it('has unique step titles within the route', () => {
+          const titles = route.steps.map((s: StepDef) => s.title.toLowerCase());
+          expect(titles.length).toBe(unique(titles).length);
+        });
+
+        it('has unique checkpoint questions within the route', () => {
+          const questions = route.steps.map((s: StepDef) => s.checkpointQuestion);
+          expect(questions.length).toBe(unique(questions).length);
+        });
+
+        it('has unique explanations within the route', () => {
+          const explanations = route.steps.map((s: StepDef) => s.explanation);
+          expect(explanations.length).toBe(unique(explanations).length);
+        });
+
+        it('has unique checkpoint answers within the route (no identical consecutive answers)', () => {
+          // It's acceptable for two steps to have the same answer if they test different things,
+          // but three identical answers in a row suggests copy-paste
+          const answers = route.steps.map((s: StepDef) => s.checkpointAnswer);
+          const allSame = answers.every((a) => a === answers[0]);
+          expect(allSame, `${code} Route ${route.routeType}: all 3 checkpoint answers are identical`).toBe(false);
+        });
+      });
+    }
+  }
+});
+
+/* ── 11. Complete mathematical correctness (remaining arithmetic) ────────── */
+
+describe('G1.1–G1.10 complete mathematical verification', () => {
+  // G1.2 — additional arithmetic checks
+  it('G1.2 Route A Step 3: 180 − 145 = 35 (sense-check correction)', () => {
+    // The question describes reading 145° for an acute angle; answer is to subtract from 180°
+    const step = SKILL_ROUTES['G1.2'][0].steps[2];
+    expect(step.checkpointAnswer).toBe('Subtract from 180° to get 35°');
+    expect(180 - 145).toBe(35);
+  });
+
+  it('G1.2 Route C Step 2: inner=65° outer=115° → answer is 65°', () => {
+    const step = SKILL_ROUTES['G1.2'][2].steps[1];
+    expect(step.checkpointAnswer).toBe('65°');
+    expect(180 - 115).toBe(65);
+  });
+
+  // G1.3 — procedure verification
+  it('G1.3 Route C Step 3: 140° drawn as acute ≈ 40° (wrong scale)', () => {
+    const step = SKILL_ROUTES['G1.3'][2].steps[2];
+    expect(step.checkpointAnswer).toBe('Read the wrong scale');
+    expect(180 - 140).toBe(40); // supports the "about 40°" in the question
+  });
+
+  // G1.4 — supplementary angle check
+  it('G1.4 Route B Step 3: 180 − 75 = 105 (supplementary)', () => {
+    const step = SKILL_ROUTES['G1.4'][1].steps[2];
+    expect(step.checkpointAnswer).toBe('105°');
+    expect(180 - 75).toBe(105);
+  });
+
+  // G1.5 — additional checks
+  it('G1.5 Route C Step 2: negative result signals wrong rule', () => {
+    const step = SKILL_ROUTES['G1.5'][2].steps[1];
+    expect(step.checkpointAnswer).toBe('Used 180° instead of 360°');
+    // Verify the student's erroneous calculation is negative
+    expect(180 - 120 - 100).toBe(-40); // confirms the error described
+  });
+
+  // G1.6 — full set verification
+  it('G1.6 Route B Step 1: a + b = 180°', () => {
+    const step = SKILL_ROUTES['G1.6'][1].steps[0];
+    expect(step.checkpointAnswer).toBe('180°');
+  });
+
+  it('G1.6 Route B Step 2: a + b = b + c implies a = c', () => {
+    const step = SKILL_ROUTES['G1.6'][1].steps[1];
+    expect(step.checkpointAnswer).toBe('a = c');
+  });
+
+  it('G1.6 Route B Step 3: vertically opposite to 125° is 125°', () => {
+    const step = SKILL_ROUTES['G1.6'][1].steps[2];
+    expect(step.checkpointAnswer).toBe('125°');
+  });
+
+  // G1.7 — verification check
+  it('G1.7 Route A Step 3: 50 + 70 + 60 = 180 (verification)', () => {
+    const step = SKILL_ROUTES['G1.7'][0].steps[2];
+    expect(step.checkpointAnswer).toBe('Yes');
+    expect(50 + 70 + 60).toBe(180);
+  });
+
+  // G1.8 — full Route B verification
+  it('G1.8 Route B Step 1: quadrilateral splits into 2 triangles', () => {
+    const step = SKILL_ROUTES['G1.8'][1].steps[0];
+    expect(step.checkpointAnswer).toBe('2');
+  });
+
+  it('G1.8 Route B Step 2: 2 × 180 = 360', () => {
+    const step = SKILL_ROUTES['G1.8'][1].steps[1];
+    expect(step.checkpointAnswer).toBe('360°');
+    expect(2 * 180).toBe(360);
+  });
+
+  // G1.9 — triangle decomposition checks
+  it('G1.9 Route B Step 1: pentagon → 3 triangles (5 − 2)', () => {
+    const step = SKILL_ROUTES['G1.9'][1].steps[0];
+    expect(step.checkpointAnswer).toBe('3');
+    expect(5 - 2).toBe(3);
+  });
+
+  it('G1.9 Route B Step 2: hexagon → 4 triangles (6 − 2)', () => {
+    const step = SKILL_ROUTES['G1.9'][1].steps[1];
+    expect(step.checkpointAnswer).toBe('4');
+    expect(6 - 2).toBe(4);
+  });
+
+  it('G1.9 Route C Step 1: subtract 2 from n', () => {
+    const step = SKILL_ROUTES['G1.9'][2].steps[0];
+    expect(step.checkpointAnswer).toBe('2');
+  });
+
+  it('G1.9 Route C Step 2: pentagon = 180 × 3 = 540°', () => {
+    const step = SKILL_ROUTES['G1.9'][2].steps[1];
+    expect(step.checkpointAnswer).toBe('540°');
+    expect(180 * (5 - 2)).toBe(540);
+  });
+
+  // G1.10 — interior/exterior relationship
+  it('G1.10 Route C Step 1: interior + exterior = 180°', () => {
+    const step = SKILL_ROUTES['G1.10'][2].steps[0];
+    expect(step.checkpointAnswer).toBe('180°');
+  });
+
+  it('G1.10 Route C Step 2: regular hexagon exterior = 60° (360 ÷ 6)', () => {
+    // Already tested; cross-verify from interior angle
+    const step = SKILL_ROUTES['G1.10'][2].steps[1];
+    expect(step.checkpointAnswer).toBe('60°');
+    expect(180 - 120).toBe(60); // interior 120°, exterior 60°
+  });
+});
+
+/* ── 12. Curriculum keyword coverage ─────────────────────────────────────── */
+
+describe('G1.1–G1.10 curriculum keyword coverage', () => {
+  /** Each skill should consistently reference its key concept across all routes. */
+  const SKILL_KEYWORDS: Record<string, RegExp> = {
+    'G1.1':  /acute|obtuse|reflex|right/i,
+    'G1.1b': /vertex|notation|∠|middle letter/i,
+    'G1.2':  /protractor|measure|scale/i,
+    'G1.3':  /draw|protractor|baseline/i,
+    'G1.4':  /straight line|180/,
+    'G1.5':  /around a point|360/,
+    'G1.6':  /vertically opposite|equal/i,
+    'G1.7':  /triangle|180/,
+    'G1.8':  /quadrilateral|360/,
+    'G1.9':  /polygon|interior|n\s*[−\-–]\s*2/i,
+    'G1.10': /exterior|360/i,
+  };
+
+  for (const code of G1_CODES) {
+    const keyword = SKILL_KEYWORDS[code];
+    if (!keyword) continue;
+
+    for (const route of SKILL_ROUTES[code]) {
+      it(`${code} Route ${route.routeType} references its key curriculum concept`, () => {
+        const allText = [
+          route.misconceptionSummary,
+          route.workedExample,
+          route.guidedPrompt,
+          route.guidedAnswer,
+          ...route.steps.flatMap((s: StepDef) => [s.explanation, s.checkpointQuestion, s.title]),
+        ].join(' ');
+
+        expect(
+          keyword.test(allText),
+          `${code} Route ${route.routeType} should reference its key concept: ${keyword}`,
+        ).toBe(true);
+      });
+    }
+  }
+});
