@@ -6,7 +6,7 @@ export default function HomePage() {
       <div className="anx-container">
         <section className="anx-panel mx-auto max-w-3xl px-8 py-12 sm:px-14 sm:py-16">
           <div className="text-center">
-            <div className="mx-auto mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-[#3d63ff] to-[#5578ff]">
+            <div className="mx-auto mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-[#6366f1] to-[#818cf8]">
               <span className="text-xl font-bold text-white tracking-tight">A</span>
             </div>
             <p className="anx-section-label">Anaxi Family</p>

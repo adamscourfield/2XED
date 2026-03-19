@@ -200,7 +200,7 @@ export default async function DashboardPage() {
       }
     >
       {/* Hero banner */}
-      <div className="anx-card overflow-hidden" style={{ background: 'linear-gradient(135deg, var(--anx-primary) 0%, #5578ff 100%)' }}>
+      <div className="anx-card overflow-hidden" style={{ background: 'linear-gradient(135deg, var(--anx-primary) 0%, #818cf8 100%)' }}>
         <div className="px-6 py-6 text-white">
           <h2 className="text-xl font-bold">Keep Learning</h2>
           <p className="mt-1 text-sm opacity-90">Start your next session and earn more XP.</p>
