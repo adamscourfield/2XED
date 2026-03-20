@@ -73,7 +73,7 @@ function RectangleSVG({ d, maxWidth }: { d: RectangleDescriptor; maxWidth: numbe
             fontSize={isMissingWidth ? 16 : 13}
             fontWeight={isMissingWidth ? 'bold' : 'normal'}
             fill={isMissingWidth ? 'var(--visual-accent, #d4541a)' : 'var(--visual-ink, #1a1814)'}
-            fontFamily="system-ui, monospace"
+            fontFamily="Inter, system-ui, monospace"
           >
             {isMissingWidth ? '?' : widthLabel}
           </text>
@@ -85,7 +85,7 @@ function RectangleSVG({ d, maxWidth }: { d: RectangleDescriptor; maxWidth: numbe
             fontSize={isMissingHeight ? 16 : 13}
             fontWeight={isMissingHeight ? 'bold' : 'normal'}
             fill={isMissingHeight ? 'var(--visual-accent, #d4541a)' : 'var(--visual-ink, #1a1814)'}
-            fontFamily="system-ui, monospace"
+            fontFamily="Inter, system-ui, monospace"
           >
             {isMissingHeight ? '?' : heightLabel}
           </text>
@@ -98,7 +98,7 @@ function RectangleSVG({ d, maxWidth }: { d: RectangleDescriptor; maxWidth: numbe
           textAnchor="middle"
           fontSize={14}
           fill="var(--visual-dim, #9e9790)"
-          fontFamily="system-ui, monospace"
+          fontFamily="Inter, system-ui, monospace"
         >
           {d.width * d.height}cm²
         </text>
@@ -143,12 +143,12 @@ function TriangleSVG({ d, maxWidth }: { d: TriangleDescriptor; maxWidth: number 
       )}
       {/* Side labels */}
       {d.sideA !== undefined && (
-        <text x={padding - 16} y={padding + size / 2} fontSize={13} fill="var(--visual-ink, #1a1814)" fontFamily="system-ui, monospace" textAnchor="end">
+        <text x={padding - 16} y={padding + size / 2} fontSize={13} fill="var(--visual-ink, #1a1814)" fontFamily="Inter, system-ui, monospace" textAnchor="end">
           {d.sideA === '?' ? '?' : d.sideA}
         </text>
       )}
       {d.sideB !== undefined && (
-        <text x={padding + size / 2} y={padding + size + 20} fontSize={13} fill="var(--visual-ink, #1a1814)" fontFamily="system-ui, monospace" textAnchor="middle">
+        <text x={padding + size / 2} y={padding + size + 20} fontSize={13} fill="var(--visual-ink, #1a1814)" fontFamily="Inter, system-ui, monospace" textAnchor="middle">
           {d.sideB === '?' ? '?' : d.sideB}
         </text>
       )}

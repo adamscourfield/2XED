@@ -69,7 +69,7 @@ export function NumberLineVisual({ d, maxWidth }: Props) {
             textAnchor="middle"
             fontSize={13}
             fill="var(--visual-ink, #1a1814)"
-            fontFamily="system-ui, monospace"
+            fontFamily="Inter, system-ui, monospace"
           >
             {v}
           </text>
@@ -121,7 +121,7 @@ export function NumberLineVisual({ d, maxWidth }: Props) {
               textAnchor="middle"
               fontSize={12}
               fill="var(--visual-green, #1a9454)"
-              fontFamily="system-ui, monospace"
+              fontFamily="Inter, system-ui, monospace"
             >
               {d.arrow.label}
             </text>
@@ -148,7 +148,7 @@ export function NumberLineVisual({ d, maxWidth }: Props) {
             fontSize={16}
             fontWeight="bold"
             fill="var(--visual-accent, #d4541a)"
-            fontFamily="system-ui"
+            fontFamily="Inter, system-ui"
           >
             ?
           </text>
