@@ -84,7 +84,7 @@ export function BarModelVisual({ d, maxWidth }: Props) {
               fontSize={seg.isQuestion ? 16 : 13}
               fontWeight={seg.isQuestion ? 'bold' : 'normal'}
               fill={seg.isQuestion ? 'var(--visual-accent, #d4541a)' : 'var(--visual-ink, #1a1814)'}
-              fontFamily="system-ui, monospace"
+              fontFamily="Inter, system-ui, monospace"
             >
               {seg.isQuestion ? '?' : seg.label ?? seg.value}
             </text>
@@ -100,7 +100,7 @@ export function BarModelVisual({ d, maxWidth }: Props) {
           textAnchor="end"
           fontSize={13}
           fill="var(--visual-ink, #1a1814)"
-          fontFamily="system-ui, monospace"
+          fontFamily="Inter, system-ui, monospace"
         >
           Total: {d.total}
         </text>
@@ -114,7 +114,7 @@ export function BarModelVisual({ d, maxWidth }: Props) {
           textAnchor="middle"
           fontSize={13}
           fill="var(--visual-dim, #9e9790)"
-          fontFamily="system-ui"
+          fontFamily="Inter, system-ui"
         >
           {d.question}
         </text>

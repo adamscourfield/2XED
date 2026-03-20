@@ -4,7 +4,7 @@ export const mathsVisualTheme = {
   muted: '#64748b',
   fill: '#f8fafc',
   panel: '#ffffff',
-  fontFamily: 'ui-sans-serif, system-ui, sans-serif',
+  fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif',
   labelSize: 12,
   captionSize: 11,
   strokeWidth: 2.5,
