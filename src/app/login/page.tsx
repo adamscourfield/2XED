@@ -38,7 +38,7 @@ export default function LoginPage() {
     <main className="flex min-h-screen items-center justify-center px-4">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-[#3d63ff] to-[#5578ff]">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-[#6366f1] to-[#818cf8]">
             <span className="text-xl font-bold text-white tracking-tight">A</span>
           </div>
           <h1 className="text-3xl font-bold tracking-tight" style={{ color: 'var(--anx-text)' }}>
