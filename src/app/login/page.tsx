@@ -1,6 +1,7 @@
 'use client';
 
 import { FormEvent, useState } from 'react';
+import Image from 'next/image';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 
@@ -38,9 +39,13 @@ export default function LoginPage() {
     <main className="flex min-h-screen items-center justify-center px-4">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-[#6366f1] to-[#818cf8]">
-            <span className="text-xl font-bold text-white tracking-tight">A</span>
-          </div>
+          <Image
+            src="/anaxi-logo.png"
+            alt="Anaxi Logo"
+            width={48}
+            height={48}
+            className="mx-auto mb-4"
+          />
           <h1 className="text-3xl font-bold tracking-tight" style={{ color: 'var(--anx-text)' }}>
             Anaxi Learn
           </h1>

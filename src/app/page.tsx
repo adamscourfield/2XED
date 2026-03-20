@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 
 export default function HomePage() {
@@ -6,9 +7,13 @@ export default function HomePage() {
       <div className="anx-container">
         <section className="anx-panel mx-auto max-w-3xl px-8 py-12 sm:px-14 sm:py-16">
           <div className="text-center">
-            <div className="mx-auto mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-[#6366f1] to-[#818cf8]">
-              <span className="text-xl font-bold text-white tracking-tight">A</span>
-            </div>
+            <Image
+              src="/anaxi-logo.png"
+              alt="Anaxi Logo"
+              width={48}
+              height={48}
+              className="mx-auto mb-6"
+            />
             <p className="anx-section-label">Anaxi Family</p>
             <h1 className="mt-4 text-4xl font-bold tracking-tight sm:text-5xl" style={{ color: 'var(--anx-text)' }}>
               Anaxi Learn
