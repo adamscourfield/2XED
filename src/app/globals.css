@@ -4,62 +4,103 @@
 
 @layer base {
   :root {
-    /* ── Brand palette (aligned with Anaxi) ──────────────────────── */
-    --anx-coral:              #fe9f9f;
-    --anx-coral-soft:         rgba(254,159,159,0.12);
-    --anx-brand-blue:         #6366f1;
-    --anx-amber:              #fdc683;
-    --anx-amber-soft:         rgba(253,198,131,0.15);
+    /* ── Surface Hierarchy — The Modern Academic Ledger ──────────── */
+    --anx-surface:                   #f7f9fb;   /* base background */
+    --anx-surface-bright:            #f9fafb;   /* main page background */
+    --anx-surface-container-low:     #f2f4f6;   /* sections */
+    --anx-surface-container:         #eef0f2;   /* containers */
+    --anx-surface-container-high:    #e8eaec;   /* nesting / secondary-container */
+    --anx-surface-container-highest: #e2e4e8;   /* input backgrounds */
+    --anx-surface-container-lowest:  #ffffff;   /* cards / active workspaces */
 
-    /* ── Surfaces ────────────────────────────────────────────────── */
-    --anx-bg: #f9fafb;
-    --anx-surface: #ffffff;
-    --anx-surface-soft: #f9fafb;
-    --anx-surface-raised: #ffffff;
-    --anx-divider: #f3f4f6;
+    /* Legacy surface aliases */
+    --anx-bg:             var(--anx-surface-bright);
+    --anx-surface-soft:   var(--anx-surface-bright);
+    --anx-surface-raised: var(--anx-surface-container-lowest);
+    --anx-divider:        var(--anx-surface-container-low);
 
-    /* ── Text ────────────────────────────────────────────────────── */
-    --anx-text: #111827;
-    --anx-text-secondary: #374151;
-    --anx-text-muted: #6b7280;
-    --anx-text-faint: #9ca3af;
+    /* ── Brand palette ───────────────────────────────────────────── */
+    --anx-coral:          #fe9f9f;
+    --anx-coral-soft:     rgba(254,159,159,0.12);
+    --anx-amber:          #fdc683;
+    --anx-amber-soft:     rgba(253,198,131,0.15);
 
-    /* ── Borders ─────────────────────────────────────────────────── */
-    --anx-border: #e5e7eb;
-    --anx-border-subtle: #f3f4f6;
-    --anx-border-hover: #d1d5db;
+    /* ── Primary — Deep Slate ─────────────────────────────────────── */
+    --anx-primary:           #000000;
+    --anx-primary-container: #131b2e;
+    --anx-on-primary:        #ffffff;
+    --anx-primary-hover:     #1a1a2e;
+    --anx-primary-active:    #131b2e;
+    --anx-primary-soft:      rgba(19,27,46,0.06);
+    --anx-primary-glow:      rgba(19,27,46,0.12);
 
-    /* ── Primary action — indigo (aligned with Anaxi) ────────────── */
-    --anx-primary: #6366f1;
-    --anx-primary-hover: #5558e6;
-    --anx-primary-active: #4f46e5;
-    --anx-primary-soft: rgba(99,102,241,0.06);
-    --anx-primary-glow: rgba(99,102,241,0.14);
+    /* ── Secondary ───────────────────────────────────────────────── */
+    --anx-secondary:              #44474e;
+    --anx-secondary-container:    var(--anx-surface-container-high);
+    --anx-on-secondary-container: #1a1c21;
 
-    /* ── Semantic colours ────────────────────────────────────────── */
-    --anx-success: #059669;
+    /* ── Tertiary — Coral (surgical precision only) ───────────────── */
+    --anx-tertiary:              #b94040;
+    --anx-tertiary-container:    #3d060b;
+    --anx-on-tertiary-container: #c06c6c;
+
+    /* ── Text — on-surface tokens (never pure black) ─────────────── */
+    --anx-on-surface:         #191c1e;
+    --anx-on-surface-variant: #44474e;
+
+    /* Legacy text aliases */
+    --anx-text:           var(--anx-on-surface);
+    --anx-text-secondary: var(--anx-on-surface-variant);
+    --anx-text-muted:     #72767f;
+    --anx-text-faint:     #9ca3af;
+
+    /* ── Borders — Ghost Border Rule ─────────────────────────────── */
+    /* Never use 100% opaque borders on sections/cards. */
+    /* Ghost border = outline-variant at 20% opacity, for accessibility only. */
+    --anx-outline:         #72767f;
+    --anx-outline-variant: #c2c7cf;
+    --anx-ghost-border:    rgba(194,199,207,0.20);
+
+    /* Legacy border aliases (now ghost) */
+    --anx-border:        rgba(194,199,207,0.20);
+    --anx-border-subtle: rgba(194,199,207,0.10);
+    --anx-border-hover:  rgba(194,199,207,0.40);
+
+    /* ── Semantic colours ─────────────────────────────────────────── */
+    --anx-success:      #059669;
     --anx-success-soft: #ecfdf5;
-    --anx-warning: #fdc683;
+    --anx-warning:      #fdc683;
     --anx-warning-soft: rgba(253,198,131,0.12);
     --anx-warning-text: #92400e;
-    --anx-danger: #fe9f9f;
-    --anx-danger-soft: rgba(254,159,159,0.10);
-    --anx-danger-text: #991b1b;
+    --anx-danger:       #fe9f9f;
+    --anx-danger-soft:  rgba(254,159,159,0.10);
+    --anx-danger-text:  #991b1b;
 
-    /* ── Layout ──────────────────────────────────────────────────── */
-    --anx-radius: 16px;
-    --anx-radius-sm: 10px;
+    /* ── Radius ──────────────────────────────────────────────────── */
+    --anx-radius:    1.5rem;   /* xl: 24px — large containers */
+    --anx-radius-sm: 0.75rem;  /* md: 12px — internal components */
 
-    /* ── Shadows — ultra-soft, layered for premium depth ──────────── */
-    --anx-shadow-sm: 0 1px 2px rgba(0,0,0,0.03), 0 1px 3px rgba(0,0,0,0.02);
-    --anx-shadow-md: 0 2px 8px -2px rgba(0,0,0,0.06), 0 4px 16px -4px rgba(0,0,0,0.04);
-    --anx-shadow-lg: 0 4px 16px -4px rgba(0,0,0,0.08), 0 8px 32px -8px rgba(0,0,0,0.05);
-    --anx-shadow-xl: 0 8px 30px -6px rgba(0,0,0,0.10), 0 16px 50px -12px rgba(0,0,0,0.06);
+    /* ── Shadows — floating elements only (extra-diffused) ───────── */
+    /* on-surface at 4% opacity, 32px blur, 8px offset */
+    --anx-shadow-float: 0 8px 32px rgba(25,28,30,0.04);
+    --anx-shadow-sm:    0 8px 32px rgba(25,28,30,0.04);
+    --anx-shadow-md:    0 8px 32px rgba(25,28,30,0.04), 0 2px 8px rgba(25,28,30,0.06);
+    --anx-shadow-lg:    0 8px 32px rgba(25,28,30,0.04), 0 4px 16px rgba(25,28,30,0.08);
+    --anx-shadow-xl:    0 8px 32px rgba(25,28,30,0.04), 0 16px 50px rgba(25,28,30,0.06);
+
+    /* ── Spacing — Institutional Calm ───────────────────────────── */
+    --anx-spacing-16: 4rem;   /* 64px — page margins */
+    --anx-spacing-24: 6rem;   /* 96px — generous page margins */
+
+    /* ── Brand blue — kept for legacy references ─────────────────── */
+    --anx-brand-blue: #131b2e;
   }
 
   /* ── Reset ────────────────────────────────────────────────────── */
   * {
-    border-color: var(--anx-border);
+    /* Ghost border everywhere by default; elements that truly need */
+    /* a visible border should apply it explicitly via class.        */
+    border-color: transparent;
   }
 
   html {
@@ -76,101 +117,113 @@
   body {
     @apply antialiased;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    color: var(--anx-text);
-    background: var(--anx-bg);
+    color: var(--anx-on-surface);
+    background: var(--anx-surface-bright);
     background-attachment: fixed;
   }
 
   /* ── Scrollbar ──────────────────────────────────────────────── */
   ::-webkit-scrollbar { width: 5px; height: 5px; }
   ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.08); border-radius: 99px; }
-  ::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.14); }
+  ::-webkit-scrollbar-thumb { background: rgba(25,28,30,0.08); border-radius: 99px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(25,28,30,0.14); }
 
   *:focus-visible {
     outline: none;
     box-shadow: 0 0 0 3px var(--anx-primary-glow);
-    border-color: var(--anx-primary);
+    border-color: rgba(0,0,0,0.40);
   }
 
   ::selection {
-    background: rgba(99,102,241,0.12);
-    color: var(--anx-text);
+    background: rgba(19,27,46,0.10);
+    color: var(--anx-on-surface);
   }
 }
 
 @layer components {
   /* ── Layout shells ─────────────────────────────── */
+  /* Use spacing-16 (64px) / spacing-24 (96px) for Institutional Calm */
   .anx-shell {
-    @apply min-h-screen px-4 py-8 sm:px-6;
+    @apply min-h-screen;
+    padding: var(--anx-spacing-16) var(--anx-spacing-16);
+  }
+
+  @media (max-width: 768px) {
+    .anx-shell {
+      padding: 2rem 1.5rem;
+    }
   }
 
   .anx-container {
     @apply mx-auto w-full max-w-5xl;
   }
 
-  /* ── Surfaces ──────────────────────────────────── */
+  /* ── Surfaces — No-Line Rule ────────────────────── */
+  /* Boundaries MUST be defined by background color shifts only. */
+  /* No 1px solid borders on sections or cards.                  */
+
+  /* Floating panels (modals, dropdowns) — glassmorphism */
   .anx-panel {
     border-radius: var(--anx-radius);
-    border: 1px solid var(--anx-border);
-    background: var(--anx-surface);
-    box-shadow: var(--anx-shadow-md);
+    background: rgba(255,255,255,0.80);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: var(--anx-shadow-float);
   }
 
+  /* Regular cards — lifted via background color, no border, no shadow */
   .anx-card {
-    @apply transition-shadow duration-200;
+    @apply transition-colors duration-200;
     border-radius: var(--anx-radius);
-    border: 1px solid rgba(229,231,235,0.8);
-    background: var(--anx-surface);
-    box-shadow: var(--anx-shadow-sm);
+    background: var(--anx-surface-container-lowest);
   }
 
   .anx-card:hover {
-    box-shadow: var(--anx-shadow-md);
+    background: var(--anx-surface-container-low);
   }
 
   .anx-card-flat {
     border-radius: var(--anx-radius);
-    border: 1px solid rgba(229,231,235,0.5);
-    background: var(--anx-surface);
+    background: var(--anx-surface-container-lowest);
   }
 
   .anx-surface-muted {
     border-radius: var(--anx-radius-sm);
-    border: 1px solid var(--anx-border-subtle);
-    background: var(--anx-bg);
+    background: var(--anx-surface-container-low);
   }
 
   /* ── Buttons ───────────────────────────────────── */
+
+  /* Primary — Deep Slate gradient, md rounding, no border */
   .anx-btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold text-white tracking-[0.01em] disabled:cursor-not-allowed disabled:opacity-40;
-    background: var(--anx-primary);
-    box-shadow: var(--anx-shadow-sm);
+    @apply inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-semibold tracking-[0.01em] disabled:cursor-not-allowed disabled:opacity-40;
+    border-radius: var(--anx-radius-sm);
+    color: var(--anx-on-primary);
+    background: linear-gradient(135deg, var(--anx-primary) 0%, var(--anx-primary-container) 100%);
     transition: all 200ms cubic-bezier(0.4,0,0.2,1);
   }
 
   .anx-btn-primary:hover:not(:disabled) {
-    background: var(--anx-primary-hover);
-    box-shadow: var(--anx-shadow-md);
+    background: linear-gradient(135deg, #1a1a1a 0%, #1f2d4a 100%);
     transform: scale(0.98);
   }
 
   .anx-btn-primary:active:not(:disabled) {
-    background: var(--anx-primary-active);
+    background: linear-gradient(135deg, var(--anx-primary-container) 0%, #0a1220 100%);
     transform: scale(0.98);
   }
 
+  /* Secondary — secondary-container background, no border */
   .anx-btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl border bg-white px-5 py-3 text-sm font-semibold tracking-[0.01em];
-    border-color: var(--anx-border);
-    color: var(--anx-text);
-    box-shadow: var(--anx-shadow-sm);
+    @apply inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-semibold tracking-[0.01em];
+    border-radius: var(--anx-radius-sm);
+    background: var(--anx-secondary-container);
+    color: var(--anx-on-secondary-container);
     transition: all 200ms cubic-bezier(0.4,0,0.2,1);
   }
 
   .anx-btn-secondary:hover {
-    border-color: var(--anx-border-hover);
-    background: var(--anx-bg);
+    background: var(--anx-surface-container-high);
     transform: scale(0.98);
   }
 
@@ -178,37 +231,54 @@
     transform: scale(0.98);
   }
 
+  /* Ghost — minimal, no background */
   .anx-btn-ghost {
     @apply inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium;
     color: var(--anx-text-muted);
-    border: 1px solid transparent;
     transition: all 200ms cubic-bezier(0.4,0,0.2,1);
   }
 
   .anx-btn-ghost:hover {
-    background: var(--anx-divider);
-    color: var(--anx-text);
+    background: var(--anx-surface-container-low);
+    color: var(--anx-on-surface);
+    transform: scale(0.98);
+  }
+
+  /* Tertiary (Coral) — Single Point of Truth actions / high-priority alerts only */
+  .anx-btn-tertiary {
+    @apply inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-semibold tracking-[0.01em];
+    border-radius: var(--anx-radius-sm);
+    background: var(--anx-tertiary-container);
+    color: var(--anx-on-tertiary-container);
+    transition: all 200ms cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .anx-btn-tertiary:hover {
+    background: #5a0b10;
     transform: scale(0.98);
   }
 
   /* ── Progress ──────────────────────────────────── */
   .anx-progress-track {
     @apply h-2 w-full overflow-hidden rounded-full;
-    background: rgba(99,102,241,0.08);
+    background: rgba(19,27,46,0.06);
   }
 
   .anx-progress-bar {
     @apply h-full rounded-full transition-all duration-500 ease-out;
-    background: var(--anx-primary);
+    background: linear-gradient(90deg, var(--anx-primary) 0%, var(--anx-primary-container) 100%);
   }
 
-  /* ── Form inputs ───────────────────────────────── */
+  /* ── Form inputs — Ghost Border Rule ───────────── */
+  /* Background: surface-container-highest                              */
+  /* Border: outline-variant at 20% opacity (Ghost Border)             */
+  /* Focus: transition border to primary at 40% opacity                */
   .anx-input {
     @apply w-full px-4 py-3 text-sm;
     border-radius: var(--anx-radius-sm);
-    border: 1px solid var(--anx-border);
-    background: var(--anx-surface);
-    color: var(--anx-text);
+    border: 1px solid var(--anx-ghost-border);
+    background: var(--anx-surface-container-highest);
+    color: var(--anx-on-surface);
     transition: all 200ms cubic-bezier(0.4,0,0.2,1);
   }
 
@@ -222,26 +292,25 @@
   }
 
   .anx-input:focus {
-    border-color: var(--anx-primary);
+    border-color: rgba(0,0,0,0.40);
     box-shadow: 0 0 0 3px var(--anx-primary-glow);
     outline: none;
   }
 
   /* ── Option buttons (MCQ, True/False) ──────────── */
+  /* Ghost border for accessibility, surface-container-lowest bg       */
   .anx-option {
-    @apply w-full border-2 px-5 py-4 text-left text-sm font-medium;
+    @apply w-full px-5 py-4 text-left text-sm font-medium;
     border-radius: var(--anx-radius);
-    border-color: rgba(229,231,235,0.8);
-    background: var(--anx-surface);
+    border: 1px solid var(--anx-ghost-border);
+    background: var(--anx-surface-container-lowest);
     color: var(--anx-text-secondary);
-    box-shadow: var(--anx-shadow-sm);
     transition: all 200ms cubic-bezier(0.4,0,0.2,1);
   }
 
   .anx-option:hover {
+    background: var(--anx-surface-container-high);
     border-color: var(--anx-border-hover);
-    background: var(--anx-bg);
-    box-shadow: var(--anx-shadow-md);
   }
 
   .anx-option:active {
@@ -249,20 +318,18 @@
   }
 
   .anx-option-selected {
-    border-color: var(--anx-primary) !important;
+    border-color: rgba(0,0,0,0.40) !important;
     background: var(--anx-primary-soft) !important;
-    color: var(--anx-primary-active);
-    box-shadow: 0 0 0 3px var(--anx-primary-glow), var(--anx-shadow-sm);
+    color: var(--anx-primary-container);
+    box-shadow: 0 0 0 3px var(--anx-primary-glow);
   }
 
   /* ── Stat cards ────────────────────────────────── */
+  /* No border — differentiated by surface-container-lowest background */
   .anx-stat {
-    /* overflow: hidden clips the optional colored accent bar at the top */
     overflow: hidden;
     border-radius: var(--anx-radius);
-    border: 1px solid rgba(229,231,235,0.8);
-    background: var(--anx-surface);
-    box-shadow: var(--anx-shadow-sm);
+    background: var(--anx-surface-container-lowest);
   }
 
   .anx-stat-label {
@@ -271,10 +338,12 @@
     color: var(--anx-text-muted);
   }
 
+  /* Newsreader for large numerical data — feels like a prestigious report */
   .anx-stat-value {
     @apply mt-1.5 text-[28px] font-bold leading-none;
+    font-family: 'Newsreader', 'Georgia', serif;
     letter-spacing: -0.02em;
-    color: var(--anx-text);
+    color: var(--anx-on-surface);
   }
 
   /* ── Badges ────────────────────────────────────── */
@@ -284,64 +353,58 @@
 
   .anx-badge-blue {
     background: var(--anx-primary-soft);
-    color: var(--anx-primary);
-    box-shadow: inset 0 0 0 1px rgba(99,102,241,0.18);
+    color: var(--anx-primary-container);
   }
 
   .anx-badge-green {
     background: var(--anx-success-soft);
     color: #065f46;
-    box-shadow: inset 0 0 0 1px rgba(5,150,105,0.20);
   }
 
   .anx-badge-amber {
     background: var(--anx-warning-soft);
     color: var(--anx-warning-text);
-    box-shadow: inset 0 0 0 1px rgba(253,198,131,0.35);
   }
 
   .anx-badge-red {
     background: var(--anx-danger-soft);
     color: var(--anx-danger-text);
-    box-shadow: inset 0 0 0 1px rgba(254,159,159,0.30);
   }
 
-  /* ── Callout boxes ────────────────────────────── */
+  /* ── Callout boxes — tonal, no solid borders ───── */
   .anx-callout-info {
-    @apply rounded-xl border px-4 py-3 text-sm;
-    border-color: rgba(99,102,241,0.18);
+    @apply rounded-xl px-4 py-3 text-sm;
     background: var(--anx-primary-soft);
-    color: var(--anx-primary);
+    color: var(--anx-primary-container);
   }
 
   .anx-callout-warning {
-    @apply rounded-xl border px-4 py-3 text-sm;
-    border-color: rgba(253,198,131,0.35);
+    @apply rounded-xl px-4 py-3 text-sm;
     background: var(--anx-warning-soft);
     color: var(--anx-warning-text);
   }
 
   .anx-callout-success {
-    @apply rounded-xl border px-4 py-3 text-sm;
-    border-color: rgba(5,150,105,0.20);
+    @apply rounded-xl px-4 py-3 text-sm;
     background: var(--anx-success-soft);
     color: #065f46;
   }
 
   .anx-callout-danger {
-    @apply rounded-xl border px-4 py-3 text-sm;
-    border-color: rgba(254,159,159,0.30);
+    @apply rounded-xl px-4 py-3 text-sm;
     background: var(--anx-danger-soft);
     color: var(--anx-danger-text);
   }
 
-  /* ── Divider ───────────────────────────────────── */
+  /* ── Divider — use sparingly, prefer tonal spacing ── */
   .anx-divider {
-    @apply border-t;
-    border-color: var(--anx-border-subtle);
+    height: 1px;
+    background: var(--anx-surface-container-low);
+    border: none;
   }
 
   /* ── Section header ────────────────────────────── */
+  /* Editorial contrast: label-sm all-caps, tracked 5-10% */
   .anx-section-label {
     @apply text-[11px] font-semibold uppercase;
     color: var(--anx-text-muted);
@@ -352,7 +415,7 @@
   /* ── Mastery meter inline ──────────────────────── */
   .anx-mastery-track {
     @apply h-1.5 w-full overflow-hidden rounded-full;
-    background: rgba(99,102,241,0.06);
+    background: rgba(19,27,46,0.06);
   }
 
   /* ── Animations ────────────────────────────────── */
@@ -385,7 +448,7 @@
     @apply relative mx-auto flex items-center justify-center rounded-full;
     width: 180px;
     height: 180px;
-    background: radial-gradient(circle, rgba(99,102,241,0.06) 40%, rgba(99,102,241,0.02) 70%, transparent 100%);
+    background: radial-gradient(circle, rgba(19,27,46,0.06) 40%, rgba(19,27,46,0.02) 70%, transparent 100%);
     animation: anxRewardPulse 2s ease-in-out infinite;
   }
 
@@ -417,45 +480,58 @@
   .anx-reward-star:nth-child(6) { top: 25%; right: -3%; animation-delay: 0.4s; }
 
   .anx-xp-badge {
-    @apply inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm font-semibold;
+    @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-semibold;
     background: var(--anx-primary-soft);
-    border-color: rgba(99,102,241,0.18);
-    color: var(--anx-primary);
+    color: var(--anx-primary-container);
   }
 
   /* ── Dashboard category card ───────────────────── */
+  /* No border — tonal background; hover via background shift */
   .anx-category-card {
-    @apply flex flex-col items-center justify-center rounded-2xl border p-4 text-center;
-    border-color: rgba(229,231,235,0.8);
-    background: var(--anx-surface);
-    box-shadow: var(--anx-shadow-sm);
+    @apply flex flex-col items-center justify-center rounded-2xl p-4 text-center;
+    background: var(--anx-surface-container-lowest);
     min-height: 100px;
-    transition: all 200ms cubic-bezier(0.4,0,0.2,1);
+    transition: background 200ms cubic-bezier(0.4,0,0.2,1);
   }
 
   .anx-category-card:hover {
-    border-color: rgba(99,102,241,0.25);
-    box-shadow: var(--anx-shadow-md);
+    background: var(--anx-surface-container-low);
     cursor: pointer;
   }
 
-  /* ── Chip / tag (already used inline, now standardized) ── */
+  /* ── Intelligence Chips ─────────────────────────── */
+  /* Default chip */
   .anx-chip {
     @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium tracking-[0.01em];
-    background: var(--anx-primary-soft);
-    color: var(--anx-primary);
+    background: var(--anx-surface-container-high);
+    color: var(--anx-on-surface-variant);
   }
 
-  /* ── Calm transition utility (aligned with Anaxi) ── */
+  /* Selected chip — tertiary-container (#3d060b) with on-tertiary-container (#c06c6c) */
+  .anx-chip-selected {
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium tracking-[0.01em];
+    background: var(--anx-tertiary-container);
+    color: var(--anx-on-tertiary-container);
+  }
+
+  /* ── Glassmorphism utility — floating nav / modals ── */
+  .anx-glass {
+    background: rgba(255,255,255,0.80);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: var(--anx-shadow-float);
+  }
+
+  /* ── Calm transition utility ─────────────────────── */
   .calm-transition {
     transition: all 200ms cubic-bezier(0.4,0,0.2,1);
   }
 
-  /* ── Styled divider ─────────────────────────────── */
+  /* ── Styled divider (tonal, no hard line) ────────── */
   .styled-divider {
     height: 1px;
     border: 0;
-    background: var(--anx-border);
+    background: var(--anx-surface-container-low);
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -501,8 +577,8 @@
 }
 
 @keyframes anxStatusGlow {
-  0% { box-shadow: 0 0 0 rgba(99,102,241,0); }
-  100% { box-shadow: 0 0 0 6px rgba(99,102,241,0.08); }
+  0% { box-shadow: 0 0 0 rgba(19,27,46,0); }
+  100% { box-shadow: 0 0 0 6px rgba(19,27,46,0.08); }
 }
 
 @keyframes anxFadeIn {

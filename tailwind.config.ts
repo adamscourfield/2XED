@@ -10,16 +10,48 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['var(--font-inter)', 'Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        sans:      ['var(--font-inter)', 'Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        serif:     ['var(--font-newsreader)', 'Newsreader', 'Georgia', 'serif'],
+        newsreader:['var(--font-newsreader)', 'Newsreader', 'Georgia', 'serif'],
       },
       colors: {
-        /* CSS variable aliases (aligned with Anaxi) */
+        /* Surface hierarchy — Modern Academic Ledger */
+        surface:                   'var(--anx-surface)',
+        'surface-bright':          'var(--anx-surface-bright)',
+        'surface-container-low':   'var(--anx-surface-container-low)',
+        'surface-container':       'var(--anx-surface-container)',
+        'surface-container-high':  'var(--anx-surface-container-high)',
+        'surface-container-highest':'var(--anx-surface-container-highest)',
+        'surface-container-lowest':'var(--anx-surface-container-lowest)',
+
+        /* Primary — Deep Slate */
+        primary:            'var(--anx-primary)',
+        'primary-container':'var(--anx-primary-container)',
+        'on-primary':       'var(--anx-on-primary)',
+
+        /* Secondary */
+        secondary:              'var(--anx-secondary)',
+        'secondary-container':  'var(--anx-secondary-container)',
+
+        /* Tertiary — Coral (surgical precision) */
+        tertiary:                 'var(--anx-tertiary)',
+        'tertiary-container':     'var(--anx-tertiary-container)',
+        'on-tertiary-container':  'var(--anx-on-tertiary-container)',
+
+        /* Text */
+        'on-surface':         'var(--anx-on-surface)',
+        'on-surface-variant': 'var(--anx-on-surface-variant)',
+
+        /* Ghost borders */
+        outline:         'var(--anx-outline)',
+        'outline-variant':'var(--anx-outline-variant)',
+
+        /* Legacy aliases (aligned with Anaxi) */
         bg:           'var(--anx-bg)',
-        surface:      'var(--anx-surface)',
-        text:         'var(--anx-text)',
+        text:         'var(--anx-on-surface)',
         muted:        'var(--anx-text-muted)',
-        border:       'var(--anx-border)',
-        divider:      'var(--anx-divider)',
+        border:       'var(--anx-ghost-border)',
+        divider:      'var(--anx-surface-container-low)',
         accent:       'var(--anx-primary)',
         accentHover:  'var(--anx-primary-hover)',
         success:      'var(--anx-success)',
@@ -28,20 +60,22 @@ const config: Config = {
         borderHover:  'var(--anx-border-hover)',
         accentSurface:'var(--anx-primary-soft)',
 
-        /* Brand palette — direct values (aligned with Anaxi) */
-        coral:  '#fe9f9f',
-        blue:   '#6366f1',
-        amber:  '#fdc683',
+        /* Brand palette — direct values */
+        coral: '#fe9f9f',
+        amber: '#fdc683',
       },
       borderRadius: {
-        lg: 'var(--anx-radius)',
-        md: 'var(--anx-radius-sm)',
+        xl: '1.5rem',   /* 24px — large containers */
+        lg: '1.5rem',   /* alias */
+        md: '0.75rem',  /* 12px — internal components */
+        sm: '0.75rem',  /* alias */
       },
       boxShadow: {
-        sm: 'var(--anx-shadow-sm)',
-        md: 'var(--anx-shadow-md)',
-        lg: 'var(--anx-shadow-lg)',
-        xl: 'var(--anx-shadow-xl)',
+        float: 'var(--anx-shadow-float)',
+        sm:    'var(--anx-shadow-sm)',
+        md:    'var(--anx-shadow-md)',
+        lg:    'var(--anx-shadow-lg)',
+        xl:    'var(--anx-shadow-xl)',
       },
       transitionTimingFunction: {
         calm: 'cubic-bezier(0,0,0.2,1)',
@@ -50,6 +84,11 @@ const config: Config = {
         '150': '150ms',
         '200': '200ms',
         '220': '220ms',
+      },
+      spacing: {
+        /* Institutional Calm page margins */
+        '16-pg': 'var(--anx-spacing-16)',
+        '24-pg': 'var(--anx-spacing-24)',
       },
       fontSize: {
         '2xs': ['0.6875rem', { lineHeight: '1.4' }],
