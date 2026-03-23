@@ -1,4 +1,4 @@
-export type SourceType = 'PPTX' | 'DOCX';
+export type SourceType = 'PPTX' | 'DOCX' | 'PDF';
 
 export type LearningPhase = 'ONBOARDING' | 'LEARN' | 'RETEACH' | 'RETAIN';
 export type DifficultyLevel = 'LOW' | 'MEDIUM' | 'HIGH';

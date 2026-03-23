@@ -73,7 +73,7 @@ export default async function TeacherDashboardPage({ searchParams }: Props) {
   if (!session?.user) redirect('/login');
 
   const user = session.user as { id: string; role?: string; name?: string | null; email?: string | null };
-  if (user.role !== 'TEACHER' && user.role !== 'ADMIN') redirect('/dashboard');
+  if (user.role !== 'TEACHER' && user.role !== 'ADMIN' && user.role !== 'LEADERSHIP') redirect('/dashboard');
 
   const teacherProfile = await prisma.teacherProfile.findUnique({
     where: { userId: user.id },

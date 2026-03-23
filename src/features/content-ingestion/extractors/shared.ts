@@ -50,12 +50,12 @@ export function readZipEntry(filePath: string, entry: string): string {
   return execFileSync('unzip', ['-p', filePath, entry], { encoding: 'utf8' });
 }
 
-function detectObjectiveHint(text: string): string | null {
+export function detectObjectiveHint(text: string): string | null {
   const match = text.match(/\bSubtopic\s+(N\d+\.\d+)\b/i) ?? text.match(/\bSUBTOPIC\s+(N\d+\.\d+)\b/i);
   return match?.[1]?.toUpperCase() ?? null;
 }
 
-function detectSubtopic(text: string): string | null {
+export function detectSubtopic(text: string): string | null {
   const subtopicMatch = text.match(/\bSubtopic\s+N\d+\.\d+\s*[–-]?\s*([^|]+)/i);
   return subtopicMatch?.[1]?.trim() ?? null;
 }

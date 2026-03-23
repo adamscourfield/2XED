@@ -11,6 +11,7 @@ enum Role {
   STUDENT
   TEACHER
   ADMIN
+  LEADERSHIP
 }
 
 enum AttemptMode {
@@ -730,3 +731,6 @@ model LaneTransition {
 
   @@index([liveSessionId, createdAt])
 }
+
+// Pending migration: add LEADERSHIP to Role enum
+// ALTER TYPE "Role" ADD VALUE IF NOT EXISTS 'LEADERSHIP';
