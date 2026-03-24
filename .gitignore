@@ -35,3 +35,6 @@ yarn-error.log*
 next-env.d.ts
 test-pdf-extract.cjs
 test-pdf-extract.mjs
+
+# curriculum source archives (tracked on main; ignored on feature branches)
+Curriculum/**/*.zip

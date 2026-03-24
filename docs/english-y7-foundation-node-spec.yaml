@@ -409,6 +409,352 @@ nodes:
       level_3_days: 7
       level_4_days: 14
 
+  # ──────────────────────────────────────────────
+  # NODE 5 — Y7-LIT-01  (Gothic unit entry)
+  # ──────────────────────────────────────────────
+  - code: Y7-LIT-01
+    strand: Literary Knowledge & Vocabulary
+    name: Recall and apply Gothic conventions
+    core_skill: Retrieve and use Gothic terminology, context and conventions accurately
+    units: [Gothic]
+    prerequisites: []
+    difficulty: core
+
+    explanation_bank:
+      - id: Y7-LIT-01-EXP-A
+        type: direct
+        title: What are Gothic conventions?
+        content_markdown: |
+          Gothic fiction is a genre that combines horror, death, and romance.
+          It was established in 1764 by Horace Walpole and became popular in 18th-century England
+          during a period of scientific discovery and change.
+
+          Key Gothic conventions:
+
+          Settings: castles, graveyards, crumbling buildings, dark forests, isolated locations
+          Weather: storms, rain, wind, fog
+          Character types: villains, monsters, damsels in distress, unreliable narrators
+          Themes: fear, death, the supernatural, isolation, evil, psychological breakdown, the Sublime
+
+          Gothic fiction creates terror in the reader and uses fear to build suspense.
+
+      - id: Y7-LIT-01-EXP-B
+        type: worked_example
+        title: Key terminology in use
+        content_markdown: |
+          Term: Epistolary novel
+          Definition: A novel written as a series of documents, usually letters.
+          Example: Dracula is told through diary entries, letters, and newspaper reports.
+
+          Term: The Sublime
+          Definition: Something of awe-inspiring beauty or power that exceeds human understanding.
+          Example: Gothic writers use wild, extreme landscapes to create the Sublime.
+
+          Term: Pathetic fallacy
+          Definition: Using weather and setting to reflect a character's emotions.
+          Example: The storm broke as he discovered the body.
+
+          Term: Foreshadowing
+          Definition: A hint given in advance of what will happen later in the story.
+          Example: The cracked mirror at the start of the story foreshadows disaster.
+
+      - id: Y7-LIT-01-EXP-C
+        type: weak_vs_strong
+        title: Using terminology precisely
+        content_markdown: |
+          Weak:
+          The weather makes the story feel scary.
+
+          Why weak:
+          - no terminology used
+          - vague ("scary")
+          - no link to Gothic convention
+
+          Strong:
+          Stoker uses pathetic fallacy — the storm arrives as Jonathan enters the castle —
+          to foreshadow danger and create a sense of dread typical of Gothic fiction.
+
+          Why strong:
+          - two precise terms used
+          - linked to specific evidence
+          - connected to genre and effect
+
+    misconceptions:
+      - code: MCP-VAGUE-GENRE
+        label: Describes Gothic vaguely without terminology
+        detection_rule: Uses "scary" or "spooky" without naming a convention
+        intervention_hint: Require at least one precise Gothic term in answer
+      - code: MCP-LIST-WITHOUT-LINK
+        label: Lists conventions without linking to text
+        detection_rule: Produces a list of conventions but does not connect to evidence
+        intervention_hint: Prompt "Which convention appears in this extract, and where?"
+      - code: MCP-WRONG-DEFINITION
+        label: Misdefines a key term
+        detection_rule: Conflates pathetic fallacy with personification, or tone with atmosphere
+        intervention_hint: Return learner to EXP-B definition card
+      - code: MCP-CONTEXT-CONFUSION
+        label: Confuses Gothic context facts
+        detection_rule: States wrong century, author or origin for Gothic genre
+        intervention_hint: Provide KO section A for re-reading
+      - code: MCP-THEME-BLUR
+        label: Confuses theme with convention
+        detection_rule: Treats settings/weather as themes and vice versa
+        intervention_hint: Sort-into-category task (settings vs themes vs character types)
+
+    mastery_model:
+      objective_accuracy_threshold: 0.85
+      min_objective_questions: 5
+      evidence_selection_threshold: 0.80
+      short_response_secure_count: 2
+      rewrite_success_required: 1
+      mastery_levels:
+        - { level: 0, label: Not attempted, description: No usable evidence }
+        - { level: 1, label: Recognition only, description: Can identify Gothic conventions when shown examples }
+        - { level: 2, label: Partial, description: Can name conventions but definitions are imprecise }
+        - { level: 3, label: Secure, description: Can define and correctly apply Gothic terminology }
+        - { level: 4, label: Fluent, description: Can use terminology analytically when discussing unseen extracts }
+
+    spaced_review:
+      level_1_days: 1
+      level_2_days: 3
+      level_3_days: 7
+      level_4_days: 14
+
+  # ──────────────────────────────────────────────
+  # NODE 6 — Y7-CRA-02  (Gothic unit — setting)
+  # ──────────────────────────────────────────────
+  - code: Y7-CRA-02
+    strand: Craft & Language
+    name: Explain how setting creates atmosphere
+    core_skill: Identify how writers use language, imagery, and Gothic conventions to build atmosphere
+    units: [Gothic]
+    prerequisites: [Y7-LIT-01, Y7-ANA-04]
+    difficulty: core
+
+    explanation_bank:
+      - id: Y7-CRA-02-EXP-A
+        type: direct
+        title: How writers create atmosphere through setting
+        content_markdown: |
+          Atmosphere is the emotional mood a writer creates through their choices.
+
+          To explain how setting creates atmosphere:
+          1. Identify the key detail (a word, image, or technique)
+          2. Name the technique if relevant (pathetic fallacy, imagery, connotations)
+          3. Explain what mood or feeling it creates
+          4. Say why — what effect does this have on the reader?
+
+          Key techniques in Gothic setting:
+          - Pathetic fallacy: weather mirrors emotion or events
+          - Semantic field: a cluster of words linked by meaning (e.g. decay, ruin, rot)
+          - Sensory language: sight, sound, smell, touch
+          - Connotations: the associations a word carries beyond its literal meaning
+          - The Sublime: awe-inspiring, overwhelming landscapes or phenomena
+
+      - id: Y7-CRA-02-EXP-B
+        type: worked_example
+        title: Worked example — Dracula
+        content_markdown: |
+          Extract: "The castle is on the very edge of a terrific precipice."
+          (Bram Stoker, Dracula)
+
+          Model analysis:
+          Stoker uses the word "terrific" — which carries connotations of terror, not just
+          greatness — to make the setting feel dangerous and overwhelming. The image of the
+          precipice (a sheer drop) creates a sense of the Sublime: the castle is placed at
+          an extreme, uncontrollable height that dwarfs the human figure. This builds an
+          atmosphere of dread and powerlessness from the opening description.
+
+          What: connotations of "terrific" + the Sublime (precipice)
+          How: "terrific precipice" — the castle overwhelms
+          Why: builds dread, makes reader feel the danger Jonathan faces
+
+      - id: Y7-CRA-02-EXP-C
+        type: weak_vs_strong
+        title: Weak vs strong
+        content_markdown: |
+          Prompt: How does Stoker use setting to create atmosphere in this extract?
+
+          Weak:
+          Stoker describes a scary castle. This makes the reader scared.
+
+          Why weak:
+          - no technique named
+          - vague effect ("scared")
+          - no analysis of language
+
+          Strong:
+          Stoker creates a threatening atmosphere through pathetic fallacy — the storm
+          breaks as Jonathan approaches the castle — linking the violent weather to
+          the danger ahead. The verb "howling" applied to the wind creates a semantic
+          field of aggression, suggesting the setting itself is hostile to the human
+          visitor.
+
+          Why strong:
+          - two techniques named and explained
+          - specific evidence quoted
+          - effect linked to theme (hostility, danger)
+
+    misconceptions:
+      - code: MCP-SETTING-RETELL
+        label: Describes the setting without analysing it
+        detection_rule: Response says what the setting looks like without explaining effect
+        intervention_hint: Add stem "This creates an atmosphere of... because..."
+      - code: MCP-TECHNIQUE-NAMED-ONLY
+        label: Names technique without explaining it
+        detection_rule: Writes "pathetic fallacy is used" with no further development
+        intervention_hint: Ask "What does this technique do to the reader?"
+      - code: MCP-GENERIC-ATMOSPHERE
+        label: Uses generic atmosphere labels
+        detection_rule: Says "scary/eerie/creepy" with no development
+        intervention_hint: Require precise atmosphere word + one specific word from the text
+      - code: MCP-NO-LANGUAGE-FOCUS
+        label: Discusses idea not language
+        detection_rule: Explains Gothic themes but does not quote or analyse words
+        intervention_hint: Force evidence_select task before short response
+      - code: MCP-CONNOTATION-CONFUSION
+        label: Misreads connotations
+        detection_rule: Assigns wrong associations to a word (e.g. "terrific" as only positive)
+        intervention_hint: Provide definition of connotations with two-meaning examples
+
+    mastery_model:
+      objective_accuracy_threshold: 0.85
+      min_objective_questions: 5
+      evidence_selection_threshold: 0.80
+      short_response_secure_count: 2
+      rewrite_success_required: 1
+      mastery_levels:
+        - { level: 0, label: Not attempted, description: No usable evidence }
+        - { level: 1, label: Recognition only, description: Can identify which quotations create strongest atmosphere }
+        - { level: 2, label: Partial, description: Can name a technique but explanation remains generic }
+        - { level: 3, label: Secure, description: Can explain how specific language creates atmosphere }
+        - { level: 4, label: Fluent, description: Can transfer analysis across Gothic and non-Gothic texts }
+
+    spaced_review:
+      level_1_days: 1
+      level_2_days: 3
+      level_3_days: 7
+      level_4_days: 14
+
+  # ──────────────────────────────────────────────
+  # NODE 7 — Y7-ANA-06  (Gothic unit — paragraph)
+  # ──────────────────────────────────────────────
+  - code: Y7-ANA-06
+    strand: Analytical Writing
+    name: Plan and write a What-How-Why analytical paragraph
+    core_skill: Structure a complete analytical response using the What-How-Why model
+    units: [Gothic]
+    prerequisites: [Y7-ANA-04, Y7-CON-03, Y7-CRA-02]
+    difficulty: core
+
+    explanation_bank:
+      - id: Y7-ANA-06-EXP-A
+        type: direct
+        title: The What-How-Why model
+        content_markdown: |
+          A strong analytical paragraph has three parts:
+
+          WHAT — What does the writer do?
+          State the technique or what the writer has chosen.
+          Example: "Stevenson uses vivid imagery to describe the transformation."
+
+          HOW — How do they do it? (Evidence + explanation)
+          Quote the evidence and explain what it does.
+          Example: "'His face became contorted' — the verb 'contorted' suggests violent,
+          unnatural change."
+
+          WHY — Why does it matter? (Effect + bigger meaning)
+          Connect to theme, character, or reader impact.
+          Example: "This develops the theme of the grotesque: the body itself becomes a
+          site of horror, suggesting that evil corrupts from within."
+
+          Strong paragraphs move through all three stages without skipping.
+
+      - id: Y7-ANA-06-EXP-B
+        type: worked_example
+        title: Teacher model — Dr Jekyll and Mr Hyde
+        content_markdown: |
+          Question: How does Stevenson present the theme of the grotesque?
+
+          WHAT:
+          Stevenson describes the transformation of Mr Hyde into Dr Jekyll using vivid
+          imagery to convey the Grotesque.
+
+          HOW:
+          For example, 'his face became contorted' — the verb 'contorted' suggests a
+          violent, unnatural reshaping, as if the body is struggling against itself.
+
+          WHY:
+          This develops the theme of psychological breakdown: the body's collapse mirrors
+          the collapse of moral identity, suggesting that evil is a physical as well as
+          a moral force.
+
+      - id: Y7-ANA-06-EXP-C
+        type: weak_vs_strong
+        title: Weak vs strong
+        content_markdown: |
+          Weak:
+          Stevenson has used first person to create intense grotesque imagery. This is
+          effective and makes the reader scared.
+
+          Why weak:
+          - "effective" is too vague
+          - no specific evidence quoted
+          - WHY section missing — no link to theme or reader impact
+
+          Strong:
+          Stevenson uses first-person narration to make the description of the grotesque
+          feel immediate and inescapable. For example, 'I felt these agonies' places the
+          reader inside the body horror, so the transformation becomes personally felt.
+          This develops the theme of the double self: Jekyll cannot escape Hyde because
+          Hyde is always 'I', always inside.
+
+          Why strong:
+          - quotation selected and explained
+          - technique connected to effect
+          - WHY links to the unit theme (the double, duality)
+
+    misconceptions:
+      - code: MCP-MISSING-HOW
+        label: Skips straight from WHAT to WHY
+        detection_rule: No quotation or language evidence between claim and theme
+        intervention_hint: Force evidence_select task; return to paragraph structure scaffold
+      - code: MCP-MISSING-WHY
+        label: Stops after evidence without effect or theme
+        detection_rule: Ends with quotation or explanation, no bigger meaning
+        intervention_hint: Prompt with "This develops the theme of... because..."
+      - code: MCP-WHAT-TOO-VAGUE
+        label: WHAT statement is too vague
+        detection_rule: Opens with "the writer uses language" without naming technique
+        intervention_hint: Ask learner to name one specific technique
+      - code: MCP-WHY-GENERIC
+        label: WHY is too generic
+        detection_rule: Ends with "this makes the reader feel scared / interested"
+        intervention_hint: Ask learner to name the specific theme this links to
+      - code: MCP-ORDER-WRONG
+        label: Paragraph parts in wrong order
+        detection_rule: Evidence appears before claim, or WHY comes before HOW
+        intervention_hint: ORDER_SEQUENCE task to rebuild paragraph from tiles
+
+    mastery_model:
+      objective_accuracy_threshold: 0.85
+      min_objective_questions: 5
+      evidence_selection_threshold: 0.80
+      short_response_secure_count: 2
+      rewrite_success_required: 1
+      mastery_levels:
+        - { level: 0, label: Not attempted, description: No usable evidence }
+        - { level: 1, label: Recognition only, description: Can identify the three paragraph parts in a model }
+        - { level: 2, label: Partial, description: Can write WHAT and HOW but WHY is missing or generic }
+        - { level: 3, label: Secure, description: Can write a complete What-How-Why paragraph with specific evidence }
+        - { level: 4, label: Fluent, description: Can produce What-How-Why independently across unseen texts }
+
+    spaced_review:
+      level_1_days: 1
+      level_2_days: 3
+      level_3_days: 7
+      level_4_days: 14
+
 # ──────────────────────────────────────────────
 # IMPLEMENTATION RULES
 # ──────────────────────────────────────────────
@@ -485,7 +831,5 @@ implementation:
     - transfer status
 
   next_build_priority:
-    - Y7-ANA-06 Build paragraph plan
-    - Y7-ANA-07 Write analytical paragraph
-    - Y7-CRA-02 Explain how setting creates atmosphere
+    - Y7-ANA-07 Write analytical paragraph (independent transfer)
     - Y7-CON-02 Explicit vs implicit characterisation
