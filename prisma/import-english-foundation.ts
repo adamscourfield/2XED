@@ -19,6 +19,10 @@ const ENGLISH_SKILL_META: Record<string, { name: string; strand: string; sortOrd
   'Y7-ANA-04': { name: 'Explain evidence clearly', strand: 'ANA', sortOrder: 20 },
   'Y7-CON-05': { name: 'Explain how a moment links to a theme', strand: 'CON', sortOrder: 30 },
   'Y7-WRT-04': { name: 'Show emotion instead of telling it directly', strand: 'WRT', sortOrder: 40 },
+  // Gothic unit nodes
+  'Y7-LIT-01': { name: 'Recall and apply Gothic conventions', strand: 'LIT', sortOrder: 50 },
+  'Y7-CRA-02': { name: 'Explain how setting creates atmosphere', strand: 'CRA', sortOrder: 60 },
+  'Y7-ANA-06': { name: 'Plan and write a What-How-Why analytical paragraph', strand: 'ANA', sortOrder: 70 },
 };
 
 function unique<T>(values: T[]): T[] {

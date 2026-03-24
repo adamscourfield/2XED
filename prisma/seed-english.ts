@@ -22,6 +22,10 @@ async function main() {
     { code: 'Y7-ANA-04', name: 'Explain evidence clearly',                          strand: 'ANA', isStretch: false, sortOrder: 20 },
     { code: 'Y7-CON-05', name: 'Explain how a moment links to a theme',            strand: 'CON', isStretch: false, sortOrder: 30 },
     { code: 'Y7-WRT-04', name: 'Show emotion instead of telling it directly',      strand: 'WRT', isStretch: false, sortOrder: 40 },
+    // Gothic unit nodes
+    { code: 'Y7-LIT-01', name: 'Recall and apply Gothic conventions',              strand: 'LIT', isStretch: false, sortOrder: 50 },
+    { code: 'Y7-CRA-02', name: 'Explain how setting creates atmosphere',           strand: 'CRA', isStretch: false, sortOrder: 60 },
+    { code: 'Y7-ANA-06', name: 'Plan and write a What-How-Why analytical paragraph', strand: 'ANA', isStretch: false, sortOrder: 70 },
   ];
 
   // 3️⃣ Upsert skills and build code→id map
@@ -48,6 +52,12 @@ async function main() {
   const prereqEdges: Array<{ parentCode: string; childCode: string; weight: number }> = [
     { parentCode: 'Y7-CON-03', childCode: 'Y7-ANA-04', weight: 1 },
     { parentCode: 'Y7-ANA-04', childCode: 'Y7-CON-05', weight: 1 },
+    // Gothic unit edges
+    { parentCode: 'Y7-LIT-01', childCode: 'Y7-CRA-02', weight: 1 },
+    { parentCode: 'Y7-ANA-04', childCode: 'Y7-CRA-02', weight: 1 },
+    { parentCode: 'Y7-ANA-04', childCode: 'Y7-ANA-06', weight: 1 },
+    { parentCode: 'Y7-CON-03', childCode: 'Y7-ANA-06', weight: 1 },
+    { parentCode: 'Y7-CRA-02', childCode: 'Y7-ANA-06', weight: 1 },
   ];
 
   for (const edge of prereqEdges) {
