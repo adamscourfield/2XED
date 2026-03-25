@@ -192,6 +192,7 @@ model Skill {
   explanationPerformance   ExplanationPerformance[]
   liveSessions             LiveSession[]
   liveAttempts             LiveAttempt[]
+  englishContentBlocks     EnglishContentBlock[]
 
   @@unique([subjectId, slug])
   @@unique([subjectId, code])
@@ -730,6 +731,51 @@ model LaneTransition {
   participant     LiveParticipant    @relation(fields: [participantId], references: [id], onDelete: Cascade)
 
   @@index([liveSessionId, createdAt])
+}
+
+// ── English content models ─────────────────────────────────────────────────────
+
+model EnglishContentBlock {
+  id          String   @id @default(cuid())
+  skillId     String
+  blockType   String   // TEXT | IMAGE | MODEL | QUESTION | CALLOUT | ANIMATION | SCAFFOLD | CHECKPOINT
+  sortOrder   Int
+  content     Json     // serialised ExplanationBlock payload
+  sourceRef   String?  // e.g. "Y7_HT1_BOOKLET_p12_block3"
+  isPublished Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  skill       Skill    @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  annotations AnnotationLayer[]
+
+  @@index([skillId, sortOrder])
+  @@index([skillId, isPublished])
+}
+
+model AIMarkResult {
+  id         String      @id @default(cuid())
+  attemptId  String
+  questionId String
+  mode       AttemptMode
+  answer     String      // text answer or "[canvas]" when image-based
+  markResult Json        // { correct, score, feedback, wtm, ebi, flagged, latencyMs }
+  modelUsed  String
+  latencyMs  Int
+  createdAt  DateTime    @default(now())
+
+  @@index([attemptId])
+  @@index([questionId, createdAt])
+}
+
+model AnnotationLayer {
+  id        String              @id @default(cuid())
+  blockId   String
+  strokes   Json                // Stroke[] serialised
+  version   Int                 @default(1)
+  createdAt DateTime            @default(now())
+  block     EnglishContentBlock @relation(fields: [blockId], references: [id], onDelete: Cascade)
+
+  @@index([blockId])
 }
 
 // Pending migration: add LEADERSHIP to Role enum
