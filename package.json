@@ -30,6 +30,7 @@
     "validate:explanation-steps": "node scripts/validate-explanations.mjs",
     "validate:n13": "node scripts/validate-n13-content-integrity.mjs",
     "validate:explanations": "node scripts/validate-explanation-integrity.mjs",
+    "english:parse-booklet": "ts-node -r tsconfig-paths/register --compiler-options '{\"module\":\"CommonJS\"}' scripts/parseBooklet.ts",
     "qa:resolve:auto-repair-notes": "ts-node -r tsconfig-paths/register --compiler-options '{\"module\":\"CommonJS\"}' scripts/qa/resolve-auto-repair-notes.ts",
     "qa:audit:unit1-visuals": "ts-node -r tsconfig-paths/register --compiler-options '{\"module\":\"CommonJS\"}' scripts/qa/audit-unit1-visuals.ts",
     "validate:qa": "npm run validate:items && npm run validate:n13 && npm run validate:explanation-steps && npm run validate:explanations && npm test",
