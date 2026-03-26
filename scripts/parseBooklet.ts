@@ -6,7 +6,7 @@
  * Writes results to tmp/parsed-booklet.json for human review in the teacher UI.
  *
  * Prerequisites:
- *   npm install canvas          (node-canvas, for pdfjs-dist page rendering)
+ *   poppler-utils must be installed (apt-get install -y poppler-utils)
  *   OPENAI_API_KEY must be set in environment
  *
  * Usage:
@@ -28,7 +28,8 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
+import * as os from 'os';
+import { execFileSync } from 'child_process';
 import { chunkPage, type ParsedPage, type VisionBlock } from '../src/features/content-ingestion/extractors/visionChunker';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
@@ -39,8 +40,8 @@ const OUTPUT_PATH = path.join(process.cwd(), 'tmp', 'parsed-booklet.json');
 const INTER_PAGE_DELAY_MS = 1500;
 /** Confidence threshold below which we flag the page for priority human review */
 const LOW_CONFIDENCE_THRESHOLD = 0.7;
-/** Scale factor for rendering: 2x → ~1500px wide for a typical A4 page */
-const RENDER_SCALE = 2.0;
+/** DPI for pdftoppm rendering — 200dpi gives ~1650px wide for A4 */
+const RENDER_DPI = 200;
 
 // ── CLI flags ─────────────────────────────────────────────────────────────────
 
@@ -90,29 +91,39 @@ export interface ParsedBooklet {
   blocks: StagedBlock[];
 }
 
-// ── PDF → PNG renderer ────────────────────────────────────────────────────────
+// ── PDF → PNG renderer (via pdftoppm) ────────────────────────────────────────
 
-async function renderPageToPng(
-  pdf: Awaited<ReturnType<typeof pdfjsLib.getDocument>['promise']>,
-  pageNum: number,
-): Promise<string> {
-  // Dynamically require canvas to avoid hard dep at import time
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { createCanvas } = require('canvas') as typeof import('canvas');
+/**
+ * Render a single PDF page to a PNG using pdftoppm (poppler-utils).
+ * Returns the page image as a base64-encoded PNG string.
+ */
+function renderPageToPng(pdfPath: string, pageNum: number): string {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'anaxi-booklet-'));
+  const outputPrefix = path.join(tmpDir, 'page');
 
-  const page = await pdf.getPage(pageNum);
-  const viewport = page.getViewport({ scale: RENDER_SCALE });
+  try {
+    execFileSync('pdftoppm', [
+      '-png',
+      '-r', String(RENDER_DPI),
+      '-f', String(pageNum),
+      '-l', String(pageNum),
+      '-singlefile',
+      pdfPath,
+      outputPrefix,
+    ]);
 
-  const canvas = createCanvas(Math.ceil(viewport.width), Math.ceil(viewport.height));
-  const ctx = canvas.getContext('2d') as unknown as CanvasRenderingContext2D;
+    // pdftoppm writes <prefix>.png when -singlefile is used
+    const outFile = `${outputPrefix}.png`;
+    if (!fs.existsSync(outFile)) {
+      throw new Error(`pdftoppm did not produce output for page ${pageNum}`);
+    }
 
-  await page.render({
-    canvasContext: ctx,
-    viewport,
-  }).promise;
-
-  // Return PNG as base64 (strip data:image/png;base64, prefix)
-  return canvas.toDataURL('image/png').replace(/^data:image\/png;base64,/, '');
+    const buf = fs.readFileSync(outFile);
+    return buf.toString('base64');
+  } finally {
+    // Clean up temp directory
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
 }
 
 // ── Sleep helper ──────────────────────────────────────────────────────────────
@@ -179,17 +190,26 @@ async function main(): Promise<void> {
     fs.mkdirSync(tmpDir, { recursive: true });
   }
 
-  // ── Load PDF ───────────────────────────────────────────────────────────────
+  // ── Get page count via pdfinfo ─────────────────────────────────────────────
 
   console.log(`Loading PDF: ${path.relative(process.cwd(), PDF_PATH)}`);
-  const buffer = fs.readFileSync(PDF_PATH);
-  const data = new Uint8Array(buffer.buffer, buffer.byteOffset, buffer.byteLength);
-  const pdf = await (pdfjsLib as unknown as typeof import('pdfjs-dist')).getDocument({
-    data,
-    disableWorker: true,
-  }).promise;
 
-  const totalPages = pdf.numPages;
+  let totalPages: number;
+  try {
+    const info = execFileSync('pdfinfo', [PDF_PATH]).toString();
+    const match = info.match(/^Pages:\s*(\d+)/m);
+    totalPages = match ? parseInt(match[1], 10) : 0;
+    if (!totalPages) throw new Error('Could not determine page count from pdfinfo');
+  } catch {
+    // Fallback: render page 1 and count via pdftoppm -l with a high ceiling
+    const raw = execFileSync('pdftoppm', ['-l', '999', '-f', '1', '-r', '1', PDF_PATH, '/dev/null'], {
+      encoding: 'utf8',
+      stdio: ['pipe', 'pipe', 'pipe'],
+    });
+    // pdfinfo is the reliable path; if both fail, abort
+    throw new Error(`Cannot determine PDF page count. Install poppler-utils: apt-get install -y poppler-utils\n${raw}`);
+  }
+
   const firstPage = PAGE_RANGE?.from ?? 1;
   const lastPage = Math.min(PAGE_RANGE?.to ?? totalPages, totalPages);
 
@@ -227,8 +247,8 @@ async function main(): Promise<void> {
     }
 
     try {
-      // Render page to PNG
-      const imageBase64 = await renderPageToPng(pdf, pageNum);
+      // Render page to PNG via pdftoppm
+      const imageBase64 = renderPageToPng(PDF_PATH, pageNum);
 
       // Call GPT-4o vision
       const parsed: ParsedPage = await chunkPage(imageBase64, pageNum);
