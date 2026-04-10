@@ -535,6 +535,7 @@ const _W2N = {
 
 function wordsToNumber(text) {
   const s = text.toLowerCase()
+    .replace(/half\s+a\s+million/g, 'five hundred thousand')
     .replace(/[,.]/g, ' ').replace(/-/g, ' ')
     .replace(/\band\b/g, ' ').replace(/\s+/g, ' ').trim();
   let result = 0, current = 0;
@@ -547,6 +548,8 @@ function wordsToNumber(text) {
       result += (current === 0 ? 1 : current) * 1000; current = 0;
     } else if (tok === 'million') {
       result += (current === 0 ? 1 : current) * 1_000_000; current = 0;
+    } else if (tok === 'billion') {
+      result += (current === 0 ? 1 : current) * 1_000_000_000; current = 0;
     }
   }
   return result + current;
@@ -1023,18 +1026,151 @@ function extractN13McqQuestions(slides) {
   return questions;
 }
 
+// ─── Extraction: ordering questions (N1.4) ────────────────────────────────────
+
+const WORD_NUM_STARTS_RE = /^(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred|thousand|million|billion|half)/i;
+
+function extractOrderingQuestions(slides) {
+  const questions = [];
+
+  for (const { runs } of slides) {
+    let direction = null;
+    const labeledItems = {};
+    let pendingLabel = null;
+    let pendingPartial = null;
+    let temperatureItems = null;
+    let pendingTemp = false;
+    let inWordNumbers = false;
+    const wordNumberItems = [];
+
+    for (const rawRun of runs) {
+      const run = rawRun.text.trim();
+      if (!run) continue;
+
+      // Q8: word numbers trigger
+      if (/arrange these numbers in ascending order/i.test(run)) {
+        inWordNumbers = true;
+        if (!direction) direction = 'ascending';
+        continue;
+      }
+
+      // Q8: collect word number items until a non-word-number run appears
+      if (inWordNumbers) {
+        if (WORD_NUM_STARTS_RE.test(run)) {
+          wordNumberItems.push(run);
+        } else {
+          inWordNumbers = false;
+        }
+        continue;
+      }
+
+      // Direction detection (standalone keyword run)
+      if (/^ascending$/i.test(run)) { direction = 'ascending'; continue; }
+      if (/^descending$/i.test(run)) { direction = 'descending'; continue; }
+
+      // Q2: temperature items — header and values may be in separate runs
+      if (/coldest to warmest/i.test(run)) {
+        const m = run.match(/:\s*(.+)$/);
+        if (m && m[1].trim()) {
+          temperatureItems = m[1].split(',').map(s => s.trim()).filter(Boolean);
+        } else {
+          pendingTemp = true;
+        }
+        continue;
+      }
+      if (pendingTemp) {
+        temperatureItems = run.split(',').map(s => s.trim()).filter(Boolean);
+        pendingTemp = false;
+        continue;
+      }
+
+      // Pure label: "a) " (letter a-h + close-paren + optional whitespace only)
+      if (/^([a-h])\)\s*$/.test(run)) {
+        pendingLabel = run[0];
+        pendingPartial = null;
+        continue;
+      }
+
+      // Split label: "h) 3" (letter + paren + partial leading digit, no comma)
+      const splitMatch = run.match(/^([a-h])\)\s*(\d+)$/);
+      if (splitMatch) {
+        pendingLabel = splitMatch[1];
+        pendingPartial = splitMatch[2];
+        continue;
+      }
+
+      // Continuation run immediately after a pending label
+      if (pendingLabel !== null) {
+        labeledItems[pendingLabel] = pendingPartial !== null
+          ? pendingPartial + run
+          : run;
+        pendingLabel = null;
+        pendingPartial = null;
+        continue;
+      }
+    }
+
+    // Emit labeled ordering questions
+    if (direction) {
+      for (const listStr of Object.values(labeledItems)) {
+        const parts = listStr.split(',').map(s => s.trim().replace(/\s+/g, '')).filter(Boolean);
+        const nums = parts.map(Number).filter(n => !isNaN(n));
+        if (nums.length < 3) continue;
+        const sorted = direction === 'ascending'
+          ? [...nums].sort((a, b) => a - b)
+          : [...nums].sort((a, b) => b - a);
+        questions.push({
+          stem: `List the following numbers in ${direction} order: ${parts.join(', ')}.`,
+          options: parts.map(String),
+          sorted: sorted.map(String),
+        });
+      }
+    }
+
+    // Q2: temperature ordering question
+    if (temperatureItems && temperatureItems.length >= 3) {
+      const tempVals = temperatureItems.map(t => ({
+        label: t,
+        val: parseInt(t.replace(/[^-\d]/g, ''), 10),
+      }));
+      const sortedTemps = [...tempVals].sort((a, b) => a.val - b.val).map(t => t.label);
+      questions.push({
+        stem: `Order the following temperatures from coldest to warmest: ${temperatureItems.join(', ')}.`,
+        options: temperatureItems,
+        sorted: sortedTemps,
+      });
+    }
+
+    // Q8: word numbers ordering question
+    if (wordNumberItems.length >= 3) {
+      const wordVals = wordNumberItems.map(w => ({
+        label: w,
+        val: wordsToNumber(w),
+      }));
+      const sortedWords = [...wordVals].sort((a, b) => a.val - b.val).map(w => w.label);
+      questions.push({
+        stem: `Arrange these numbers in ascending order: ${wordNumberItems.join(', ')}.`,
+        options: wordNumberItems,
+        sorted: sortedWords,
+      });
+    }
+  }
+
+  return questions;
+}
+
 // ─── Build JSONL records ──────────────────────────────────────────────────────
 
 function makeRef(type, n) {
   return `${skillCode}-QB-${type}-${String(n).padStart(3, '0')}`;
 }
 
-function makeRecord(ref, stem, format, answer, options) {
+function makeRecord(ref, stem, format, answer, options, acceptedAnswers) {
   const rec = {
     source: { question_ref: ref, source_file: sourceFile },
     question: { stem, format, answer },
     skills: { primary_skill_code: skillCode },
-    marking: { mark_scheme_type: 'AUTO_EXACT', accepted_answers: [answer] },
+    marking: { mark_scheme_type: 'AUTO_EXACT', accepted_answers: acceptedAnswers || [answer] },
   };
   if (options && options.length > 0) {
     rec.question.options = options;
@@ -1108,6 +1244,15 @@ const blkUnique = extractFillBlankQuestions(slides);
 // 9. N1.3-style Skills Check MCQ (A/B C/D two-line format)
 const mcq13Unique = extractN13McqQuestions(slides);
 
+// 10. Ordering questions (N1.4)
+const ordQuestions = extractOrderingQuestions(slides);
+const ordSeen = new Set();
+const ordUnique = ordQuestions.filter((q) => {
+  if (ordSeen.has(q.stem)) return false;
+  ordSeen.add(q.stem);
+  return true;
+});
+
 // ─── Write output ─────────────────────────────────────────────────────────────
 
 const lines = [];
@@ -1169,6 +1314,11 @@ mcq13Unique.forEach((q, i) => {
   lines.push(makeRecord(makeRef('MCQ', mcqOffset + i + 1), q.stem, 'SINGLE_CHOICE', q.answer, q.options));
 });
 
+ordUnique.forEach((q, i) => {
+  const answer = q.sorted.join(', ');
+  lines.push(makeRecord(makeRef('ORD', i + 1), q.stem, 'ORDER_SEQUENCE', answer, q.options, q.sorted));
+});
+
 fs.writeFileSync(outPath, lines.map((r) => JSON.stringify(r)).join('\n') + '\n');
 
 const summary = {
@@ -1184,6 +1334,7 @@ const summary = {
     writeAsFigures: figUnique.length,
     trueFalse: tfUnique.length,
     fillBlank: blkUnique.length,
+    orderSequence: ordUnique.length,
     total: lines.length,
   },
 };
