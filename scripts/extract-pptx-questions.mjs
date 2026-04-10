@@ -1159,6 +1159,100 @@ function extractOrderingQuestions(slides) {
   return questions;
 }
 
+// ─── Extraction: median and midpoint questions (N1.5) ────────────────────────
+
+function hasUnitChars(s) {
+  return /[a-z°£$€]/i.test(s);
+}
+
+function parseNumericPart(s) {
+  return { val: parseFloat(s.replace(/[^-\d.]/g, '')), original: s.trim() };
+}
+
+function computeMedianStr(items) {
+  const parsed = items.map(parseNumericPart).filter(p => !isNaN(p.val));
+  if (parsed.length < 2) return null;
+  parsed.sort((a, b) => a.val - b.val);
+  const n = parsed.length;
+  if (n % 2 === 1) return parsed[(n - 1) / 2].original;
+  const lo = parsed[n / 2 - 1], hi = parsed[n / 2];
+  const mid = (lo.val + hi.val) / 2;
+  const suffixMatch = lo.original.match(/([a-zA-Z°]+)$/);
+  const suffix = suffixMatch ? suffixMatch[1] : '';
+  return String(mid) + suffix;
+}
+
+function parseMidpointContent(content) {
+  const m = content.match(/^(.+?)\s+and\s+(.+)$/i);
+  if (!m) return null;
+  const aStr = m[1].trim(), bStr = m[2].trim();
+  const a = parseFloat(aStr.replace(/[^-\d.]/g, ''));
+  const b = parseFloat(bStr.replace(/[^-\d.]/g, ''));
+  if (isNaN(a) || isNaN(b)) return null;
+  return { aStr, bStr, a, b };
+}
+
+function computeMidpointStr(parts) {
+  const mid = (parts.a + parts.b) / 2;
+  const prefixMatch = parts.aStr.match(/^([£$€])/);
+  if (prefixMatch) {
+    const formatted = mid % 1 === 0 ? String(mid) + '.00' : mid.toFixed(2);
+    return prefixMatch[1] + formatted;
+  }
+  const suffixMatch = parts.aStr.match(/([a-z]+)$/i);
+  const suffix = suffixMatch ? suffixMatch[1] : '';
+  return String(mid) + suffix;
+}
+
+function extractMedianQuestions(slides) {
+  const questions = [];
+  const ITEM_RE = /^([a-p])\)\s+(.+)$/;
+  for (const { runs } of slides) {
+    let collecting = false;
+    for (const rawRun of runs) {
+      const run = rawRun.text;
+      if (/find the median/i.test(run)) { collecting = true; continue; }
+      if (!collecting) continue;
+      const m = run.trim().match(ITEM_RE);
+      if (!m) continue;
+      const items = m[2].split(',').map(s => s.trim()).filter(Boolean);
+      if (items.length < 2) continue;
+      const answer = computeMedianStr(items);
+      if (!answer) continue;
+      questions.push({
+        stem: `Find the median of: ${items.join(', ')}.`,
+        answer,
+        format: hasUnitChars(answer) ? 'SHORT_TEXT' : 'NUMERIC',
+      });
+    }
+  }
+  return questions;
+}
+
+function extractMidpointQuestions(slides) {
+  const questions = [];
+  const ITEM_RE = /^([a-o])\)\s+(.+)$/;
+  for (const { runs } of slides) {
+    let collecting = false;
+    for (const rawRun of runs) {
+      const run = rawRun.text;
+      if (/find the midpoint of a pair/i.test(run)) { collecting = true; continue; }
+      if (!collecting) continue;
+      const m = run.trim().match(ITEM_RE);
+      if (!m) continue;
+      const parts = parseMidpointContent(m[2]);
+      if (!parts) continue;
+      const answer = computeMidpointStr(parts);
+      questions.push({
+        stem: `Find the midpoint of ${parts.aStr} and ${parts.bStr}.`,
+        answer,
+        format: hasUnitChars(answer) ? 'SHORT_TEXT' : 'NUMERIC',
+      });
+    }
+  }
+  return questions;
+}
+
 // ─── Build JSONL records ──────────────────────────────────────────────────────
 
 function makeRef(type, n) {
@@ -1253,6 +1347,24 @@ const ordUnique = ordQuestions.filter((q) => {
   return true;
 });
 
+// 11. Median questions (N1.5)
+const medQuestions = extractMedianQuestions(slides);
+const medSeen = new Set();
+const medUnique = medQuestions.filter((q) => {
+  if (medSeen.has(q.stem)) return false;
+  medSeen.add(q.stem);
+  return true;
+});
+
+// 12. Midpoint questions (N1.5)
+const midQuestions = extractMidpointQuestions(slides);
+const midSeen = new Set();
+const midUnique = midQuestions.filter((q) => {
+  if (midSeen.has(q.stem)) return false;
+  midSeen.add(q.stem);
+  return true;
+});
+
 // ─── Write output ─────────────────────────────────────────────────────────────
 
 const lines = [];
@@ -1319,6 +1431,14 @@ ordUnique.forEach((q, i) => {
   lines.push(makeRecord(makeRef('ORD', i + 1), q.stem, 'ORDER_SEQUENCE', answer, q.options, q.sorted));
 });
 
+medUnique.forEach((q, i) => {
+  lines.push(makeRecord(makeRef('MED', i + 1), q.stem, q.format, q.answer, null));
+});
+
+midUnique.forEach((q, i) => {
+  lines.push(makeRecord(makeRef('MID', i + 1), q.stem, q.format, q.answer, null));
+});
+
 fs.writeFileSync(outPath, lines.map((r) => JSON.stringify(r)).join('\n') + '\n');
 
 const summary = {
@@ -1335,6 +1455,8 @@ const summary = {
     trueFalse: tfUnique.length,
     fillBlank: blkUnique.length,
     orderSequence: ordUnique.length,
+    median: medUnique.length,
+    midpoint: midUnique.length,
     total: lines.length,
   },
 };
