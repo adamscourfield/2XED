@@ -715,6 +715,314 @@ function extractN12McqQuestions(slides) {
   return questions;
 }
 
+// ─── N1.3 helpers ─────────────────────────────────────────────────────────────
+
+/** Parse a string as an integer, falling back to wordsToNumber. Returns null on failure. */
+function parseNum(str) {
+  const stripped = str.trim().replace(/[,\s]/g, '');
+  const n = parseInt(stripped, 10);
+  if (!isNaN(n)) return n;
+  const w = wordsToNumber(str.trim());
+  return w > 0 ? w : null;
+}
+
+/** Evaluate L op R where op is one of < > ≤ ≥ = ≠ */
+function evalOp(a, op, b) {
+  if (op === '<') return a < b;
+  if (op === '>') return a > b;
+  if (op === '≤') return a <= b;
+  if (op === '≥') return a >= b;
+  if (op === '=') return a === b;
+  if (op === '≠') return a !== b;
+  return false;
+}
+
+/** Given a statement string like "3 < 5" or "One million < 214 380", return "True"/"False"/null. */
+function evaluateInequalityStatement(text) {
+  // Try each operator (longest first to avoid < matching ≤)
+  const OPS = ['≥', '≤', '≠', '>', '<', '='];
+  for (const sym of OPS) {
+    const idx = text.indexOf(sym);
+    if (idx === -1) continue;
+    const left = parseNum(text.slice(0, idx));
+    const right = parseNum(text.slice(idx + sym.length));
+    if (left === null || right === null) continue;
+    return evalOp(left, sym, right) ? 'True' : 'False';
+  }
+  return null;
+}
+
+/** Evaluate an MCQ5-style option claim ("17050 ≠ seventeen thousand and five", "32 + 55 = 88", etc.) */
+function evaluateStatementOption(opt) {
+  // X ≠ Y
+  const neqIdx = opt.indexOf('≠');
+  if (neqIdx !== -1) {
+    const left = parseNum(opt.slice(0, neqIdx));
+    const right = parseNum(opt.slice(neqIdx + 1));
+    if (left !== null && right !== null) return left !== right;
+  }
+  // X = Y (possibly arithmetic: A + B = C)
+  const eqIdx = opt.indexOf('=');
+  if (eqIdx !== -1) {
+    const lhs = opt.slice(0, eqIdx).trim();
+    const rhs = parseNum(opt.slice(eqIdx + 1));
+    const arith = lhs.match(/^(.+?)\s*\+\s*(.+)$/);
+    if (arith) {
+      const a = parseNum(arith[1]), b = parseNum(arith[2]);
+      if (a !== null && b !== null && rhs !== null) return a + b === rhs;
+    }
+    const left = parseNum(lhs);
+    if (left !== null && rhs !== null) return left === rhs;
+  }
+  return false;
+}
+
+/** Determine the correct answer for an N1.3 Skills Check MCQ. Returns matching option string or null. */
+function computeN13McqAnswer(stemText, options) {
+  const stemLow = stemText.toLowerCase();
+
+  // MCQ4: "minimum value of N" → option with ≥N
+  const minMatch = stemLow.match(/minimum value of (\d+)/);
+  if (minMatch) {
+    const N = minMatch[1];
+    return options.find((o) => o.includes(`≥ ${N}`) || o.includes(`≥${N}`)) ?? null;
+  }
+  const maxMatch = stemLow.match(/maximum value of (\d+)/);
+  if (maxMatch) {
+    const N = maxMatch[1];
+    return options.find((o) => o.includes(`≤ ${N}`) || o.includes(`≤${N}`)) ?? null;
+  }
+
+  // MCQ3: "could [var] = N" — evaluate each inequality at N
+  const couldM = stemLow.match(/could\s+[a-z]\s*=\s*(\d+)/);
+  if (couldM) {
+    const val = parseInt(couldM[1], 10);
+    const ineqM = [...stemText.matchAll(/Inequality\s+(\d+)[:\s]+[a-z]\s*([<>≤≥])\s*(\d+)/gi)];
+    if (ineqM.length >= 2) {
+      const satisfied = ineqM
+        .filter((m) => evalOp(val, m[2], parseInt(m[3], 10)))
+        .map((m) => m[1]);
+      if (satisfied.length === 0) return options.find((o) => /neither/i.test(o)) ?? null;
+      if (satisfied.length === ineqM.length) return options.find((o) => /both/i.test(o)) ?? null;
+      const n = satisfied[0];
+      return options.find((o) => new RegExp(`only inequality ${n}`, 'i').test(o)) ?? null;
+    }
+  }
+
+  // MCQ5: "which … statements is correct" — evaluate each option
+  if (/which\s+(one\s+)?of the following statements is correct/i.test(stemText)) {
+    return options.find((o) => evaluateStatementOption(o)) ?? null;
+  }
+
+  // MCQ1: "in words" — flip the literal inequality in the stem
+  if (/in words/i.test(stemLow) && /inequality.*[<>]/i.test(stemLow)) {
+    const ineqM = stemText.match(/inequality[:\s]+(\d+)\s*([<>])\s*([a-z])/i);
+    if (ineqM) {
+      const num = ineqM[1];
+      const varN = ineqM[3];
+      // e.g. "3 > t" → t < 3 → option says "t is smaller/less than 3"
+      return (
+        options.find(
+          (o) =>
+            o.toLowerCase().includes(`${varN} is smaller than ${num}`) ||
+            o.toLowerCase().includes(`${varN} is less than ${num}`) ||
+            o.includes(`${varN} < ${num}`)
+        ) ?? null
+      );
+    }
+  }
+
+  // MCQ2: "cannot be true" / "can not be true"
+  if (/cannot be true|can not be true/i.test(stemText)) {
+    const condM = stemText.match(/([a-z])\s*([<>])\s*(\d+)/);
+    if (condM) {
+      const [, varN, op, boundStr] = condM;
+      const bound = parseInt(boundStr, 10);
+      const contradictOp = op === '>' ? '<' : '>';
+      return (
+        options.find(
+          (o) =>
+            o.toLowerCase().includes(`${varN} is less than ${bound}`) ||
+            o.toLowerCase().includes(`${varN} is smaller than ${bound}`) ||
+            o.includes(`${varN} ${contradictOp} ${bound}`)
+        ) ?? null
+      );
+    }
+  }
+
+  return null;
+}
+
+// ─── Extraction: inequality true/false (N1.3 slide 2 table + Q4) ──────────────
+
+function extractInequalityTrueFalseQuestions(slides) {
+  const questions = [];
+  const seen = new Set();
+  // Match labeled rows: "a) 3 < 5", "k) 3  849 000 > one million", etc.
+  const ROW_RE = /^([a-k])\)\s+(.+[<>=≠≤≥].+)$/;
+
+  for (const { runs } of slides) {
+    for (let i = 0; i < runs.length; i++) {
+      const text = runs[i].text;
+
+      // Labeled inequality row
+      const rowM = ROW_RE.exec(text);
+      if (rowM && i + 1 < runs.length) {
+        const statement = rowM[2].trim();
+        const nextText = runs[i + 1].text.trim();
+        if (!/^(True|False)$/i.test(nextText)) continue;
+        const answer = nextText.charAt(0).toUpperCase() + nextText.slice(1).toLowerCase();
+        const stem = `True or false? ${statement}`;
+        if (!seen.has(stem)) {
+          seen.add(stem);
+          questions.push({ stem, answer });
+        }
+        continue;
+      }
+
+      // Q4: "True or false?: a = 8  satisfies the inequality a > 5."
+      if (/^true or false\?:/i.test(text)) {
+        const satisfyM = text.match(
+          /([a-z])\s*=\s*(\d+)\s+satisfies\s+the\s+inequality\s+[a-z]\s*([<>≤≥=≠])\s*(\d+)/i
+        );
+        if (satisfyM) {
+          const N = parseInt(satisfyM[2], 10);
+          const op = satisfyM[3];
+          const M = parseInt(satisfyM[4], 10);
+          const answer = evalOp(N, op, M) ? 'True' : 'False';
+          const stem = text
+            .replace(/\s+Circle the correct answer\.?\s*$/i, '')
+            .replace(/\?:/, '?')
+            .trim();
+          if (!seen.has(stem)) {
+            seen.add(stem);
+            questions.push({ stem, answer });
+          }
+        }
+      }
+    }
+  }
+  return questions;
+}
+
+// ─── Extraction: fill-blank integer inequalities (N1.3 Q8/Q9) ─────────────────
+
+function extractFillBlankQuestions(slides) {
+  const questions = [];
+  const seen = new Set();
+  const BLANK = /_{4,}/;
+
+  for (const { runs } of slides) {
+    for (let i = 0; i < runs.length; i++) {
+      const text = runs[i].text;
+      if (!BLANK.test(text) || !/[<>≤≥]/.test(text)) continue;
+
+      let stem = null, answer = null;
+
+      // Blank on left: "______ < 100"
+      const leftM = text.match(/^_{4,}\s*([<>≤≥])\s*(.+)$/);
+      if (leftM) {
+        const op = leftM[1], rhs = parseNum(leftM[2].trim());
+        if (rhs !== null) {
+          if (op === '<') { answer = String(rhs - 1); stem = `What is the largest integer satisfying ______ < ${rhs}?`; }
+          else if (op === '≤') { answer = String(rhs); stem = `What is the largest integer satisfying ______ ≤ ${rhs}?`; }
+          else if (op === '>') { answer = String(rhs + 1); stem = `What is the smallest integer satisfying ______ > ${rhs}?`; }
+          else if (op === '≥') { answer = String(rhs); stem = `What is the smallest integer satisfying ______ ≥ ${rhs}?`; }
+        }
+      }
+
+      // Blank on right (numeric or word left): "489 < _____" / "Six hundred... < _____"
+      if (!stem) {
+        const rightM = text.match(/^(.+?)\s*([<>])\s*_{4,}$/);
+        if (rightM) {
+          const lhs = parseNum(rightM[1].trim()), op = rightM[2];
+          if (lhs !== null) {
+            if (op === '<') { answer = String(lhs + 1); stem = `What is the smallest integer satisfying ${lhs} < ______?`; }
+            else if (op === '>') { answer = String(lhs - 1); stem = `What is the largest integer satisfying ${lhs} > ______?`; }
+          }
+        }
+      }
+
+      if (!stem || !answer) continue;
+
+      // Verify: next run must be a single number matching computed answer
+      if (i + 1 < runs.length) {
+        const nextNum = parseNum(runs[i + 1].text);
+        if (nextNum === null || String(nextNum) !== answer) continue;
+      } else {
+        continue;
+      }
+
+      if (!seen.has(stem)) {
+        seen.add(stem);
+        questions.push({ stem, answer });
+      }
+    }
+  }
+  return questions;
+}
+
+// ─── Extraction: N1.3-style Skills Check MCQ (A/B then C/D two-line format) ───
+
+function extractN13McqQuestions(slides) {
+  const questions = [];
+  const seenStems = new Set();
+  const AB_RE = /^A\.\s+.{3,}\s{2,}B\.\s+.{3,}/;
+  const CD_RE = /^C\.\s+.{3,}\s{2,}D\.\s+.{3,}/;
+
+  for (const { runs } of slides) {
+    let inSkillsCheck = false;
+    let stemParts = [];
+
+    for (let i = 0; i < runs.length; i++) {
+      const text = runs[i].text;
+
+      if (/^skills check$/i.test(text)) {
+        inSkillsCheck = true;
+        stemParts = [];
+        continue;
+      }
+      if (!inSkillsCheck) continue;
+
+      if (AB_RE.test(text)) {
+        if (i + 1 >= runs.length || !CD_RE.test(runs[i + 1].text)) {
+          stemParts = [];
+          continue;
+        }
+        const abParts = text.replace(/^A\.\s+/, '').split(/\s{2,}B\.\s+/);
+        const cdParts = runs[i + 1].text.replace(/^C\.\s+/, '').split(/\s{2,}D\.\s+/);
+        if (abParts.length < 2 || cdParts.length < 2) {
+          stemParts = [];
+          i++;
+          continue;
+        }
+        const options = [abParts[0].trim(), abParts[1].trim(), cdParts[0].trim(), cdParts[1].trim()];
+        const stemText = stemParts.map((s) => s.replace(/\s+/g, ' ').trim()).join(' ');
+
+        if (!seenStems.has(stemText)) {
+          const answer = computeN13McqAnswer(stemText, options);
+          if (answer !== null) {
+            seenStems.add(stemText);
+            questions.push({ stem: stemText, options, answer });
+          } else {
+            console.warn(`  [WARN] N1.3 MCQ: could not determine answer for stem: "${stemText.slice(0, 60)}..."`);
+          }
+        }
+
+        stemParts = [];
+        i++; // consume CD line
+        continue;
+      }
+
+      // Accumulate stem fragments (skip CD lines that appear stray)
+      if (!CD_RE.test(text)) {
+        stemParts.push(text);
+      }
+    }
+  }
+  return questions;
+}
+
 // ─── Build JSONL records ──────────────────────────────────────────────────────
 
 function makeRef(type, n) {
@@ -791,6 +1099,15 @@ const figUnique = extractWriteAsFiguresQuestions(slides);
 // 6. N1.2-style MCQ
 const mcq12Unique = extractN12McqQuestions(slides);
 
+// 7. Inequality true/false (N1.3 slide 2 table + Q4)
+const tfUnique = extractInequalityTrueFalseQuestions(slides);
+
+// 8. Fill-blank integer inequalities (N1.3 Q8/Q9)
+const blkUnique = extractFillBlankQuestions(slides);
+
+// 9. N1.3-style Skills Check MCQ (A/B C/D two-line format)
+const mcq13Unique = extractN13McqQuestions(slides);
+
 // ─── Write output ─────────────────────────────────────────────────────────────
 
 const lines = [];
@@ -839,6 +1156,19 @@ mcq12Unique.forEach((q, i) => {
   lines.push(makeRecord(makeRef('MCQ', mcqUnique.length + i + 1), q.stem, 'SINGLE_CHOICE', q.answer, q.options));
 });
 
+tfUnique.forEach((q, i) => {
+  lines.push(makeRecord(makeRef('TF', i + 1), q.stem, 'TRUE_FALSE', q.answer, null));
+});
+
+blkUnique.forEach((q, i) => {
+  lines.push(makeRecord(makeRef('BLK', i + 1), q.stem, 'NUMERIC', q.answer, null));
+});
+
+const mcqOffset = mcqUnique.length + mcq12Unique.length;
+mcq13Unique.forEach((q, i) => {
+  lines.push(makeRecord(makeRef('MCQ', mcqOffset + i + 1), q.stem, 'SINGLE_CHOICE', q.answer, q.options));
+});
+
 fs.writeFileSync(outPath, lines.map((r) => JSON.stringify(r)).join('\n') + '\n');
 
 const summary = {
@@ -849,9 +1179,11 @@ const summary = {
     greatest: grtUnique.length,
     smallest: smlUnique.length,
     difference: difUnique.length,
-    mcq: mcqUnique.length + mcq12Unique.length,
+    mcq: mcqUnique.length + mcq12Unique.length + mcq13Unique.length,
     writeAsWords: wrdUnique.length,
     writeAsFigures: figUnique.length,
+    trueFalse: tfUnique.length,
+    fillBlank: blkUnique.length,
     total: lines.length,
   },
 };
