@@ -121,6 +121,18 @@ export default async function TeacherDashboardPage({ searchParams }: Props) {
     );
   }
 
+  // Fetch recent live sessions for this teacher
+  const recentSessions = await prisma.liveSession.findMany({
+    where: { teacherUserId: user.id },
+    include: {
+      subject: { select: { title: true } },
+      skill: { select: { name: true, code: true } },
+      _count: { select: { participants: true } },
+    },
+    orderBy: { createdAt: 'desc' },
+    take: 5,
+  });
+
   const allStudentIds = [...new Set(teacherProfile.classrooms.flatMap((tc) => tc.classroom.enrollments.map((e) => e.studentUserId)))];
   const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
 
@@ -187,6 +199,61 @@ export default async function TeacherDashboardPage({ searchParams }: Props) {
         </>
       }
     >
+      {/* ── Live lesson launcher ─────────────────────────────────────────── */}
+      <div className="anx-lesson-launcher flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="anx-section-label mb-1" style={{ color: 'var(--anx-text-muted)' }}>Live lesson</p>
+          <h2 className="text-xl font-semibold" style={{ color: 'var(--anx-text)' }}>Ready to teach?</h2>
+          <p className="mt-0.5 text-sm" style={{ color: 'var(--anx-text-muted)' }}>
+            Start a session, pick your topics, and deploy content live to student devices.
+          </p>
+        </div>
+        <Link href="/teacher/live/new" className="anx-btn-primary shrink-0 whitespace-nowrap">
+          Start a live lesson →
+        </Link>
+      </div>
+
+      {/* ── Recent live sessions ─────────────────────────────────────────── */}
+      {recentSessions.length > 0 && (
+        <div>
+          <p className="anx-section-label mb-3" style={{ color: 'var(--anx-text-muted)' }}>Recent sessions</p>
+          <div className="space-y-2">
+            {recentSessions.map((ls) => {
+              const isLive = ls.status === 'ACTIVE' || ls.status === 'LOBBY';
+              const statusColour =
+                ls.status === 'ACTIVE' ? 'anx-badge-green' :
+                ls.status === 'LOBBY' ? 'anx-badge-amber' :
+                ls.status === 'PAUSED' ? 'anx-badge-amber' :
+                'anx-badge-blue';
+              return (
+                <div key={ls.id} className="flex items-center justify-between gap-4 anx-card px-4 py-3">
+                  <div className="flex min-w-0 flex-1 items-center gap-3">
+                    {isLive && <span className="anx-live-dot" />}
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium" style={{ color: 'var(--anx-text)' }}>
+                        {ls.subject.title}{ls.skill ? ` — ${ls.skill.code}: ${ls.skill.name}` : ''}
+                      </p>
+                      <p className="text-xs" style={{ color: 'var(--anx-text-muted)' }}>
+                        Code: <span className="font-mono font-semibold">{ls.joinCode}</span> · {ls._count.participants} student{ls._count.participants !== 1 ? 's' : ''} · {ls.createdAt.toLocaleDateString('en-GB')}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex shrink-0 items-center gap-3">
+                    <span className={`anx-badge ${statusColour}`}>{ls.status}</span>
+                    {(isLive || ls.status === 'PAUSED') && (
+                      <Link href={`/teacher/live/${ls.id}`} className="anx-btn-secondary px-3 py-1.5 text-xs">
+                        Open conductor →
+                      </Link>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* ── Time window filter ───────────────────────────────────────────── */}
       <div className="flex flex-wrap gap-2 text-xs">
           {[7, 30, 90].map((d) => (
             <Link

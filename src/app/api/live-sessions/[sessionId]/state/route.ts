@@ -47,8 +47,21 @@ export async function GET(_req: NextRequest, { params }: Props) {
     },
   });
 
+  // Build lane distribution
+  const laneCounts = { LANE_1: 0, LANE_2: 0, LANE_3: 0 };
+  const laneStudents: Record<string, Array<{ id: string; name: string | null; email: string }>> = {
+    LANE_1: [], LANE_2: [], LANE_3: [],
+  };
+
   if (!liveSession) return NextResponse.json({ error: 'Session not found' }, { status: 404 });
   if (liveSession.teacherUserId !== userId) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+
+  for (const p of liveSession.participants) {
+    if (p.isActive) {
+      laneCounts[p.currentLane] = (laneCounts[p.currentLane] ?? 0) + 1;
+      laneStudents[p.currentLane]?.push({ id: p.studentUserId, name: p.student.name, email: p.student.email });
+    }
+  }
 
   // Build per-skill response summary
   const skillSummary = new Map<
@@ -140,7 +153,12 @@ export async function GET(_req: NextRequest, { params }: Props) {
     startedAt: liveSession.startedAt,
     skillId: liveSession.skillId,
     skill: liveSession.skill,
+    phases: liveSession.phases,
+    currentPhaseIndex: liveSession.currentPhaseIndex,
+    currentContent: liveSession.currentContent,
     participants,
+    laneCounts,
+    laneStudents,
     responseSummary,
     recommendedExplanation,
   });

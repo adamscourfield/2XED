@@ -650,19 +650,24 @@ model ClassroomEnrollment {
 }
 
 model LiveSession {
-  id            String            @id @default(cuid())
-  classroomId   String
-  teacherUserId String
-  subjectId     String
-  skillId       String?
-  status        LiveSessionStatus @default(LOBBY)
-  phase         LiveSessionPhase  @default(DIAGNOSTIC)
-  reteachAlert  Boolean           @default(false)
-  joinCode      String            @unique
-  startedAt     DateTime?
-  endedAt       DateTime?
-  createdAt     DateTime          @default(now())
-  updatedAt     DateTime          @updatedAt
+  id                String            @id @default(cuid())
+  classroomId       String
+  teacherUserId     String
+  subjectId         String
+  skillId           String?
+  status            LiveSessionStatus @default(LOBBY)
+  phase             LiveSessionPhase  @default(DIAGNOSTIC)
+  reteachAlert      Boolean           @default(false)
+  joinCode          String            @unique
+  startedAt         DateTime?
+  endedAt           DateTime?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  // Lesson phase plan: ordered array of {skillId, type, label, explanationRouteId?}
+  phases            Json?
+  currentPhaseIndex Int               @default(0)
+  // What's currently deployed to student devices
+  currentContent    Json?
 
   classroom     Classroom         @relation(fields: [classroomId], references: [id])
   teacher       User              @relation("TeacherLiveSessions", fields: [teacherUserId], references: [id])

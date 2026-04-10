@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { redirect } from 'next/navigation';
 
@@ -30,9 +30,24 @@ interface Item {
   options: unknown;
 }
 
+interface CurrentContent {
+  contentType: 'EXPLANATION' | 'MESSAGE' | 'PHASE';
+  targetLanes?: string[];
+  message?: string;
+  phaseIndex?: number;
+  broadcastAt?: string;
+}
+
+interface SessionPoll {
+  status: string;
+  currentPhaseIndex: number;
+  currentContent: CurrentContent | null;
+}
+
 type AppState =
   | { phase: 'join' }
   | { phase: 'waiting'; session: JoinedSession }
+  | { phase: 'between-phases'; session: JoinedSession; message: string }
   | { phase: 'question'; session: JoinedSession; item: Item }
   | { phase: 'feedback'; session: JoinedSession; correct: boolean; nextItem: Item | null }
   | { phase: 'done'; session: JoinedSession };
@@ -44,6 +59,79 @@ export default function StudentLivePage() {
   const [answer, setAnswer] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Track last seen content to detect teacher pushes
+  const lastPhaseIndexRef = useRef<number>(-1);
+  const lastBroadcastAtRef = useRef<string | null>(null);
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const sessionRef = useRef<JoinedSession | null>(null);
+
+  // Update sessionRef when appState changes
+  useEffect(() => {
+    if (appState.phase !== 'join') {
+      sessionRef.current = (appState as { session: JoinedSession }).session ?? null;
+    }
+  }, [appState]);
+
+  // Poll for session state changes when in an active session
+  useEffect(() => {
+    const isInSession = appState.phase === 'waiting' || appState.phase === 'between-phases' || appState.phase === 'question' || appState.phase === 'feedback';
+    if (!isInSession) {
+      if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; }
+      return;
+    }
+
+    const sessionId = sessionRef.current?.sessionId;
+    if (!sessionId) return;
+
+    async function pollSession() {
+      const sid = sessionRef.current?.sessionId;
+      if (!sid) return;
+      try {
+        const res = await fetch(`/api/live-sessions/${sid}/student-state`);
+        if (!res.ok) return;
+        const data: SessionPoll = await res.json();
+
+        // Session ended
+        if (data.status === 'COMPLETED') {
+          const sess = sessionRef.current;
+          if (sess) setAppState({ phase: 'done', session: sess });
+          return;
+        }
+
+        // Teacher pushed new content / advanced phase
+        const phaseChanged = data.currentPhaseIndex !== lastPhaseIndexRef.current && lastPhaseIndexRef.current !== -1;
+        const newBroadcast = data.currentContent?.broadcastAt && data.currentContent.broadcastAt !== lastBroadcastAtRef.current;
+
+        if (phaseChanged) {
+          lastPhaseIndexRef.current = data.currentPhaseIndex;
+          const sess = sessionRef.current;
+          if (sess) setAppState({ phase: 'between-phases', session: sess, message: 'Your teacher has moved to the next phase. Get ready!' });
+        }
+
+        if (newBroadcast && data.currentContent) {
+          lastBroadcastAtRef.current = data.currentContent.broadcastAt ?? null;
+          if (data.currentContent.contentType === 'MESSAGE' && data.currentContent.message) {
+            const sess = sessionRef.current;
+            if (sess) setAppState({ phase: 'between-phases', session: sess, message: data.currentContent.message });
+          }
+        }
+
+        if (lastPhaseIndexRef.current === -1) {
+          lastPhaseIndexRef.current = data.currentPhaseIndex;
+        }
+        if (!lastBroadcastAtRef.current && data.currentContent?.broadcastAt) {
+          lastBroadcastAtRef.current = data.currentContent.broadcastAt;
+        }
+      } catch {
+        // silently ignore poll errors
+      }
+    }
+
+    pollRef.current = setInterval(pollSession, 3000);
+    return () => { if (pollRef.current) clearInterval(pollRef.current); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [appState.phase]);
 
   if (status === 'loading') return <div className="p-8" style={{ color: 'var(--anx-text-muted)' }}>Loading…</div>;
   if (status === 'unauthenticated') {
@@ -71,24 +159,19 @@ export default function StudentLivePage() {
         return;
       }
       const session: JoinedSession = await res.json();
+      lastPhaseIndexRef.current = -1;
+      lastBroadcastAtRef.current = null;
 
       if (session.status === 'LOBBY') {
         setAppState({ phase: 'waiting', session });
       } else {
-        // Session is already active — fetch first question
-        await fetchFirstQuestion(session);
+        setAppState({ phase: 'waiting', session });
       }
     } catch {
       setError('Network error. Please try again.');
     } finally {
       setLoading(false);
     }
-  }
-
-  function fetchFirstQuestion(session: JoinedSession) {
-    // The item serving happens through the attempts response.
-    // Show a waiting screen until the teacher starts the session.
-    setAppState({ phase: 'waiting', session });
   }
 
   async function handleAnswer(e: React.FormEvent) {
@@ -143,21 +226,20 @@ export default function StudentLivePage() {
     if (appState.phase !== 'feedback') return;
     const { session, nextItem } = appState;
     if (!nextItem) {
-      setAppState({ phase: 'done', session });
+      setAppState({ phase: 'waiting', session });
     } else {
       setAppState({ phase: 'question', session, item: nextItem });
     }
   }
 
-  // Render join screen
+  // ── Join screen ─────────────────────────────────────────────────────────────
   if (appState.phase === 'join') {
     return (
       <main className="anx-shell flex items-center justify-center">
         <div className="anx-panel w-full max-w-sm p-8">
-          <h1 className="mb-6 text-center text-2xl font-bold" style={{ color: 'var(--anx-text)' }}>Join Live Session</h1>
-          {error && (
-            <div className="anx-callout-danger mb-4">{error}</div>
-          )}
+          <h1 className="mb-2 text-center text-2xl font-bold" style={{ color: 'var(--anx-text)' }}>Join Live Session</h1>
+          <p className="mb-6 text-center text-sm" style={{ color: 'var(--anx-text-muted)' }}>Enter the code your teacher shows on the board.</p>
+          {error && <div className="anx-callout-danger mb-4 text-sm">{error}</div>}
           <form onSubmit={handleJoin} className="space-y-4">
             <div>
               <label htmlFor="joinCode" className="mb-1 block text-sm font-medium" style={{ color: 'var(--anx-text-secondary)' }}>
@@ -170,7 +252,7 @@ export default function StudentLivePage() {
                 onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
                 maxLength={6}
                 placeholder="ABC123"
-                className="anx-input text-center text-xl font-mono tracking-widest uppercase"
+                className="anx-input text-center text-2xl font-mono tracking-widest uppercase"
                 required
               />
             </div>
@@ -187,33 +269,54 @@ export default function StudentLivePage() {
     );
   }
 
-  // Waiting for session to start
+  // ── Waiting for session to start ────────────────────────────────────────────
   if (appState.phase === 'waiting') {
     return (
       <main className="anx-shell flex items-center justify-center">
         <div className="anx-panel w-full max-w-sm p-8 text-center">
-          <div className="mb-4 text-4xl">⏳</div>
+          <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-[var(--anx-surface-container-high)] border-t-[var(--anx-primary)]" />
           <h2 className="mb-2 text-xl font-semibold" style={{ color: 'var(--anx-text)' }}>Waiting for your teacher…</h2>
           <p className="text-sm" style={{ color: 'var(--anx-text-muted)' }}>
             You&apos;ve joined <strong>{appState.session.subject.title}</strong>.
-            The session will begin shortly.
+            The lesson will begin shortly.
           </p>
         </div>
       </main>
     );
   }
 
-  // Question screen
+  // ── Between phases — teacher message ────────────────────────────────────────
+  if (appState.phase === 'between-phases') {
+    return (
+      <main className="anx-shell flex items-center justify-center">
+        <div className="anx-panel w-full max-w-sm p-8 text-center">
+          <div className="mb-4 text-4xl">💬</div>
+          <h2 className="mb-3 text-xl font-semibold" style={{ color: 'var(--anx-text)' }}>
+            From your teacher
+          </h2>
+          <p className="mb-6 text-base" style={{ color: 'var(--anx-text-secondary)' }}>
+            {appState.message}
+          </p>
+          <button
+            onClick={() => setAppState({ phase: 'waiting', session: appState.session })}
+            className="anx-btn-primary px-6 py-2"
+          >
+            OK
+          </button>
+        </div>
+      </main>
+    );
+  }
+
+  // ── Question screen ─────────────────────────────────────────────────────────
   if (appState.phase === 'question') {
     const { item } = appState;
     const opts = Array.isArray(item.options) ? (item.options as string[]) : [];
     return (
       <main className="anx-shell flex items-center justify-center">
         <div className="anx-panel w-full max-w-lg p-8">
-          {error && (
-            <div className="anx-callout-danger mb-4">{error}</div>
-          )}
-          <p className="mb-6 text-lg" style={{ color: 'var(--anx-text)' }}>{item.question}</p>
+          {error && <div className="anx-callout-danger mb-4 text-sm">{error}</div>}
+          <p className="mb-6 text-base leading-relaxed" style={{ color: 'var(--anx-text)' }}>{item.question}</p>
           <form onSubmit={handleAnswer} className="space-y-3">
             {opts.length > 0 ? (
               opts.map((opt) => (
@@ -257,12 +360,14 @@ export default function StudentLivePage() {
     );
   }
 
-  // Feedback screen
+  // ── Feedback screen ─────────────────────────────────────────────────────────
   if (appState.phase === 'feedback') {
     return (
       <main className="anx-shell flex items-center justify-center">
         <div className="anx-panel w-full max-w-sm p-8 text-center">
-          <div className="mb-4 text-5xl">
+          <div
+            className={`mb-4 text-5xl ${appState.correct ? 'animate-[anxPulseCorrect_220ms_ease-out]' : 'animate-[anxShakeIncorrect_260ms_ease-out]'}`}
+          >
             {appState.correct ? '✅' : '❌'}
           </div>
           <h2 className="mb-4 text-xl font-bold" style={{ color: appState.correct ? 'var(--anx-success)' : 'var(--anx-danger)' }}>
@@ -272,20 +377,22 @@ export default function StudentLivePage() {
             onClick={handleNext}
             className="anx-btn-primary px-6 py-2"
           >
-            {appState.nextItem ? 'Next question →' : 'Finish'}
+            {appState.nextItem ? 'Next question →' : 'Keep going'}
           </button>
         </div>
       </main>
     );
   }
 
-  // Done screen
+  // ── Done screen ─────────────────────────────────────────────────────────────
   return (
-    <main className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
-      <div className="w-full max-w-sm rounded-lg border border-gray-200 bg-white p-8 text-center shadow-sm">
+    <main className="anx-shell flex items-center justify-center">
+      <div className="anx-panel w-full max-w-sm p-8 text-center">
         <div className="mb-4 text-5xl">🎉</div>
-        <h2 className="mb-2 text-xl font-bold text-gray-900">All done!</h2>
-        <p className="text-sm text-gray-500">You&apos;ve completed all questions for this session.</p>
+        <h2 className="mb-2 text-xl font-bold" style={{ color: 'var(--anx-text)' }}>All done!</h2>
+        <p className="text-sm" style={{ color: 'var(--anx-text-muted)' }}>
+          You&apos;ve completed all questions for this session.
+        </p>
       </div>
     </main>
   );
