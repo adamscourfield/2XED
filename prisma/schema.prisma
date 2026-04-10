@@ -778,5 +778,3 @@ model AnnotationLayer {
   @@index([blockId])
 }
 
-// Pending migration: add LEADERSHIP to Role enum
-// ALTER TYPE "Role" ADD VALUE IF NOT EXISTS 'LEADERSHIP';
