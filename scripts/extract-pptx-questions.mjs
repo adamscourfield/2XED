@@ -1412,6 +1412,94 @@ function extractN16McqQuestions(slides) {
   return questions;
 }
 
+// ─── Extraction: N1.8 decimal ordering (Q1 descending + Q2 ascending) ───────
+
+function extractN18OrderingQuestions(slides) {
+  const questions = [];
+  const seen = new Set();
+  // Label + comma-separated pure decimal list in one run, e.g. "a) 3.7, 3.5, 3.9, 3.4, 3.8"
+  const ITEM_RE = /^([a-p])\)\s+([\d.,\s]+\d)$/;
+
+  for (const { runs } of slides) {
+    for (let i = 0; i < runs.length - 1; i++) {
+      const { text, bold } = runs[i];
+      if (bold) continue;
+
+      const m = ITEM_RE.exec(text.trim());
+      if (!m) continue;
+
+      const rawItems = m[2].split(',').map(s => s.trim()).filter(Boolean);
+      if (rawItems.length < 2) continue;
+      // All items must be pure decimals / integers (no units)
+      if (!rawItems.every(s => /^[\d.]+$/.test(s))) continue;
+
+      // Next run must be bold (the sorted answer)
+      const nextRun = runs[i + 1];
+      if (!nextRun.bold) continue;
+
+      const answerItems = nextRun.text.split(',').map(s => s.trim()).filter(Boolean);
+      if (answerItems.length !== rawItems.length) continue;
+      if (!answerItems.every(s => /^[\d.]+$/.test(s))) continue;
+
+      // Determine direction by comparing answer to sorted arrays
+      const nums = rawItems.map(parseFloat);
+      const ascending = [...nums].sort((a, b) => a - b);
+      const descending = [...ascending].reverse();
+      const ansNums = answerItems.map(parseFloat);
+      const ansStr = JSON.stringify(ansNums);
+
+      let direction = null;
+      if (ansStr === JSON.stringify(ascending)) direction = 'ascending';
+      else if (ansStr === JSON.stringify(descending)) direction = 'descending';
+      else continue; // answer doesn't match either order — skip
+
+      const stem = `Place the following numbers in ${direction} order: ${rawItems.join(', ')}`;
+      if (seen.has(stem)) continue;
+      seen.add(stem);
+      questions.push({ stem, sorted: answerItems, options: rawItems });
+    }
+  }
+  return questions;
+}
+
+// ─── Extraction: N1.8 decimal medians (Q9) ───────────────────────────────────
+
+function extractN18MedianQuestions(slides) {
+  const questions = [];
+  const seen = new Set();
+  const ITEM_RE = /^([a-f])\)\s+([\d.,\s]+\d)$/;
+
+  for (const { runs } of slides) {
+    // Only slides containing "Calculate the median"
+    if (!runs.some(r => /calculate the median/i.test(r.text))) continue;
+
+    // Collect labeled items (a–f) whose values are all pure decimals
+    const items = {};
+    for (const { text, bold } of runs) {
+      if (bold) continue;
+      const m = ITEM_RE.exec(text.trim());
+      if (!m) continue;
+      const nums = m[2].split(',').map(s => s.trim()).filter(Boolean);
+      if (nums.every(s => /^[\d.]+$/.test(s))) items[m[1]] = nums;
+    }
+
+    for (const label of Object.keys(items).sort()) {
+      const nums = items[label].map(parseFloat);
+      nums.sort((a, b) => a - b);
+      const n = nums.length;
+      const mid = n % 2 === 1
+        ? nums[Math.floor(n / 2)]
+        : (nums[n / 2 - 1] + nums[n / 2]) / 2;
+      // Format: strip unnecessary trailing zeros
+      const answer = parseFloat(mid.toFixed(10)).toString();
+      const rawNums = items[label];
+      const stem = `Calculate the median of the following numbers: ${rawNums.join(', ')}`;
+      if (!seen.has(stem)) { seen.add(stem); questions.push({ stem, answer }); }
+    }
+  }
+  return questions;
+}
+
 // ─── Extraction: N1.7 decimal inequality True/False (slide 2 table) ──────────
 
 function extractN17TrueFalseQuestions(slides) {
@@ -1659,6 +1747,24 @@ const tf17Unique = tf17Questions.filter((q) => {
 // 16. N1.7 Skills Check MCQs
 const mcq17Unique = skillCode === 'N1.7' ? extractN17McqQuestions(slides) : [];
 
+// 17. N1.8 decimal ordering (Q1 descending + Q2 ascending)
+const ord18Questions = skillCode === 'N1.8' ? extractN18OrderingQuestions(slides) : [];
+const ord18Seen = new Set();
+const ord18Unique = ord18Questions.filter((q) => {
+  if (ord18Seen.has(q.stem)) return false;
+  ord18Seen.add(q.stem);
+  return true;
+});
+
+// 18. N1.8 decimal medians (Q9)
+const med18Questions = skillCode === 'N1.8' ? extractN18MedianQuestions(slides) : [];
+const med18Seen = new Set();
+const med18Unique = med18Questions.filter((q) => {
+  if (med18Seen.has(q.stem)) return false;
+  med18Seen.add(q.stem);
+  return true;
+});
+
 // ─── Write output ─────────────────────────────────────────────────────────────
 
 const lines = [];
@@ -1751,6 +1857,15 @@ mcq17Unique.forEach((q, i) => {
   lines.push(makeRecord(makeRef('MCQ', mcq17Offset + i + 1), q.stem, 'SINGLE_CHOICE', q.answer, q.options));
 });
 
+ord18Unique.forEach((q, i) => {
+  const answer = q.sorted.join(', ');
+  lines.push(makeRecord(makeRef('ORD', ordUnique.length + i + 1), q.stem, 'ORDER_SEQUENCE', answer, q.options, q.sorted));
+});
+
+med18Unique.forEach((q, i) => {
+  lines.push(makeRecord(makeRef('MED', medUnique.length + midUnique.length + i + 1), q.stem, 'NUMERIC', q.answer, null));
+});
+
 fs.writeFileSync(outPath, lines.map((r) => JSON.stringify(r)).join('\n') + '\n');
 
 const summary = {
@@ -1766,8 +1881,8 @@ const summary = {
     writeAsFigures: figUnique.length,
     trueFalse: tfUnique.length + tf17Unique.length,
     fillBlank: blkUnique.length,
-    orderSequence: ordUnique.length,
-    median: medUnique.length,
+    orderSequence: ordUnique.length + ord18Unique.length,
+    median: medUnique.length + med18Unique.length,
     midpoint: midUnique.length,
     decimalPlace: decUnique.length,
     total: lines.length,
