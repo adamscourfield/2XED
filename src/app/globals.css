@@ -605,3 +605,200 @@
   0%, 100% { transform: translateY(0) scale(1); opacity: 0.7; }
   50% { transform: translateY(-6px) scale(1.15); opacity: 1; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   CONDUCTOR LAYOUT — Teacher live lesson conductor dashboard
+   Full-viewport three-panel grid. Applied to the outermost conductor wrapper.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@layer components {
+  /* Outer shell: fixed viewport, three rows (topbar / body / actionbar) */
+  .anx-conductor-shell {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    height: 100dvh;
+    overflow: hidden;
+    background: var(--anx-surface-bright);
+  }
+
+  /* Top bar: session info, join code, timer, status controls */
+  .anx-conductor-topbar {
+    background: var(--anx-surface-container-lowest);
+    border-bottom: 1px solid var(--anx-border);
+    box-shadow: var(--anx-shadow-sm);
+    z-index: 10;
+  }
+
+  /* Body: the three-panel grid */
+  .anx-conductor-body {
+    display: grid;
+    grid-template-columns: 240px 1fr 280px;
+    overflow: hidden;
+  }
+
+  /* Generic conductor panel (each column) */
+  .anx-conductor-panel {
+    overflow-y: auto;
+    border-right: 1px solid var(--anx-border);
+  }
+  .anx-conductor-panel:last-child {
+    border-right: none;
+  }
+
+  /* Left panel: lesson phase list */
+  .anx-conductor-panel-left {
+    background: var(--anx-surface-container-lowest);
+  }
+
+  /* Centre panel: class pulse + response data */
+  .anx-conductor-panel-centre {
+    background: var(--anx-surface-bright);
+  }
+
+  /* Right panel: class roster + lane breakdown */
+  .anx-conductor-panel-right {
+    background: var(--anx-surface-container-lowest);
+  }
+
+  /* Action bar: phase deploy CTA at the bottom */
+  .anx-conductor-actionbar {
+    background: var(--anx-surface-container-lowest);
+    border-top: 1px solid var(--anx-border);
+    box-shadow: 0 -2px 12px rgba(25,28,30,0.04);
+    z-index: 10;
+  }
+
+  /* Teacher dashboard lesson launcher hero section */
+  .anx-lesson-launcher {
+    background: var(--anx-surface-container-lowest);
+    border: 1px solid var(--anx-border);
+    border-radius: var(--anx-radius);
+    padding: 1.25rem 1.5rem;
+  }
+
+  /* ── Live indicator — pulsing green dot ────────────────────────────────── */
+  .anx-live-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--anx-success);
+    box-shadow: 0 0 0 0 rgba(5, 150, 105, 0.4);
+    animation: anxLivePulse 1.8s ease-out infinite;
+    flex-shrink: 0;
+  }
+
+  /* ── Lane band — three-column lane display ─────────────────────────────── */
+  .anx-lane-band {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+  }
+
+  .anx-lane {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.75rem 0.5rem;
+    border-radius: var(--anx-radius-sm);
+    text-align: center;
+  }
+
+  .anx-lane-1 {
+    background: var(--anx-success-soft);
+  }
+
+  .anx-lane-2 {
+    background: var(--anx-warning-soft);
+  }
+
+  .anx-lane-3 {
+    background: var(--anx-danger-soft);
+  }
+
+  /* ── Phase step — used in lesson setup and conductor panel ─────────────── */
+  .anx-phase-strip {
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+
+  .anx-phase-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    position: relative;
+    flex: 1;
+  }
+
+  .anx-phase-step::before {
+    content: '';
+    position: absolute;
+    top: 10px;
+    right: calc(-50% + 10px);
+    left: calc(50% + 10px);
+    height: 2px;
+    background: var(--anx-outline-variant);
+  }
+
+  .anx-phase-step:last-child::before {
+    display: none;
+  }
+
+  .anx-phase-step-node {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    background: var(--anx-surface-container-high);
+    color: var(--anx-text-muted);
+    z-index: 1;
+    transition: background 200ms var(--anx-transition-calm), color 200ms var(--anx-transition-calm);
+  }
+
+  .anx-phase-step-active .anx-phase-step-node {
+    background: var(--anx-primary);
+    color: var(--anx-on-primary);
+  }
+
+  .anx-phase-step-done .anx-phase-step-node {
+    background: var(--anx-success);
+    color: white;
+  }
+
+  .anx-phase-step-active::before,
+  .anx-phase-step-done::before {
+    background: var(--anx-success);
+  }
+}
+
+@keyframes anxLivePulse {
+  0% { box-shadow: 0 0 0 0 rgba(5, 150, 105, 0.5); }
+  70% { box-shadow: 0 0 0 8px rgba(5, 150, 105, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(5, 150, 105, 0); }
+}
+
+/* Responsive: stack conductor panels on narrow screens */
+@media (max-width: 900px) {
+  .anx-conductor-body {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+    overflow-y: auto;
+  }
+
+  .anx-conductor-panel-left,
+  .anx-conductor-panel-right {
+    border-right: none;
+    border-bottom: 1px solid var(--anx-border);
+  }
+
+  .anx-conductor-panel-centre {
+    border-bottom: 1px solid var(--anx-border);
+  }
+}

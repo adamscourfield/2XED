@@ -33,7 +33,7 @@ export default async function TeacherLiveNewPage() {
 
   const skillsBySubject = await prisma.skill.findMany({
     where: { subjectId: { in: subjects.map((s) => s.id) } },
-    select: { id: true, code: true, name: true, subjectId: true },
+    select: { id: true, code: true, name: true, strand: true, subjectId: true },
     orderBy: { sortOrder: 'asc' },
   });
 

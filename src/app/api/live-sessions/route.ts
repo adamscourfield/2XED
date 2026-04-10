@@ -4,10 +4,20 @@ import { z } from 'zod';
 import { authOptions } from '@/features/auth/authOptions';
 import { prisma } from '@/db/prisma';
 
+const phaseSchema = z.object({
+  index: z.number().int().nonnegative(),
+  skillId: z.string().min(1),
+  skillCode: z.string(),
+  skillName: z.string(),
+  type: z.enum(['PRACTICE', 'EXPLANATION']),
+  label: z.string(),
+});
+
 const schema = z.object({
   classroomId: z.string().min(1),
   subjectId: z.string().min(1),
   skillId: z.string().min(1).optional(),
+  phases: z.array(phaseSchema).optional(),
 });
 
 function generateJoinCode(): string {
@@ -31,7 +41,7 @@ export async function POST(req: NextRequest) {
   const parsed = schema.safeParse(await req.json());
   if (!parsed.success) return NextResponse.json({ error: 'Invalid input', issues: parsed.error.issues }, { status: 400 });
 
-  const { classroomId, subjectId, skillId } = parsed.data;
+  const { classroomId, subjectId, skillId, phases } = parsed.data;
 
   // Validate teacher owns the classroom
   const teacherProfile = await prisma.teacherProfile.findUnique({
@@ -61,6 +71,8 @@ export async function POST(req: NextRequest) {
       skillId: skillId ?? null,
       joinCode,
       status: 'LOBBY',
+      phases: phases ?? undefined,
+      currentPhaseIndex: 0,
     },
   });
 
