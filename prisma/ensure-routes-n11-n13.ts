@@ -329,9 +329,9 @@ const SKILL_ROUTES: Record<string, RouteDef[]> = {
           title: 'Equality as a special case',
           explanation:
             'When two numbers are equal, you may use =, ≤, or ≥ — all are correct. For example, 6 = 6, 6 ≤ 6 and 6 ≥ 6 are all true statements.',
-          checkpointQuestion: 'Which symbols correctly compare 9 and 9?',
-          checkpointOptions: ['=', '≤', '≥', '<'],
-          checkpointAnswer: '=, ≤ and ≥ are all correct',
+          checkpointQuestion: 'Is 9 ≤ 9 true or false?',
+          checkpointOptions: ['True', 'False'],
+          checkpointAnswer: 'True',
         },
         {
           stepOrder: 3,
@@ -464,5 +464,10 @@ async function main() {
 }
 
 if (process.env.DATABASE_URL) {
-  main().catch(console.error).finally(() => prisma.$disconnect());
+  main()
+    .catch((e) => {
+      console.error(e);
+      process.exit(1);
+    })
+    .finally(() => prisma.$disconnect());
 }
