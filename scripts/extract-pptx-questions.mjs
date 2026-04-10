@@ -78,10 +78,11 @@ function parseSlideRuns(xml) {
   while ((m = runRe.exec(xml)) !== null) {
     const runXml = m[1];
     const underlined = /u="sng"|u="dbl"/.test(runXml);
+    const bold = /\bb="1"/.test(runXml);
     const tMatch = runXml.match(/<a:t[^>]*>([\s\S]*?)<\/a:t>/);
     if (!tMatch) continue;
     const text = decodeXmlEntities(tMatch[1]).trim();
-    if (text) runs.push({ text, underlined });
+    if (text) runs.push({ text, underlined, bold });
   }
   return runs;
 }
@@ -697,9 +698,10 @@ function extractN12McqQuestions(slides) {
         i += 3; continue;
       }
 
-      // Type 2: "Write the number [words] in figures"
+      // Type 2: "Write the number [words] in figures" (integers only, not decimal descriptions)
       const figMatch = text.match(/^write the number\s+(.+?)\s+in figures$/i);
       if (figMatch) {
+        if (/hundredths?|thousandths?|tenths?/i.test(figMatch[1])) continue;
         if (i + 2 >= runs.length) continue;
         const opts = parseN12OptionLines(runs[i + 1].text, runs[i + 2].text);
         if (!opts) continue;
@@ -1253,6 +1255,152 @@ function extractMidpointQuestions(slides) {
   return questions;
 }
 
+// ─── Extraction: decimal place value questions (N1.6) ────────────────────────
+
+function computeDecimalPlaceValue(prefix, digit, suffix) {
+  const fullNumber = prefix + digit + suffix;
+  const dotIdx = fullNumber.indexOf('.');
+  const digitPos = prefix.length; // position of digit char in fullNumber
+
+  if (dotIdx === -1 || digitPos < dotIdx) {
+    // Digit is in the integer part
+    const intStr = dotIdx === -1 ? fullNumber : fullNumber.slice(0, dotIdx);
+    const posFromRight = intStr.length - digitPos - 1;
+    return String(parseInt(digit) * Math.pow(10, posFromRight));
+  }
+  // Digit is in the decimal part
+  const decimalPos = digitPos - dotIdx; // 1=tenths, 2=hundredths, 3=thousandths…
+  return (parseInt(digit) / Math.pow(10, decimalPos)).toFixed(decimalPos);
+}
+
+function extractDecimalPlaceQuestions(slides) {
+  const questions = [];
+  const LABEL_RE = /^([a-l])\)\s*(.*)$/;
+
+  for (const { runs } of slides) {
+    let pendingLabel = null, pendingPrefix = null, pendingDigit = null;
+
+    const emitPending = (suffix = '') => {
+      if (!pendingLabel || !pendingDigit) return;
+      const fullNum = pendingPrefix + pendingDigit + suffix;
+      if (!fullNum.includes('.')) { pendingLabel = null; pendingPrefix = null; pendingDigit = null; return; }
+      const answer = computeDecimalPlaceValue(pendingPrefix, pendingDigit, suffix);
+      questions.push({
+        stem: `In the number ${fullNum}, what is the value of the digit ${pendingDigit}?`,
+        answer,
+      });
+      pendingLabel = null; pendingPrefix = null; pendingDigit = null;
+    };
+
+    for (const { text, underlined, bold } of runs) {
+      const trimmed = text.trim();
+
+      // Start of a labeled item
+      const lm = trimmed.match(LABEL_RE);
+      if (lm) {
+        emitPending();
+        pendingLabel = lm[1];
+        pendingPrefix = lm[2];
+        pendingDigit = null;
+        continue;
+      }
+
+      if (!pendingLabel) continue;
+
+      if (!pendingDigit) {
+        if (underlined) {
+          pendingDigit = trimmed;               // Q1: underlined digit
+        } else if (bold && trimmed === '3') {
+          pendingDigit = '3';                   // Q2: bold "3"
+        } else {
+          pendingPrefix += trimmed;             // more prefix chars
+        }
+      } else {
+        emitPending(trimmed);                   // suffix → emit
+      }
+    }
+    emitPending();
+  }
+
+  return questions;
+}
+
+function extractN16McqQuestions(slides) {
+  const questions = [];
+  const AB_RE = /^(.+?)\s{2,}B\.\s+(.+)$/;
+  const CD_RE = /^(.+?)\s{2,}D\.\s+(.+)$/;
+
+  for (const { runs } of slides) {
+    let inSkills = false;
+    let contextRuns = [];
+    let optAB = null;
+
+    for (const rawRun of runs) {
+      const { text, underlined, bold } = rawRun;
+      const trimmed = text.trim();
+
+      if (/^Skills Check$/i.test(trimmed)) { inSkills = true; continue; }
+      if (!inSkills) continue;
+
+      if (AB_RE.test(trimmed) && !optAB) {
+        const m = trimmed.match(AB_RE);
+        optAB = { A: m[1].trim(), B: m[2].trim() };
+        continue;
+      }
+
+      if (CD_RE.test(trimmed) && optAB) {
+        const m = trimmed.match(CD_RE);
+        const C = m[1].trim(), D = m[2].trim();
+        const options = [optAB.A, optAB.B, C, D];
+
+        // Split context into question text vs. number display runs
+        const isNumRun = r => /^[\d.]+$/.test(r.text) || r.underlined;
+        const numRuns = contextRuns.filter(isNumRun);
+        const qRuns = contextRuns.filter(r => !isNumRun(r));
+
+        let answer = null;
+        const uIdx = numRuns.findIndex(r => r.underlined);
+
+        if (uIdx !== -1) {
+          // MCQ type: value of underlined digit
+          const prefix = numRuns.slice(0, uIdx).map(r => r.text).join('');
+          const digit = numRuns[uIdx].text;
+          const suffix = numRuns.slice(uIdx + 1).map(r => r.text).join('');
+          const computed = computeDecimalPlaceValue(prefix, digit, suffix);
+          answer = options.find(opt => Math.abs(parseFloat(opt) - parseFloat(computed)) < 1e-9);
+        } else {
+          // MCQ type: "X place-value in figures"
+          const stemText = qRuns.map(r => r.text).join(' ');
+          const pm = stemText.match(/(\w+)\s+(tenth|hundredth|thousandth)s?/i);
+          if (pm) {
+            const n = wordsToNumber(pm[1]);
+            const place = pm[2].toLowerCase();
+            const val = place === 'tenth' ? n / 10 : place === 'hundredth' ? n / 100 : n / 1000;
+            answer = options.find(opt => Math.abs(parseFloat(opt) - val) < 1e-9);
+          }
+        }
+
+        // Build stem: for underlined-digit MCQ, embed the number
+        const numStr = numRuns.map(r => r.text).join('');
+        const questionText = qRuns.map(r => r.text).join(' ').replace(/\s+/g, ' ').trim();
+        const stem = numStr
+          ? questionText.replace(/in this number\??\.?\s*$/i, `in ${numStr}?`)
+          : questionText;
+
+        if (answer) questions.push({ stem, options, answer });
+
+        contextRuns = [];
+        optAB = null;
+        continue;
+      }
+
+      if (!optAB && trimmed) contextRuns.push(rawRun);
+    }
+  }
+
+  return questions;
+}
+
 // ─── Build JSONL records ──────────────────────────────────────────────────────
 
 function makeRef(type, n) {
@@ -1339,7 +1487,7 @@ const blkUnique = extractFillBlankQuestions(slides);
 const mcq13Unique = extractN13McqQuestions(slides);
 
 // 10. Ordering questions (N1.4)
-const ordQuestions = extractOrderingQuestions(slides);
+const ordQuestions = skillCode === 'N1.4' ? extractOrderingQuestions(slides) : [];
 const ordSeen = new Set();
 const ordUnique = ordQuestions.filter((q) => {
   if (ordSeen.has(q.stem)) return false;
@@ -1348,7 +1496,7 @@ const ordUnique = ordQuestions.filter((q) => {
 });
 
 // 11. Median questions (N1.5)
-const medQuestions = extractMedianQuestions(slides);
+const medQuestions = skillCode === 'N1.5' ? extractMedianQuestions(slides) : [];
 const medSeen = new Set();
 const medUnique = medQuestions.filter((q) => {
   if (medSeen.has(q.stem)) return false;
@@ -1357,13 +1505,25 @@ const medUnique = medQuestions.filter((q) => {
 });
 
 // 12. Midpoint questions (N1.5)
-const midQuestions = extractMidpointQuestions(slides);
+const midQuestions = skillCode === 'N1.5' ? extractMidpointQuestions(slides) : [];
 const midSeen = new Set();
 const midUnique = midQuestions.filter((q) => {
   if (midSeen.has(q.stem)) return false;
   midSeen.add(q.stem);
   return true;
 });
+
+// 13. Decimal place value questions (N1.6 Q1 + Q2)
+const decQuestions = skillCode === 'N1.6' ? extractDecimalPlaceQuestions(slides) : [];
+const decSeen = new Set();
+const decUnique = decQuestions.filter((q) => {
+  if (decSeen.has(q.stem)) return false;
+  decSeen.add(q.stem);
+  return true;
+});
+
+// 14. N1.6 Skills Check MCQs
+const mcq16Unique = skillCode === 'N1.6' ? extractN16McqQuestions(slides) : [];
 
 // ─── Write output ─────────────────────────────────────────────────────────────
 
@@ -1439,6 +1599,15 @@ midUnique.forEach((q, i) => {
   lines.push(makeRecord(makeRef('MID', i + 1), q.stem, q.format, q.answer, null));
 });
 
+decUnique.forEach((q, i) => {
+  lines.push(makeRecord(makeRef('DEC', i + 1), q.stem, 'NUMERIC', q.answer, null));
+});
+
+const mcq16Offset = mcqUnique.length + mcq12Unique.length + mcq13Unique.length;
+mcq16Unique.forEach((q, i) => {
+  lines.push(makeRecord(makeRef('MCQ', mcq16Offset + i + 1), q.stem, 'SINGLE_CHOICE', q.answer, q.options));
+});
+
 fs.writeFileSync(outPath, lines.map((r) => JSON.stringify(r)).join('\n') + '\n');
 
 const summary = {
@@ -1449,7 +1618,7 @@ const summary = {
     greatest: grtUnique.length,
     smallest: smlUnique.length,
     difference: difUnique.length,
-    mcq: mcqUnique.length + mcq12Unique.length + mcq13Unique.length,
+    mcq: mcqUnique.length + mcq12Unique.length + mcq13Unique.length + mcq16Unique.length,
     writeAsWords: wrdUnique.length,
     writeAsFigures: figUnique.length,
     trueFalse: tfUnique.length,
@@ -1457,6 +1626,7 @@ const summary = {
     orderSequence: ordUnique.length,
     median: medUnique.length,
     midpoint: midUnique.length,
+    decimalPlace: decUnique.length,
     total: lines.length,
   },
 };
