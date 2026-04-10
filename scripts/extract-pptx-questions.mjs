@@ -731,6 +731,15 @@ function parseNum(str) {
   return w > 0 ? w : null;
 }
 
+/** Parse a string as a float (for decimal N values), falling back to wordsToNumber. */
+function parseNumFloat(str) {
+  const stripped = str.trim().replace(/[,\s]/g, '');
+  const f = parseFloat(stripped);
+  if (!isNaN(f)) return f;
+  const w = wordsToNumber(str.trim());
+  return w > 0 ? w : null;
+}
+
 /** Evaluate L op R where op is one of < > ≤ ≥ = ≠ */
 function evalOp(a, op, b) {
   if (op === '<') return a < b;
@@ -924,35 +933,37 @@ function extractFillBlankQuestions(slides) {
 
       let stem = null, answer = null;
 
-      // Blank on left: "______ < 100"
+      // Blank on left: "______ < 100" or "______ < 3.7"
       const leftM = text.match(/^_{4,}\s*([<>≤≥])\s*(.+)$/);
       if (leftM) {
-        const op = leftM[1], rhs = parseNum(leftM[2].trim());
+        const op = leftM[1], rhs = parseNumFloat(leftM[2].trim());
         if (rhs !== null) {
-          if (op === '<') { answer = String(rhs - 1); stem = `What is the largest integer satisfying ______ < ${rhs}?`; }
-          else if (op === '≤') { answer = String(rhs); stem = `What is the largest integer satisfying ______ ≤ ${rhs}?`; }
-          else if (op === '>') { answer = String(rhs + 1); stem = `What is the smallest integer satisfying ______ > ${rhs}?`; }
-          else if (op === '≥') { answer = String(rhs); stem = `What is the smallest integer satisfying ______ ≥ ${rhs}?`; }
+          if (op === '<') { answer = String(Math.ceil(rhs) - 1); stem = `What is the largest integer satisfying ______ < ${rhs}?`; }
+          else if (op === '≤') { answer = String(Math.floor(rhs)); stem = `What is the largest integer satisfying ______ ≤ ${rhs}?`; }
+          else if (op === '>') { answer = String(Math.floor(rhs) + 1); stem = `What is the smallest integer satisfying ______ > ${rhs}?`; }
+          else if (op === '≥') { answer = String(Math.ceil(rhs)); stem = `What is the smallest integer satisfying ______ ≥ ${rhs}?`; }
         }
       }
 
-      // Blank on right (numeric or word left): "489 < _____" / "Six hundred... < _____"
+      // Blank on right (numeric or word left): "489 < _____" or "4.89 < _____"
       if (!stem) {
         const rightM = text.match(/^(.+?)\s*([<>])\s*_{4,}$/);
         if (rightM) {
-          const lhs = parseNum(rightM[1].trim()), op = rightM[2];
+          const lhs = parseNumFloat(rightM[1].trim()), op = rightM[2];
           if (lhs !== null) {
-            if (op === '<') { answer = String(lhs + 1); stem = `What is the smallest integer satisfying ${lhs} < ______?`; }
-            else if (op === '>') { answer = String(lhs - 1); stem = `What is the largest integer satisfying ${lhs} > ______?`; }
+            if (op === '<') { answer = String(Math.floor(lhs) + 1); stem = `What is the smallest integer satisfying ${lhs} < ______?`; }
+            else if (op === '>') { answer = String(Math.ceil(lhs) - 1); stem = `What is the largest integer satisfying ${lhs} > ______?`; }
           }
         }
       }
 
       if (!stem || !answer) continue;
 
-      // Verify: next run must be a single number matching computed answer
+      // Verify: next run must be a single integer matching computed answer (not a list)
       if (i + 1 < runs.length) {
-        const nextNum = parseNum(runs[i + 1].text);
+        const nextText = runs[i + 1].text.trim();
+        if (nextText.includes(',')) continue; // list answer → example section, skip
+        const nextNum = parseNum(nextText);
         if (nextNum === null || String(nextNum) !== answer) continue;
       } else {
         continue;
@@ -1401,6 +1412,117 @@ function extractN16McqQuestions(slides) {
   return questions;
 }
 
+// ─── Extraction: N1.7 decimal inequality True/False (slide 2 table) ──────────
+
+function extractN17TrueFalseQuestions(slides) {
+  const questions = [];
+  const INEQ_RE = /[\d.]+\s*(?:&lt;|&gt;|[<>≤≥≠=])\s*[\d.]+/;
+  const DECODE = s => s.replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&').replace(/&le;/g,'≤').replace(/&ge;/g,'≥');
+
+  for (const { runs } of slides) {
+    // Only process slides containing the "Statement" column header
+    if (!runs.some(r => r.text.trim() === 'Statement')) continue;
+
+    for (let i = 0; i < runs.length; i++) {
+      const { text, bold } = runs[i];
+      if (bold || !INEQ_RE.test(text)) continue;
+
+      // Find the immediately next non-empty run; it must be bold True/False
+      for (let j = i + 1; j < runs.length; j++) {
+        const nxt = runs[j];
+        if (!nxt.text.trim()) continue;
+        if (nxt.bold) {
+          const ans = nxt.text.trim();
+          if (ans === 'True' || ans === 'False') {
+            const stmt = DECODE(text.trim());
+            questions.push({ stem: `True or false? ${stmt}`, answer: ans });
+          }
+        }
+        break;
+      }
+    }
+  }
+  return questions;
+}
+
+// ─── Extraction: N1.7 Skills Check MCQs ──────────────────────────────────────
+
+function extractN17McqQuestions(slides) {
+  const questions = [];
+  const AB_RE = /^(.+?)\s{2,}B\.\s+(.+?)$/;
+  const CD_RE = /^(.+?)\s{2,}D\.\s+(.+?)$/;
+
+  for (const { runs } of slides) {
+    let inSkills = false;
+    let stemRuns = [];
+    let optAB = null;
+
+    const flush = () => { stemRuns = []; optAB = null; };
+
+    for (const { text, bold } of runs) {
+      const trimmed = text.trim();
+      if (!trimmed) continue;
+
+      if (bold && trimmed === 'Skills Check') { inSkills = true; flush(); continue; }
+      if (!inSkills) continue;
+
+      // Detect option line starting with "A. "
+      if (/^A\.\s+/.test(trimmed)) {
+        const abLine = trimmed.replace(/^A\.\s+/, '');
+        const abM = abLine.match(AB_RE);
+        if (abM) { optAB = [abM[1].trim(), abM[2].trim()]; }
+        continue;
+      }
+
+      // Detect option line starting with "C. "
+      if (/^C\.\s+/.test(trimmed) && optAB) {
+        const cdLine = trimmed.replace(/^C\.\s+/, '');
+        const cdM = cdLine.match(CD_RE);
+        if (cdM) {
+          const options = [optAB[0], optAB[1], cdM[1].trim(), cdM[2].trim()];
+          const stemText = stemRuns.map(r => r.trim()).join(' ').replace(/\s+/g, ' ').trim();
+          const answer = computeN17McqAnswer(stemText, options);
+          if (answer) questions.push({ stem: stemText, options, answer });
+        }
+        flush();
+        continue;
+      }
+
+      // If option line found but no CD yet, skip other bold runs
+      if (optAB) continue;
+
+      stemRuns.push(text);
+    }
+  }
+  return questions;
+}
+
+function computeN17McqAnswer(stem, options) {
+  // MCQ type 1: fill a comparison symbol between two decimals ("X ____ Y")
+  const fillM = stem.match(/([\d.]+)\s+_{3,}\s+([\d.]+)/);
+  if (fillM) {
+    const a = parseFloat(fillM[1]), b = parseFloat(fillM[2]);
+    const sym = a < b ? '<' : a > b ? '>' : '=';
+    const idx = options.findIndex(o => o.trim() === sym);
+    return idx >= 0 ? options[idx] : null;
+  }
+
+  // MCQ type 2: "smallest five integers satisfying _____ OP N"
+  const listM = stem.match(/_{3,}\s*(≥|≤|>|<)\s*([\d.]+)/);
+  if (listM) {
+    const op = listM[1], n = parseFloat(listM[2]);
+    let first;
+    if (op === '≥') first = Math.ceil(n);
+    else if (op === '>') first = Math.floor(n) + 1;
+    else if (op === '≤') first = Math.floor(n);
+    else first = Math.ceil(n) - 1;
+    const idx = options.findIndex(o => o.trim().replace(/\s/g,'').startsWith(String(first)));
+    return idx >= 0 ? options[idx] : null;
+  }
+
+  return null;
+}
+
 // ─── Build JSONL records ──────────────────────────────────────────────────────
 
 function makeRef(type, n) {
@@ -1484,7 +1606,7 @@ const tfUnique = extractInequalityTrueFalseQuestions(slides);
 const blkUnique = extractFillBlankQuestions(slides);
 
 // 9. N1.3-style Skills Check MCQ (A/B C/D two-line format)
-const mcq13Unique = extractN13McqQuestions(slides);
+const mcq13Unique = skillCode === 'N1.3' ? extractN13McqQuestions(slides) : [];
 
 // 10. Ordering questions (N1.4)
 const ordQuestions = skillCode === 'N1.4' ? extractOrderingQuestions(slides) : [];
@@ -1524,6 +1646,18 @@ const decUnique = decQuestions.filter((q) => {
 
 // 14. N1.6 Skills Check MCQs
 const mcq16Unique = skillCode === 'N1.6' ? extractN16McqQuestions(slides) : [];
+
+// 15. N1.7 decimal inequality True/False (slide 2 table)
+const tf17Questions = skillCode === 'N1.7' ? extractN17TrueFalseQuestions(slides) : [];
+const tf17Seen = new Set();
+const tf17Unique = tf17Questions.filter((q) => {
+  if (tf17Seen.has(q.stem)) return false;
+  tf17Seen.add(q.stem);
+  return true;
+});
+
+// 16. N1.7 Skills Check MCQs
+const mcq17Unique = skillCode === 'N1.7' ? extractN17McqQuestions(slides) : [];
 
 // ─── Write output ─────────────────────────────────────────────────────────────
 
@@ -1608,6 +1742,15 @@ mcq16Unique.forEach((q, i) => {
   lines.push(makeRecord(makeRef('MCQ', mcq16Offset + i + 1), q.stem, 'SINGLE_CHOICE', q.answer, q.options));
 });
 
+tf17Unique.forEach((q, i) => {
+  lines.push(makeRecord(makeRef('TF', tfUnique.length + i + 1), q.stem, 'TRUE_FALSE', q.answer, null));
+});
+
+const mcq17Offset = mcqUnique.length + mcq12Unique.length + mcq13Unique.length + mcq16Unique.length;
+mcq17Unique.forEach((q, i) => {
+  lines.push(makeRecord(makeRef('MCQ', mcq17Offset + i + 1), q.stem, 'SINGLE_CHOICE', q.answer, q.options));
+});
+
 fs.writeFileSync(outPath, lines.map((r) => JSON.stringify(r)).join('\n') + '\n');
 
 const summary = {
@@ -1618,10 +1761,10 @@ const summary = {
     greatest: grtUnique.length,
     smallest: smlUnique.length,
     difference: difUnique.length,
-    mcq: mcqUnique.length + mcq12Unique.length + mcq13Unique.length + mcq16Unique.length,
+    mcq: mcqUnique.length + mcq12Unique.length + mcq13Unique.length + mcq16Unique.length + mcq17Unique.length,
     writeAsWords: wrdUnique.length,
     writeAsFigures: figUnique.length,
-    trueFalse: tfUnique.length,
+    trueFalse: tfUnique.length + tf17Unique.length,
     fillBlank: blkUnique.length,
     orderSequence: ordUnique.length,
     median: medUnique.length,
