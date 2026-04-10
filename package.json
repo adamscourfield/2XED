@@ -40,7 +40,9 @@
     "content:report:unit1-gaps": "node scripts/report-curriculum-seeding-gaps.mjs",
     "content:build:unit1-packs": "node scripts/build-curriculum-review-packs.mjs",
     "content:build:phase1-queue": "node scripts/build-phase1-authoring-queue.mjs",
-    "content:build:phase1-briefs": "node scripts/build-phase1-author-briefs.mjs"
+    "content:build:phase1-briefs": "node scripts/build-phase1-author-briefs.mjs",
+    "content:extract:question-bank": "node scripts/extract-pptx-questions.mjs",
+    "db:import:question-bank": "ts-node -r tsconfig-paths/register --compiler-options '{\"module\":\"CommonJS\"}' prisma/import-question-bank.ts"
   },
   "prisma": {
     "seed": "ts-node -r tsconfig-paths/register --compiler-options '{\"module\":\"CommonJS\"}' prisma/seed.ts && ts-node -r tsconfig-paths/register --compiler-options '{\"module\":\"CommonJS\"}' prisma/ensure-routes-n11-n13.ts && ts-node -r tsconfig-paths/register --compiler-options '{\"module\":\"CommonJS\"}' prisma/ensure-routes-n14-n15.ts"
