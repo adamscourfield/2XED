@@ -86,7 +86,7 @@ function parseSlideRuns(xml) {
   return runs;
 }
 
-function readAllRuns(pptxPath) {
+function readSlidesRuns(pptxPath) {
   const listing = execFileSync('unzip', ['-Z1', pptxPath], { encoding: 'utf8' })
     .split('\n')
     .map((l) => l.trim())
@@ -97,12 +97,15 @@ function readAllRuns(pptxPath) {
       return na - nb;
     });
 
-  const allRuns = [];
-  for (const entry of listing) {
+  return listing.map((entry) => {
     const xml = execFileSync('unzip', ['-p', pptxPath, entry], { encoding: 'utf8' });
-    allRuns.push(...parseSlideRuns(xml));
-  }
-  return allRuns;
+    const slideNumber = Number(entry.match(/slide(\d+)\.xml$/)?.[1] ?? 0);
+    return { slideNumber, runs: parseSlideRuns(xml) };
+  });
+}
+
+function readAllRuns(pptxPath) {
+  return readSlidesRuns(pptxPath).flatMap((s) => s.runs);
 }
 
 // ─── Number / place-value helpers ────────────────────────────────────────────
@@ -473,6 +476,245 @@ function extractMcqQuestions(runs) {
   return questions;
 }
 
+// ─── British English number words ────────────────────────────────────────────
+
+const _ONES = [
+  '', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine',
+  'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen',
+  'seventeen', 'eighteen', 'nineteen',
+];
+const _TENS = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
+
+function _two(n) {
+  if (n === 0) return '';
+  if (n < 20) return _ONES[n];
+  const t = Math.floor(n / 10), o = n % 10;
+  return o === 0 ? _TENS[t] : `${_TENS[t]}-${_ONES[o]}`;
+}
+
+function _hun(n) {
+  // 1–999
+  if (n < 100) return _two(n);
+  const h = Math.floor(n / 100), rem = n % 100;
+  return rem === 0 ? `${_ONES[h]} hundred` : `${_ONES[h]} hundred and ${_two(rem)}`;
+}
+
+function _fmt(n) {
+  // recursive, returns lower-case, n > 0
+  if (n >= 1_000_000) {
+    const m = Math.floor(n / 1_000_000), rem = n % 1_000_000;
+    const mp = `${_fmt(m)} million`;
+    if (rem === 0) return mp;
+    if (rem < 100) return `${mp} and ${_two(rem)}`;
+    return `${mp}, ${_fmt(rem)}`;
+  }
+  if (n >= 1000) {
+    const t = Math.floor(n / 1000), rem = n % 1000;
+    const tp = `${_fmt(t)} thousand`;
+    if (rem === 0) return tp;
+    if (rem < 100) return `${tp} and ${_two(rem)}`;
+    return `${tp}, ${_hun(rem)}`;
+  }
+  return _hun(n);
+}
+
+function numberToWords(n) {
+  if (n === 0) return 'zero';
+  const w = _fmt(n);
+  return w.charAt(0).toUpperCase() + w.slice(1);
+}
+
+// ─── Words to number ──────────────────────────────────────────────────────────
+
+const _W2N = {
+  zero:0, one:1, two:2, three:3, four:4, five:5, six:6, seven:7, eight:8, nine:9,
+  ten:10, eleven:11, twelve:12, thirteen:13, fourteen:14, fifteen:15, sixteen:16,
+  seventeen:17, eighteen:18, nineteen:19,
+  twenty:20, thirty:30, forty:40, fifty:50, sixty:60, seventy:70, eighty:80, ninety:90,
+};
+
+function wordsToNumber(text) {
+  const s = text.toLowerCase()
+    .replace(/[,.]/g, ' ').replace(/-/g, ' ')
+    .replace(/\band\b/g, ' ').replace(/\s+/g, ' ').trim();
+  let result = 0, current = 0;
+  for (const tok of s.split(' ').filter(Boolean)) {
+    if (_W2N[tok] !== undefined) {
+      current += _W2N[tok];
+    } else if (tok === 'hundred') {
+      current = (current === 0 ? 1 : current) * 100;
+    } else if (tok === 'thousand') {
+      result += (current === 0 ? 1 : current) * 1000; current = 0;
+    } else if (tok === 'million') {
+      result += (current === 0 ? 1 : current) * 1_000_000; current = 0;
+    }
+  }
+  return result + current;
+}
+
+// ─── Extraction: write integers as words (N1.2 sections 1-4) ─────────────────
+
+const WRITE_AS_WORDS_HEADER_RE = /^\d+\.\s+write\s+each\s+numbers?\s+as\s+(?:a\s+)?words?[:.?]?\s*$/i;
+
+function isNumberItem(text) {
+  // Optional lower-case label prefix "b) " then digits+commas+spaces, 2+ digits total
+  const stripped = text.replace(/^[a-z]\)\s*/, '').replace(/[,\s]/g, '');
+  return /^\d{2,}$/.test(stripped);
+}
+
+function extractWriteAsWordsQuestions(slides) {
+  const questions = [];
+  const seen = new Set();
+
+  for (const { runs } of slides) {
+    let i = 0;
+    while (i < runs.length) {
+      if (!WRITE_AS_WORDS_HEADER_RE.test(runs[i].text)) { i++; continue; }
+      i++;
+      // skip non-items until first item
+      while (i < runs.length && !isNumberItem(runs[i].text)) i++;
+      // collect consecutive items
+      while (i < runs.length && isNumberItem(runs[i].text)) {
+        const stripped = runs[i].text.replace(/^[a-z]\)\s*/, '').replace(/[,\s]/g, '');
+        const n = parseInt(stripped, 10);
+        if (!isNaN(n) && !seen.has(n)) {
+          seen.add(n);
+          questions.push({ n, answer: numberToWords(n) });
+        }
+        i++;
+      }
+    }
+  }
+  return questions;
+}
+
+// ─── Extraction: write words as integers (N1.2 section 5) ────────────────────
+
+const NUMBER_WORD_RE = /\b(zero|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred|thousand|million)\b/i;
+
+function isWordPhrase(text) { return NUMBER_WORD_RE.test(text); }
+
+function isColumnHeader(text) {
+  return /^(millions?|hundred thousands?|ten thousands?|thousands?|hundreds?|tens?|ones?)$/i.test(text);
+}
+
+function extractWriteAsFiguresQuestions(slides) {
+  const questions = [];
+  const seen = new Set();
+  const HEADER_RE = /^5\.\s+write\s+(?:each\s+of\s+these\s+)?words?\s+in\s+numerals?/i;
+
+  for (const { runs } of slides) {
+    let i = 0;
+    while (i < runs.length) {
+      if (!HEADER_RE.test(runs[i].text)) { i++; continue; }
+      i++;
+      // find "Independent Practice"
+      while (i < runs.length && !/^independent practice$/i.test(runs[i].text)) i++;
+      if (i >= runs.length) break;
+      i++;
+
+      let firstFound = false;
+
+      while (i < runs.length) {
+        const text = runs[i].text;
+        const numOnly = text.replace(/[,\s]/g, '');
+
+        if (isColumnHeader(text)) { i++; continue; }
+        if (/^\d{4,}$/.test(numOnly)) break; // answer section
+        if (/^(example\s+\d|steps|skills\s+check)$/i.test(text)) break;
+
+        // labeled "b) Eight thousand..."
+        if (/^[b-z]\)\s+\S/.test(text)) {
+          const phrase = text.replace(/^[b-z]\)\s+/, '').replace(/\.\s*$/, '').trim();
+          if (isWordPhrase(phrase)) {
+            const n = wordsToNumber(phrase);
+            if (n > 0 && !seen.has(n)) { seen.add(n); questions.push({ phrase, answer: String(n) }); firstFound = true; }
+          }
+          i++; continue;
+        }
+
+        // split-label "d)" then next run is the phrase
+        if (/^[b-z]\)$/.test(text) && i + 1 < runs.length) {
+          const phrase = runs[i + 1].text.replace(/\.\s*$/, '').replace(/\s+/g, ' ').trim();
+          if (isWordPhrase(phrase)) {
+            const n = wordsToNumber(phrase);
+            if (n > 0 && !seen.has(n)) { seen.add(n); questions.push({ phrase, answer: String(n) }); firstFound = true; }
+          }
+          i += 2; continue;
+        }
+
+        // unlabeled first item
+        if (!firstFound && isWordPhrase(text)) {
+          const phrase = text.replace(/\.\s*$/, '').trim();
+          const n = wordsToNumber(phrase);
+          if (n > 0 && !seen.has(n)) { seen.add(n); questions.push({ phrase, answer: String(n) }); firstFound = true; }
+        }
+
+        i++;
+      }
+      break;
+    }
+  }
+  return questions;
+}
+
+// ─── Extraction: N1.2-style Skills Check MCQ ─────────────────────────────────
+
+function parseN12OptionLines(line1, line2) {
+  const ab = line1.split(/\s{2,}B\.\s+/);
+  const cd = line2.split(/\s{2,}D\.\s+/);
+  if (ab.length < 2 || cd.length < 2) return null;
+  return [ab[0].trim(), ab[1].trim(), cd[0].trim(), cd[1].trim()];
+}
+
+function extractN12McqQuestions(slides) {
+  const questions = [];
+  const seenStems = new Set();
+
+  for (const { runs } of slides) {
+    for (let i = 0; i < runs.length; i++) {
+      const text = runs[i].text;
+
+      // Type 1: "Write the following number in words:"
+      if (/^write the following number in words:/i.test(text)) {
+        if (i + 3 >= runs.length) continue;
+        const numStr = runs[i + 1].text.replace(/[,\s]/g, '');
+        const n = parseInt(numStr, 10);
+        if (isNaN(n)) continue;
+        const opts = parseN12OptionLines(runs[i + 2].text, runs[i + 3].text);
+        if (!opts) continue;
+        const computed = numberToWords(n);
+        const norm = (s) => s.toLowerCase().replace(/-/g, ' ').replace(/\s+/g, ' ').trim();
+        const correct = opts.find((o) => norm(o) === norm(computed)) ?? opts[0];
+        const stem = `Write the number ${n} in words.`;
+        if (!seenStems.has(stem)) {
+          seenStems.add(stem);
+          questions.push({ stem, options: opts, answer: correct });
+        }
+        i += 3; continue;
+      }
+
+      // Type 2: "Write the number [words] in figures"
+      const figMatch = text.match(/^write the number\s+(.+?)\s+in figures$/i);
+      if (figMatch) {
+        if (i + 2 >= runs.length) continue;
+        const opts = parseN12OptionLines(runs[i + 1].text, runs[i + 2].text);
+        if (!opts) continue;
+        const n = wordsToNumber(figMatch[1]);
+        if (n === 0) continue;
+        const norm = (s) => s.replace(/[,\s]/g, '');
+        const correct = opts.find((o) => norm(o) === String(n)) ?? opts[0];
+        if (!seenStems.has(text)) {
+          seenStems.add(text);
+          questions.push({ stem: text, options: opts, answer: correct });
+        }
+        i += 2; continue;
+      }
+    }
+  }
+  return questions;
+}
+
 // ─── Build JSONL records ──────────────────────────────────────────────────────
 
 function makeRef(type, n) {
@@ -494,11 +736,11 @@ function makeRecord(ref, stem, format, answer, options) {
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
-const allRuns = readAllRuns(pptxPath);
+const slides = readSlidesRuns(pptxPath);
+const allRuns = slides.flatMap((s) => s.runs);
 
-// 1. Value-of-digit questions
+// 1. Value-of-digit questions (N1.1-style)
 const valQuestions = extractValueOfDigitQuestions(allRuns);
-// Deduplicate: same fullNumber + underlinedDigit
 const valSeen = new Set();
 const valUnique = valQuestions.filter((q) => {
   const key = `${q.fullNumber}|${q.underlinedDigit}`;
@@ -507,9 +749,8 @@ const valUnique = valQuestions.filter((q) => {
   return true;
 });
 
-// 2. Arrangement questions
+// 2. Arrangement questions (N1.1-style)
 const { greatest, smallest, differences } = extractArrangementQuestions(allRuns);
-// Deduplicate by digits + type
 const grtSeen = new Set();
 const smlSeen = new Set();
 const grtUnique = greatest.filter((q) => {
@@ -532,7 +773,7 @@ const difUnique = differences.filter((q) => {
   return true;
 });
 
-// 3. MCQ
+// 3. MCQ N1.1-style
 const mcqQuestions = extractMcqQuestions(allRuns);
 const mcqSeen = new Set();
 const mcqUnique = mcqQuestions.filter((q) => {
@@ -540,6 +781,15 @@ const mcqUnique = mcqQuestions.filter((q) => {
   mcqSeen.add(q.stem);
   return true;
 });
+
+// 4. Write-as-words questions (N1.2 sections 1-4)
+const wrdUnique = extractWriteAsWordsQuestions(slides);
+
+// 5. Write-as-figures questions (N1.2 section 5)
+const figUnique = extractWriteAsFiguresQuestions(slides);
+
+// 6. N1.2-style MCQ
+const mcq12Unique = extractN12McqQuestions(slides);
 
 // ─── Write output ─────────────────────────────────────────────────────────────
 
@@ -574,6 +824,21 @@ mcqUnique.forEach((q, i) => {
   lines.push(makeRecord(makeRef('MCQ', i + 1), q.stem, 'SINGLE_CHOICE', q.answer, q.options));
 });
 
+wrdUnique.forEach((q, i) => {
+  const stem = `Write the number ${q.n} in words.`;
+  lines.push(makeRecord(makeRef('WRD', i + 1), stem, 'SHORT_TEXT', q.answer, null));
+});
+
+figUnique.forEach((q, i) => {
+  const stem = `Write in figures: ${q.phrase}.`;
+  lines.push(makeRecord(makeRef('FIG', i + 1), stem, 'NUMERIC', q.answer, null));
+});
+
+mcq12Unique.forEach((q, i) => {
+  // offset MCQ ref counter past N1.1-style MCQs
+  lines.push(makeRecord(makeRef('MCQ', mcqUnique.length + i + 1), q.stem, 'SINGLE_CHOICE', q.answer, q.options));
+});
+
 fs.writeFileSync(outPath, lines.map((r) => JSON.stringify(r)).join('\n') + '\n');
 
 const summary = {
@@ -584,7 +849,9 @@ const summary = {
     greatest: grtUnique.length,
     smallest: smlUnique.length,
     difference: difUnique.length,
-    mcq: mcqUnique.length,
+    mcq: mcqUnique.length + mcq12Unique.length,
+    writeAsWords: wrdUnique.length,
+    writeAsFigures: figUnique.length,
     total: lines.length,
   },
 };
