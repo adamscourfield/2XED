@@ -54,7 +54,14 @@ type AppState =
 
 export default function StudentLivePage() {
   const { data: authSession, status } = useSession();
-  const [joinCode, setJoinCode] = useState('');
+
+  // Pre-fill from ?code= query param (e.g. when redirected from dashboard)
+  const initialCode =
+    typeof window !== 'undefined'
+      ? new URLSearchParams(window.location.search).get('code')?.toUpperCase().slice(0, 6) ?? ''
+      : '';
+
+  const [joinCode, setJoinCode] = useState(initialCode);
   const [appState, setAppState] = useState<AppState>({ phase: 'join' });
   const [answer, setAnswer] = useState('');
   const [loading, setLoading] = useState(false);

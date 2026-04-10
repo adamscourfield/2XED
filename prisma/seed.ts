@@ -32,6 +32,79 @@ async function main() {
     },
   });
 
+  // Demo teacher
+  const teacherPassword = await bcrypt.hash('teacher123', 10);
+  const teacher = await prisma.user.upsert({
+    where: { email: 'teacher@example.com' },
+    update: {},
+    create: {
+      email: 'teacher@example.com',
+      password: teacherPassword,
+      name: 'Demo Teacher',
+      role: 'TEACHER',
+    },
+  });
+
+  // Teacher profile (required for /teacher/dashboard analytics)
+  const teacherProfile = await prisma.teacherProfile.upsert({
+    where: { userId: teacher.id },
+    update: {},
+    create: {
+      userId: teacher.id,
+      externalSource: 'anaxi_observe',
+      externalTeacherId: 'demo-teacher-001',
+      externalSchoolId: 'demo-school-001',
+      displayName: 'Demo Teacher',
+    },
+  });
+
+  // Demo classroom
+  const classroom = await prisma.classroom.upsert({
+    where: { externalSource_externalClassId: { externalSource: 'anaxi_observe', externalClassId: 'demo-class-7a' } },
+    update: {},
+    create: {
+      externalSource: 'anaxi_observe',
+      externalClassId: 'demo-class-7a',
+      externalSchoolId: 'demo-school-001',
+      name: 'Year 7A — Maths',
+      yearGroup: 'Year 7',
+      subjectSlug: 'ks3-maths',
+    },
+  });
+
+  // Link teacher to classroom
+  await prisma.teacherClassroom.upsert({
+    where: { teacherProfileId_classroomId: { teacherProfileId: teacherProfile.id, classroomId: classroom.id } },
+    update: {},
+    create: {
+      teacherProfileId: teacherProfile.id,
+      classroomId: classroom.id,
+      roleLabel: 'Lead teacher',
+    },
+  });
+
+  // Enrol demo student in the classroom (requires a StudentProfile first)
+  const studentProfile = await prisma.studentProfile.upsert({
+    where: { userId: student.id },
+    update: {},
+    create: {
+      userId: student.id,
+      externalSource: 'anaxi_observe',
+      externalStudentId: 'demo-student-001',
+      externalSchoolId: 'demo-school-001',
+    },
+  });
+
+  await prisma.classroomEnrollment.upsert({
+    where: { classroomId_studentUserId: { classroomId: classroom.id, studentUserId: student.id } },
+    update: {},
+    create: {
+      classroomId: classroom.id,
+      studentUserId: student.id,
+      studentProfileId: studentProfile.id,
+    },
+  });
+
   // 2️⃣ Subject
   const subject = await prisma.subject.upsert({
     where: { slug: 'ks3-maths' },
@@ -517,6 +590,8 @@ async function main() {
 
   console.log('✅ Seed complete:', {
     student: student.email,
+    teacher: teacher.email,
+    classroom: classroom.name,
     subject: subject.title,
     skills: skillDefs.length,
     prereqEdges: prereqEdges.length,
