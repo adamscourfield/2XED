@@ -47,26 +47,8 @@ export default async function DashboardPage() {
   const userId = (session.user as { id: string }).id;
   const role = (session.user as { role?: string }).role;
 
-  if (role === 'TEACHER') {
-    return (
-      <LearningPageShell
-        title="Teacher Dashboard"
-        subtitle={session.user.name ?? session.user.email ?? 'Teacher account'}
-        maxWidthClassName="max-w-3xl"
-        actions={<SignOutButton />}
-        meta={
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="anx-chip">Teacher view</span>
-            <span className="anx-chip">Student routes hidden</span>
-          </div>
-        }
-      >
-        <div className="anx-card p-6 text-sm text-[color:var(--anx-text-secondary)]">
-          Teacher accounts can sign in successfully. Student learning routes are hidden for this role.
-        </div>
-      </LearningPageShell>
-    );
-  }
+  if (role === 'TEACHER') redirect('/teacher/dashboard');
+  if (role === 'ADMIN') redirect('/admin');
 
   const subjects = await prisma.subject.findMany({
     include: {
@@ -438,25 +420,6 @@ export default async function DashboardPage() {
         </div>
       )}
 
-      {role === 'ADMIN' && (
-        <section className="anx-card p-5">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] " style={{ color: 'var(--anx-primary)' }}>Admin tools</p>
-              <h2 className="mt-1 text-lg font-semibold text-[color:var(--anx-text)]">Operational dashboards</h2>
-              <p className="mt-1 text-sm text-[color:var(--anx-text-secondary)]">Jump straight to insight and intervention views.</p>
-            </div>
-            <div className="flex flex-wrap gap-3">
-              <Link href="/admin/insight/ks3-maths" className="anx-btn-primary">
-                Insight dashboard
-              </Link>
-              <Link href="/admin/interventions" className="anx-btn-secondary">
-                Interventions
-              </Link>
-            </div>
-          </div>
-        </section>
-      )}
     </LearningPageShell>
   );
 }
