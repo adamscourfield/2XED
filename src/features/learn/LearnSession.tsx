@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { OrderedMagnetInput } from '@/components/learn/OrderedMagnetInput';
+import { NumberLineInput } from '@/components/learn/NumberLineInput';
 import { ItemVisualPanel } from '@/components/learn/ItemVisualPanel';
 import { getItemContent, ItemInteractionType } from './itemContent';
 import { sanitizeStudentCopy } from './studentCopy';
@@ -87,6 +88,19 @@ export function LearnSession({ subject, skill, items, userId, gamification }: Pr
           onChange={setSelectedAnswer}
           emptyPrompt="Move the magnets here in the right order."
           helperText="Drag to move them, or tap one to add it."
+        />
+      );
+    }
+
+    if (type === 'NUMBER_LINE') {
+      if (!currentItemContent?.numberLine) {
+        return <div className="anx-callout-warning">Number line configuration missing.</div>;
+      }
+      return (
+        <NumberLineInput
+          config={currentItemContent.numberLine}
+          value={selectedAnswer}
+          onChange={setSelectedAnswer}
         />
       );
     }
@@ -228,7 +242,11 @@ export function LearnSession({ subject, skill, items, userId, gamification }: Pr
                   ? 'Type your answer.'
                   : currentItemContent.type === 'ORDER'
                     ? 'Put them in the right order.'
-                    : 'Pick one answer.'}
+                    : currentItemContent.type === 'NUMBER_LINE'
+                      ? currentItemContent.numberLine?.task === 'place'
+                        ? 'Tap the number line to place your marker.'
+                        : 'Estimate the value shown by the arrow.'
+                      : 'Pick one answer.'}
             </p>
           )}
           {currentItemContent && renderAnswerInput(currentItemContent.type)}

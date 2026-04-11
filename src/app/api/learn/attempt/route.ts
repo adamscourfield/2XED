@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
   }
 
   const itemContent = getItemContent(item);
-  const correct = gradeAttempt(itemContent.acceptedAnswers, answer);
+  const correct = gradeAttempt(itemContent.acceptedAnswers, answer, itemContent.numberLine?.tolerance);
 
   const attempt = await prisma.attempt.create({
     data: { userId, itemId, answer, correct },

@@ -9,6 +9,7 @@ export const CanonicalQuestionFormatSchema = z.enum([
   'NUMERIC',
   'ORDER_SEQUENCE',
   'MULTI_SELECT',
+  'NUMBER_LINE',
 ]);
 
 export type CanonicalQuestionFormat = z.infer<typeof CanonicalQuestionFormatSchema>;
@@ -35,6 +36,14 @@ export const MappingRowSchema = z.object({
     format: QuestionFormatSchema,
     options: z.array(z.string()).optional(),
     answer: z.string().min(1),
+    numberLine: z.object({
+      min: z.number(),
+      max: z.number(),
+      step: z.number(),
+      labelledValues: z.array(z.number()).optional(),
+      task: z.enum(['place', 'read']),
+      markerValue: z.number().optional(),
+    }).optional(),
   }),
   skills: z.object({
     primary_skill_code: z.string().min(1),
@@ -208,7 +217,17 @@ export function deriveStoredItemFromMapping(row: MappingRow): {
     NUMERIC: 'SHORT_NUMERIC',
     ORDER_SEQUENCE: 'ORDER',
     MULTI_SELECT: 'MULTI_SELECT',
+    NUMBER_LINE: 'NUMBER_LINE',
   };
+
+  const numberLineOptions = parsed.question.numberLine
+    ? {
+        numberLine: {
+          ...parsed.question.numberLine,
+          tolerance: parsed.marking?.tolerance ?? 10,
+        },
+      }
+    : {};
 
   return {
     type: typeByFormat[canonicalFormat],
@@ -216,6 +235,7 @@ export function deriveStoredItemFromMapping(row: MappingRow): {
     options: {
       choices,
       acceptedAnswers,
+      ...numberLineOptions,
     },
     canonicalFormat,
   };
@@ -223,6 +243,7 @@ export function deriveStoredItemFromMapping(row: MappingRow): {
 
 export function getItemContractIssues(item: StoredItemContract): ContractIssue[] {
   const content = getItemContent(item);
+  if (content.type === 'NUMBER_LINE') return [];
   const issues: ContractIssue[] = [];
   const rawChoices = rawChoiceList(item.options);
   const normalizedChoiceSet = new Set(content.choices.map((choice) => normalizeAnswer(choice)));
