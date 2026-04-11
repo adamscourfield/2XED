@@ -12,7 +12,7 @@
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:seed": "ts-node -r tsconfig-paths/register --compiler-options '{\"module\":\"CommonJS\"}' prisma/seed.ts && ts-node -r tsconfig-paths/register --compiler-options '{\"module\":\"CommonJS\"}' prisma/ensure-routes-n11-n13.ts && ts-node -r tsconfig-paths/register --compiler-options '{\"module\":\"CommonJS\"}' prisma/ensure-routes-n14-n15.ts",
-    "db:import:phase1-unit1": "ts-node -r tsconfig-paths/register --compiler-options '{\"module\":\"CommonJS\"}' prisma/import-phase1-unit1.ts",
+    "db:import:phase1-unit1": "echo 'DEPRECATED: use npm run db:import:question-bank instead — all files are now in docs/unit-mapping/question-bank/' && exit 1",
     "db:backfill:unit1-visuals": "ts-node -r tsconfig-paths/register --compiler-options '{\"module\":\"CommonJS\"}' prisma/backfill-unit1-visuals.ts",
     "db:ensure:routes:n14-n15": "ts-node -r tsconfig-paths/register --compiler-options '{\"module\":\"CommonJS\"}' prisma/ensure-routes-n14-n15.ts",
     "db:ensure:routes:n5": "ts-node -r tsconfig-paths/register --compiler-options '{\"module\":\"CommonJS\"}' prisma/ensure-routes-n5.ts",
