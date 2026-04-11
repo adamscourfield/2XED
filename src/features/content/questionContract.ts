@@ -30,6 +30,10 @@ export const MappingRowSchema = z.object({
   source: z.object({
     question_ref: z.string(),
     source_file: z.string().optional(),
+    year_group: z.string().optional(),
+    unit: z.string().optional(),
+    part: z.string().optional(),
+    tier: z.string().optional(),
   }),
   question: z.object({
     stem: z.string().min(1),
@@ -41,17 +45,41 @@ export const MappingRowSchema = z.object({
       max: z.number(),
       step: z.number(),
       labelledValues: z.array(z.number()).optional(),
-      task: z.enum(['place', 'read']),
+      task: z.enum(['place', 'read', 'round']),
       markerValue: z.number().optional(),
     }).optional(),
   }),
   skills: z.object({
     primary_skill_code: z.string().min(1),
     secondary_skill_codes: z.array(z.string()).optional(),
+    micro_skills: z.array(z.string()).optional(),
+    prereq_skill_codes: z.array(z.string()).optional(),
   }),
+  misconceptions: z.array(z.object({
+    type: z.string(),
+    diagnostic_signal: z.string().optional(),
+  })).optional(),
+  variation: z.object({
+    pattern_type: z.string().optional(),
+    position_in_sequence: z.number().optional(),
+    sequence_size: z.number().optional(),
+    notes: z.string().optional(),
+  }).optional(),
+  cognitive_load: z.object({
+    level: z.number().optional(),
+    justification: z.string().optional(),
+    working_memory_drivers: z.array(z.string()).optional(),
+  }).optional(),
   marking: z.object({
+    mark_scheme_type: z.string().optional(),
+    max_marks: z.number().optional(),
     accepted_answers: z.array(z.string()).optional(),
     tolerance: z.number().optional(),
+  }).optional(),
+  metadata: z.object({
+    mapper: z.string().optional(),
+    mapped_at: z.string().optional(),
+    quality_status: z.string().optional(),
   }).optional(),
 });
 
