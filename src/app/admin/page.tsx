@@ -331,6 +331,7 @@ export default async function AdminHomePage() {
             </div>
             <div className="mt-3 border-t pt-3 space-y-1" style={{ borderColor: 'var(--anx-border)' }}>
               {[
+                { label: 'Question Bank', href: '/admin/questions', sub: 'Author & manage all questions' },
                 { label: 'Content audit', href: '/admin/content-audit', sub: 'Coverage & gaps by strand' },
                 { label: 'Content ingestion', href: '/admin/content-ingestion', sub: 'Review & publish batches' },
                 { label: 'Knowledge state', href: '/admin/knowledge-state', sub: 'Debug learner state traces' },
@@ -357,10 +358,10 @@ export default async function AdminHomePage() {
             {[
               { label: 'Insight', href: subjects[0] ? `/admin/insight/${subjects[0].slug}` : '/admin/insight/ks3-maths', icon: '📊' },
               { label: 'Interventions', href: '/admin/interventions', icon: '⚑', alert: openInterventions > 0 },
+              { label: 'Questions', href: '/admin/questions', icon: '✏️' },
               { label: 'QA Workbench', href: subjects[0] ? `/admin/content/${subjects[0].slug}` : '/admin/content/ks3-maths', icon: '🔬', alert: openNotes > 0 },
               { label: 'Content Audit', href: '/admin/content-audit', icon: '📋' },
               { label: 'Ingestion', href: '/admin/content-ingestion', icon: '📥' },
-              { label: 'Knowledge State', href: '/admin/knowledge-state', icon: '🧠' },
             ].map((link) => (
               <Link
                 key={link.href}
