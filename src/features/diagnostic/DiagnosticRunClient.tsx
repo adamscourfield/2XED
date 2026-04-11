@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { OrderedMagnetInput } from '@/components/learn/OrderedMagnetInput';
+import { NumberLineInput } from '@/components/learn/NumberLineInput';
 import { ItemVisualPanel } from '@/components/learn/ItemVisualPanel';
 import { getItemContent, ItemInteractionType } from '@/features/learn/itemContent';
 
@@ -43,6 +44,19 @@ export function DiagnosticRunClient({ subject, skill, item, sessionId, itemsSeen
           onChange={setSelectedAnswer}
           emptyPrompt="Move the magnets here in the right order."
           helperText="Drag to move them, or tap one to add it."
+        />
+      );
+    }
+
+    if (type === 'NUMBER_LINE') {
+      if (!itemContent.numberLine) {
+        return <div className="anx-callout-warning">Number line configuration missing.</div>;
+      }
+      return (
+        <NumberLineInput
+          config={itemContent.numberLine}
+          value={selectedAnswer}
+          onChange={setSelectedAnswer}
         />
       );
     }
@@ -111,7 +125,11 @@ export function DiagnosticRunClient({ subject, skill, item, sessionId, itemsSeen
               ? 'Type your answer.'
               : itemContent.type === 'ORDER'
                 ? 'Put them in the right order.'
-                : 'Pick one answer.'}
+                : itemContent.type === 'NUMBER_LINE'
+                  ? itemContent.numberLine?.task === 'place'
+                    ? 'Tap the number line to place your marker.'
+                    : 'Estimate the value shown by the arrow.'
+                  : 'Pick one answer.'}
         </p>
         {renderAnswerInput(itemContent.type)}
         <button

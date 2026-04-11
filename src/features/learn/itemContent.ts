@@ -1,12 +1,23 @@
 import { extractOrderingChoices, isOrderingPrompt } from '@/features/items/ordering';
 
-export type ItemInteractionType = 'MCQ' | 'TRUE_FALSE' | 'SHORT_TEXT' | 'SHORT_NUMERIC' | 'ORDER' | 'MULTI_SELECT';
+export type ItemInteractionType = 'MCQ' | 'TRUE_FALSE' | 'SHORT_TEXT' | 'SHORT_NUMERIC' | 'ORDER' | 'MULTI_SELECT' | 'NUMBER_LINE';
+
+export interface NumberLineConfig {
+  min: number;
+  max: number;
+  step: number;
+  labelledValues?: number[];
+  task: 'place' | 'read';
+  markerValue?: number;
+  tolerance: number;
+}
 
 export interface ItemContent {
   type: ItemInteractionType;
   choices: string[];
   acceptedAnswers: string[];
   canonicalAnswer: string;
+  numberLine?: NumberLineConfig;
 }
 
 type AcceptedAnswerInput = string | string[];
@@ -91,7 +102,24 @@ function normalizeAcceptedAnswers(input: AcceptedAnswerInput): string[] {
   return unique(splitAcceptedAnswerString(input));
 }
 
-function parseOptions(options: unknown, question?: string, answer?: string): { choices: string[]; acceptedAnswers: string[] } {
+function parseNumberLineConfig(raw: unknown): NumberLineConfig | undefined {
+  if (!isObject(raw)) return undefined;
+  const { min, max, step, task, markerValue, tolerance, labelledValues } = raw;
+  if (typeof min !== 'number' || typeof max !== 'number' || (task !== 'place' && task !== 'read')) return undefined;
+  return {
+    min,
+    max,
+    step: typeof step === 'number' && step > 0 ? step : Math.max(1, Math.round((max - min) / 8)),
+    task,
+    markerValue: typeof markerValue === 'number' ? markerValue : undefined,
+    tolerance: typeof tolerance === 'number' ? tolerance : 10,
+    labelledValues: Array.isArray(labelledValues)
+      ? labelledValues.filter((v): v is number => typeof v === 'number')
+      : undefined,
+  };
+}
+
+function parseOptions(options: unknown, question?: string, answer?: string): { choices: string[]; acceptedAnswers: string[]; numberLine?: NumberLineConfig } {
   if (Array.isArray(options)) {
     const choices = unique(toStringList(options));
     return {
@@ -105,6 +133,7 @@ function parseOptions(options: unknown, question?: string, answer?: string): { c
     return {
       choices: choices.length > 0 ? choices : question ? extractOrderingChoices(question, answer) : [],
       acceptedAnswers: unique(toStringList(options.acceptedAnswers)),
+      numberLine: parseNumberLineConfig(options.numberLine),
     };
   }
 
@@ -128,6 +157,7 @@ function inferInteractionType(item: {
   if (normalized === 'SHORT_TEXT') return 'SHORT_TEXT';
   if (normalized === 'MCQ') return 'MCQ';
   if (normalized === 'MULTI_SELECT') return 'MULTI_SELECT';
+  if (normalized === 'NUMBER_LINE') return 'NUMBER_LINE';
 
   return (item.type as ItemInteractionType) || 'MCQ';
 }
@@ -146,13 +176,24 @@ export function getItemContent(item: {
     choices: parsed.choices,
     acceptedAnswers,
     canonicalAnswer: item.answer,
+    numberLine: parsed.numberLine,
   };
 }
 
 export function gradeAttempt(
   acceptedAnswers: AcceptedAnswerInput,
-  submittedAnswer: string
+  submittedAnswer: string,
+  tolerance?: number
 ): boolean {
+  if (tolerance != null && tolerance > 0) {
+    const submitted = parseFloat(submittedAnswer.replace(/,/g, '').trim());
+    if (!isNaN(submitted)) {
+      return normalizeAcceptedAnswers(acceptedAnswers).some((answer) => {
+        const target = parseFloat(answer.replace(/,/g, '').trim());
+        return !isNaN(target) && Math.abs(submitted - target) <= tolerance;
+      });
+    }
+  }
   const submitted = normalizeAnswer(submittedAnswer);
   return normalizeAcceptedAnswers(acceptedAnswers).some((answer) => normalizeAnswer(answer) === submitted);
 }
@@ -171,6 +212,8 @@ export function getAnswerFormatHint(type: string, question: string, options?: un
       return 'Select all correct answers.';
     case 'SHORT_TEXT':
       return 'Type a short answer using words or symbols only as needed.';
+    case 'NUMBER_LINE':
+      return 'Use the number line to answer.';
     default:
       return null;
   }
