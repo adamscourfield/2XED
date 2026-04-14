@@ -11,80 +11,8 @@ import { resolveItemVisuals } from '../src/features/learn/itemVisuals';
 
 const prisma = new PrismaClient();
 
-const PACK_FILES = [
-  'docs/unit-mapping/question-bank/review-pack-phase1-n1-1-to-n1-5.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n1-5-topup.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n1-6-to-n1-8.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n1-6-topup.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n1-9-to-n1-12.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n1-11-to-n1-12-topup.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n1-13-to-n1-15.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n1-13-topup.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n1-14-topup.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n1-14-topup-2.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n1-15-topup.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n1-16-topup.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n1-17-topup.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n1-18-topup.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n1-19-topup.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n1-20-topup.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n2-1-topup.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n2-2-topup.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n2-2-topup-2.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n2-3-topup.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n2-4-topup.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n2-4-topup-2.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n2-5-topup.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n2-6-topup.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n2-6-topup-2.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n2-7-topup.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n2-7-topup-2.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n2-8-topup.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n2-8-topup-2.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n2-9-topup.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n2-10-topup.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n2-11-topup.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n2-12-topup.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n2-13-topup.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n2-14-topup.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n2-15-topup.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n2-16-topup.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n3-1-topup.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n3-3-topup.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n3-4-topup.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n3-5-topup.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n3-6-topup.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n3-7-topup.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n3-8-topup.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n3-9-topup.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n3-10-topup.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n3-11-topup.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n3-12-topup.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n3-13-topup.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n3-23-topup.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n3-24-topup.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n3-14-topup.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n3-15-topup.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n3-16-topup.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n3-17-topup.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n3-18-topup.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n3-19-topup.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n3-20-topup.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n3-21-topup.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n3-22-topup.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n2-1-to-n2-4.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n2-5-to-n2-8.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n2-9-to-n2-13.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n2-14-to-n2-16.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n3-1-to-n3-3.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n3-4-to-n3-6.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n3-7-to-n3-9.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n3-10-to-n3-13.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n3-14-to-n3-17.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n3-18-to-n3-21.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n3-22-to-n3-24.jsonl',
-  'docs/unit-mapping/question-bank/review-pack-phase1-n4-1-to-n4-9.jsonl',
-] as const;
+/** Same directory as `prisma/import-question-bank.ts` — load every `*.jsonl` so legacy packs (e.g. `n1-*-questions.jsonl`) stay in sync. */
+const QUESTION_BANK_DIR = path.resolve(process.cwd(), 'docs/unit-mapping/question-bank');
 
 const PHASE1_SKILL_META: Record<string, { name: string; strand: string; sortOrder: number }> = {
   'N1.1': { name: 'Recognise the place value of each digit in whole numbers up to millions', strand: 'PV', sortOrder: 5 },
@@ -210,18 +138,28 @@ async function main() {
     throw new Error('Subject ks3-maths not found. Run db:seed first.');
   }
 
+  if (!fs.existsSync(QUESTION_BANK_DIR)) {
+    throw new Error(`Question bank directory not found: ${QUESTION_BANK_DIR}`);
+  }
+
+  const packFiles = fs
+    .readdirSync(QUESTION_BANK_DIR)
+    .filter((f) => f.endsWith('.jsonl'))
+    .sort()
+    .map((f) => path.join(QUESTION_BANK_DIR, f));
+
+  if (packFiles.length === 0) {
+    console.log(JSON.stringify({ message: 'No JSONL files in question-bank directory.', importedPacks: 0 }, null, 2));
+    return;
+  }
+
   const importedSkillCodes = new Set<string>();
   let created = 0;
   let updated = 0;
   let linked = 0;
   let rowsProcessed = 0;
 
-  for (const relativePath of PACK_FILES) {
-    const mappingPath = path.resolve(process.cwd(), relativePath);
-    if (!fs.existsSync(mappingPath)) {
-      throw new Error(`Mapping file not found: ${mappingPath}`);
-    }
-
+  for (const mappingPath of packFiles) {
     const lines = fs
       .readFileSync(mappingPath, 'utf8')
       .split('\n')
@@ -363,7 +301,7 @@ async function main() {
   console.log(
     JSON.stringify(
       {
-        importedPacks: PACK_FILES.length,
+        importedPacks: packFiles.length,
         rowsProcessed,
         created,
         updated,
