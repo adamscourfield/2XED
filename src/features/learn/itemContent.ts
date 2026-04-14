@@ -109,17 +109,6 @@ function normalizeAcceptedAnswers(input: AcceptedAnswerInput): string[] {
   return unique(splitAcceptedAnswerString(input));
 }
 
-function parseProtractorConfig(raw: unknown): ProtractorConfig | undefined {
-  if (!isObject(raw)) return undefined;
-  const { targetAngle, tolerance, angleImage } = raw;
-  if (typeof targetAngle !== 'number') return undefined;
-  return {
-    targetAngle,
-    tolerance: typeof tolerance === 'number' ? tolerance : 2,
-    angleImage: typeof angleImage === 'string' ? angleImage : undefined,
-  };
-}
-
 function parseNumberLineConfig(raw: unknown): NumberLineConfig | undefined {
   if (!isObject(raw)) return undefined;
   const { min, max, step, task, markerValue, tolerance, labelledValues } = raw;
