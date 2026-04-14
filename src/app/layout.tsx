@@ -1,23 +1,22 @@
 import type { Metadata } from 'next';
-import { Inter, Newsreader } from 'next/font/google';
+import { Plus_Jakarta_Sans, Manrope } from 'next/font/google';
 import './globals.css';
 import { Providers } from './providers';
 
-const inter = Inter({
+const plusJakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
   display: 'swap',
-  variable: '--font-inter',
+  variable: '--font-jakarta',
 });
 
-const newsreader = Newsreader({
+const manrope = Manrope({
   subsets: ['latin'],
   display: 'swap',
-  variable: '--font-newsreader',
-  style: ['normal', 'italic'],
+  variable: '--font-manrope',
 });
 
 export const metadata: Metadata = {
-  title: 'Anaxi Learn',
+  title: '2XED',
   description: 'Adaptive mastery learning platform',
 };
 
@@ -27,8 +26,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${newsreader.variable}`}>
-      <body className={inter.className}>
+    <html lang="en" className={`${plusJakarta.variable} ${manrope.variable}`}>
+      <body className={`${manrope.className} bg-surface text-on-surface antialiased`}>
         <Providers>{children}</Providers>
       </body>
     </html>

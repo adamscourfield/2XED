@@ -4,14 +4,15 @@
 
 @layer base {
   :root {
-    /* ── Surface Hierarchy — The Modern Academic Ledger ──────────── */
-    --anx-surface:                   #f7f9fb;   /* base background */
-    --anx-surface-bright:            #f9fafb;   /* main page background */
-    --anx-surface-container-low:     #f2f4f6;   /* sections */
-    --anx-surface-container:         #eef0f2;   /* containers */
-    --anx-surface-container-high:    #e8eaec;   /* nesting / secondary-container */
-    --anx-surface-container-highest: #e2e4e8;   /* input backgrounds */
-    --anx-surface-container-lowest:  #ffffff;   /* cards / active workspaces */
+    /* ── Surface Hierarchy — 2XED ──────────── */
+    --anx-surface:                   #f4f6f8;
+    --anx-surface-bright:            #f9fafb;
+    --anx-surface-container-low:     #f0f2f5;
+    --anx-surface-container:         #eaedf0;
+    --anx-surface-container-high:    #e4e7eb;
+    --anx-surface-container-highest: #dfe3e7;
+    --anx-surface-container-lowest:  #ffffff;
+    --anx-surface-hover:             rgba(74, 64, 224, 0.05);
 
     /* Legacy surface aliases */
     --anx-bg:             var(--anx-surface-bright);
@@ -20,32 +21,32 @@
     --anx-divider:        var(--anx-surface-container-low);
 
     /* ── Brand palette ───────────────────────────────────────────── */
-    --anx-coral:          #fe9f9f;
-    --anx-coral-soft:     rgba(254,159,159,0.12);
-    --anx-amber:          #fdc683;
-    --anx-amber-soft:     rgba(253,198,131,0.15);
+    --anx-coral:          #b41340;
+    --anx-coral-soft:     rgba(180, 19, 64, 0.12);
+    --anx-amber:          #f74b6d;
+    --anx-amber-soft:     rgba(247, 75, 109, 0.15);
 
-    /* ── Primary — Deep Slate ─────────────────────────────────────── */
-    --anx-primary:           #000000;
-    --anx-primary-container: #131b2e;
+    /* ── Primary — Electric Aura ─────────────────────────────────────── */
+    --anx-primary:           #4a40e0;
+    --anx-primary-container: #9795ff;
     --anx-on-primary:        #ffffff;
-    --anx-primary-hover:     #1a1a2e;
-    --anx-primary-active:    #131b2e;
-    --anx-primary-soft:      rgba(19,27,46,0.06);
-    --anx-primary-glow:      rgba(19,27,46,0.12);
+    --anx-primary-hover:     #3a31b5;
+    --anx-primary-active:    #2e2794;
+    --anx-primary-soft:      rgba(74, 64, 224, 0.06);
+    --anx-primary-glow:      rgba(74, 64, 224, 0.12);
 
-    /* ── Secondary ───────────────────────────────────────────────── */
-    --anx-secondary:              #44474e;
-    --anx-secondary-container:    var(--anx-surface-container-high);
-    --anx-on-secondary-container: #1a1c21;
+    /* ── Secondary - Energetic Pulse  ───────────────────────────────────────────────── */
+    --anx-secondary:              #702ae1;
+    --anx-secondary-container:    #dcc9ff;
+    --anx-on-secondary-container: #34126b;
 
-    /* ── Tertiary — Coral (surgical precision only) ───────────────── */
-    --anx-tertiary:              #b94040;
-    --anx-tertiary-container:    #3d060b;
-    --anx-on-tertiary-container: #c06c6c;
+    /* ── Tertiary — Secure/Emerald ───────────────── */
+    --anx-tertiary:              #006947;
+    --anx-tertiary-container:    #cdf1dc;
+    --anx-on-tertiary-container: #003624;
 
     /* ── Text — on-surface tokens (never pure black) ─────────────── */
-    --anx-on-surface:         #191c1e;
+    --anx-on-surface:         #242f41;
     --anx-on-surface-variant: #44474e;
 
     /* Legacy text aliases */
@@ -55,45 +56,43 @@
     --anx-text-faint:     #9ca3af;
 
     /* ── Borders — Ghost Border Rule ─────────────────────────────── */
-    /* Never use 100% opaque borders on sections/cards. */
-    /* Ghost border = outline-variant at 20% opacity, for accessibility only. */
+    /* Ghost border = outline-variant at 15% opacity, for accessibility only. */
     --anx-outline:         #72767f;
-    --anx-outline-variant: #c2c7cf;
-    --anx-ghost-border:    rgba(194,199,207,0.20);
+    --anx-outline-variant: rgba(194, 199, 207, 0.15);
+    --anx-ghost-border:    rgba(194, 199, 207, 0.15);
 
     /* Legacy border aliases (now ghost) */
-    --anx-border:        rgba(194,199,207,0.20);
+    --anx-border:        var(--anx-ghost-border);
     --anx-border-subtle: rgba(194,199,207,0.10);
     --anx-border-hover:  rgba(194,199,207,0.40);
 
     /* ── Semantic colours ─────────────────────────────────────────── */
-    --anx-success:      #059669;
+    --anx-success:      #006947;
     --anx-success-soft: #ecfdf5;
-    --anx-warning:      #fdc683;
-    --anx-warning-soft: rgba(253,198,131,0.12);
-    --anx-warning-text: #92400e;
-    --anx-danger:       #fe9f9f;
-    --anx-danger-soft:  rgba(254,159,159,0.10);
-    --anx-danger-text:  #991b1b;
+    --anx-warning:      #f74b6d;
+    --anx-warning-soft: rgba(247, 75, 109, 0.12);
+    --anx-warning-text: #922031;
+    --anx-danger:       #b41340;
+    --anx-danger-soft:  rgba(180, 19, 64, 0.10);
+    --anx-danger-text:  #870d2f;
 
     /* ── Radius ──────────────────────────────────────────────────── */
-    --anx-radius:    1.5rem;   /* xl: 24px — large containers */
+    --anx-radius:    1rem;   /* lg: 16px — large containers */
     --anx-radius-sm: 0.75rem;  /* md: 12px — internal components */
 
     /* ── Shadows — floating elements only (extra-diffused) ───────── */
-    /* on-surface at 4% opacity, 32px blur, 8px offset */
-    --anx-shadow-float: 0 8px 32px rgba(25,28,30,0.04);
-    --anx-shadow-sm:    0 8px 32px rgba(25,28,30,0.04);
-    --anx-shadow-md:    0 8px 32px rgba(25,28,30,0.04), 0 2px 8px rgba(25,28,30,0.06);
-    --anx-shadow-lg:    0 8px 32px rgba(25,28,30,0.04), 0 4px 16px rgba(25,28,30,0.08);
-    --anx-shadow-xl:    0 8px 32px rgba(25,28,30,0.04), 0 16px 50px rgba(25,28,30,0.06);
+    --anx-shadow-float: 0 20px 40px rgba(4,14,31,0.06);
+    --anx-shadow-sm:    0 8px 32px rgba(4,14,31,0.04);
+    --anx-shadow-md:    0 12px 36px rgba(4,14,31,0.05);
+    --anx-shadow-lg:    0 20px 40px rgba(4,14,31,0.06);
+    --anx-shadow-xl:    0 24px 48px rgba(4,14,31,0.06);
 
     /* ── Spacing — Institutional Calm ───────────────────────────── */
     --anx-spacing-16: 4rem;   /* 64px — page margins */
     --anx-spacing-24: 6rem;   /* 96px — generous page margins */
 
     /* ── Brand blue — kept for legacy references ─────────────────── */
-    --anx-brand-blue: #131b2e;
+    --anx-brand-blue: #4a40e0;
   }
 
   /* ── Reset ────────────────────────────────────────────────────── */
@@ -116,7 +115,7 @@
 
   body {
     @apply antialiased;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-family: var(--font-manrope), 'Manrope', system-ui, -apple-system, sans-serif;
     color: var(--anx-on-surface);
     background: var(--anx-surface-bright);
     background-attachment: fixed;
@@ -125,27 +124,32 @@
   /* ── Scrollbar ──────────────────────────────────────────────── */
   ::-webkit-scrollbar { width: 5px; height: 5px; }
   ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: rgba(25,28,30,0.08); border-radius: 99px; }
-  ::-webkit-scrollbar-thumb:hover { background: rgba(25,28,30,0.14); }
+  ::-webkit-scrollbar-thumb { background: rgba(36,47,65,0.08); border-radius: 99px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(36,47,65,0.14); }
 
   *:focus-visible {
     outline: none;
     box-shadow: 0 0 0 3px var(--anx-primary-glow);
-    border-color: rgba(0,0,0,0.40);
+    border-color: rgba(74,64,224,0.40);
   }
 
   ::selection {
-    background: rgba(19,27,46,0.10);
+    background: rgba(74,64,224,0.10);
     color: var(--anx-on-surface);
   }
 }
 
 @layer components {
   /* ── Layout shells ─────────────────────────────── */
-  /* Use spacing-16 (64px) / spacing-24 (96px) for Institutional Calm */
   .anx-shell {
     @apply min-h-screen;
     padding: var(--anx-spacing-16) var(--anx-spacing-16);
+  }
+
+  @media (min-width: 1024px) {
+    .anx-shell {
+      padding: var(--anx-spacing-16) 120px var(--anx-spacing-16) 80px;
+    }
   }
 
   @media (max-width: 768px) {
@@ -194,37 +198,38 @@
 
   /* ── Buttons ───────────────────────────────────── */
 
-  /* Primary — Deep Slate gradient, md rounding, no border */
+  /* Primary — Electric Aura gradient, full rounding, subtle scale-up */
   .anx-btn-primary {
     @apply inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-semibold tracking-[0.01em] disabled:cursor-not-allowed disabled:opacity-40;
-    border-radius: var(--anx-radius-sm);
+    border-radius: 9999px;
     color: var(--anx-on-primary);
     background: linear-gradient(135deg, var(--anx-primary) 0%, var(--anx-primary-container) 100%);
     transition: all 200ms cubic-bezier(0.4,0,0.2,1);
   }
 
   .anx-btn-primary:hover:not(:disabled) {
-    background: linear-gradient(135deg, #1a1a1a 0%, #1f2d4a 100%);
-    transform: scale(0.98);
+    background: linear-gradient(135deg, var(--anx-primary) 0%, #a4a1ff 100%);
+    transform: scale(1.02);
   }
 
   .anx-btn-primary:active:not(:disabled) {
-    background: linear-gradient(135deg, var(--anx-primary-container) 0%, #0a1220 100%);
+    background: linear-gradient(135deg, var(--anx-primary-active) 0%, var(--anx-primary) 100%);
     transform: scale(0.98);
   }
 
-  /* Secondary — secondary-container background, no border */
+  /* Secondary — surface-container-highest background, no border */
   .anx-btn-secondary {
     @apply inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-semibold tracking-[0.01em];
     border-radius: var(--anx-radius-sm);
-    background: var(--anx-secondary-container);
-    color: var(--anx-on-secondary-container);
+    background: var(--anx-surface-container-highest);
+    color: var(--anx-primary-container);
+    border: none;
     transition: all 200ms cubic-bezier(0.4,0,0.2,1);
   }
 
   .anx-btn-secondary:hover {
     background: var(--anx-surface-container-high);
-    transform: scale(0.98);
+    transform: scale(1.02);
   }
 
   .anx-btn-secondary:active {
@@ -261,23 +266,22 @@
   /* ── Progress ──────────────────────────────────── */
   .anx-progress-track {
     @apply h-2 w-full overflow-hidden rounded-full;
-    background: rgba(19,27,46,0.06);
+    background: var(--anx-secondary-container);
   }
 
   .anx-progress-bar {
     @apply h-full rounded-full transition-all duration-500 ease-out;
-    background: linear-gradient(90deg, var(--anx-primary) 0%, var(--anx-primary-container) 100%);
+    background: var(--anx-secondary);
   }
 
   /* ── Form inputs — Ghost Border Rule ───────────── */
-  /* Background: surface-container-highest                              */
-  /* Border: outline-variant at 20% opacity (Ghost Border)             */
-  /* Focus: transition border to primary at 40% opacity                */
+  /* ── Form inputs — Ghost Border Rule ───────────── */
+  /* Background: surface-container-low, Focus: surface-container-highest */
   .anx-input {
     @apply w-full px-4 py-3 text-sm;
     border-radius: var(--anx-radius-sm);
-    border: 1px solid var(--anx-ghost-border);
-    background: var(--anx-surface-container-highest);
+    border: 2px solid transparent;
+    background: var(--anx-surface-container-low);
     color: var(--anx-on-surface);
     transition: all 200ms cubic-bezier(0.4,0,0.2,1);
   }
@@ -288,12 +292,13 @@
   }
 
   .anx-input:hover {
-    border-color: var(--anx-border-hover);
+    border-color: var(--anx-ghost-border);
   }
 
   .anx-input:focus {
-    border-color: rgba(0,0,0,0.40);
-    box-shadow: 0 0 0 3px var(--anx-primary-glow);
+    background: var(--anx-surface-container-highest);
+    border-color: var(--anx-primary);
+    box-shadow: none;
     outline: none;
   }
 
@@ -338,10 +343,10 @@
     color: var(--anx-text-muted);
   }
 
-  /* Newsreader for large numerical data — feels like a prestigious report */
+  /* Plus Jakarta Sans for large numerical data */
   .anx-stat-value {
     @apply mt-1.5 text-[28px] font-bold leading-none;
-    font-family: 'Newsreader', 'Georgia', serif;
+    font-family: var(--font-jakarta), 'Plus Jakarta Sans', sans-serif;
     letter-spacing: -0.02em;
     color: var(--anx-on-surface);
   }
@@ -349,6 +354,16 @@
   /* ── Badges ────────────────────────────────────── */
   .anx-badge {
     @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium tracking-[0.01em];
+  }
+
+  .anx-achievement-badge {
+    @apply inline-flex items-center rounded-full px-4 py-1.5 text-sm font-semibold tracking-wide;
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 4px 12px rgba(4,14,31,0.06);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    color: var(--anx-on-surface);
   }
 
   .anx-badge-blue {
