@@ -10,6 +10,7 @@ export const CanonicalQuestionFormatSchema = z.enum([
   'ORDER_SEQUENCE',
   'MULTI_SELECT',
   'NUMBER_LINE',
+  'PROTRACTOR',
 ]);
 
 export type CanonicalQuestionFormat = z.infer<typeof CanonicalQuestionFormatSchema>;
@@ -47,6 +48,11 @@ export const MappingRowSchema = z.object({
       labelledValues: z.array(z.number()).optional(),
       task: z.enum(['place', 'read', 'round']),
       markerValue: z.number().optional(),
+    }).optional(),
+    protractor: z.object({
+      angleImage: z.string().optional(),
+      targetAngle: z.number(),
+      tolerance: z.number().optional(),
     }).optional(),
   }),
   skills: z.object({
@@ -246,6 +252,7 @@ export function deriveStoredItemFromMapping(row: MappingRow): {
     ORDER_SEQUENCE: 'ORDER',
     MULTI_SELECT: 'MULTI_SELECT',
     NUMBER_LINE: 'NUMBER_LINE',
+    PROTRACTOR: 'PROTRACTOR',
   };
 
   const numberLineOptions = parsed.question.numberLine
@@ -257,6 +264,16 @@ export function deriveStoredItemFromMapping(row: MappingRow): {
       }
     : {};
 
+  const protractorOptions = parsed.question.protractor
+    ? {
+        protractor: {
+          angleImage: parsed.question.protractor.angleImage ?? '',
+          targetAngle: parsed.question.protractor.targetAngle,
+          tolerance: parsed.question.protractor.tolerance ?? parsed.marking?.tolerance ?? 2,
+        },
+      }
+    : {};
+
   return {
     type: typeByFormat[canonicalFormat],
     answer,
@@ -264,6 +281,7 @@ export function deriveStoredItemFromMapping(row: MappingRow): {
       choices,
       acceptedAnswers,
       ...numberLineOptions,
+      ...protractorOptions,
     },
     canonicalFormat,
   };
@@ -272,6 +290,7 @@ export function deriveStoredItemFromMapping(row: MappingRow): {
 export function getItemContractIssues(item: StoredItemContract): ContractIssue[] {
   const content = getItemContent(item);
   if (content.type === 'NUMBER_LINE') return [];
+  if (content.type === 'PROTRACTOR') return [];
   const issues: ContractIssue[] = [];
   const rawChoices = rawChoiceList(item.options);
   const normalizedChoiceSet = new Set(content.choices.map((choice) => normalizeAnswer(choice)));
