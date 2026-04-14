@@ -13,7 +13,7 @@ export interface NumberLineConfig {
 }
 
 export interface ProtractorConfig {
-  angleImage: string;
+  angleImage?: string;
   targetAngle: number;
   tolerance: number;
 }
@@ -109,6 +109,17 @@ function normalizeAcceptedAnswers(input: AcceptedAnswerInput): string[] {
   return unique(splitAcceptedAnswerString(input));
 }
 
+function parseProtractorConfig(raw: unknown): ProtractorConfig | undefined {
+  if (!isObject(raw)) return undefined;
+  const { targetAngle, tolerance, angleImage } = raw;
+  if (typeof targetAngle !== 'number') return undefined;
+  return {
+    targetAngle,
+    tolerance: typeof tolerance === 'number' ? tolerance : 2,
+    angleImage: typeof angleImage === 'string' ? angleImage : undefined,
+  };
+}
+
 function parseNumberLineConfig(raw: unknown): NumberLineConfig | undefined {
   if (!isObject(raw)) return undefined;
   const { min, max, step, task, markerValue, tolerance, labelledValues } = raw;
@@ -131,7 +142,7 @@ export function parseProtractorConfig(raw: unknown): ProtractorConfig | undefine
   const { angleImage, targetAngle, tolerance } = raw;
   if (typeof targetAngle !== 'number') return undefined;
   return {
-    angleImage: typeof angleImage === 'string' ? angleImage : '',
+    angleImage: typeof angleImage === 'string' ? angleImage : undefined,
     targetAngle,
     tolerance: typeof tolerance === 'number' ? tolerance : 2,
   };
@@ -236,7 +247,7 @@ export function getAnswerFormatHint(type: string, question: string, options?: un
     case 'NUMBER_LINE':
       return 'Use the number line to answer.';
     case 'PROTRACTOR':
-      return 'Use the protractor to measure the angle, then type your answer.';
+      return 'Use the on-screen protractor to measure the angle, then type your reading.';
     default:
       return null;
   }

@@ -267,8 +267,7 @@ export function deriveStoredItemFromMapping(row: MappingRow): {
   const protractorOptions = parsed.question.protractor
     ? {
         protractor: {
-          angleImage: parsed.question.protractor.angleImage ?? '',
-          targetAngle: parsed.question.protractor.targetAngle,
+          ...parsed.question.protractor,
           tolerance: parsed.question.protractor.tolerance ?? parsed.marking?.tolerance ?? 2,
         },
       }
@@ -289,8 +288,7 @@ export function deriveStoredItemFromMapping(row: MappingRow): {
 
 export function getItemContractIssues(item: StoredItemContract): ContractIssue[] {
   const content = getItemContent(item);
-  if (content.type === 'NUMBER_LINE') return [];
-  if (content.type === 'PROTRACTOR') return [];
+  if (content.type === 'NUMBER_LINE' || content.type === 'PROTRACTOR') return [];
   const issues: ContractIssue[] = [];
   const rawChoices = rawChoiceList(item.options);
   const normalizedChoiceSet = new Set(content.choices.map((choice) => normalizeAnswer(choice)));

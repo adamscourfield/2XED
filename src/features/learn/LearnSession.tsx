@@ -261,7 +261,7 @@ export function LearnSession({ subject, skill, items, userId, gamification }: Pr
                         ? 'Tap the number line to place your marker.'
                         : 'Estimate the value shown by the arrow.'
                       : currentItemContent.type === 'PROTRACTOR'
-                        ? 'Use the protractor to measure the angle.'
+                        ? 'Position the protractor, then type your reading below.'
                         : 'Pick one answer.'}
             </p>
           )}
