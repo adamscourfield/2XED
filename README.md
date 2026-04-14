@@ -1,4 +1,4 @@
-# Anaxi-Learn
+# 2XED
 
 ## Getting Started
 
