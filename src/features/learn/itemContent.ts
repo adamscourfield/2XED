@@ -1,6 +1,6 @@
 import { extractOrderingChoices, isOrderingPrompt } from '@/features/items/ordering';
 
-export type ItemInteractionType = 'MCQ' | 'TRUE_FALSE' | 'SHORT_TEXT' | 'SHORT_NUMERIC' | 'ORDER' | 'MULTI_SELECT' | 'NUMBER_LINE';
+export type ItemInteractionType = 'MCQ' | 'TRUE_FALSE' | 'SHORT_TEXT' | 'SHORT_NUMERIC' | 'ORDER' | 'MULTI_SELECT' | 'NUMBER_LINE' | 'PROTRACTOR';
 
 export interface NumberLineConfig {
   min: number;
@@ -12,12 +12,19 @@ export interface NumberLineConfig {
   tolerance: number;
 }
 
+export interface ProtractorConfig {
+  angleImage?: string;
+  targetAngle: number;
+  tolerance: number;
+}
+
 export interface ItemContent {
   type: ItemInteractionType;
   choices: string[];
   acceptedAnswers: string[];
   canonicalAnswer: string;
   numberLine?: NumberLineConfig;
+  protractor?: ProtractorConfig;
 }
 
 type AcceptedAnswerInput = string | string[];
@@ -102,6 +109,17 @@ function normalizeAcceptedAnswers(input: AcceptedAnswerInput): string[] {
   return unique(splitAcceptedAnswerString(input));
 }
 
+function parseProtractorConfig(raw: unknown): ProtractorConfig | undefined {
+  if (!isObject(raw)) return undefined;
+  const { targetAngle, tolerance, angleImage } = raw;
+  if (typeof targetAngle !== 'number') return undefined;
+  return {
+    targetAngle,
+    tolerance: typeof tolerance === 'number' ? tolerance : 2,
+    angleImage: typeof angleImage === 'string' ? angleImage : undefined,
+  };
+}
+
 function parseNumberLineConfig(raw: unknown): NumberLineConfig | undefined {
   if (!isObject(raw)) return undefined;
   const { min, max, step, task, markerValue, tolerance, labelledValues } = raw;
@@ -119,7 +137,18 @@ function parseNumberLineConfig(raw: unknown): NumberLineConfig | undefined {
   };
 }
 
-function parseOptions(options: unknown, question?: string, answer?: string): { choices: string[]; acceptedAnswers: string[]; numberLine?: NumberLineConfig } {
+export function parseProtractorConfig(raw: unknown): ProtractorConfig | undefined {
+  if (!isObject(raw)) return undefined;
+  const { angleImage, targetAngle, tolerance } = raw;
+  if (typeof targetAngle !== 'number') return undefined;
+  return {
+    angleImage: typeof angleImage === 'string' ? angleImage : undefined,
+    targetAngle,
+    tolerance: typeof tolerance === 'number' ? tolerance : 2,
+  };
+}
+
+function parseOptions(options: unknown, question?: string, answer?: string): { choices: string[]; acceptedAnswers: string[]; numberLine?: NumberLineConfig; protractor?: ProtractorConfig } {
   if (Array.isArray(options)) {
     const choices = unique(toStringList(options));
     return {
@@ -134,6 +163,7 @@ function parseOptions(options: unknown, question?: string, answer?: string): { c
       choices: choices.length > 0 ? choices : question ? extractOrderingChoices(question, answer) : [],
       acceptedAnswers: unique(toStringList(options.acceptedAnswers)),
       numberLine: parseNumberLineConfig(options.numberLine),
+      protractor: parseProtractorConfig(options.protractor),
     };
   }
 
@@ -158,6 +188,7 @@ function inferInteractionType(item: {
   if (normalized === 'MCQ') return 'MCQ';
   if (normalized === 'MULTI_SELECT') return 'MULTI_SELECT';
   if (normalized === 'NUMBER_LINE') return 'NUMBER_LINE';
+  if (normalized === 'PROTRACTOR') return 'PROTRACTOR';
 
   return (item.type as ItemInteractionType) || 'MCQ';
 }
@@ -177,6 +208,7 @@ export function getItemContent(item: {
     acceptedAnswers,
     canonicalAnswer: item.answer,
     numberLine: parsed.numberLine,
+    protractor: parsed.protractor,
   };
 }
 
@@ -214,6 +246,8 @@ export function getAnswerFormatHint(type: string, question: string, options?: un
       return 'Type a short answer using words or symbols only as needed.';
     case 'NUMBER_LINE':
       return 'Use the number line to answer.';
+    case 'PROTRACTOR':
+      return 'Use the on-screen protractor to measure the angle, then type your reading.';
     default:
       return null;
   }

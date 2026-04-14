@@ -1,8 +1,24 @@
 'use client';
 
 import { useCallback, useMemo, useState } from 'react';
-import type { ReteachPlan, RouteType } from './reteachContent';
+import { ProtractorInput } from '@/components/learn/ProtractorInput';
+import type { ReteachPlan, ReteachStep, RouteType } from './reteachContent';
 import { getInteractionRenderer, type StepInteractionState } from './interactionRegistry';
+
+function getProtractorStepConfig(steps: ReteachStep[]) {
+  for (const s of steps) {
+    const type = s.interaction?.type ?? s.visualType ?? 'none';
+    if (type === 'protractor.v1' || type === 'protractor') {
+      const cfg = s.interaction?.config ?? {};
+      return {
+        angleImage: typeof cfg.angleImage === 'string' ? cfg.angleImage : '',
+        targetAngle: typeof cfg.targetAngle === 'number' ? cfg.targetAngle : 90,
+        tolerance: typeof cfg.tolerance === 'number' ? cfg.tolerance : 2,
+      };
+    }
+  }
+  return null;
+}
 
 interface Props {
   subjectId: string;
@@ -152,12 +168,24 @@ export function ReteachSession({ subjectId, skillId, routeType, assignedPathId, 
   const interactionRequired = (step.interaction?.type ?? step.visualType ?? 'none') !== 'none';
   const canCheck = Boolean(selected) && (!interactionRequired || interactionStatus.completed);
 
+  const protractorStepConfig = getProtractorStepConfig(plan.steps);
+
   if (stage === 'worked') {
     return (
       <div className="space-y-5">
         <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6 text-base text-slate-700">
-          <p className="text-lg font-bold text-slate-900">👀 Worked example</p>
+          <p className="text-lg font-bold text-slate-900">Worked example</p>
           <p className="mt-1 text-base leading-relaxed">{plan.workedExample}</p>
+          {protractorStepConfig && (
+            <div className="mt-4">
+              <ProtractorInput
+                config={protractorStepConfig}
+                value=""
+                onChange={() => {}}
+                demo={true}
+              />
+            </div>
+          )}
           <button className="anx-btn-primary mt-4 w-full py-3 text-base" onClick={() => setStage('guided')}>
             Let me try one
           </button>
@@ -172,6 +200,16 @@ export function ReteachSession({ subjectId, skillId, routeType, assignedPathId, 
         <div className="rounded-xl border border-slate-200 bg-white p-5">
           <p className="text-lg font-bold text-slate-900">Your turn</p>
           <p className="mt-1 text-base text-slate-700">{plan.guidedPrompt}</p>
+          {protractorStepConfig && (
+            <div className="mt-3">
+              <ProtractorInput
+                config={protractorStepConfig}
+                value=""
+                onChange={() => {}}
+                demo={true}
+              />
+            </div>
+          )}
           {needsWritingHint && <p className="mt-2 text-sm text-slate-600">Write it clearly. “And” is fine, but you do not need it.</p>}
           <input
             className="anx-input mt-3 text-base"

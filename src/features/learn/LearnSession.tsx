@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { OrderedMagnetInput } from '@/components/learn/OrderedMagnetInput';
 import { NumberLineInput } from '@/components/learn/NumberLineInput';
+import { ProtractorInput } from '@/components/learn/ProtractorInput';
 import { ItemVisualPanel } from '@/components/learn/ItemVisualPanel';
 import { getItemContent, ItemInteractionType } from './itemContent';
 import { sanitizeStudentCopy } from './studentCopy';
@@ -99,6 +100,19 @@ export function LearnSession({ subject, skill, items, userId, gamification }: Pr
       return (
         <NumberLineInput
           config={currentItemContent.numberLine}
+          value={selectedAnswer}
+          onChange={setSelectedAnswer}
+        />
+      );
+    }
+
+    if (type === 'PROTRACTOR') {
+      if (!currentItemContent?.protractor) {
+        return <div className="anx-callout-warning">Protractor configuration missing.</div>;
+      }
+      return (
+        <ProtractorInput
+          config={currentItemContent.protractor}
           value={selectedAnswer}
           onChange={setSelectedAnswer}
         />
@@ -246,7 +260,9 @@ export function LearnSession({ subject, skill, items, userId, gamification }: Pr
                       ? currentItemContent.numberLine?.task === 'place'
                         ? 'Tap the number line to place your marker.'
                         : 'Estimate the value shown by the arrow.'
-                      : 'Pick one answer.'}
+                      : currentItemContent.type === 'PROTRACTOR'
+                        ? 'Position the protractor, then type your reading below.'
+                        : 'Pick one answer.'}
             </p>
           )}
           {currentItemContent && renderAnswerInput(currentItemContent.type)}

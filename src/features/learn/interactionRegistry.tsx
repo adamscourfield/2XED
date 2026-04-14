@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { ProtractorInput } from '@/components/learn/ProtractorInput';
 import type { ReteachStep } from './reteachContent';
 
 export interface StepInteractionState {
@@ -7,6 +8,7 @@ export interface StepInteractionState {
   placeValueSelection?: string;
   compareColumnIndex?: number;
   decompositionParts: string[];
+  protractorInteracted?: boolean;
 }
 
 export interface InteractionStatus {
@@ -237,6 +239,29 @@ const decomposeRenderer: InteractionRenderer = {
   },
 };
 
+const protractorRenderer: InteractionRenderer = {
+  status: ({ state }) => ({
+    started: Boolean(state.protractorInteracted),
+    completed: Boolean(state.protractorInteracted),
+  }),
+  render: ({ step, markInteraction }) => {
+    const config = step.interaction?.config ?? {};
+    return (
+      <ProtractorInput
+        config={{
+          angleImage: typeof config.angleImage === 'string' ? config.angleImage : '',
+          targetAngle: typeof config.targetAngle === 'number' ? config.targetAngle : 90,
+          tolerance: typeof config.tolerance === 'number' ? config.tolerance : 2,
+        }}
+        value=""
+        onChange={() => {}}
+        demo={true}
+        onInteract={() => markInteraction({ protractorInteracted: true, completedAt: Date.now() })}
+      />
+    );
+  },
+};
+
 const renderers: Record<string, InteractionRenderer> = {
   'place_value_select.v1': placeValueRenderer,
   'compare_columns.v1': compareRenderer,
@@ -245,6 +270,8 @@ const renderers: Record<string, InteractionRenderer> = {
   compare_columns: compareRenderer,
   decompose_number: decomposeRenderer,
   none: noneRenderer,
+  'protractor.v1': protractorRenderer,
+  protractor: protractorRenderer,
 };
 
 export function getInteractionRenderer(step: ReteachStep): InteractionRenderer {
