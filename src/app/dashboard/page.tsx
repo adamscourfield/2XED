@@ -8,6 +8,7 @@ import { selectNextSkill } from '@/features/learn/nextSkill';
 import { LearningPageShell } from '@/components/LearningPageShell';
 import { SignOutButton } from '@/components/SignOutButton';
 import { JoinSessionInput } from '@/components/JoinSessionInput';
+import { DashboardLessonCalendar } from '@/components/DashboardLessonCalendar';
 import { getUserGamificationSummary } from '@/features/gamification/gamificationService';
 
 const MAX_RECENT_ATTEMPTS = 20;
@@ -201,6 +202,8 @@ export default async function DashboardPage() {
           </div>
         </div>
       </div>
+
+      <DashboardLessonCalendar hint="Shows scheduled reviews and practice due dates from your plan." />
 
       {/* Join live session */}
       <section className="anx-card flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">

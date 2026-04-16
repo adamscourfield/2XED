@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { prisma } from '@/db/prisma';
 import { LearningPageShell } from '@/components/LearningPageShell';
+import { DashboardLessonCalendar } from '@/components/DashboardLessonCalendar';
 
 type EventPayload = Record<string, unknown>;
 
@@ -203,6 +204,8 @@ export default async function TeacherDashboardPage({ searchParams }: Props) {
         </>
       }
     >
+      <DashboardLessonCalendar hint="Shows your live sessions and scheduled reviews for students in your classes." />
+
       {/* ── Live lesson launcher ─────────────────────────────────────────── */}
       <div className="anx-lesson-launcher flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
         <div>
