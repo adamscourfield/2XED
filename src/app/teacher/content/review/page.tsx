@@ -77,6 +77,7 @@ export default async function BookletReviewPage() {
       <LearningPageShell
         title="Booklet Review"
         subtitle="Human review gate — accept or reject GPT-4o parsed blocks before publish"
+        appChrome="teacher"
       >
         <div className="anx-callout-info p-6 rounded-lg space-y-2">
           <p className="font-semibold">No staging file found.</p>
@@ -92,6 +93,7 @@ export default async function BookletReviewPage() {
     <LearningPageShell
       title="Booklet Review"
       subtitle="Human review gate — accept or reject GPT-4o parsed blocks before publish"
+      appChrome="teacher"
     >
       <BookletReviewClient
         blocks={parsedBooklet.blocks}

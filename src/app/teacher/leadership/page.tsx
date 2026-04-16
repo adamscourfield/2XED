@@ -273,6 +273,8 @@ export default async function LeadershipDashboardPage({ searchParams }: Props) {
       title="Leadership Dashboard"
       subtitle={`Full school overview — ${schoolTotalStudents} students across ${allClassrooms.length} classrooms`}
       maxWidthClassName="max-w-7xl"
+      appChrome="teacher"
+      appChromeShowLeadershipNav
       meta={
         <div className="flex flex-wrap items-center gap-3 text-xs">
           <span className="anx-chip">Leadership view</span>
