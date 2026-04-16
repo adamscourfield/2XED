@@ -204,7 +204,7 @@ export default async function TeacherDashboardPage({ searchParams }: Props) {
         </>
       }
     >
-      <DashboardLessonCalendar hint="Shows your live sessions and scheduled reviews for students in your classes." />
+      <DashboardLessonCalendar hint="Shows class timetables you maintain, your live sessions, and student reviews." />
 
       {/* ── Live lesson launcher ─────────────────────────────────────────── */}
       <div className="anx-lesson-launcher flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
