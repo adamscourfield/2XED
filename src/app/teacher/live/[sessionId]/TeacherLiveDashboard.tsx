@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
+import { TeacherLiveWhiteboard } from '@/components/teacher/TeacherLiveWhiteboard';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -66,10 +67,12 @@ function ConductorTopBar({
   snapshot,
   elapsed,
   onStatusChange,
+  onOpenWhiteboard,
 }: {
   snapshot: SessionSnapshot;
   elapsed: string;
   onStatusChange: (s: 'ACTIVE' | 'PAUSED' | 'COMPLETED') => void;
+  onOpenWhiteboard?: () => void;
 }) {
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -126,7 +129,16 @@ function ConductorTopBar({
 
       <span className={`anx-badge ${statusColour} ml-1`}>{snapshot.status}</span>
 
-      <div className="ml-auto flex gap-2">
+      <div className="ml-auto flex flex-wrap items-center gap-2">
+        {onOpenWhiteboard && (snapshot.status === 'ACTIVE' || snapshot.status === 'PAUSED') && (
+          <button
+            type="button"
+            onClick={onOpenWhiteboard}
+            className="anx-btn-secondary px-4 py-2 text-sm"
+          >
+            Blank whiteboard
+          </button>
+        )}
         {snapshot.status === 'LOBBY' && (
           <button
             onClick={() => updateStatus('ACTIVE')}
@@ -527,6 +539,7 @@ function ActionBar({
 
 export function TeacherLiveDashboard({ sessionId }: Props) {
   const [snapshot, setSnapshot] = useState<SessionSnapshot | null>(null);
+  const [whiteboardOpen, setWhiteboardOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [elapsed, setElapsed] = useState('—');
   const sseRef = useRef<EventSource | null>(null);
@@ -621,11 +634,18 @@ export function TeacherLiveDashboard({ sessionId }: Props) {
 
   return (
     <div className="anx-conductor-shell">
+      <TeacherLiveWhiteboard
+        sessionId={sessionId}
+        open={whiteboardOpen}
+        onClose={() => setWhiteboardOpen(false)}
+        onPushed={fetchSnapshot}
+      />
       {/* Top bar */}
       <ConductorTopBar
         snapshot={snapshot}
         elapsed={elapsed}
         onStatusChange={handleStatusChange}
+        onOpenWhiteboard={() => setWhiteboardOpen(true)}
       />
 
       {/* Three-panel body */}

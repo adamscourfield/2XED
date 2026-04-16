@@ -3,15 +3,17 @@ import { getServerSession } from 'next-auth';
 import { z } from 'zod';
 import { authOptions } from '@/features/auth/authOptions';
 import { prisma } from '@/db/prisma';
+import { LiveWhiteboardPayloadSchema, validateWhiteboardPointBudget } from '@/lib/live/whiteboard-strokes';
 
 const schema = z.object({
   // Which lanes receive the broadcast. Defaults to all lanes if omitted.
   lanes: z.array(z.enum(['LANE_1', 'LANE_2', 'LANE_3'])).optional(),
   // The content to push — can be an explanation route id, a message, etc.
-  contentType: z.enum(['EXPLANATION', 'MESSAGE', 'PHASE']),
+  contentType: z.enum(['EXPLANATION', 'MESSAGE', 'PHASE', 'WHITEBOARD']),
   explanationRouteId: z.string().optional(),
   message: z.string().max(500).optional(),
   phaseIndex: z.number().int().nonnegative().optional(),
+  whiteboard: LiveWhiteboardPayloadSchema.optional(),
 });
 
 interface Props {
@@ -40,12 +42,22 @@ export async function POST(req: NextRequest, { params }: Props) {
   if (!liveSession) return NextResponse.json({ error: 'Session not found' }, { status: 404 });
   if (liveSession.teacherUserId !== userId) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
-  const { lanes, contentType, explanationRouteId, message, phaseIndex } = parsed.data;
+  const { lanes, contentType, explanationRouteId, message, phaseIndex, whiteboard } = parsed.data;
 
   const broadcastPayload: Record<string, unknown> = {
     contentType,
     broadcastAt: new Date().toISOString(),
   };
+
+  if (contentType === 'WHITEBOARD') {
+    if (!whiteboard) {
+      return NextResponse.json({ error: 'whiteboard payload required' }, { status: 400 });
+    }
+    if (!validateWhiteboardPointBudget(whiteboard.strokes)) {
+      return NextResponse.json({ error: 'Whiteboard has too many points' }, { status: 400 });
+    }
+    broadcastPayload.whiteboard = whiteboard;
+  }
 
   if (contentType === 'EXPLANATION' && explanationRouteId) {
     // Verify explanation route exists
