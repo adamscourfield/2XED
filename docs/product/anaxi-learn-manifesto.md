@@ -1,10 +1,10 @@
-# Anaxi Learn - Manifesto
+# 2XED - Manifesto
 
 Source: https://drive.google.com/file/d/1-qoKTgyarr2T7FA16-zJ0v_bmihdExf3wGBjid2LhLU/view
 
-Anaxi Learn – Product Manifesto and System Architecture Blueprint
+2XED – Product Manifesto and System Architecture Blueprint
 1. Product Thesis
-Anaxi Learn is a curriculum‑anchored diagnostic and mastery platform.
+2XED is a curriculum‑anchored diagnostic and mastery platform.
  
 Its purpose is to identify what a student can already do securely, detect the first prerequisite gap in the curriculum, deliver the explanation route most likely to unlock understanding, and return the student to the teacher‑led curriculum as quickly as possible.
  
@@ -18,7 +18,7 @@ Not every student needs a different curriculum. They need accurate diagnosis aga
 3. Catch‑up work is often broad, inefficient, and poorly targeted.
 4. Explanations vary in effectiveness across students but this is rarely measured.
  
-Anaxi Learn solves these problems through curriculum‑linked diagnostics, structured micro‑skills, and multiple explanation routes per skill.
+2XED solves these problems through curriculum‑linked diagnostics, structured micro‑skills, and multiple explanation routes per skill.
 3. System Design Principles
 1. Curriculum Anchored
 The teacher’s curriculum sequence remains the central spine.

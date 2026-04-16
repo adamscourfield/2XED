@@ -112,7 +112,7 @@ async function main() {
     create: {
       slug: 'ks3-maths',
       title: 'KS3 Maths',
-      description: 'Anaxi Learn - Maths (Year 7 Entry) Number and FDP v1',
+      description: '2XED - Maths (Year 7 Entry) Number and FDP v1',
     },
   });
 

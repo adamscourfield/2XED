@@ -1,6 +1,6 @@
 # scaffold-live-session
 
-Scaffold all code needed to support a teacher-initiated live classroom session in Anaxi Learn, built around the three-lane routing model.
+Scaffold all code needed to support a teacher-initiated live classroom session in 2XED, built around the three-lane routing model.
 
 ## Usage
 ```

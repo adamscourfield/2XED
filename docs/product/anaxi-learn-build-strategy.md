@@ -1,8 +1,8 @@
-# Anaxi Learn - Build Strategy
+# 2XED - Build Strategy
 
 Source: https://drive.google.com/file/d/10IQHfzEHv5UJu8mdcb6NFGxZ2jtcQlR55Z1zHFgI9gs/view
 
-Anaxi Learn – MVP Build Checklist
+2XED – MVP Build Checklist
 ________________
 
 

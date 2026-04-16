@@ -1,4 +1,4 @@
-# Year 7 English — Anaxi Learn Implementation Plan
+# Year 7 English — 2XED Implementation Plan
 
 _Branch: `claude/plan-year7-english-amztr` | Updated: 2026-03-24_
 

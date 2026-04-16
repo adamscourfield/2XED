@@ -3,7 +3,7 @@
 ## Cursor Cloud specific instructions
 
 ### Overview
-Anaxi Learn is a Next.js 15 full-stack adaptive learning platform backed by PostgreSQL 15+. It is a single-service monolith (not a monorepo).
+2XED is a Next.js 15 full-stack adaptive learning platform backed by PostgreSQL 15+. It is a single-service monolith (not a monorepo).
 
 ### Prerequisites
 - **Node.js 20** (use `nvm use 20`; Node 22+ may work but the project targets 20)

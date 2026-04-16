@@ -12,7 +12,7 @@ async function main() {
     create: {
       slug: 'ks3-english',
       title: 'KS3 English',
-      description: 'Anaxi Learn – English (Year 7 Entry) Foundation Set v1',
+      description: '2XED – English (Year 7 Entry) Foundation Set v1',
     },
   });
 

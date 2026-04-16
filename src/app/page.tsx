@@ -16,7 +16,7 @@ export default function HomePage() {
             />
             <p className="anx-section-label">Anaxi Family</p>
             <h1 className="mt-4 text-4xl font-bold tracking-tight sm:text-5xl" style={{ color: 'var(--anx-text)' }}>
-              Anaxi Learn
+              2XED
             </h1>
             <p className="mx-auto mt-4 max-w-lg text-base leading-relaxed sm:text-lg" style={{ color: 'var(--anx-text-muted)' }}>
               Adaptive mastery learning with clean pacing, targeted practice, and progress that stays easy to read.
