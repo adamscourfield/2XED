@@ -4,7 +4,7 @@ Date: 2026-03-10
 Status: Accepted
 
 ## Context
-Anaxi Learn has grown rapidly across diagnostic flow, learning progression, and knowledge-state updates. Clear boundaries are required to reduce coupling and regression risk.
+2XED has grown rapidly across diagnostic flow, learning progression, and knowledge-state updates. Clear boundaries are required to reduce coupling and regression risk.
 
 ## Decision
 Define module responsibilities as follows:

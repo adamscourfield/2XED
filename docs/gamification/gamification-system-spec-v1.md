@@ -1,4 +1,4 @@
-# Anaxi Learn Gamification System Spec (v1)
+# 2XED Gamification System Spec (v1)
 
 ## Objective
 Increase sustained engagement for secondary learners **without diluting mastery quality**.

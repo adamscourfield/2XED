@@ -47,7 +47,7 @@ export default function LoginPage() {
             className="mx-auto mb-4"
           />
           <h1 className="text-3xl font-bold tracking-tight" style={{ color: 'var(--anx-text)' }}>
-            Anaxi Learn
+            2XED
           </h1>
           <p className="mt-1 text-sm" style={{ color: 'var(--anx-text-muted)' }}>
             Sign in to continue learning

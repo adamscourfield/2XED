@@ -5,7 +5,7 @@ VERSION 1 SPECIFICATION
 1. PURPOSE
 ====================================================
 
-The Knowledge State Engine is the core decision-making layer of Anaxi Learn.
+The Knowledge State Engine is the core decision-making layer of 2XED.
 
 Its purpose is to estimate the latent knowledge state of each student for each skill, using observable learning evidence.
 
@@ -497,7 +497,7 @@ Schedule later only when evidence is strong and stable.
 12. EXPLANATION SWITCHING RULES
 ====================================================
 
-Anaxi Learn should support multiple explanations per skill.
+2XED should support multiple explanations per skill.
 
 Each explanation should have its own estimated performance profile:
 - learning_gain
@@ -735,7 +735,7 @@ The Knowledge State Engine is successful if it allows the platform to:
 Most learning systems ask:
 Did the student get it right?
 
-Anaxi Learn must ask:
+2XED must ask:
 How strong is the knowledge?
 How retrievable is it?
 How transferable is it?
