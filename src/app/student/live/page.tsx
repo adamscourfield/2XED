@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { redirect } from 'next/navigation';
 import { AppChrome } from '@/components/AppChrome';
+import { LiveWhiteboardViewer } from '@/components/student/LiveWhiteboardViewer';
+import type { LiveWhiteboardPayload } from '@/lib/live/whiteboard-strokes';
 
 interface SkillMeta {
   id: string;
@@ -32,26 +34,36 @@ interface Item {
 }
 
 interface CurrentContent {
-  contentType: 'EXPLANATION' | 'MESSAGE' | 'PHASE';
+  contentType: 'EXPLANATION' | 'MESSAGE' | 'PHASE' | 'WHITEBOARD';
   targetLanes?: string[];
   message?: string;
   phaseIndex?: number;
   broadcastAt?: string;
+  whiteboard?: LiveWhiteboardPayload;
 }
 
 interface SessionPoll {
   status: string;
   currentPhaseIndex: number;
   currentContent: CurrentContent | null;
+  studentLane?: string | null;
 }
 
 type AppState =
   | { phase: 'join' }
   | { phase: 'waiting'; session: JoinedSession }
   | { phase: 'between-phases'; session: JoinedSession; message: string }
+  | { phase: 'whiteboard'; session: JoinedSession; whiteboard: LiveWhiteboardPayload }
   | { phase: 'question'; session: JoinedSession; item: Item }
   | { phase: 'feedback'; session: JoinedSession; correct: boolean; nextItem: Item | null }
   | { phase: 'done'; session: JoinedSession };
+
+function broadcastTargetsStudentLane(content: CurrentContent, studentLane: string | null | undefined): boolean {
+  const lanes = content.targetLanes;
+  if (!lanes || lanes.length === 0) return true;
+  if (!studentLane) return true;
+  return lanes.includes(studentLane);
+}
 
 export default function StudentLivePage() {
   const { data: authSession, status } = useSession();
@@ -71,6 +83,7 @@ export default function StudentLivePage() {
   // Track last seen content to detect teacher pushes
   const lastPhaseIndexRef = useRef<number>(-1);
   const lastBroadcastAtRef = useRef<string | null>(null);
+  const lastWhiteboardVersionRef = useRef<number>(-1);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const sessionRef = useRef<JoinedSession | null>(null);
 
@@ -83,7 +96,12 @@ export default function StudentLivePage() {
 
   // Poll for session state changes when in an active session
   useEffect(() => {
-    const isInSession = appState.phase === 'waiting' || appState.phase === 'between-phases' || appState.phase === 'question' || appState.phase === 'feedback';
+    const isInSession =
+      appState.phase === 'waiting' ||
+      appState.phase === 'between-phases' ||
+      appState.phase === 'whiteboard' ||
+      appState.phase === 'question' ||
+      appState.phase === 'feedback';
     if (!isInSession) {
       if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; }
       return;
@@ -119,9 +137,25 @@ export default function StudentLivePage() {
 
         if (newBroadcast && data.currentContent) {
           lastBroadcastAtRef.current = data.currentContent.broadcastAt ?? null;
-          if (data.currentContent.contentType === 'MESSAGE' && data.currentContent.message) {
+          const cc = data.currentContent;
+          const laneOk = broadcastTargetsStudentLane(cc, data.studentLane);
+
+          if (cc.contentType === 'WHITEBOARD' && laneOk && cc.whiteboard) {
+            const wb = cc.whiteboard;
             const sess = sessionRef.current;
-            if (sess) setAppState({ phase: 'between-phases', session: sess, message: data.currentContent.message });
+            if (!sess) return;
+            if (wb.action === 'hide') {
+              lastWhiteboardVersionRef.current = wb.version;
+              setAppState({ phase: 'waiting', session: sess });
+            } else if (wb.action === 'show' || wb.action === 'clear') {
+              if (wb.version >= lastWhiteboardVersionRef.current) {
+                lastWhiteboardVersionRef.current = wb.version;
+                setAppState({ phase: 'whiteboard', session: sess, whiteboard: wb });
+              }
+            }
+          } else if (cc.contentType === 'MESSAGE' && laneOk && cc.message) {
+            const sess = sessionRef.current;
+            if (sess) setAppState({ phase: 'between-phases', session: sess, message: cc.message });
           }
         }
 
@@ -136,7 +170,8 @@ export default function StudentLivePage() {
       }
     }
 
-    pollRef.current = setInterval(pollSession, 3000);
+    const pollMs = appState.phase === 'whiteboard' ? 1500 : 3000;
+    pollRef.current = setInterval(pollSession, pollMs);
     return () => { if (pollRef.current) clearInterval(pollRef.current); };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appState.phase]);
@@ -177,6 +212,7 @@ export default function StudentLivePage() {
       const session: JoinedSession = await res.json();
       lastPhaseIndexRef.current = -1;
       lastBroadcastAtRef.current = null;
+      lastWhiteboardVersionRef.current = -1;
 
       if (session.status === 'LOBBY') {
         setAppState({ phase: 'waiting', session });
@@ -282,6 +318,28 @@ export default function StudentLivePage() {
             </button>
           </form>
         </div>
+        </main>
+      </AppChrome>
+    );
+  }
+
+  // ── Teacher whiteboard (read-only for students) ─────────────────────────────
+  if (appState.phase === 'whiteboard') {
+    const wb = appState.whiteboard;
+    return (
+      <AppChrome variant="student">
+        <main className="anx-shell flex min-h-0 flex-1 flex-col px-4 py-6">
+          <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-3">
+            <div className="text-center">
+              <h2 className="text-lg font-semibold" style={{ color: 'var(--anx-text)' }}>
+                Teacher whiteboard
+              </h2>
+              <p className="text-sm" style={{ color: 'var(--anx-text-muted)' }}>
+                Your teacher is sketching on the board. This view updates automatically.
+              </p>
+            </div>
+            <LiveWhiteboardViewer logicalWidth={wb.width} logicalHeight={wb.height} strokes={wb.strokes} className="min-h-[240px]" />
+          </div>
         </main>
       </AppChrome>
     );
