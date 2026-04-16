@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { redirect } from 'next/navigation';
+import { AppChrome } from '@/components/AppChrome';
 
 interface SkillMeta {
   id: string;
@@ -140,7 +141,15 @@ export default function StudentLivePage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appState.phase]);
 
-  if (status === 'loading') return <div className="p-8" style={{ color: 'var(--anx-text-muted)' }}>Loading…</div>;
+  if (status === 'loading') {
+    return (
+      <AppChrome variant="student">
+        <main className="anx-shell flex flex-1 items-center justify-center">
+          <p style={{ color: 'var(--anx-text-muted)' }}>Loading…</p>
+        </main>
+      </AppChrome>
+    );
+  }
   if (status === 'unauthenticated') {
     redirect('/login');
   }
@@ -242,7 +251,8 @@ export default function StudentLivePage() {
   // ── Join screen ─────────────────────────────────────────────────────────────
   if (appState.phase === 'join') {
     return (
-      <main className="anx-shell flex items-center justify-center">
+      <AppChrome variant="student">
+        <main className="anx-shell flex flex-1 items-center justify-center">
         <div className="anx-panel w-full max-w-sm p-8">
           <h1 className="mb-2 text-center text-2xl font-bold" style={{ color: 'var(--anx-text)' }}>Join Live Session</h1>
           <p className="mb-6 text-center text-sm" style={{ color: 'var(--anx-text-muted)' }}>Enter the code your teacher shows on the board.</p>
@@ -272,14 +282,16 @@ export default function StudentLivePage() {
             </button>
           </form>
         </div>
-      </main>
+        </main>
+      </AppChrome>
     );
   }
 
   // ── Waiting for session to start ────────────────────────────────────────────
   if (appState.phase === 'waiting') {
     return (
-      <main className="anx-shell flex items-center justify-center">
+      <AppChrome variant="student">
+        <main className="anx-shell flex flex-1 items-center justify-center">
         <div className="anx-panel w-full max-w-sm p-8 text-center">
           <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-[var(--anx-surface-container-high)] border-t-[var(--anx-primary)]" />
           <h2 className="mb-2 text-xl font-semibold" style={{ color: 'var(--anx-text)' }}>Waiting for your teacher…</h2>
@@ -288,14 +300,16 @@ export default function StudentLivePage() {
             The lesson will begin shortly.
           </p>
         </div>
-      </main>
+        </main>
+      </AppChrome>
     );
   }
 
   // ── Between phases — teacher message ────────────────────────────────────────
   if (appState.phase === 'between-phases') {
     return (
-      <main className="anx-shell flex items-center justify-center">
+      <AppChrome variant="student">
+        <main className="anx-shell flex flex-1 items-center justify-center">
         <div className="anx-panel w-full max-w-sm p-8 text-center">
           <div className="mb-4 text-4xl">💬</div>
           <h2 className="mb-3 text-xl font-semibold" style={{ color: 'var(--anx-text)' }}>
@@ -311,7 +325,8 @@ export default function StudentLivePage() {
             OK
           </button>
         </div>
-      </main>
+        </main>
+      </AppChrome>
     );
   }
 
@@ -320,7 +335,8 @@ export default function StudentLivePage() {
     const { item } = appState;
     const opts = Array.isArray(item.options) ? (item.options as string[]) : [];
     return (
-      <main className="anx-shell flex items-center justify-center">
+      <AppChrome variant="student">
+        <main className="anx-shell flex flex-1 items-center justify-center">
         <div className="anx-panel w-full max-w-lg p-8">
           {error && <div className="anx-callout-danger mb-4 text-sm">{error}</div>}
           <p className="mb-6 text-base leading-relaxed" style={{ color: 'var(--anx-text)' }}>{item.question}</p>
@@ -363,14 +379,16 @@ export default function StudentLivePage() {
             </button>
           </form>
         </div>
-      </main>
+        </main>
+      </AppChrome>
     );
   }
 
   // ── Feedback screen ─────────────────────────────────────────────────────────
   if (appState.phase === 'feedback') {
     return (
-      <main className="anx-shell flex items-center justify-center">
+      <AppChrome variant="student">
+        <main className="anx-shell flex flex-1 items-center justify-center">
         <div className="anx-panel w-full max-w-sm p-8 text-center">
           <div
             className={`mb-4 text-5xl ${appState.correct ? 'animate-[anxPulseCorrect_220ms_ease-out]' : 'animate-[anxShakeIncorrect_260ms_ease-out]'}`}
@@ -387,13 +405,15 @@ export default function StudentLivePage() {
             {appState.nextItem ? 'Next question →' : 'Keep going'}
           </button>
         </div>
-      </main>
+        </main>
+      </AppChrome>
     );
   }
 
   // ── Done screen ─────────────────────────────────────────────────────────────
   return (
-    <main className="anx-shell flex items-center justify-center">
+    <AppChrome variant="student">
+      <main className="anx-shell flex flex-1 items-center justify-center">
       <div className="anx-panel w-full max-w-sm p-8 text-center">
         <div className="mb-4 text-5xl">🎉</div>
         <h2 className="mb-2 text-xl font-bold" style={{ color: 'var(--anx-text)' }}>All done!</h2>
@@ -401,6 +421,7 @@ export default function StudentLivePage() {
           You&apos;ve completed all questions for this session.
         </p>
       </div>
-    </main>
+      </main>
+    </AppChrome>
   );
 }

@@ -1,4 +1,5 @@
 import { ReactNode } from 'react';
+import { AppChrome, type AppChromeVariant } from '@/components/AppChrome';
 
 interface LearningPageShellProps {
   title: string;
@@ -7,6 +8,10 @@ interface LearningPageShellProps {
   actions?: ReactNode;
   children: ReactNode;
   maxWidthClassName?: string;
+  /** When set, wraps the page in the app layout with left navigation. */
+  appChrome?: AppChromeVariant;
+  /** Adds Leadership to the teacher nav (e.g. leadership role pages). */
+  appChromeShowLeadershipNav?: boolean;
 }
 
 export function LearningPageShell({
@@ -16,9 +21,11 @@ export function LearningPageShell({
   actions,
   children,
   maxWidthClassName = 'max-w-5xl',
+  appChrome,
+  appChromeShowLeadershipNav = false,
 }: LearningPageShellProps) {
-  return (
-    <main className="anx-shell">
+  const main = (
+    <main className="anx-shell flex-1">
       <div className={`mx-auto w-full ${maxWidthClassName} px-4 sm:px-6`}>
         <header className="mb-8 space-y-4">
           <div className="flex flex-wrap items-start justify-between gap-4">
@@ -39,4 +46,14 @@ export function LearningPageShell({
       </div>
     </main>
   );
+
+  if (appChrome) {
+    return (
+      <AppChrome variant={appChrome} showLeadershipNav={appChromeShowLeadershipNav}>
+        {main}
+      </AppChrome>
+    );
+  }
+
+  return main;
 }

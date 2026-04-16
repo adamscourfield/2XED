@@ -113,6 +113,8 @@ export default async function TeacherDashboardPage({ searchParams }: Props) {
       <LearningPageShell
         title="Teacher Dashboard"
         subtitle={`Observe-linked analytics for ${user.name ?? user.email}`}
+        appChrome="teacher"
+        appChromeShowLeadershipNav={user.role === 'ADMIN' || user.role === 'LEADERSHIP'}
       >
         <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
           No teacher profile linked yet. Add a TeacherProfile row mapped to your Observe teacher id.
@@ -187,6 +189,8 @@ export default async function TeacherDashboardPage({ searchParams }: Props) {
       title="Teacher Dashboard"
       subtitle={`Observe-linked analytics for ${user.name ?? user.email}`}
       maxWidthClassName="max-w-6xl"
+      appChrome="teacher"
+      appChromeShowLeadershipNav={user.role === 'ADMIN' || user.role === 'LEADERSHIP'}
       meta={
         <>
           <p><span className="font-semibold">Observe Teacher ID:</span> {teacherProfile.externalTeacherId}</p>

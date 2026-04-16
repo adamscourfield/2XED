@@ -175,6 +175,7 @@ export default async function DashboardPage() {
       title={`Hi, ${session.user.name ?? session.user.email}`}
       subtitle="Ready to learn"
       maxWidthClassName="max-w-5xl"
+      appChrome="student"
       actions={
         <div className="flex items-center gap-3">
           <span className="anx-xp-badge">🏅 {gamification.xp} XP</span>
