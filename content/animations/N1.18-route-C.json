@@ -1,0 +1,77 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N1.18",
+  "skillName": "Write positive integers in the form A × 10ⁿ",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students write A outside the range 1 ≤ A < 10, leaving two or more digits before the decimal point.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Write 360 000 in standard form",             "highlight": null },
+            { "text": "Student: 36 × 10⁴  ✗",                      "highlight": "accent" },
+            { "text": "A = 36 — two digits before decimal point",   "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The student correctly found that the significant digits are three and six, and that the remaining part is ten to the four. But A must be between one and ten — thirty-six breaks that rule.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "fix-a",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "36 × 10⁴ — A too big",                      "highlight": "accent" },
+            { "text": "Divide A by 10: 36 ÷ 10 = 3.6",             "highlight": null },
+            { "text": "Multiply the power by 10 to compensate: 10⁴ × 10 = 10⁵", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Divide A by ten to bring it into range: thirty-six becomes three point six. To keep the overall value the same, multiply the power of ten by ten — increasing the exponent by one.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "correct-answer",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "36 × 10⁴ = 3.6 × 10⁵  ✓",     "highlight": "green" },
+            { "text": "Check: 3.6 × 100 000 = 360 000", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Three point six times ten to the five. Verify by expanding: three point six times one hundred thousand is three hundred and sixty thousand. Correct.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "360 000 = 3.6 × 10⁵",
+          "label": "A too large → divide A by 10, add 1 to exponent"
+        }
+      ],
+      "narration": "Three point six times ten to the five. One digit before the decimal in A — standard form is correct.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: writing 36 × 10⁴ where A has two digits. Fix it: divide A by 10 and add 1 to the exponent → 3.6 × 10⁵. Always check that 1 ≤ A < 10.",
+    "audioNarration": "If A is 10 or more, divide it by 10 and increase the exponent by 1. Keep adjusting until A is between 1 and 10."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}
