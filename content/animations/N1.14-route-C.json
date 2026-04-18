@@ -1,0 +1,80 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N1.14",
+  "skillName": "Compare negatives using =, ≠, <, >, ≤, ≥",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students write the correct symbol for the positive versions then forget to flip it when both numbers are negative.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Compare −4 and −9",                          "highlight": null },
+            { "text": "Student: 9 > 4, so −9 > −4  ✗",             "highlight": "accent" },
+            { "text": "Copied the positive comparison without flipping", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The student correctly saw that nine is greater than four, then wrote the same symbol for the negatives. But the negative sign reverses the ordering — the comparison must flip.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "use-number-line",
+      "visuals": [
+        {
+          "type": "number_line",
+          "min": -10,
+          "max": 0,
+          "markers": [-10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0],
+          "points": [
+            { "value": -9, "label": "−9", "highlight": "accent" },
+            { "value": -4, "label": "−4", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Place both on the number line. Negative nine is nine steps left; negative four is four steps left. Negative nine sits to the left of negative four — so it is smaller.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "correct-symbol",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "−9 is left of −4 on the number line",   "highlight": null },
+            { "text": "Left = smaller → −9 < −4  ✓",           "highlight": "green" },
+            { "text": "Compare: 9 > 4 but −9 < −4",            "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Negative nine is less than negative four — the opposite of how the positive digits compare. The number line reveals the truth without any risk of confusing the sign.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "−9 < −4",
+          "label": "Number line: −9 is left of −4 → −9 is smaller"
+        }
+      ],
+      "narration": "Negative nine is less than negative four. When both numbers are negative, use the number line — left is always smaller, no matter what the digits say.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: comparing −9 and −4 by their digits alone and writing −9 > −4. Place both on a number line — −9 is further left, so it is the smaller value.",
+    "audioNarration": "Don't trust your instinct with negatives — place them on a number line. The one further left is always smaller, even if its digit is larger."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

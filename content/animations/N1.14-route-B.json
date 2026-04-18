@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N1.14",
+  "skillName": "Compare negatives using =, ≠, <, >, ≤, ≥",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students think owing more money (a bigger debt) means having more — they confuse magnitude with value.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "debt-model",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "A bigger debt means less money — a larger negative digit means a smaller value",
+          "subText": "−£7 in your account is worse than −£3"
+        }
+      ],
+      "narration": "Imagine a bank balance. Negative seven pounds means you owe seven pounds. Negative three pounds means you owe only three. Owing more is worse — so negative seven is the smaller balance.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "distance-from-zero",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Distance of −7 from zero: 7 units",   "highlight": null },
+            { "text": "Distance of −3 from zero: 3 units",   "highlight": null },
+            { "text": "Greater distance left → smaller value", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The distance from zero is called the absolute value. A larger absolute value on the negative side puts the number further left — and further left always means smaller.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "inequality-flips",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "For positives: 7 > 3",                        "highlight": null },
+            { "text": "For negatives: −7 < −3",                      "highlight": "accent" },
+            { "text": "The inequality sign flips when both sides are negative", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "The comparison reverses for negatives. Seven is greater than three, but negative seven is less than negative three. The negative sign flips the ordering.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "−7 < −3",
+          "label": "Larger digit after − → further left → smaller value"
+        }
+      ],
+      "narration": "Negative seven is less than negative three. More debt, further left, smaller value — all three descriptions say the same thing.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: thinking −7 > −3 because 7 > 3. Negatives reverse the order — a larger digit means a smaller, more negative value.",
+    "audioNarration": "For negatives, size works in reverse. Think of debt: owing £7 is worse than owing £3. Negative seven is the smaller number."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}
