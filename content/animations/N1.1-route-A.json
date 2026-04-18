@@ -1,0 +1,108 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N1.1",
+  "skillName": "Recognise the place value of each digit in whole numbers up to millions",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students confuse the value a digit represents with the digit itself (e.g. the 4 in 4,200 is '4', not '4,000').",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "introduce",
+      "visuals": [
+        {
+          "type": "show_expression",
+          "expression": "4,372",
+          "parts": [
+            { "text": "4", "id": "d-thou", "highlight": null },
+            { "text": ",", "id": "sep1",   "highlight": "dim" },
+            { "text": "3", "id": "d-hund", "highlight": null },
+            { "text": "7", "id": "d-tens", "highlight": null },
+            { "text": "2", "id": "d-ones", "highlight": null }
+          ]
+        }
+      ],
+      "narration": "Look at this number. Each digit is sitting in a different position — and that position completely changes what it is worth.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "name-columns",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Ones       → rightmost digit",   "highlight": null },
+            { "text": "Tens       → second from right",  "highlight": null },
+            { "text": "Hundreds   → third from right",   "highlight": null },
+            { "text": "Thousands  → fourth from right",  "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Count from the right. That's always where you start — the columns build up from the ones end. Notice how each column is ten times bigger than the one before it.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "digit-times-column",
+      "visuals": [
+        {
+          "type": "show_expression",
+          "expression": "4,372",
+          "parts": [
+            { "text": "4", "id": "d-thou", "highlight": "accent" },
+            { "text": ",", "id": "sep1",   "highlight": "dim" },
+            { "text": "3", "id": "d-hund", "highlight": "dim" },
+            { "text": "7", "id": "d-tens", "highlight": "dim" },
+            { "text": "2", "id": "d-ones", "highlight": "dim" }
+          ]
+        },
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "4 is in the thousands column", "highlight": null },
+            { "text": "4 × 1,000 = 4,000",            "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Watch the highlighted digit. Its value isn't four — it's four thousands. The column does the multiplying for you.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "expand",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "4,372",                        "highlight": null },
+            { "text": "= 4,000 + 300 + 70 + 2",       "highlight": "accent" },
+            { "text": "Each digit contributes its column value", "highlight": "dim" }
+          ]
+        }
+      ],
+      "narration": "Expanding the number like this shows exactly what each digit contributes. Every digit has a job — and its job is determined entirely by which column it sits in.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 4,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Value of 4 in 4,372 = 4,000",
+          "label": "Place value = digit × column value"
+        }
+      ],
+      "narration": "The digit is four. But its value is four thousand. Always multiply the digit by its column value to find the place value.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: saying the digit 4 in 4,372 is worth '4'. It's worth 4,000 — the column value does the multiplying.",
+    "audioNarration": "The most common error here is stopping at the digit itself. Four in the thousands column isn't four — it's four thousand."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}
