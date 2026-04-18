@@ -1,0 +1,78 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N1.2",
+  "skillName": "Write integers in words and figures",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students write 'and' between every group or use it incorrectly (e.g. 'four thousand and two hundred and six').",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "introduce",
+      "visuals": [
+        {
+          "type": "show_expression",
+          "expression": "4,206",
+          "parts": [
+            { "text": "4",   "id": "d-thou", "highlight": null },
+            { "text": ",",   "id": "sep1",   "highlight": "dim" },
+            { "text": "2",   "id": "d-hund", "highlight": null },
+            { "text": "0",   "id": "d-tens", "highlight": "blue" },
+            { "text": "6",   "id": "d-ones", "highlight": null }
+          ]
+        }
+      ],
+      "narration": "We need to write this number in words. The zero is the tricky part — it holds a position but we don't say it.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "split-groups",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Split at the comma:",              "highlight": null },
+            { "text": "Left of comma:  4  → 'four thousand'", "highlight": "accent" },
+            { "text": "Right of comma: 206 → 'two hundred and six'", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The comma is your dividing line. Everything to the left gets 'thousand' attached. Everything to the right is written as a number under a thousand.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "and-rule",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "'And' goes before the final part — only if that part is less than 100",
+          "subText": "four thousand two hundred AND six ✓   (not: four thousand AND two hundred AND six)"
+        }
+      ],
+      "narration": "There's only one 'and' in the whole number. It sits right before the last section — but only when that section is less than a hundred. Put it anywhere else and it's wrong.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "four thousand two hundred and six",
+          "label": "4,206 written in words"
+        }
+      ],
+      "narration": "One 'and', right before the six. The zero tens are simply silent.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: 'four thousand AND two hundred AND six'. Only one 'and' — before the final part when it is under 100.",
+    "audioNarration": "If you hear yourself saying 'and' more than once, stop. There should only ever be one 'and' in the whole number."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}
