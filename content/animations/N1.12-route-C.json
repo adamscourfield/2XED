@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N1.12",
+  "skillName": "Rounding to decimal places",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students cascade-round: rounding to 2 d.p. first, then using that result to round to 1 d.p., giving a wrong answer.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Round 3.449 to 1 decimal place",                        "highlight": null },
+            { "text": "Student: 3.449 → 3.45 (to 2 d.p.) → 3.5 (to 1 d.p.)  ✗", "highlight": "accent" },
+            { "text": "Two rounds instead of one",                              "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The student rounded twice — first to two decimal places, then used that result to round to one. That extra step changes the answer. Rounding must be done in one step, looking only at the original number.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "one-step-rule",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Always round from the original number — never round a rounded result",
+          "subText": "Look only at the digit immediately to the right of your target place"
+        }
+      ],
+      "narration": "Round in one single step. Look at the digit directly to the right of the target place in the original number — ignore every digit beyond that one.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "correct-method",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "3.449 to 1 d.p.: target is tenths digit → 4",     "highlight": null },
+            { "text": "Decision digit: hundredths → 4",                    "highlight": "accent" },
+            { "text": "4 < 5 → round down: keep tenths as 4 → 3.4  ✓",   "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Target is the tenths digit. Decision digit is the hundredths — four, in the original number. Four is less than five, so round down. The answer is three point four, not three point five.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "3.449 ≈ 3.4  (to 1 d.p.)",
+          "label": "Decision digit 4 < 5 → round down → 3.4"
+        }
+      ],
+      "narration": "Three point four. One step, one look at the digit to the right of the target — that is all that is needed.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: rounding 3.449 to 1 d.p. via 3.45, then to 3.5. Always go back to the original number and look at just the one digit to the right of your target.",
+    "audioNarration": "Never round a rounded result. Go back to the original, find the decision digit immediately right of the target place, and round in one single step."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

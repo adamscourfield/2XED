@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N1.12",
+  "skillName": "Rounding to decimal places",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students look at the digit being rounded rather than the digit one place to its right.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "locate-target",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Round 6.847 to 2 decimal places",         "highlight": null },
+            { "text": "2nd decimal place: the digit 4",          "highlight": "accent" },
+            { "text": "Decision digit: one place further right → 7", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Count from the decimal point to find the target place. For two decimal places that is the hundredths digit — four. The decision digit is immediately to its right: seven.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "apply-rule",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Decision digit 0–4 → round down (leave target digit unchanged). Decision digit 5–9 → round up (add 1 to target digit).",
+          "subText": "Then drop all digits to the right of the target place"
+        }
+      ],
+      "narration": "Seven is five or more, so round up. Add one to the hundredths digit: four becomes five. Drop everything to the right.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "write-answer",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "6.847 → target digit 4, decision digit 7",  "highlight": null },
+            { "text": "7 ≥ 5 → round up: 4 → 5",                   "highlight": "accent" },
+            { "text": "Drop the 7 → 6.85",                          "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Six point eight four seven rounded to two decimal places is six point eight five. The seven triggers the round-up and is then dropped.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "6.847 ≈ 6.85",
+          "label": "Decision digit 7 ≥ 5 → hundredths 4 rounds up to 5"
+        }
+      ],
+      "narration": "Six point eight five. Two decimal places — the answer stops at the hundredths column.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: looking at the target digit (4) to decide rounding. The decision always comes from the digit one place to the RIGHT of where you are rounding to.",
+    "audioNarration": "Never look at the target digit itself. Look one column further right — that digit alone decides whether you round up or keep it the same."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}
