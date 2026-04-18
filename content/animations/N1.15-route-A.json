@@ -1,0 +1,82 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N1.15",
+  "skillName": "Order any integers, negatives and decimals",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students order the absolute values and then attach signs, getting the negative ordering back to front.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "write-as-decimals",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Order: −2,  0.5,  −0.3,  1,  −1.7",          "highlight": null },
+            { "text": "All already in decimal form — no conversion needed", "highlight": "accent" },
+            { "text": "Pad if needed: −2.0,  0.5,  −0.3,  1.0,  −1.7", "highlight": null }
+          ]
+        }
+      ],
+      "narration": "Write every number in decimal form and pad to equal decimal places. This puts them all in the same format so comparisons are straightforward.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "place-on-line",
+      "visuals": [
+        {
+          "type": "number_line",
+          "min": -3,
+          "max": 2,
+          "markers": [-3, -2, -1, 0, 1, 2],
+          "points": [
+            { "value": -2,   "label": "−2",   "highlight": null },
+            { "value": -1.7, "label": "−1.7", "highlight": null },
+            { "value": -0.3, "label": "−0.3", "highlight": null },
+            { "value": 0.5,  "label": "0.5",  "highlight": null },
+            { "value": 1,    "label": "1",    "highlight": null }
+          ]
+        }
+      ],
+      "narration": "Place all five values on one number line. Negatives fall to the left of zero; positives to the right. Decimals sit between the integer marks.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "read-off-order",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Read left to right for ascending order:",          "highlight": null },
+            { "text": "−2 < −1.7 < −0.3 < 0.5 < 1",                    "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Read the number line from left to right. That gives the ascending order directly — no further calculation needed.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "−2 < −1.7 < −0.3 < 0.5 < 1",
+          "label": "Convert to decimals → place on one line → read left to right"
+        }
+      ],
+      "narration": "Negative two is the smallest; one is the largest. One number line, left to right, handles any mix of integers, negatives, and decimals.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: ordering absolute values (0.3, 1.7, 2) then reattaching signs — this reverses the negative ordering. Use one number line for the full set.",
+    "audioNarration": "Don't split into positives and negatives and order separately. Place everything on one number line and read left to right — that handles any mixture correctly."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

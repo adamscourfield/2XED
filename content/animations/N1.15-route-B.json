@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N1.15",
+  "skillName": "Order any integers, negatives and decimals",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students think zero is either the smallest number or not part of the ordering at all.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "one-line-all-numbers",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Every number — negative, zero, decimal, integer — has one fixed position on the same number line",
+          "subText": "Zero is the dividing point: negatives left, positives right"
+        }
+      ],
+      "narration": "There is only one number line and every number lives on it. Zero sits at the centre. All negatives are to its left; all positives, including decimals, are to its right.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "zero-in-context",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "−0.5 < 0 < 0.5",                             "highlight": "accent" },
+            { "text": "Zero is greater than every negative number",   "highlight": "green" },
+            { "text": "Zero is less than every positive number",      "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Zero is not the smallest number — every negative is smaller. And zero is not the largest — every positive is larger. Zero is exactly between the two worlds.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "mixed-set-strategy",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "All negatives come before zero",            "highlight": "accent" },
+            { "text": "Zero sits in the middle if present",       "highlight": null },
+            { "text": "All positives come after zero",            "highlight": "green" },
+            { "text": "Within each group: further from zero = more extreme", "highlight": null }
+          ]
+        }
+      ],
+      "narration": "Split any mixed set into three groups: negatives, zero, positives. Negatives go first in ascending order — most negative first. Then zero. Then positives in ascending order.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "−3 < −1.2 < 0 < 0.7 < 2",
+          "label": "Negatives (most extreme first) → zero → positives"
+        }
+      ],
+      "narration": "Negative three, negative one point two, zero, zero point seven, two. The structure of the number line makes the order clear.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: treating zero as the smallest or ignoring it in the ordering. Zero is greater than all negatives and less than all positives — it belongs between them.",
+    "audioNarration": "Zero is not the smallest number — every negative is smaller than zero. Place zero between the negatives and the positives where it belongs."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}
