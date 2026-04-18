@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N1.10",
+  "skillName": "Round integers to the nearest 10, 100 or 1000",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students round the wrong digit — they look at the digit being rounded rather than the digit immediately to its right.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "identify-column",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Round 4 763 to the nearest 100",            "highlight": null },
+            { "text": "Target column: hundreds → digit is 7",      "highlight": "accent" },
+            { "text": "Decision digit: one column right → tens → 6", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Find the column you are rounding to — here it is hundreds. Then look one column to its right. That neighbour digit makes the decision — not the hundreds digit itself.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "apply-rule",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Decision digit 0–4 → round down (keep target digit). Decision digit 5–9 → round up (add 1 to target digit).",
+          "subText": "Then replace all digits to the right of the target column with zeros"
+        }
+      ],
+      "narration": "The decision digit is six. Six is five or more, so round up. Add one to the hundreds digit: seven becomes eight. Replace everything to the right with zeros.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "write-result",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "4 763 → hundreds digit 7, decision digit 6", "highlight": null },
+            { "text": "6 ≥ 5 → round up: 7 → 8",                   "highlight": "accent" },
+            { "text": "Replace tens and ones with 0 → 4 800",       "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Four thousand seven hundred and sixty-three rounds up to four thousand eight hundred. The tens and ones become zeros because they have been swallowed by the rounding.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "4 763 ≈ 4 800",
+          "label": "Decision digit 6 ≥ 5 → round up hundreds → zero the rest"
+        }
+      ],
+      "narration": "Four thousand seven hundred and sixty-three rounded to the nearest hundred is four thousand eight hundred.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: looking at the target column digit to decide rounding. Always look one column to the RIGHT of the target — that is the decision digit.",
+    "audioNarration": "The target column digit does not decide rounding. Look one place to its right — if that digit is five or more, round up; otherwise round down."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

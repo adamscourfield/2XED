@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N1.7",
+  "skillName": "Compare decimals using =, ≠, <, >, ≤, ≥",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students think more decimal digits means a larger number.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "length-not-size",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Decimal length and decimal size are different things",
+          "subText": "0.9 > 0.85  — shorter but bigger"
+        }
+      ],
+      "narration": "A longer decimal is not a larger decimal. The value depends entirely on which digits sit in which columns — not on how many digits there are.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "tenths-dominate",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "0.9  → 9 tenths",           "highlight": "accent" },
+            { "text": "0.85 → 8 tenths + 5 hundredths", "highlight": null },
+            { "text": "9 tenths > 8 tenths → 0.9 wins", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Nine tenths is a larger column than eight tenths. The extra five hundredths in 0.85 can never make up the gap — a whole tenth separates them.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "pad-to-confirm",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "0.9 → 0.90",              "highlight": null },
+            { "text": "90 hundredths vs 85 hundredths", "highlight": "accent" },
+            { "text": "0.90 > 0.85  ✓",          "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Padding with a trailing zero makes the comparison obvious. Ninety hundredths is more than eighty-five hundredths.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "0.9 > 0.85",
+          "label": "The tenths column decides — length is irrelevant"
+        }
+      ],
+      "narration": "Zero point nine is greater. One digit after the decimal, but it is in the most important position.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: assuming 0.85 > 0.9 because 85 > 9. Compare by column, not by digit count.",
+    "audioNarration": "More digits does not mean more value. Check the tenths column first — it carries the most weight."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

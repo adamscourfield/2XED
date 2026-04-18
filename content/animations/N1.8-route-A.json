@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N1.8",
+  "skillName": "Order decimals",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students order decimals by digit count rather than by column value.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "pad-same-length",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Order: 0.6,  0.38,  0.405",         "highlight": null },
+            { "text": "Pad:   0.600, 0.380, 0.405",        "highlight": "accent" },
+            { "text": "All now have three decimal places",  "highlight": null }
+          ]
+        }
+      ],
+      "narration": "Before ordering, pad every decimal with trailing zeros until they all share the same number of decimal places. The values are unchanged — you are just making the columns line up.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "compare-columns",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Tenths: 6, 3, 4 → 3 smallest, then 4, then 6", "highlight": "accent" },
+            { "text": "0.380 < 0.405 < 0.600",                        "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Compare the tenths column first. Three tenths is least, then four tenths, then six tenths. The tenths column settles the order without needing to look any further right.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "write-order",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Ascending:  0.38 < 0.405 < 0.6",   "highlight": "green" },
+            { "text": "Descending: 0.6  > 0.405 > 0.38",  "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Strip the padding zeros and write the original forms in order. Ascending goes smallest to largest; descending goes largest to smallest.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "0.38 < 0.405 < 0.6",
+          "label": "Pad → compare tenths → order smallest to largest"
+        }
+      ],
+      "narration": "Pad, compare column by column, then write in order. Three steps every time you need to sort a list of decimals.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: ordering by digit count and placing 0.6 first because it is 'short'. Pad to the same length first — 0.600 is the largest here.",
+    "audioNarration": "Digit count tells you nothing about size. Pad everything to equal length, then compare the tenths column first."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N1.7",
+  "skillName": "Compare decimals using =, ≠, <, >, ≤, ≥",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students compare decimal digits without aligning decimal points first.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "align-points",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Compare 3.09 and 3.9",  "highlight": null },
+            { "text": "Pad: 3.09 and 3.90",    "highlight": "accent" },
+            { "text": "Tenths: 0 vs 9 → 3.09 < 3.9", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Pad both decimals to the same number of decimal places. Now every digit lines up with its matching column — and comparison becomes straightforward.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "compare-left-right",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Ones: 3 = 3 → move right",         "highlight": "dim" },
+            { "text": "Tenths: 0 < 9 → 3.09 is smaller", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Compare column by column from the left. The first column that differs settles it. You never need to look any further right.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "write-symbol",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "3.09  <  3.9",  "highlight": "green" },
+            { "text": "3.9   >  3.09", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "The open end faces the bigger number — three point nine. Both statements say the same thing, just written in opposite directions.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "3.09 < 3.9",
+          "label": "Align → compare tenths → 0 < 9"
+        }
+      ],
+      "narration": "Align, compare column by column, write the symbol. Three steps, every time.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: comparing 3.09 and 3.9 as if 09 > 9 (as integers). Always align decimal points and compare column by column.",
+    "audioNarration": "Pad decimals to the same length before comparing. Without alignment, digit positions mean nothing."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

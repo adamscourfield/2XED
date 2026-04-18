@@ -1,0 +1,81 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N1.6",
+  "skillName": "Decimal place value",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students confuse tenths with tens, or hundredths with hundreds.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "introduce",
+      "visuals": [
+        {
+          "type": "show_expression",
+          "expression": "3.47",
+          "parts": [
+            { "text": "3",  "id": "ones",  "highlight": null },
+            { "text": ".",  "id": "point", "highlight": "dim" },
+            { "text": "4",  "id": "tenth", "highlight": "accent" },
+            { "text": "7",  "id": "hundr", "highlight": null }
+          ]
+        }
+      ],
+      "narration": "The decimal point is the dividing line. Everything left is whole numbers. Everything right is fractions of one.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "column-names",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "1st right of point → tenths   (÷10)",    "highlight": null },
+            { "text": "2nd right of point → hundredths (÷100)", "highlight": "accent" },
+            { "text": "3rd right of point → thousandths (÷1000)", "highlight": null }
+          ]
+        }
+      ],
+      "narration": "Each step to the right divides by ten again. Tenths, hundredths, thousandths — notice these names mirror tens, hundreds, thousands on the left, but they are fractions, not whole-number multiples.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "digit-value",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "In 3.47:",                        "highlight": null },
+            { "text": "4 in tenths column → 4 × 0.1 = 0.4", "highlight": "green" },
+            { "text": "7 in hundredths column → 7 × 0.01 = 0.07", "highlight": "green" },
+            { "text": "3.47 = 3 + 0.4 + 0.07",          "highlight": "dim" }
+          ]
+        }
+      ],
+      "narration": "Same rule as whole-number place value: digit times column value gives the contribution. Expanding shows exactly what each digit adds to the total.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Value of 6 in 2.364 = 0.06",
+          "label": "6 is in the hundredths column: 6 × 0.01"
+        }
+      ],
+      "narration": "Six hundredths. The column it sits in — second right of the decimal point — determines the value completely.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: calling the first right column 'tens' instead of 'tenths'. The decimal point separates whole columns from fraction columns.",
+    "audioNarration": "Tenths and tens sound similar but are completely different. One is to the right of the decimal point, one is to the left."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}
