@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N1.19",
+  "skillName": "Understand negative powers of 10",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students think a negative exponent makes the result negative.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "negative-means-reciprocal",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "A negative exponent means take the reciprocal — flip the power to the denominator",
+          "subText": "10⁻ⁿ = 1 ÷ 10ⁿ"
+        }
+      ],
+      "narration": "A negative exponent does not make the result negative. It means divide one by the positive version. Ten to the minus three is one divided by ten to the three — one divided by one thousand.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "fraction-form",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "10⁻¹ = 1/10   = 0.1",    "highlight": null },
+            { "text": "10⁻² = 1/100  = 0.01",   "highlight": "accent" },
+            { "text": "10⁻³ = 1/1000 = 0.001",  "highlight": null }
+          ]
+        }
+      ],
+      "narration": "Each negative power of ten is a unit fraction — one over a power of ten. Ten to the minus two is one hundredth; ten to the minus three is one thousandth.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "place-value-link",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Tenths column     = 10⁻¹",  "highlight": null },
+            { "text": "Hundredths column = 10⁻²",  "highlight": "accent" },
+            { "text": "Thousandths column = 10⁻³", "highlight": null },
+            { "text": "Negative powers name the decimal columns", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Every decimal column in the place value system is a negative power of ten. Tenths is ten to the minus one, hundredths is ten to the minus two. Negative powers and decimal place value are the same idea.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "10⁻² = 1/100 = 0.01",
+          "label": "Negative exponent = reciprocal = decimal fraction"
+        }
+      ],
+      "narration": "Ten to the minus two equals one hundredth equals zero point zero one. Three ways to say the same thing — a small positive fraction, never a negative number.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: thinking 10⁻² = −100. The negative exponent means reciprocal, not negative value. 10⁻² = 1/100 = 0.01 — a small positive number.",
+    "audioNarration": "Negative exponent does not mean negative result. It means 1 divided by the positive power. 10⁻² is one hundredth, which is positive and very small."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}
