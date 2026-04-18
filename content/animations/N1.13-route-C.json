@@ -1,0 +1,79 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N1.13",
+  "skillName": "Position negatives on a number line",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students place negative numbers in ascending digit order to the left of zero, so −1 ends up furthest left instead of −5.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "number_line",
+          "min": -5,
+          "max": 0,
+          "markers": [-5, -4, -3, -2, -1, 0],
+          "points": [
+            { "value": -5, "label": "−1 ✗", "highlight": "accent" },
+            { "value": -1, "label": "−5 ✗", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The student placed negative one at the far left and negative five near zero — treating the digits as if negative numbers increase toward the left in the same order as positives. That is back to front.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "anchor-at-zero",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Count outward from zero — negative numbers grow away from zero to the left",
+          "subText": "−1 is the first step left; −5 is five steps left"
+        }
+      ],
+      "narration": "Always start placing from zero. Negative one is the first step left — it is the closest negative to zero. Negative five is five steps left — it is the furthest from zero of the two.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "correct-placement",
+      "visuals": [
+        {
+          "type": "number_line",
+          "min": -5,
+          "max": 0,
+          "markers": [-5, -4, -3, -2, -1, 0],
+          "points": [
+            { "value": -1, "label": "−1 ✓", "highlight": "green" },
+            { "value": -5, "label": "−5 ✓", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Negative one sits at the first tick left of zero. Negative five sits at the fifth tick — the far left end. The digit tells you how many steps from zero, always counting left.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "−1 is closer to 0 than −5",
+          "label": "Count steps left from zero — bigger digit = further left"
+        }
+      ],
+      "narration": "Negative one is close to zero; negative five is far from it. The digit is a distance from zero — count that many steps to the left.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: placing −1 furthest left because 1 comes before 5. Start at zero and count LEFT — −1 is just one step away; −5 is five steps away.",
+    "audioNarration": "Negative numbers grow away from zero to the left. Count from zero — the digit tells you the distance, the minus sign tells you to go left."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}
