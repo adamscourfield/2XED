@@ -1,0 +1,74 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N1.4",
+  "skillName": "Use and interpret inequalities in context (incl number lines and statements)",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students compare negatives by face value, not position — thinking -8 > -3 because 8 > 3.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "number-line",
+      "visuals": [
+        {
+          "type": "number_line",
+          "range": [-10, 5],
+          "highlightStart": -8,
+          "arrowFrom": -8,
+          "arrowTo": -3
+        }
+      ],
+      "narration": "Look at where the two numbers sit on the line. The arrow points right — from the smaller number towards the larger one. On a number line, right always means bigger.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "direction-rule",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Further left = smaller. Further right = larger.",
+          "subText": "-8 is further left than -3, so -8 < -3"
+        }
+      ],
+      "narration": "This rule holds for every number — positive, negative, zero, decimal. The number line never lies. Position on the line is the only thing that matters.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "write-inequality",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "-8  is left of  -3",  "highlight": null },
+            { "text": "-8  <  -3",            "highlight": "green" },
+            { "text": "-4  __ -9  →  -4 > -9 (further right)", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Use the line position to write the symbol. If you can picture where both numbers sit, the symbol almost writes itself.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "-4 > -9",
+          "label": "Closer to zero = greater, for negative numbers"
+        }
+      ],
+      "narration": "Negative four is closer to zero than negative nine, so it sits further right — and further right always means greater.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: thinking -8 > -3 because 8 > 3. For negatives, the larger the absolute value, the smaller the number.",
+    "audioNarration": "With negatives, bigger digits mean further from zero — which means further left — which means smaller. Flip your instinct."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

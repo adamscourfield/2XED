@@ -1,0 +1,74 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N1.4",
+  "skillName": "Use and interpret inequalities in context (incl number lines and statements)",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students misapply inequality symbols when negative values are involved.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "closer-to-zero",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "For negatives: closer to zero = greater value",
+          "subText": "-2 > -6  because -2 is only 2 steps from 0, while -6 is 6 steps away"
+        }
+      ],
+      "narration": "Think of negative numbers as debts. Owing two pounds is better than owing six. Less debt — closer to zero — means a greater value.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "number-line-check",
+      "visuals": [
+        {
+          "type": "number_line",
+          "range": [-7, 1],
+          "highlightStart": -6,
+          "arrowFrom": -6,
+          "arrowTo": -2
+        }
+      ],
+      "narration": "The arrow points right — towards the greater value. Negative two is to the right of negative six, so negative two is greater. The line makes this visual and unambiguous.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "fill-the-sign",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "-4  __  -9", "highlight": null },
+            { "text": "-4 is closer to 0 than -9", "highlight": "accent" },
+            { "text": "-4  >  -9", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Negative four is closer to zero, so it is greater. The open end of the symbol faces it. Greater than.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "-4 > -9",
+          "label": "Closer to zero wins for negative numbers"
+        }
+      ],
+      "narration": "Closer to zero, further right on the line, greater value. Those three ideas all say the same thing.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: using the symbol based on digit size alone. For negatives, a larger digit means further from zero — which means smaller.",
+    "audioNarration": "Negative numbers work the opposite way to what you might expect. More negative means smaller, not larger."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

@@ -1,0 +1,79 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N1.5",
+  "skillName": "Find the median from a set of numbers (incl midpoint using a calculator)",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students do not know what to do when there is an even number of values.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "why-average-two",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "4 values: 2, 4, 8, 10",           "highlight": null },
+            { "text": "No single middle value exists",    "highlight": "accent" },
+            { "text": "Middle lies between 4 and 8",     "highlight": "dim" }
+          ]
+        }
+      ],
+      "narration": "With four values, the true middle falls in the gap between the second and third values. We use the average of those two to pin down that exact midpoint.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "calculate-midpoint",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "(4 + 8) ÷ 2", "highlight": null },
+            { "text": "= 12 ÷ 2",    "highlight": "accent" },
+            { "text": "= 6",          "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Add the two middle values and divide by two. This gives the point exactly halfway between them — which is where the median sits.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "robust-to-outliers",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Median of 1, 3, 100, 5, 7?",  "highlight": null },
+            { "text": "Sorted: 1, 3, 5, 7, 100",      "highlight": "accent" },
+            { "text": "Median = 5 (middle value)",     "highlight": "green" },
+            { "text": "Outlier 100 doesn't shift it",  "highlight": "dim" }
+          ]
+        }
+      ],
+      "narration": "Notice that the extreme value — a hundred — has no effect on the median. It lands at the end of the sorted list and the middle value stays unchanged. That robustness is why the median is so useful.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Median of 2, 8, 4, 10  =  6",
+          "label": "Even count: average the two middle values"
+        }
+      ],
+      "narration": "Four is the second value, eight is the third. Their midpoint is six — which is the median.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: stopping at two middle values without averaging them. Always add and halve to find the true midpoint.",
+    "audioNarration": "Two middle values means you're not done yet. Add them and divide by two to find where the middle actually is."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}
