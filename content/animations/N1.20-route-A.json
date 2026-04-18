@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N1.20",
+  "skillName": "Place value systems beyond base 10",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students read base-2 digits as if they were base-10, treating 1010₂ as one thousand and ten.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "column-values-base2",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Base 2 column values (right to left):",    "highlight": null },
+            { "text": "2⁰=1,  2¹=2,  2²=4,  2³=8,  2⁴=16",     "highlight": "accent" },
+            { "text": "Each column is double the one to its right", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "In base two, each column is worth twice the column to its right — instead of ten times as in base ten. The columns from right to left are one, two, four, eight, sixteen, and so on.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "convert-binary",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Convert 1011₂ to base 10",                      "highlight": null },
+            { "text": "1×8 + 0×4 + 1×2 + 1×1",                       "highlight": "accent" },
+            { "text": "= 8 + 0 + 2 + 1 = 11",                        "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Multiply each binary digit by its column value and add the results. One times eight, zero times four, one times two, one times one — that gives eleven.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "only-digits-0-and-1",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Base 2 uses only the digits 0 and 1 — no digit can equal or exceed the base",
+          "subText": "Base 10 uses 0–9; base 2 uses 0–1; base 16 uses 0–9 and A–F"
+        }
+      ],
+      "narration": "Each base only uses digits from zero up to one less than the base. Base two allows only zero and one. Base sixteen needs sixteen symbols, so it borrows letters A through F for ten through fifteen.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "1011₂ = 11₁₀",
+          "label": "Multiply each digit by its column power of 2 → add"
+        }
+      ],
+      "narration": "One zero one one in base two equals eleven in base ten. The column values — powers of two — do the conversion.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: reading 1011₂ as 'one thousand and eleven'. The subscript 2 means every column is a power of 2, not 10. Multiply each digit by its power of 2 and add.",
+    "audioNarration": "The base changes the column values. In base 2, columns are 1, 2, 4, 8 — not 1, 10, 100, 1000. Always multiply by the correct power of the base."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}
