@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "G1.1b",
+  "skillName": "Understand angle notation and label angles correctly",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students struggle to identify which angle is meant when several angles share a vertex.",
+  "generatedAt": "2026-04-19T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "why-three-letters",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Three letters are needed because multiple angles can share the same vertex",
+          "subText": "The outer letters specify which two arms — removing ambiguity"
+        }
+      ],
+      "narration": "When three or more lines meet at a point, there are multiple angles at that vertex. Simply saying 'the angle at B' is ambiguous. The three-letter notation removes that ambiguity by naming the specific two arms that form the angle.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "multiple-angles-at-one-vertex",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "At vertex O, rays go to A, B, and C",              "highlight": null },
+            { "text": "∠AOB = angle between arms OA and OB",             "highlight": "accent" },
+            { "text": "∠BOC = different angle, between arms OB and OC",  "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "At vertex O, rays go out to A, B, and C. Angle AOB is the opening between arm OA and arm OB. Angle BOC is a different opening — between OB and OC. The outer letters tell you which pair of arms to look at.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "notation-as-address",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "∠AOC spans from arm OA all the way to arm OC",   "highlight": "accent" },
+            { "text": "∠AOB + ∠BOC = ∠AOC (if B is between A and C)",  "highlight": "accent" },
+            { "text": "Three-letter notation makes these distinctions clear  ✓", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Angle AOC spans from OA to OC — a larger angle that includes angle AOB and angle BOC combined. The three-letter notation acts as a precise address, specifying exactly which angle out of several at the same vertex.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "∠AOB ≠ ∠AOC ≠ ∠BOC — same vertex, different angles",
+          "label": "Outer letters name the arms — they specify which of several angles at a vertex"
+        }
+      ],
+      "narration": "Three angles at the same vertex O — but three different values. The outer letters select which pair of arms to measure between. That is why three letters are always used.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: assuming 'the angle at O' is unambiguous when multiple rays meet there. Three letters are needed — the outer letters specify which two arms. ∠AOB and ∠AOC are different angles at the same vertex O.",
+    "audioNarration": "When several rays meet at a vertex, there are multiple angles there. The three-letter notation removes ambiguity — the outer letters name the two arms, pinpointing exactly which angle is meant."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

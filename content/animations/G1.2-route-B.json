@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "G1.2",
+  "skillName": "Measure angles with a protractor",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students do not align the baseline properly, leading to systematic errors in all their readings.",
+  "generatedAt": "2026-04-19T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "why-baseline-matters",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "The baseline must sit exactly on one arm because the scale starts counting from 0° there",
+          "subText": "Any offset in the baseline adds a systematic error to every reading"
+        }
+      ],
+      "narration": "The protractor scale starts measuring from zero at the baseline. If the baseline is tilted away from the arm, you are not starting your count from zero — you are starting from some other value. Every reading will then be wrong by the same amount.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "misalignment-effect",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Baseline 10° off from the arm",                    "highlight": "accent" },
+            { "text": "Scale now starts at 10° instead of 0°",           "highlight": "accent" },
+            { "text": "Every measurement will be 10° too large or small  ✗", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "If the baseline is placed ten degrees off from the arm, the scale starts at ten rather than zero. An angle that is really sixty degrees will read seventy. The error is systematic — it affects every angle measured without re-aligning.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "correct-alignment-check",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Check: the 0° mark sits exactly on the arm  ✓",    "highlight": "green" },
+            { "text": "Check: the centre hole sits on the vertex  ✓",     "highlight": "green" },
+            { "text": "Both checks needed for an accurate reading",       "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Before reading the scale, make two checks: the zero mark must lie exactly along one arm, and the centre hole must sit exactly on the vertex. Both must be correct — one error in either undoes the whole measurement.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Accurate reading = correct centre + correct baseline alignment",
+          "label": "Misaligned baseline → systematic error in every angle read"
+        }
+      ],
+      "narration": "Accurate measurement requires two precise alignments: centre on vertex and baseline on arm. An error in either produces a wrong reading — and since the error is systematic, it cannot be caught by a single sanity-check.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: placing the protractor roughly and reading without checking the baseline. If the baseline is 10° off the arm, every reading is wrong by 10°. Always verify the 0° mark sits exactly on the arm.",
+    "audioNarration": "Protractor accuracy depends on two alignments: centre on vertex and baseline exactly on one arm. An off-baseline creates a systematic error — every reading will be wrong by the same offset."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "G1.2",
+  "skillName": "Measure angles with a protractor",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students read the wrong scale on the protractor (inner vs outer) and get 180° minus the correct answer.",
+  "generatedAt": "2026-04-19T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "protractor-setup",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Step 1: Place centre of protractor on the vertex", "highlight": "accent" },
+            { "text": "Step 2: Align the baseline (0° line) along one arm", "highlight": "accent" },
+            { "text": "Step 3: Read where the other arm crosses the scale",  "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Three steps: place the centre hole exactly on the vertex of the angle, align the flat baseline along one arm starting at zero, then read the scale where the other arm crosses.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "two-scales",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Protractors have two scales — use the one that starts at 0° on your baseline arm",
+          "subText": "The other scale reads 180° on that same arm — it is for measuring from the other direction"
+        }
+      ],
+      "narration": "A standard protractor has two number scales. The correct scale to use is the one that reads zero where your baseline arm sits. The other scale reads one hundred and eighty there — it would give the supplementary angle.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "scale-selection",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Angle looks acute (less than 90°)",                "highlight": null },
+            { "text": "Reading gives 55° or 125° — which is correct?",    "highlight": "accent" },
+            { "text": "Acute angle → smaller reading → 55°  ✓",           "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "If the angle looks clearly acute — smaller than a right angle — the correct reading must be less than ninety degrees. If the protractor offers fifty-five or one hundred and twenty-five, choose fifty-five. Always sanity-check using the angle type.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Angle = 55°  (acute → reading < 90° is correct)",
+          "label": "Centre on vertex → baseline on arm → read scale that starts at 0° there"
+        }
+      ],
+      "narration": "Fifty-five degrees. Centre the protractor on the vertex, align the baseline, and use the scale starting at zero on that arm. Sanity-check: acute angles give readings below ninety.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: reading the wrong scale and getting 125° for an acute angle. The correct scale is the one that starts at 0° on the baseline arm. If the angle looks acute, the reading must be less than 90°.",
+    "audioNarration": "Two scales, one correct answer. Use the scale that reads 0° where your baseline arm sits. Then sanity-check: an acute angle must read less than 90°, an obtuse angle between 90° and 180°."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "G1.2",
+  "skillName": "Measure angles with a protractor",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students confuse the inner and outer scales and report 180° minus the correct angle.",
+  "generatedAt": "2026-04-19T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "An angle is clearly obtuse",                       "highlight": null },
+            { "text": "Student reads 60° from protractor  ✗",             "highlight": "accent" },
+            { "text": "Obtuse must be between 90° and 180° — 60° is wrong", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The angle is visibly obtuse — larger than a right angle. The student reads sixty degrees, which is acute. The correct answer must be between ninety and one hundred and eighty. The student read the inner scale when the outer was correct, or vice versa.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "supplementary-pair",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "The two scales always give supplementary readings — they add to 180°",
+          "subText": "If you read 60° and the angle is obtuse, the correct reading is 180° − 60° = 120°"
+        }
+      ],
+      "narration": "The two scales on a protractor are supplementary — any pair of readings from the same position add to one hundred and eighty. If you get a reading that clearly does not match the angle type, subtract it from one hundred and eighty to find the correct value.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "type-check-fix",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Angle looks obtuse → reading must be 90°–180°",    "highlight": "accent" },
+            { "text": "Protractor shows 60° — that is the wrong scale",   "highlight": "accent" },
+            { "text": "Correct reading: 180° − 60° = 120°  ✓",           "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "The angle looks obtuse, so the reading must be between ninety and one hundred and eighty. The protractor shows sixty, which is acute — wrong scale. The correct reading is one hundred and eighty minus sixty, which is one hundred and twenty.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Angle = 120°  (obtuse — not 60°)",
+          "label": "Wrong-scale reading + correct reading = 180°.  Angle type confirms which is right."
+        }
+      ],
+      "narration": "One hundred and twenty degrees. The two scale readings always add to one hundred and eighty — if you have the wrong one, subtract from one hundred and eighty. The angle type tells you which reading is correct.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: reading 60° for an obtuse angle (read the wrong scale). The two scales add to 180° — if the angle type does not match your reading, use 180° − reading = correct answer.",
+    "audioNarration": "Always check that your reading matches the angle type. Obtuse must be 90°–180°, acute must be 0°–90°. If it does not match, you read the wrong scale — subtract from 180° to correct it."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

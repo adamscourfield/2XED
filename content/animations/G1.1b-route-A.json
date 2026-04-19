@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "G1.1b",
+  "skillName": "Understand angle notation and label angles correctly",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students do not realise the middle letter of ∠ABC is the vertex of the angle.",
+  "generatedAt": "2026-04-19T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "notation-rule",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "In ∠ABC, the middle letter B is the vertex — the point where the arms meet",
+          "subText": "A and C are points on the two arms — they define which angle at B is meant"
+        }
+      ],
+      "narration": "The angle symbol followed by three letters tells you exactly which angle is meant. The middle letter always names the vertex — the corner of the angle. The first and last letters name points on each arm, identifying the two sides of the angle.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "read-the-notation",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "∠PQR → vertex is Q (middle letter)",              "highlight": "accent" },
+            { "text": "Arms go from Q toward P and from Q toward R",     "highlight": "accent" },
+            { "text": "The angle is at Q, between arm QP and arm QR",    "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "In angle PQR, the vertex is Q — the middle letter. One arm runs from Q toward P and the other from Q toward R. The angle is the opening at Q between those two arms.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "label-correctly",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "To label angle at B in triangle ABC:",             "highlight": null },
+            { "text": "Write ∠ABC or ∠CBA — B is in the middle",        "highlight": "accent" },
+            { "text": "∠BAC would label the angle at A instead  ✗",     "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "In triangle ABC, to label the angle at vertex B, write angle ABC or angle CBA — B must be the middle letter. Writing angle BAC would label the angle at A instead, because A would then be in the middle.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "∠ABC → vertex at B   ∠PQR → vertex at Q",
+          "label": "Middle letter = vertex — always"
+        }
+      ],
+      "narration": "Angle ABC has its vertex at B. Angle PQR has its vertex at Q. The middle letter always names the vertex — that is the one rule to remember about angle notation.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: thinking the first letter of ∠ABC names the vertex. The vertex is always the middle letter — B in ∠ABC. The outer letters A and C are on the arms.",
+    "audioNarration": "In angle notation, the middle letter is the vertex — the corner of the angle. The first and last letters are points on the two arms. ∠ABC has its angle at B, not at A."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}
