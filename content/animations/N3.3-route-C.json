@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.3",
+  "skillName": "Multiply and divide integers and decimals by powers of 10",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students shift digits the wrong number of places, often shifting once for ×100 instead of twice.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "0.06 × 100",                              "highlight": null },
+            { "text": "Student: 0.06 × 100 = 0.6  ✗",           "highlight": "accent" },
+            { "text": "Shifted only 1 place — should be 2",      "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The student shifted one place but one hundred has two zeros — two places are needed. Zero point zero six becomes six, not zero point six.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "count-zeros",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Count the zeros in the power of 10 — that is how many places to shift",
+          "subText": "10 → 1 place.  100 → 2 places.  1000 → 3 places."
+        }
+      ],
+      "narration": "The number of zeros in the power of ten tells you exactly how many places to shift. One hundred has two zeros — shift two places. One thousand has three zeros — shift three places.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "correct-method",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "0.06 × 100: 100 has 2 zeros → shift 2 left", "highlight": "accent" },
+            { "text": "0.06 → 0.6 (1 place) → 6.0 (2 places)",     "highlight": "accent" },
+            { "text": "Answer: 6  ✓",                               "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Shift zero point zero six two places to the left: first to zero point six, then to six. The answer is six — a whole number.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "0.06 × 100 = 6",
+          "label": "100 has 2 zeros → shift 2 places left → 0.06 becomes 6"
+        }
+      ],
+      "narration": "Six. Count the zeros in the power of ten — then shift exactly that many places. No more, no fewer.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: 0.06 × 100 = 0.6 (shifted only 1 place). 100 has two zeros — shift two places left: 0.06 → 0.6 → 6. Always count the zeros.",
+    "audioNarration": "Count the zeros in the power of ten — that is your shift distance. 100 has two zeros, so shift two places. 0.06 becomes 6, not 0.6."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}
