@@ -1,0 +1,78 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N2.3",
+  "skillName": "Use commutative and associative laws",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students regroup numbers without checking whether the operation allows it.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "commutative-law",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Commutative: a + b = b + a",          "highlight": "accent" },
+            { "text": "17 + 83 = 83 + 17 = 100",            "highlight": "green" },
+            { "text": "Swap to make a round number appear",  "highlight": null }
+          ]
+        }
+      ],
+      "narration": "The commutative law lets you swap the order of addition. Spotting that eighty-three and seventeen sum to one hundred is much easier if you reorder them — seventeen plus eighty-three becomes obvious.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "associative-law",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Associative: (a + b) + c = a + (b + c)", "highlight": "accent" },
+            { "text": "4 + 17 + 6 = 4 + (17 + 6) = 4 + 23?", "highlight": null },
+            { "text": "Better: (4 + 6) + 17 = 10 + 17 = 27", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "The associative law lets you regroup which numbers you add first. Four and six pair to make ten — then adding seventeen is trivial. Choosing the right grouping makes mental arithmetic much faster.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "apply-both",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "23 + 45 + 7 + 55",                   "highlight": null },
+            { "text": "Reorder: 23 + 7 + 45 + 55",          "highlight": "accent" },
+            { "text": "Group: (23+7) + (45+55) = 30 + 100 = 130", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Combine both laws: reorder using commutativity, then regroup using associativity. Pairing twenty-three with seven and forty-five with fifty-five reveals two round-number totals that add instantly.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "23 + 45 + 7 + 55 = 130",
+          "label": "Reorder → regroup → spot pairs that make round numbers"
+        }
+      ],
+      "narration": "One hundred and thirty. Two simple laws — commutativity and associativity — turned a four-number sum into two trivial additions.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: adding left to right without looking for friendly pairs. Use commutativity to reorder and associativity to regroup — find pairs that sum to 10, 100, or other round numbers.",
+    "audioNarration": "Before you add a long list, scan for pairs that make round numbers. Reorder and regroup freely — addition allows both."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

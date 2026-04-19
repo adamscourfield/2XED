@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N2.3",
+  "skillName": "Use commutative and associative laws",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students think the laws are just tricks, not understanding why they work.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "why-commutative-works",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Addition counts a total — the order you count items never changes how many there are",
+          "subText": "3 red + 5 blue = 5 blue + 3 red = 8 objects either way"
+        }
+      ],
+      "narration": "Commutativity works because addition is counting a combined total. Whether you count three red items then five blue, or five blue then three red, the total is always eight. The order of counting does not change what is being counted.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "why-associative-works",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "(2 + 3) + 4 = 5 + 4 = 9",   "highlight": null },
+            { "text": "2 + (3 + 4) = 2 + 7 = 9",   "highlight": "accent" },
+            { "text": "Grouping changes the steps, not the total", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Associativity works because the brackets only change which addition you do first — the total being counted stays the same. Grouping is a choice of convenience, not a change of meaning.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "laws-for-efficiency",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Laws guarantee rearranging is safe",          "highlight": null },
+            { "text": "Pick any order, any grouping — total is fixed", "highlight": "accent" },
+            { "text": "Choose the arrangement that is easiest to compute", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "These laws are not tricks — they are guarantees. Because they always hold, you can rearrange and regroup with complete confidence, choosing whatever arrangement makes the arithmetic simplest.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "(a + b) + c = a + (b + c) = a + b + c",
+          "label": "Grouping and order are choices — the total is fixed"
+        }
+      ],
+      "narration": "The total is the total, regardless of how you group or order the additions. The laws simply give you freedom to choose the most convenient path.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: thinking you must add left to right. The commutative and associative laws guarantee any order or grouping gives the same answer — choose the easiest.",
+    "audioNarration": "These laws are not shortcuts — they are mathematical guarantees. You can reorder and regroup any addition freely because the total never changes."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

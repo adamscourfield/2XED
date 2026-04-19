@@ -1,0 +1,74 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N2.1",
+  "skillName": "Properties of addition and subtraction",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students apply commutativity to subtraction, writing 3 − 8 = 8 − 3.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Student: 3 − 8 = 8 − 3 = 5  ✗",              "highlight": "accent" },
+            { "text": "Swapped the order to avoid a negative answer", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The student swapped the numbers to get a positive answer, assuming subtraction works like addition. But three minus eight and eight minus three are different calculations with different results.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "show-difference",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "8 − 3 = 5   (start at 8, remove 3)",  "highlight": "green" },
+            { "text": "3 − 8 = −5  (start at 3, remove 8)",  "highlight": "accent" },
+            { "text": "The answers are opposites of each other", "highlight": null }
+          ]
+        }
+      ],
+      "narration": "Eight minus three is five. Three minus eight is negative five. The answers are always opposite in sign when you reverse a subtraction — they are never equal unless both numbers are the same.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "when-to-swap",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "You may swap addition: a + b = b + a. You may NOT swap subtraction: a − b ≠ b − a.",
+          "subText": "If you need to reverse a subtraction, the answer changes sign"
+        }
+      ],
+      "narration": "Only swap when you see a plus sign. A minus sign must stay attached to the number that follows it. If the question gives three minus eight, the answer is negative five — not positive five.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "3 − 8 = −5  (not +5)",
+          "label": "Subtraction is not commutative — order changes the sign"
+        }
+      ],
+      "narration": "Three minus eight is negative five. Swapping to eight minus three gives positive five — a completely different answer. Never swap a subtraction to dodge a negative result.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: rewriting 3 − 8 as 8 − 3 = 5. Subtraction is not commutative. 3 − 8 = −5; reversing the order changes the sign of the answer.",
+    "audioNarration": "You cannot swap a subtraction. Three minus eight is negative five. If you reverse it to eight minus three you get positive five — a different number entirely."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

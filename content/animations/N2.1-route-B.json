@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N2.1",
+  "skillName": "Properties of addition and subtraction",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students think subtraction always makes a number smaller.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "subtraction-on-number-line",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Addition moves right on the number line; subtraction moves left",
+          "subText": "Subtracting a negative moves RIGHT — it makes the number bigger"
+        }
+      ],
+      "narration": "Addition always moves right; subtraction always moves left on the number line. Subtracting a positive moves left — the number decreases. But subtracting a negative reverses direction and increases the value.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "zero-as-identity",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Adding zero changes nothing: a + 0 = a",     "highlight": "accent" },
+            { "text": "Subtracting zero changes nothing: a − 0 = a", "highlight": "accent" },
+            { "text": "Zero is the identity element for addition",   "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Zero is the identity for addition and subtraction. Adding or subtracting zero leaves any number exactly where it started. This sounds obvious but underpins a lot of algebraic reasoning.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "subtraction-as-adding-negative",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "a − b = a + (−b)",           "highlight": "accent" },
+            { "text": "10 − 3 = 10 + (−3) = 7",    "highlight": "green" },
+            { "text": "Subtraction is addition of the opposite", "highlight": "null" }
+          ]
+        }
+      ],
+      "narration": "Every subtraction can be rewritten as adding the negative. Ten minus three is the same as ten plus negative three. This unifies addition and subtraction into one operation.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "a − b = a + (−b)",
+          "label": "Subtraction = adding the opposite; zero is the identity"
+        }
+      ],
+      "narration": "Subtraction is addition of the negative. That one idea explains why subtracting a negative makes a number bigger — you are adding its positive opposite.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: thinking subtraction always decreases a number. Subtracting a negative increases it — 5 − (−3) = 5 + 3 = 8.",
+    "audioNarration": "Subtraction moves left on the number line — unless you are subtracting a negative, which reverses direction. Subtracting a negative is the same as adding a positive."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}
