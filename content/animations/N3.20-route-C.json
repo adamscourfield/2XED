@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.20",
+  "skillName": "Divide decimals",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students divide the whole parts and decimal parts separately rather than converting to an equivalent whole-number division.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "3.6 ÷ 0.4",                                         "highlight": null },
+            { "text": "Student: 3 ÷ 0 = error, 0.6 ÷ 0.4 = 1.5  ✗",      "highlight": "accent" },
+            { "text": "Split the division — treated parts independently",    "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The student tried to split three point six and zero point four into separate parts and divide them independently. Division does not work this way — the whole expression is a single ratio and must be treated as one.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "scale-both",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Multiply BOTH numbers by the same power of 10 to clear all decimals",
+          "subText": "3.6 ÷ 0.4 → × 10 → 36 ÷ 4"
+        }
+      ],
+      "narration": "Multiply both three point six and zero point four by ten. Three point six becomes thirty-six and zero point four becomes four. Now divide thirty-six by four — a straightforward whole-number calculation.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "correct-answer",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "3.6 ÷ 0.4 → 36 ÷ 4 = 9  ✓",                      "highlight": "accent" },
+            { "text": "Check: 0.4 × 9 = 3.6  ✓",                         "highlight": "green" },
+            { "text": "Estimate: 3.6 ÷ 0.4 ≈ 3.6 ÷ 0.5 = 7.2 → 9 plausible ✓", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Thirty-six divided by four is nine. Check: zero point four times nine is three point six — correct. The estimate confirms the scale: three point six divided by about half gives roughly seven, so nine is plausible.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "3.6 ÷ 0.4 = 36 ÷ 4 = 9",
+          "label": "Treat as one ratio — scale both by ×10, then divide whole numbers"
+        }
+      ],
+      "narration": "Nine. Always treat a division as a single ratio — scale both values by the same power of ten, then divide as whole numbers.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: splitting 3.6 ÷ 0.4 and dividing parts separately. Treat it as one ratio — multiply both by 10: 36 ÷ 4 = 9. Check: 0.4 × 9 = 3.6 ✓",
+    "audioNarration": "A decimal division is a single ratio — never split the digits and divide separately. Multiply both the dividend and divisor by the same power of ten, then do one clean whole-number division."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

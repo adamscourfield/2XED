@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.21",
+  "skillName": "Find missing lengths given area",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students multiply the known side by the area instead of dividing the area by the known side.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "rearrange-formula",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Area = length × width   →   missing side = Area ÷ known side",
+          "subText": "Divide the area by the side you know to find the side you don't"
+        }
+      ],
+      "narration": "The area formula is length times width. To find a missing side, rearrange: divide the area by the side you already know. If area equals forty-eight and one side is six, the missing side is forty-eight divided by six.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "apply-to-rectangle",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Rectangle: Area = 48 cm², width = 6 cm",           "highlight": null },
+            { "text": "Length = Area ÷ width = 48 ÷ 6",                  "highlight": "accent" },
+            { "text": "Length = 8 cm  ✓",                                "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Area is forty-eight square centimetres, width is six centimetres. Length equals forty-eight divided by six, which is eight centimetres.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "check",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Check: 8 × 6 = 48 cm²  ✓",                       "highlight": "green" },
+            { "text": "Missing side is always Area ÷ known side",        "highlight": "accent" },
+            { "text": "Works for triangles too: base = 2 × Area ÷ height", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Check: eight times six is forty-eight — correct. For triangles, the formula is half base times height, so rearrange differently: base equals two times the area divided by the height.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "48 ÷ 6 = 8 cm",
+          "label": "Missing side = Area ÷ known side"
+        }
+      ],
+      "narration": "Eight centimetres. Rearrange the area formula by dividing — never multiply — the area by the known side.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: multiplying the known side by the area (6 × 48 = 288). The missing side is found by dividing: 48 ÷ 6 = 8 cm. Rearrange area = l × w to get l = area ÷ w.",
+    "audioNarration": "To find a missing side, divide the area by the side you know — not multiply. Area = length × width rearranges to length = area ÷ width."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

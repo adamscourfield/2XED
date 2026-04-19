@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.19",
+  "skillName": "Short division (decimal answers)",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students stop dividing at the remainder rather than continuing with a decimal extension of the dividend.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Give the exact answer to 9 ÷ 4",                    "highlight": null },
+            { "text": "Student: 2 r 1  ✗",                                 "highlight": "accent" },
+            { "text": "Stopped at remainder — question asks for exact decimal", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Two remainder one is correct as far as it goes, but the question asked for an exact decimal answer. The remainder one must be continued by extending into decimal places until the remainder is zero.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "continue-past-decimal",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Write a decimal point after 9, add zeros, and continue the division",
+          "subText": "9 ÷ 4 → 9.00 ÷ 4 — place decimal in quotient above the point in dividend"
+        }
+      ],
+      "narration": "Write nine as nine point zero zero. Place a decimal point in the quotient position directly above the decimal point in the dividend. Then continue dividing using the zeros in the tenths and hundredths places.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "correct-calculation",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "9 ÷ 4 = 2 r 1 → 2.",                              "highlight": "accent" },
+            { "text": "Tenths: 10 ÷ 4 = 2 r 2",                          "highlight": "accent" },
+            { "text": "Hundredths: 20 ÷ 4 = 5 r 0 → 2.25  ✓",           "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Two with remainder one. The one becomes ten tenths — ten divided by four is two remainder two. The two becomes twenty hundredths — twenty divided by four is five with no remainder. Answer: two point two five.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "9 ÷ 4 = 2.25",
+          "label": "Extend with decimal zeros until remainder is zero — not 2 r 1"
+        }
+      ],
+      "narration": "Two point two five. Never stop at a remainder when an exact answer is needed — extend into tenths, hundredths, and beyond until the division terminates.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: 9 ÷ 4 = 2 r 1 (stopped at remainder). Extend with decimal zeros: 10 ÷ 4 = 2 r 2, then 20 ÷ 4 = 5. Exact answer: 2.25.",
+    "audioNarration": "When an exact answer is needed, never stop at a remainder. Add a decimal point and zeros to the dividend, place the point in the quotient, and keep dividing until the remainder is zero."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

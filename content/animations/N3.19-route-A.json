@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.19",
+  "skillName": "Short division (decimal answers)",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students stop dividing at the remainder rather than continuing with a decimal extension of the dividend.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "extend-the-dividend",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "When a remainder occurs, extend the dividend with a decimal point and zeros",
+          "subText": "Keep dividing past the decimal point to get an exact decimal answer"
+        }
+      ],
+      "narration": "When a division leaves a remainder, you do not have to stop. Place a decimal point after the dividend and add zeros, then continue dividing. The decimal point goes in the quotient directly above where it was placed in the dividend.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "set-up-decimal",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Divide 7 ÷ 4",                                     "highlight": null },
+            { "text": "7 ÷ 4 = 1 r 3 → extend: 7.0 ÷ 4",               "highlight": "accent" },
+            { "text": "Place decimal point in quotient above the point",   "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Seven divided by four: one remainder three. Write seven point zero and continue. The decimal point appears in the quotient aligned above the point in the dividend.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "continue-dividing",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Carry 3 to tenths: 30 ÷ 4 = 7 r 2",               "highlight": "accent" },
+            { "text": "Carry 2 to hundredths: 20 ÷ 4 = 5 r 0",           "highlight": "accent" },
+            { "text": "7 ÷ 4 = 1.75  ✓",                                 "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "The remainder three becomes thirty in the tenths column. Thirty divided by four is seven remainder two. The remainder two becomes twenty in the hundredths column. Twenty divided by four is five with no remainder. Answer: one point seven five.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "7 ÷ 4 = 1.75",
+          "label": "Extend with decimal zeros — keep dividing until remainder is zero"
+        }
+      ],
+      "narration": "One point seven five. Extending the dividend with decimal zeros allows short division to produce exact decimal answers without stopping at the remainder.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: 7 ÷ 4 = 1 r 3 (stopped at remainder). Add a decimal point and zero to continue: 30 ÷ 4 = 7 r 2, then 20 ÷ 4 = 5. Answer: 1.75.",
+    "audioNarration": "Don't stop at the remainder. Place a decimal point and keep dividing using zeros. The remainder three becomes thirty, then twenty — continuing until there is no remainder gives the exact decimal answer."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

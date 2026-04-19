@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.20",
+  "skillName": "Divide decimals",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students divide the whole parts and decimal parts separately rather than converting to an equivalent whole-number division.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "convert-to-whole-numbers",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Multiply both dividend and divisor by the same power of 10",
+          "subText": "This creates an equivalent whole-number division without changing the answer"
+        }
+      ],
+      "narration": "Dividing a decimal by a decimal can be converted to a simpler whole-number problem. Multiply both the dividend and divisor by the same power of ten. Because both change by the same factor, the quotient is unchanged.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "scale-up",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Calculate 4.8 ÷ 0.6",                              "highlight": null },
+            { "text": "× 10 on both: 48 ÷ 6",                            "highlight": "accent" },
+            { "text": "48 ÷ 6 = 8  ✓",                                  "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Four point eight divided by zero point six. Multiply both by ten: forty-eight divided by six. Forty-eight divided by six is eight. The answer is eight — the same as for the decimal problem, because scaling both parts equally preserves the ratio.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "check-scale",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Check: 0.6 × 8 = 4.8  ✓",                        "highlight": "green" },
+            { "text": "Or: 4.8 ÷ 0.6 = (4.8 × 10) ÷ (0.6 × 10) = 48 ÷ 6", "highlight": "accent" },
+            { "text": "Ratio preserved → same answer  ✓",                 "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Check: zero point six times eight is four point eight — correct. The scaling works because multiplying both numerator and denominator of a division by the same number does not change the value — the ratio is preserved.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "4.8 ÷ 0.6 = 48 ÷ 6 = 8",
+          "label": "Scale both by ×10 — remove decimals, same answer"
+        }
+      ],
+      "narration": "Eight. Multiply both dividend and divisor by ten to clear the decimals, then perform a straightforward whole-number division.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: dividing 4 by 0 and .8 by .6 separately. Treat the whole division as one expression — multiply both values by 10: 4.8 ÷ 0.6 = 48 ÷ 6 = 8.",
+    "audioNarration": "Treat a decimal division as a whole. Multiply both parts by the same power of ten to eliminate decimals — the answer is unchanged because the ratio of dividend to divisor stays the same."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}
