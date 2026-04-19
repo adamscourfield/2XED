@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "G1.9",
+  "skillName": "Interior angle sum of any polygon",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students do not know the formula for the interior angle sum of a polygon or use 180n instead of 180(n − 2).",
+  "generatedAt": "2026-04-19T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "the-formula",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Interior angle sum = 180° × (n − 2), where n = number of sides",
+          "subText": "Always subtract 2 from the number of sides before multiplying by 180°"
+        }
+      ],
+      "narration": "The interior angle sum of any polygon is one hundred and eighty degrees multiplied by the number of sides minus two. The minus two is essential — without it the formula gives a result three hundred and sixty degrees too large.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "pentagon-example",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Pentagon: n = 5",                                    "highlight": null },
+            { "text": "Sum = 180° × (5 − 2) = 180° × 3 = 540°",          "highlight": "accent" },
+            { "text": "Check: 5 sides → 3 triangles → 3 × 180° = 540°  ✓", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Pentagon: five sides. Sum equals one hundred and eighty times five minus two, which is one hundred and eighty times three, which is five hundred and forty degrees. Check: a pentagon splits into three triangles — three times one hundred and eighty is five hundred and forty.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "hexagon-example",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Hexagon: n = 6",                                    "highlight": "accent" },
+            { "text": "Sum = 180° × (6 − 2) = 180° × 4 = 720°",          "highlight": "accent" },
+            { "text": "Regular hexagon: each angle = 720° ÷ 6 = 120°  ✓", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Hexagon: six sides. Sum equals one hundred and eighty times four, which is seven hundred and twenty degrees. A regular hexagon has six equal angles — seven hundred and twenty divided by six is one hundred and twenty degrees each.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Pentagon: 540°   Hexagon: 720°   Formula: 180° × (n − 2)",
+          "label": "Subtract 2 first, then multiply by 180° — order matters"
+        }
+      ],
+      "narration": "Five hundred and forty and seven hundred and twenty. The formula is one hundred and eighty times the bracket n minus two. Always subtract two before multiplying.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: 180° × n (forgetting to subtract 2). Pentagon: 180° × 5 = 900° is wrong. The correct answer is 180° × (5 − 2) = 540°. Always subtract 2 from n first.",
+    "audioNarration": "The formula is 180 times n minus 2, not 180 times n. The bracket matters — subtract 2 from the number of sides first, then multiply. Pentagon: 180 × 3 = 540°, not 900°."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

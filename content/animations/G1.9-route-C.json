@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "G1.9",
+  "skillName": "Interior angle sum of any polygon",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students use 180n instead of 180(n − 2), forgetting to subtract 2, giving an answer 360° too large.",
+  "generatedAt": "2026-04-19T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Interior angle sum of a pentagon (5 sides)",        "highlight": null },
+            { "text": "Student: 180° × 5 = 900°  ✗",                      "highlight": "accent" },
+            { "text": "Forgot to subtract 2 — answer is 360° too large",  "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The student multiplied one hundred and eighty by five and got nine hundred. The correct answer is five hundred and forty. The error is exactly three hundred and sixty — the amount that results from omitting the minus two in the bracket.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "why-subtract-2",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Subtract 2 because the formula counts triangles, not sides",
+          "subText": "A pentagon has 3 triangles inside it — not 5.  3 × 180° = 540°."
+        }
+      ],
+      "narration": "The formula counts triangles formed inside the polygon, not the sides themselves. A pentagon contains three triangles — not five. Multiplying by five is counting three non-existent triangles, giving an answer three hundred and sixty degrees too large.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "correct-calculation",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Pentagon: n = 5",                                    "highlight": "accent" },
+            { "text": "Sum = 180° × (5 − 2) = 180° × 3 = 540°  ✓",      "highlight": "green" },
+            { "text": "Not 180° × 5 = 900°  ✗",                          "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Pentagon: five sides. Five minus two is three. One hundred and eighty times three is five hundred and forty. Always write the bracket and evaluate n minus two first — then multiply.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Pentagon: 180° × (5 − 2) = 540°   (not 180° × 5 = 900°)",
+          "label": "Always evaluate (n − 2) first — that gives the triangle count"
+        }
+      ],
+      "narration": "Five hundred and forty degrees. The bracket n minus two must be evaluated before multiplying by one hundred and eighty. Skipping it gives an answer exactly three hundred and sixty too large.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: 180° × 5 = 900° for a pentagon. The formula is 180° × (n − 2) = 180° × 3 = 540°. The bracket is not optional — it changes the answer by 360°.",
+    "audioNarration": "The bracket in 180(n−2) is essential. Without it you multiply by n instead of n−2, giving an answer 360° too large. For a pentagon: 180 × 3 = 540°, not 180 × 5 = 900°."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

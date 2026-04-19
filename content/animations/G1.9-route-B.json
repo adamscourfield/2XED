@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "G1.9",
+  "skillName": "Interior angle sum of any polygon",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students memorise the formula without understanding why subtracting 2 is necessary or how triangles relate to the polygon.",
+  "generatedAt": "2026-04-19T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "triangles-inside-polygon",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Choose one vertex and draw diagonals to all non-adjacent vertices — this creates triangles",
+          "subText": "An n-sided polygon always splits into (n − 2) triangles this way"
+        }
+      ],
+      "narration": "Pick any vertex of a polygon and draw lines to all other vertices that are not directly next to it. This splits the polygon into triangles. A polygon with n sides produces exactly n minus two triangles — and that is where the formula comes from.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "why-n-minus-2",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "From one vertex, you can draw diagonals to (n − 3) other vertices", "highlight": null },
+            { "text": "That creates (n − 3) + 1 = (n − 2) triangles",                     "highlight": "accent" },
+            { "text": "Pentagon: 5 − 2 = 3 triangles  ✓",                               "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "From one vertex, you can reach n minus three other vertices by diagonal — not the two adjacent ones. That makes n minus three diagonals, creating n minus three plus one equals n minus two triangles. For a pentagon: five minus two equals three triangles.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "formula-derived",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "(n − 2) triangles × 180° each",                    "highlight": "accent" },
+            { "text": "= 180° × (n − 2)",                                 "highlight": "accent" },
+            { "text": "This IS the formula — derived, not memorised  ✓",  "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Each of the n minus two triangles has an angle sum of one hundred and eighty degrees. Multiply: n minus two times one hundred and eighty. The formula emerges directly from counting the triangles — it is not a magic fact to memorise.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "n sides → (n − 2) triangles → sum = 180° × (n − 2)",
+          "label": "The formula counts triangles — subtract 2 because two sides do not create new triangles from the chosen vertex"
+        }
+      ],
+      "narration": "The formula is derived — not arbitrary. Count the triangles from one vertex, multiply by one hundred and eighty. The n minus two arises naturally from the geometry of diagonals.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: using the formula without understanding the (n − 2). It counts the triangles formed by drawing diagonals from one vertex. A pentagon makes 3 triangles (5 − 2), giving 3 × 180° = 540°.",
+    "audioNarration": "The formula 180(n−2) counts triangles. Draw diagonals from one vertex of an n-sided polygon — you get n−2 triangles. Multiply by 180° because each triangle sums to 180°. The formula is derived from the triangle rule."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}
