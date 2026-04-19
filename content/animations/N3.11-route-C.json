@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.11",
+  "skillName": "Factors",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students miss factor pairs by not working systematically, often omitting 1 and the number itself.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Factors of 30",                                    "highlight": null },
+            { "text": "Student: 2, 3, 5, 6, 10, 15  ✗",                 "highlight": "accent" },
+            { "text": "Missing 1 and 30 — both are always factors",       "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The student found several factors but missed one and thirty. One divides into every number, and every number divides into itself. Both must always be included.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "systematic-pairs",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Always start with the pair (1, n) — then test 2, 3, 4, … upward",
+          "subText": "Write both members of each pair — the small one and the large one"
+        }
+      ],
+      "narration": "Start every factor list with the pair one and the number. Then test two, three, four, and so on. For each exact divisor, record both the divisor and its partner. Stop when the pairs meet.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "correct-factors",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "1×30, 2×15, 3×10, 5×6",                         "highlight": "accent" },
+            { "text": "4 → 30÷4 = 7.5 ✗  |  √30 ≈ 5.5 — done",       "highlight": "accent" },
+            { "text": "All factors: 1, 2, 3, 5, 6, 10, 15, 30  ✓",    "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Pairs: one and thirty, two and fifteen, three and ten, five and six. Four is not a factor. The square root of thirty is about five point five, so pairs are complete. All eight factors listed in order.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Factors of 30: 1, 2, 3, 5, 6, 10, 15, 30",
+          "label": "Always begin with (1, n) — then test systematically for missing pairs"
+        }
+      ],
+      "narration": "One, two, three, five, six, ten, fifteen, thirty. Starting with the pair one and thirty ensures the two most commonly missed factors are included from the beginning.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: missing 1 and 30 from the factor list. Always start with the pair (1, 30), then work upward testing 2, 3, 4, 5 — recording both members of every exact pair.",
+    "audioNarration": "One and the number itself are always factors — start your list with that pair. Then test each number upward, writing down both the divisor and its partner every time you find an exact division."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

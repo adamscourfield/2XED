@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.12",
+  "skillName": "LCM",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students do not understand why LCM is useful or what it represents in context.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "lcm-in-context",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "LCM answers: 'when will two repeating patterns align again?'",
+          "subText": "Used for adding fractions, scheduling, and finding synchronisation points"
+        }
+      ],
+      "narration": "The LCM is the answer to questions about synchronisation. If one event repeats every four days and another every six days, the LCM tells you after how many days they will happen on the same day again.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "synchronisation-example",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Event A every 4 days: day 4, 8, 12, 16, 20, 24", "highlight": "accent" },
+            { "text": "Event B every 6 days: day 6, 12, 18, 24",        "highlight": "accent" },
+            { "text": "First overlap: day 12 → LCM(4,6) = 12",         "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Event A falls on days four, eight, twelve. Event B falls on days six, twelve. Day twelve is the first day both events coincide — that is the LCM. It represents the smallest cycle length at which both patterns realign.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "lcm-and-fractions",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Adding ½ + ⅓ needs a common denominator",         "highlight": null },
+            { "text": "LCM(2, 3) = 6 → use sixths",                     "highlight": "accent" },
+            { "text": "3/6 + 2/6 = 5/6  ✓",                           "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "LCM is also the lowest common denominator when adding fractions. To add one-half and one-third, find the LCM of two and three — which is six. Both fractions convert to sixths, making the addition straightforward.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "LCM(4, 6) = 12",
+          "label": "Smallest synchronisation point — cycles of 4 and 6 first align at 12"
+        }
+      ],
+      "narration": "Twelve. The LCM is the smallest number where both cycles meet — whether counting days, adding fractions, or solving any problem involving repeating intervals.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: seeing LCM as just a number calculation with no meaning. LCM represents when two repeating cycles first align — useful for fractions, scheduling, and many real-world problems.",
+    "audioNarration": "LCM has meaning: it is the smallest value where two repeating patterns first coincide. That is why it appears in fraction addition and real-world scheduling — it finds the first shared point."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}
