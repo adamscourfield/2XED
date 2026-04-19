@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.23",
+  "skillName": "Square and cube numbers, roots",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students double a number when asked to square it, or triple it when asked to cube it.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Calculate 6²",                                       "highlight": null },
+            { "text": "Student: 6² = 6 × 2 = 12  ✗",                      "highlight": "accent" },
+            { "text": "Multiplied by the exponent — exponent means factor count", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The student treated the exponent two as a multiplier, calculating six times two. But the exponent tells you how many times to use six as a factor — not what to multiply six by. Six squared means six times six.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "what-exponent-means",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "n² means n appears as a factor 2 times: n × n",
+          "subText": "n³ means n appears as a factor 3 times: n × n × n"
+        }
+      ],
+      "narration": "The exponent counts how many copies of the base number are multiplied together. Two means two copies of the base: six times six. Three means three copies: six times six times six. The exponent is a count of factors, not a multiplier.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "correct-calculations",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "6² = 6 × 6 = 36  ✓  (not 12)",                    "highlight": "green" },
+            { "text": "6³ = 6 × 6 × 6 = 216  ✓  (not 18)",               "highlight": "green" },
+            { "text": "2² = 4, 3² = 9, 4² = 16, 5² = 25",               "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Six squared is six times six, which is thirty-six — not twelve. Six cubed is six times six times six: thirty-six times six is two hundred and sixteen — not eighteen. The difference between multiplying by the exponent and using it as a factor count is enormous.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "6² = 36   6³ = 216",
+          "label": "Exponent = factor count, not multiplier: 6² = 6×6, not 6×2"
+        }
+      ],
+      "narration": "Thirty-six and two hundred and sixteen. The exponent is a count of factors — write out that many copies of the base and multiply them together.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: 6² = 12 (multiplied by 2 instead of squaring). Six squared means 6 × 6 = 36. The exponent 2 counts factors — it does not multiply.",
+    "audioNarration": "The exponent is not a multiplier. It tells you how many times to write the base number as a factor. Six squared means six times six equals thirty-six — not six times two equals twelve."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

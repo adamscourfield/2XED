@@ -1,0 +1,78 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.24",
+  "skillName": "Introduction to primes",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students include 1 as a prime number and sometimes exclude 2.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "List the prime numbers up to 10",                    "highlight": null },
+            { "text": "Student: 1, 3, 5, 7  ✗",                           "highlight": "accent" },
+            { "text": "Included 1 (not prime) and excluded 2 (is prime)",  "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Two errors: one is not prime, and two was missed. These are the two most common mistakes with prime numbers. Apply the definition — exactly two factors — to both to see why.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "check-1-and-2",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Factors of 1: just {1}  → one factor → NOT prime  ✗", "highlight": "accent" },
+            { "text": "Factors of 2: {1, 2}  → two factors → IS prime  ✓",  "highlight": "green" },
+            { "text": "2 is the only even prime — all other even numbers have 2 as a factor", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "One has exactly one factor — itself. One factor fails the prime test. Two has exactly two factors — one and two. Two factors passes. Two is therefore prime, and because every other even number is divisible by two, it is the only even prime.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "correct-list",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Primes up to 10: 2, 3, 5, 7  ✓",                  "highlight": "green" },
+            { "text": "4 = 2×2, 6 = 2×3, 8 = 2×4, 9 = 3×3, 10 = 2×5",  "highlight": "accent" },
+            { "text": "All composites — each has more than two factors",   "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Primes up to ten: two, three, five, seven. Four, six, eight, nine, and ten are all composite — each can be expressed as a product of smaller factors, giving them more than two factors.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Primes to 10: 2, 3, 5, 7",
+          "label": "1 excluded (one factor only).  2 included (exactly two factors: 1 and 2)."
+        }
+      ],
+      "narration": "Two, three, five, seven. One is out — one factor. Two is in — exactly two factors. Apply the definition carefully at both ends of the list.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: listing 1, 3, 5, 7 as primes to 10. One has only one factor — not prime. Two has factors 1 and 2 — prime. Correct list: 2, 3, 5, 7.",
+    "audioNarration": "Check both boundaries: 1 has only one factor so it is not prime. 2 has exactly two factors so it is prime. The correct primes up to ten are 2, 3, 5, and 7."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

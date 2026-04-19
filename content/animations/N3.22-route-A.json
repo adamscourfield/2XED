@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.22",
+  "skillName": "Solve problems using the mean",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students find the mean correctly but cannot reverse the process to find a missing value when the mean is given.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "mean-formula",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Mean = total ÷ count   →   total = mean × count",
+          "subText": "Rearrange to find total, then subtract known values to find the missing one"
+        }
+      ],
+      "narration": "The mean is the total divided by the count. To work backwards from the mean, multiply: total equals mean times count. Once you have the total, subtract the values you know to find any missing value.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "find-total",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Mean of 5 numbers = 8. Four values: 6, 9, 7, 10", "highlight": null },
+            { "text": "Total = mean × count = 8 × 5 = 40",               "highlight": "accent" },
+            { "text": "Known sum: 6 + 9 + 7 + 10 = 32",                 "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The mean of five numbers is eight. The total of all five must be eight times five, which is forty. Add the four known values: six plus nine plus seven plus ten is thirty-two.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "find-missing-value",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Missing value = total − known sum",                 "highlight": "accent" },
+            { "text": "= 40 − 32 = 8  ✓",                              "highlight": "green" },
+            { "text": "Check: (6+9+7+10+8) ÷ 5 = 40 ÷ 5 = 8  ✓",      "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Missing value equals forty minus thirty-two, which is eight. Check: six plus nine plus seven plus ten plus eight is forty. Forty divided by five is eight — the mean. Correct.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Missing value = 8 × 5 − (6+9+7+10) = 40 − 32 = 8",
+          "label": "Total = mean × count, then subtract known values"
+        }
+      ],
+      "narration": "Eight. Multiply mean by count to get the total, subtract the known values, and the remainder is the missing one.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: trying to find the missing value by averaging the known values. Instead, find the required total (mean × count), then subtract the sum of known values: 8×5 − 32 = 8.",
+    "audioNarration": "Work backwards from the mean: multiply mean by count to get the total all values must add up to. Then subtract the sum of the values you know — the result is the missing value."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

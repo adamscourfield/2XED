@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.22",
+  "skillName": "Solve problems using the mean",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students find the mean correctly but cannot reverse the process to find a missing value when the mean is given.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Mean of 4 values is 9. Values: 7, 11, 8, ?",       "highlight": null },
+            { "text": "Student: mean of 7,11,8 = 8.67 → missing = 8.67  ✗", "highlight": "accent" },
+            { "text": "Averaged the known values — ignored the required mean", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The student averaged the three known values, but that ignores the constraint: the mean of all four values must be nine. The missing value must be chosen specifically so the total of all four reaches the required amount.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "required-total",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Find the required total first: mean × count = total all values must reach",
+          "subText": "Then: missing value = required total − sum of known values"
+        }
+      ],
+      "narration": "The required total is the mean times the count: nine times four equals thirty-six. All four values must sum to thirty-six. Find the sum of the three known values and subtract from thirty-six.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "correct-calculation",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Required total = 9 × 4 = 36",                      "highlight": "accent" },
+            { "text": "Known sum: 7 + 11 + 8 = 26",                      "highlight": "accent" },
+            { "text": "Missing = 36 − 26 = 10  ✓",                      "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Required total is thirty-six. Known sum is seven plus eleven plus eight, which is twenty-six. Missing value is thirty-six minus twenty-six, which is ten. Check: seven plus eleven plus eight plus ten is thirty-six; thirty-six divided by four is nine. Correct.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Missing value = (9 × 4) − (7 + 11 + 8) = 36 − 26 = 10",
+          "label": "Required total − known sum = missing value"
+        }
+      ],
+      "narration": "Ten. Start with the required total — mean times count — then subtract the known values. That is the only way to guarantee the mean comes out right.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: averaging the known values to estimate the missing one. Instead, find the required total (9 × 4 = 36), subtract the known sum (26), and the missing value is 10.",
+    "audioNarration": "Do not average the values you already know. Find the total all values must reach: mean times count. Then subtract the sum of known values. That gives the exact missing value."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

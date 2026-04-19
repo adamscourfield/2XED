@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.22",
+  "skillName": "Solve problems using the mean",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students think the mean is always one of the values in the dataset, or that it must be a whole number.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "what-mean-represents",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "The mean is the value each item would have if the total were shared equally",
+          "subText": "It is a fair-share value — it may not match any actual data point"
+        }
+      ],
+      "narration": "The mean represents what every value would be if all the data were levelled out equally. If five people had different amounts of money and pooled it, the mean is what each would get after sharing equally. It need not equal any of the original values.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "levelling-model",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Values: 3, 7, 5, 9, 6  — total: 30",               "highlight": null },
+            { "text": "Shared equally among 5: 30 ÷ 5 = 6",              "highlight": "accent" },
+            { "text": "Mean = 6 — none of the original values is 6",     "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Values three, seven, five, nine, and six total thirty. Shared equally among five, each gets six. The mean is six — and in this case, one of the data points happens to equal six, but that is coincidental. Often the mean falls between values.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "mean-can-be-decimal",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Values: 1, 2, 4 — total: 7",                       "highlight": "accent" },
+            { "text": "Mean = 7 ÷ 3 = 2.33…",                           "highlight": "accent" },
+            { "text": "The mean is not always a whole number  ✓",        "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "For values one, two, and four, the total is seven and the mean is seven divided by three — approximately two point three three. The mean is a decimal that does not appear in the data at all. This is completely normal.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Mean = total ÷ count — a fair-share value, not necessarily in the data",
+          "label": "The mean balances the data — it can be a decimal and need not appear in the list"
+        }
+      ],
+      "narration": "The mean is a fair-share value — it balances the dataset. It can be any number, including a decimal, and it may or may not match any value in the original list.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: expecting the mean to be one of the data values, or to always be a whole number. The mean is the total shared equally — it can be any number, including a decimal.",
+    "audioNarration": "The mean is not necessarily one of the data values and does not have to be a whole number. It is the total divided by the count — a fair-share value that balances the data."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}
