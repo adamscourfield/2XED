@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "G1.5",
+  "skillName": "Angles around a point sum to 360°",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students forget that all angles around a single point must total 360° and leave out angles or use the wrong total.",
+  "generatedAt": "2026-04-19T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "the-rule",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "All angles around a point add up to 360°",
+          "subText": "Include every angle at the point — none can be left out"
+        }
+      ],
+      "narration": "All the angles that meet at a single point, going all the way around, must add to three hundred and sixty degrees. Include every angle — not just the obvious ones. Set up the equation: all known angles plus the unknown equals three hundred and sixty.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "apply-the-rule",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Three angles around a point: 120°, 90°, and x°",   "highlight": null },
+            { "text": "120° + 90° + x° = 360°",                          "highlight": "accent" },
+            { "text": "x = 360° − 210° = 150°  ✓",                      "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Three angles around a point: one hundred and twenty, ninety, and x. Sum to three hundred and sixty: one hundred and twenty plus ninety is two hundred and ten, so x equals three hundred and sixty minus two hundred and ten, which is one hundred and fifty.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "check",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Check: 120° + 90° + 150° = 360°  ✓",              "highlight": "green" },
+            { "text": "All angles accounted for — none missed",           "highlight": "accent" },
+            { "text": "Count the regions around the point before solving", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Check: one hundred and twenty plus ninety plus one hundred and fifty equals three hundred and sixty. Before setting up the equation, count all the regions around the point to make sure none are missed.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "120° + 90° + 150° = 360°",
+          "label": "Sum all angles at the point = 360° — count every region before solving"
+        }
+      ],
+      "narration": "One hundred and fifty degrees. Total three hundred and sixty — confirmed. Always count the regions around the point first to ensure the equation includes every angle.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: using 180° for angles around a full point, or leaving out one of the angles. All angles around a point — in every direction — sum to 360°. Include every region in the equation.",
+    "audioNarration": "Angles around a complete point always sum to 360°. Write an equation including all angles at that point. If you count three regions, write three terms — missing one will give a wrong answer."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

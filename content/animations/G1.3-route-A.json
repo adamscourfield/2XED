@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "G1.3",
+  "skillName": "Draw angles with a protractor",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students draw the baseline but then mark the wrong scale on the protractor, producing 180° minus the intended angle.",
+  "generatedAt": "2026-04-19T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "drawing-steps",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Step 1: Draw a baseline and mark a point (the vertex)", "highlight": "accent" },
+            { "text": "Step 2: Place centre on vertex, baseline along the line",  "highlight": "accent" },
+            { "text": "Step 3: Mark the required angle on the correct scale",     "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Draw a straight baseline and mark a point on it — this will be the vertex. Place the protractor with its centre on that point and the baseline aligned along the line. Find the required angle on the correct scale and make a small mark.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "choose-correct-scale",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Use the scale that reads 0° where your baseline sits — then count up to your angle",
+          "subText": "Drawing 70°: find 70° on the scale that starts at 0° on your baseline arm"
+        }
+      ],
+      "narration": "With the protractor in position, identify which scale reads zero at the baseline. Count along that scale to the required angle and make a dot. Do not switch to the other scale mid-way — stay on the scale that started at zero.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "complete-the-angle",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Step 4: Remove protractor, join vertex to the mark", "highlight": "accent" },
+            { "text": "Step 5: Sanity-check — does the angle look right?",  "highlight": "accent" },
+            { "text": "70° should look clearly less than a right angle  ✓", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Remove the protractor and draw a straight line from the vertex to the mark you made. Check the result: a seventy-degree angle should look clearly smaller than a right angle. If it looks obtuse, you used the wrong scale and drew one hundred and ten degrees.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "70° drawn correctly — acute, clearly less than 90°",
+          "label": "Baseline → correct scale → mark → remove → join → sanity-check"
+        }
+      ],
+      "narration": "Seventy degrees — a clean acute angle. The sanity-check is essential: if the drawn angle does not match the expected type, the wrong scale was used.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: marking 110° instead of 70° by using the wrong scale. Always use the scale that reads 0° on your baseline — then 70° on that scale gives the correct angle. Sanity-check: 70° is acute.",
+    "audioNarration": "The scale to use is the one that starts at 0° on your baseline. If you pick the other scale for a 70° angle, you will mark 110° instead. Check the result looks like the right type — acute, obtuse, or otherwise."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "G1.5",
+  "skillName": "Angles around a point sum to 360°",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students do not connect the 360° rule to the idea of a full rotation and treat it as an arbitrary fact to memorise.",
+  "generatedAt": "2026-04-19T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "full-rotation",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "A full rotation returns to the starting direction — that rotation is defined as 360°",
+          "subText": "Any angles that together fill all directions from a point must sum to 360°"
+        }
+      ],
+      "narration": "One complete rotation — turning all the way around until facing the original direction — is defined as three hundred and sixty degrees. Any set of angles that together cover all directions from a point are simply dividing up that one full rotation.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "dividing-the-full-rotation",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Full rotation = 360°",                             "highlight": null },
+            { "text": "Split into any regions — they share the 360°",    "highlight": "accent" },
+            { "text": "4 right angles: 4 × 90° = 360°  ✓",              "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Four right angles arranged around a point each claim ninety degrees of the full rotation — four times ninety is three hundred and sixty. Any other split — two angles, five angles, unequal angles — still totals three hundred and sixty, because they always share the same full rotation.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "practical-connection",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Compass: N, E, S, W — four directions",            "highlight": "accent" },
+            { "text": "From N back to N = full turn = 360°",             "highlight": "accent" },
+            { "text": "Each quarter turn (N→E→S→W→N) = 90°",            "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Think of a compass: turning from north through east, south, west, and back to north is a full turn of three hundred and sixty degrees. Each quarter step is ninety degrees. The angles around any point work the same way — they divide a full turn.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Full rotation = 360° — angles around a point share this rotation",
+          "label": "The 360° rule is not arbitrary — it describes one complete rotation"
+        }
+      ],
+      "narration": "Three hundred and sixty degrees — one complete rotation. Angles around a point are not a rule to memorise; they are simply the portions of one full rotation, which always total three hundred and sixty.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: treating 360° as an arbitrary number. It is not — it is the definition of one full rotation. Any angles that together complete a full turn from a single point must sum to 360°.",
+    "audioNarration": "Three hundred and sixty degrees is a full rotation — turning all the way around. Angles around a point divide up that full rotation, so they must always total 360°. The rule describes a physical reality, not an arbitrary fact."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}
