@@ -1,0 +1,81 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.4",
+  "skillName": "Multiplication (without carrying)",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students don't see why the grid method gives the same result as column multiplication.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "distributive-law",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Multiplication distributes over addition: a × (b + c) = a×b + a×c",
+          "subText": "Partitioning a number and multiplying each part separately always works"
+        }
+      ],
+      "narration": "The grid method works because of the distributive law. Multiplying by a split number is identical to multiplying by each part and adding the results. This is not a trick — it is a mathematical guarantee.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "area-model",
+      "visuals": [
+        {
+          "type": "area_model",
+          "rows": [{ "label": "3", "height": 1 }],
+          "cols": [
+            { "label": "200", "width": 4 },
+            { "label": "30",  "width": 1 },
+            { "label": "1",   "width": 0.2 }
+          ],
+          "cells": [
+            { "row": 0, "col": 0, "value": "600" },
+            { "row": 0, "col": 1, "value": "90" },
+            { "row": 0, "col": 2, "value": "3" }
+          ]
+        }
+      ],
+      "narration": "Picture a rectangle three units tall and two hundred and thirty-one units wide. Split the width into two hundred, thirty, and one. Each section of the rectangle is a partial product — the areas add to the total.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "same-as-column",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Grid: 600 + 90 + 3 = 693",           "highlight": "accent" },
+            { "text": "Column: write 3, 9, 6 in their columns → 693", "highlight": "green" },
+            { "text": "Both methods apply the distributive law", "highlight": null }
+          ]
+        }
+      ],
+      "narration": "The grid and column methods produce the same partial products — they are two presentations of the same distributive law. The column method is more compact; the grid makes the reasoning visible.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "231 × 3 = (200 + 30 + 1) × 3 = 693",
+          "label": "Distributive law: multiply each part then add"
+        }
+      ],
+      "narration": "Six hundred and ninety-three. Partitioning and distributing is not a workaround — it is exactly what the column method compresses into a neater layout.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: thinking the grid method is less rigorous than column multiplication. Both apply the distributive law identically — the grid just makes each partial product visible.",
+    "audioNarration": "The grid and column methods are the same mathematics. Both split the number into parts, multiply each part, and add. The grid makes every step explicit."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

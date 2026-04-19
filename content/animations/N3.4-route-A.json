@@ -1,0 +1,80 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.4",
+  "skillName": "Multiplication (without carrying)",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students add partial products in the wrong order, misaligning place values.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "grid-method",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Multiply 231 × 3 using the grid method",  "highlight": null },
+            { "text": "Split: 200 + 30 + 1",                     "highlight": "accent" },
+            { "text": "× 3:  600 + 90 + 3 = 693",               "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Partition the larger number into hundreds, tens, and ones. Multiply each part by three separately. Two hundred times three is six hundred, thirty times three is ninety, one times three is three. Add: six hundred and ninety-three.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "column-method",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "  231",                    "highlight": null },
+            { "text": "×   3",                    "highlight": null },
+            { "text": "Ones: 1×3 = 3",            "highlight": "accent" },
+            { "text": "Tens: 3×3 = 9",            "highlight": "accent" },
+            { "text": "Hundreds: 2×3 = 6 → 693",  "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "In column format, multiply each digit by three from right to left. One times three is three, three times three is nine, two times three is six. No carrying needed here — write each product directly.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "no-carry-check",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "No carry needed when each digit × multiplier < 10", "highlight": "accent" },
+            { "text": "1×3=3, 3×3=9, 2×3=6 — all single digit",           "highlight": "green" },
+            { "text": "Write directly without carrying",                    "highlight": "null" }
+          ]
+        }
+      ],
+      "narration": "When every partial product is a single digit — less than ten — no carrying is needed. Each product goes directly into its column.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "231 × 3 = 693",
+          "label": "Multiply each digit right to left — no carry when product < 10"
+        }
+      ],
+      "narration": "Six hundred and ninety-three. Multiply digit by digit from the right, write each product directly when no carry is needed.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: writing partial products in the wrong place — e.g. writing 6, 9, 3 as a list rather than building the column answer 693. Ones product goes in ones column, tens in tens, and so on.",
+    "audioNarration": "Each partial product belongs in its own column. The ones digit × multiplier goes in the ones column, tens digit × multiplier in the tens column, and so on."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

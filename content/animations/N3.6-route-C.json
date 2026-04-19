@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.6",
+  "skillName": "Area of rectangles, parallelograms, triangles and compound shapes",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students add the areas of sub-shapes in a compound figure but include an overlapping region twice.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "L-shape split into two rectangles A and B",         "highlight": null },
+            { "text": "Student: Area = A + B (using the full dimensions of each)  ✗", "highlight": "accent" },
+            { "text": "Overlapping corner counted in both A and B",          "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "When splitting a compound shape, the split must produce non-overlapping parts. If the rectangles are drawn with full dimensions that overlap, the corner region gets counted twice — giving an answer that is too large.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "clean-split",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Split the compound shape so every part is non-overlapping — each square centimetre belongs to exactly one region",
+          "subText": "Draw the dividing line inside the shape, not extending across it"
+        }
+      ],
+      "narration": "The dividing line must run cleanly through the interior, creating two regions with no overlap. Adjust the dimension of each region to reflect only its actual area — not the full span of the original shape.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "correct-split",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "L-shape: overall 10×8, cut-out 4×3",              "highlight": null },
+            { "text": "Split into: Rectangle A: 10×5, Rectangle B: 6×3", "highlight": "accent" },
+            { "text": "Area = 50 + 18 = 68 cm²  ✓",                    "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "One valid split: a ten by five rectangle for the bottom section and a six by three rectangle for the top step. The dimensions are adjusted so there is no overlap. Fifty plus eighteen is sixty-eight square centimetres.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Area = 50 + 18 = 68 cm²",
+          "label": "Non-overlapping split → calculate each part → add"
+        }
+      ],
+      "narration": "Sixty-eight square centimetres. Split cleanly, adjust dimensions, add. Every part of the shape is counted exactly once.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: splitting a compound shape into rectangles with overlapping dimensions, counting a corner region twice. Ensure the split produces non-overlapping regions — adjust dimensions accordingly.",
+    "audioNarration": "Each square centimetre must belong to exactly one region. Check your split produces non-overlapping parts — if dimensions overlap, a region is being counted twice."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

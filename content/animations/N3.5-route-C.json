@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.5",
+  "skillName": "Multiplication (with carrying)",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students forget to add the carry to the next column's product.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "263 × 4",                                      "highlight": null },
+            { "text": "Student: 3×4=12 (write 2 carry 1), 6×4=24 (write 24)  ✗", "highlight": "accent" },
+            { "text": "Forgot to add the carry 1 to 24",              "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The student carried the one correctly after the ones column but then multiplied the tens digit and wrote twenty-four without adding the carried one. The tens product must include the carry.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "carry-must-be-added",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "After multiplying each digit, ADD the carry before deciding what to write and carry next",
+          "subText": "Product + carry → write units digit, carry tens digit"
+        }
+      ],
+      "narration": "The carry must be added before you decide what to write and what to carry next. Multiply the digit, add the carry from the previous column, then split the result into units to write and tens to carry.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "correct-method",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Ones: 3×4 = 12 → write 2, carry 1",           "highlight": "accent" },
+            { "text": "Tens: 6×4 = 24, + carry 1 = 25 → write 5, carry 2", "highlight": "accent" },
+            { "text": "Hundreds: 2×4 = 8, + carry 2 = 10 → write 10 → answer: 1052  ✓", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Ones: twelve — write two, carry one. Tens: twenty-four plus one is twenty-five — write five, carry two. Hundreds: eight plus two is ten — write one zero. Answer: one thousand and fifty-two.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "263 × 4 = 1052",
+          "label": "Multiply → add carry → write units → carry tens"
+        }
+      ],
+      "narration": "One thousand and fifty-two. The carry must be added at every column — multiply first, add carry second, then split the result.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: multiplying the digit correctly but writing the product without adding the previous carry. Always: multiply → add carry → write units digit → carry tens digit.",
+    "audioNarration": "The carry must be added before you write anything. Multiply the digit, add the carry from the last column, then split: units to write, tens to carry forward."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

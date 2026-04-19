@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.6",
+  "skillName": "Area of rectangles, parallelograms, triangles and compound shapes",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students can't see why the triangle formula has a half and why a parallelogram equals a rectangle of the same base and height.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "parallelogram-from-rectangle",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "A parallelogram can be cut and rearranged into a rectangle of the same base and height",
+          "subText": "Slice the triangle from one end and attach it to the other — same area, new rectangle"
+        }
+      ],
+      "narration": "Cut a right-triangle from one end of a parallelogram and slide it to the opposite end. The shape becomes a rectangle — same base, same perpendicular height, same area. That is why both use base times height.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "triangle-is-half",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Two identical triangles form a parallelogram", "highlight": "accent" },
+            { "text": "Parallelogram area = b × h",                  "highlight": null },
+            { "text": "Triangle area = ½ × b × h",                  "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Every triangle is exactly half a parallelogram — place two identical triangles together and they form a parallelogram. So a triangle's area is exactly half of base times height.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "compound-shapes",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Split compound shape into rectangles and triangles", "highlight": "accent" },
+            { "text": "Calculate each part separately",                     "highlight": null },
+            { "text": "Add the parts (or subtract cut-outs)",               "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Compound shapes are handled by splitting. Identify rectangles and triangles within the compound shape, calculate each area separately, and add — or subtract cut-out regions.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Triangle = ½ × parallelogram = ½ × b × h",
+          "label": "Two triangles make a parallelogram — hence the half"
+        }
+      ],
+      "narration": "The half in the triangle formula is not arbitrary — it directly reflects that a triangle is half a parallelogram. The visual proof makes it memorable.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: forgetting the half in the triangle formula. Two identical triangles tile a parallelogram — so one triangle is exactly half the base × height product.",
+    "audioNarration": "A triangle is half a parallelogram — join two together and they form one. That is where the half in the formula comes from. It is not arbitrary."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}
