@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.8",
+  "skillName": "Short division (with carrying)",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students forget to carry the remainder to the next digit, treating each column as independent.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "857 ÷ 4",                                        "highlight": null },
+            { "text": "Student: 8÷4=2, 5÷4=1, 7÷4=1 r3 → 211 r3  ✗",   "highlight": "accent" },
+            { "text": "Remainder from tens not carried to ones",          "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The student correctly divided each digit but ignored the remainder of one from the tens column. That one ten must be included in the ones step — without it, the ones digit is calculated as seven rather than seventeen.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "carry-rule",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Write remainders as a small digit in front of the next column's number",
+          "subText": "Then include that small digit when you divide the next column"
+        }
+      ],
+      "narration": "After each step, check whether there is a remainder. If there is, write it as a small digit in front of the next digit. When you divide that next column, use the combined number — the small carry digit joined to the main digit.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "correct-method",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Tens: 5 ÷ 4 = 1 r 1 → carry ¹ to ones",     "highlight": "accent" },
+            { "text": "Ones: ¹7 = 17 ÷ 4 = 4 r 1",                 "highlight": "accent" },
+            { "text": "Answer: 214 r 1  ✓ (not 211 r 3)",           "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Write the remainder one as a small superscript before the seven — making seventeen. Seventeen divided by four is four remainder one. The answer is two hundred and fourteen remainder one, not two eleven remainder three.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "857 ÷ 4 = 214 r 1",
+          "label": "Always carry remainders — a missed carry changes every digit that follows"
+        }
+      ],
+      "narration": "Two hundred and fourteen remainder one. A missed carry does not just affect one digit — it changes every subsequent step, so always check for a remainder before moving to the next column.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: 857 ÷ 4 = 211 r 3 (remainder from tens not carried). The remainder of 1 ten must be written before the 7, making 17 ÷ 4 = 4 r 1. Answer: 214 r 1.",
+    "audioNarration": "Every remainder must carry to the next column. Write it as a small digit before the next number and use the combined value in that step. Skipping the carry produces a wrong answer in every column after."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

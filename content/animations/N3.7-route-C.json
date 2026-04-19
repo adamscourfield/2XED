@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.7",
+  "skillName": "Short division (without carrying)",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students divide the divisor by each digit rather than each digit by the divisor.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "693 ÷ 3",                                          "highlight": null },
+            { "text": "Student: 3 ÷ 6 = 0.5, 3 ÷ 9 = 0.3, 3 ÷ 3 = 1  ✗", "highlight": "accent" },
+            { "text": "Divided the divisor BY the digits — backwards",     "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The student divided three by each digit instead of each digit by three. This reverses the operation entirely — three divided by six is not the same as six divided by three.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "which-way-round",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Always divide the dividend digit by the divisor — never the other way",
+          "subText": "In 693 ÷ 3: the divisor is 3, so divide EACH digit of 693 by 3"
+        }
+      ],
+      "narration": "The divisor is the number you are dividing by — it goes outside the bus-stop bracket. Every digit inside the bracket is divided by that outside number, not the reverse.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "correct-method",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Hundreds: 6 ÷ 3 = 2 (not 3 ÷ 6)",  "highlight": "accent" },
+            { "text": "Tens:     9 ÷ 3 = 3 (not 3 ÷ 9)",  "highlight": "accent" },
+            { "text": "Ones:     3 ÷ 3 = 1  → Answer: 231  ✓", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Six divided by three is two, nine divided by three is three, three divided by three is one. Each digit of the dividend is divided by the divisor — the answer is two hundred and thirty-one.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "693 ÷ 3 = 231",
+          "label": "Dividend digits ÷ divisor — the divisor is always the number you divide BY"
+        }
+      ],
+      "narration": "Two hundred and thirty-one. The divisor is always what you divide by — each digit inside the bracket is divided by the number outside, never the reverse.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: 693 ÷ 3 computed as 3÷6, 3÷9, 3÷3. The divisor 3 goes outside — divide each digit of 693 by 3, not the other way round.",
+    "audioNarration": "The divisor is what you divide BY. In 693 ÷ 3, divide each digit of 693 by 3 — not 3 by each digit. Direction matters."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

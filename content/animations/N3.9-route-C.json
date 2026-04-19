@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.9",
+  "skillName": "Order of Operations",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students calculate left to right regardless of operation, ignoring priority rules.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Calculate: 12 − 2 × 3",                          "highlight": null },
+            { "text": "Student: 12 − 2 = 10, then 10 × 3 = 30  ✗",     "highlight": "accent" },
+            { "text": "Worked left to right — ignored multiplication priority", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The student worked left to right, subtracting two from twelve before multiplying by three. But multiplication takes priority over subtraction — the multiplication must be done first.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "scan-first",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Before calculating, scan the expression for × and ÷ — do those first",
+          "subText": "Then return to + and − in left-to-right order"
+        }
+      ],
+      "narration": "The habit to build: before starting, scan the whole expression for multiplication and division signs. Those operations are calculated first, wherever they appear. Then handle addition and subtraction from left to right.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "correct-method",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "12 − 2 × 3",                               "highlight": null },
+            { "text": "Step 1 — Multiply first: 2 × 3 = 6",       "highlight": "accent" },
+            { "text": "Step 2 — Subtract: 12 − 6 = 6  ✓",        "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "First, two times three is six. Then twelve minus six is six. The answer is six, not thirty — a very different result from working left to right.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "12 − 2 × 3 = 6",
+          "label": "Multiply first: 2 × 3 = 6, then 12 − 6 = 6"
+        }
+      ],
+      "narration": "Six. Scan for multiplication and division first, calculate those, then handle addition and subtraction from left to right. Left to right is only correct when all operations have equal priority.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: 12 − 2 × 3 = 30 (worked left to right). Multiplication takes priority — calculate 2 × 3 = 6 first, then 12 − 6 = 6.",
+    "audioNarration": "Scan for multiplication and division before you start. Those go first, no matter where they appear in the expression. Addition and subtraction wait until all higher-priority operations are done."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}
