@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N2.11",
+  "skillName": "Perimeter of rectangles and parallelograms",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students use the diagonal of a parallelogram as a side length in the perimeter.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Parallelogram: base 10 cm, slant side 6 cm, height 5 cm", "highlight": null },
+            { "text": "Student: P = 2(10 + 5) = 30 cm  ✗",                       "highlight": "accent" },
+            { "text": "Used perpendicular height instead of slant side",          "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The student used the perpendicular height — five centimetres — as a side length. But the height is not a side. The sides of the parallelogram are the base and the slant edge. The height is only used for area.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "height-vs-side",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Perimeter uses the actual side lengths — never the perpendicular height",
+          "subText": "The slant side is longer than the height — it is the actual boundary"
+        }
+      ],
+      "narration": "The perpendicular height drops at right angles inside the parallelogram — it is not part of the boundary. The slant side is the actual edge you would walk along. Use the slant side for perimeter.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "correct-method",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Sides: base 10 cm, slant side 6 cm",  "highlight": "accent" },
+            { "text": "P = 2(10 + 6) = 2 × 16",             "highlight": "accent" },
+            { "text": "P = 32 cm  ✓",                       "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Use the base and the slant side: two times ten plus six is thirty-two centimetres. The height of five centimetres plays no part in the perimeter.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "P = 2(10 + 6) = 32 cm",
+          "label": "Use slant sides — perpendicular height is for area only"
+        }
+      ],
+      "narration": "Thirty-two centimetres. For perimeter, always use the actual side lengths — the slant sides you would walk along, not the internal height.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: using the perpendicular height as a side in P = 2(b + h). The height is for area. Perimeter uses the actual slant side — the boundary edge.",
+    "audioNarration": "The perpendicular height is inside the shape — it is not a boundary edge. Always use the slant side for perimeter. Height is for area calculations only."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

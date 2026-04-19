@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N2.10",
+  "skillName": "Perimeter of regular polygons",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students divide the perimeter by 2 instead of by n when finding the side length.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Regular octagon, perimeter = 56 cm",        "highlight": null },
+            { "text": "Student: side = 56 ÷ 2 = 28 cm  ✗",        "highlight": "accent" },
+            { "text": "Divided by 2 — confused with a rectangle",  "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The student divided by two as if the shape were a rectangle. A rectangle divides by two because it has two pairs of equal sides. An octagon has eight equal sides — the perimeter divides by eight.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "count-sides-first",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Side length = Perimeter ÷ number of sides (n)",
+          "subText": "Count the sides of the polygon before dividing"
+        }
+      ],
+      "narration": "Always count the sides of the polygon first. The perimeter is shared equally between all n sides — divide by n, not by two.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "correct-method",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Octagon: n = 8 sides",                "highlight": "accent" },
+            { "text": "Side = 56 ÷ 8 = 7 cm  ✓",            "highlight": "green" },
+            { "text": "Check: 8 × 7 = 56 ✓",                "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Eight sides: divide fifty-six by eight to get seven centimetres per side. Check by multiplying back: eight times seven is fifty-six. Correct.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Side = 56 ÷ 8 = 7 cm",
+          "label": "Divide perimeter by the number of sides — not by 2"
+        }
+      ],
+      "narration": "Seven centimetres. Count the sides first, then divide. Always check by multiplying back.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: dividing the perimeter by 2 for a regular octagon. Divide by the number of sides — 8 here. The ÷2 shortcut only applies to rectangles.",
+    "audioNarration": "Dividing by 2 is a rectangle trick. For any regular polygon, divide by the number of sides. Count the sides first — then divide."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

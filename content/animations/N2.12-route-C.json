@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N2.12",
+  "skillName": "Perimeter of an isosceles triangle or an isosceles trapezium",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students find a missing leg by subtracting from the perimeter without accounting for both legs.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Isosceles triangle: perimeter 30 cm, base 6 cm",  "highlight": null },
+            { "text": "Student: leg = 30 − 6 = 24 cm  ✗",                "highlight": "accent" },
+            { "text": "Subtracted base once — forgot there are two legs", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The student subtracted the base correctly but forgot that the remaining twenty-four centimetres represents both legs combined, not just one. Each leg is half of twenty-four.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "two-equal-legs",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "After subtracting known sides, divide the remainder by 2 to find one isosceles leg",
+          "subText": "Both legs are equal — the remainder is shared equally between them"
+        }
+      ],
+      "narration": "The perimeter minus the base gives the total length of both legs together. Divide by two to find each leg's length.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "correct-method",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "P = 30, base = 6",                    "highlight": null },
+            { "text": "Both legs = 30 − 6 = 24 cm",          "highlight": "accent" },
+            { "text": "Each leg = 24 ÷ 2 = 12 cm  ✓",        "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Thirty minus six is twenty-four — that is both legs together. Twenty-four divided by two is twelve centimetres per leg. Check: twelve plus twelve plus six equals thirty.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Each leg = (P − base) ÷ 2 = 12 cm",
+          "label": "Subtract known sides → divide remainder by 2 → one leg"
+        }
+      ],
+      "narration": "Twelve centimetres. Subtract the base, then halve — because two equal legs share the remaining perimeter.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: leg = P − base = 30 − 6 = 24 cm. That is both legs combined. Divide by 2: each leg = (30 − 6) ÷ 2 = 12 cm.",
+    "audioNarration": "After subtracting the base, you have the combined length of both legs. Divide by two — the two legs share that total equally."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

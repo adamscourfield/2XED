@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N2.10",
+  "skillName": "Perimeter of regular polygons",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students add all sides individually rather than using the formula n × side length.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "regular-means-equal",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "A regular polygon has all sides equal and all angles equal",
+          "subText": "Perimeter = number of sides × side length"
+        }
+      ],
+      "narration": "A regular polygon has every side the same length. That means you do not need to add each side individually — multiply the side length by the number of sides.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "apply-formula",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Regular hexagon, side = 4.5 cm",     "highlight": null },
+            { "text": "n = 6 sides",                       "highlight": "accent" },
+            { "text": "Perimeter = 6 × 4.5 = 27 cm",       "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "A regular hexagon has six equal sides. Six multiplied by four point five is twenty-seven centimetres. One multiplication replaces six additions.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "reverse-problem",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Regular pentagon, perimeter = 35 cm", "highlight": null },
+            { "text": "n = 5 sides",                        "highlight": "accent" },
+            { "text": "Side = 35 ÷ 5 = 7 cm",              "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "If the perimeter is given, find the side length by dividing by the number of sides. Thirty-five divided by five gives seven centimetres per side.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Perimeter = n × side length",
+          "label": "Regular polygon → multiply one side length by number of sides"
+        }
+      ],
+      "narration": "Perimeter equals n times the side length. Know the side, multiply. Know the perimeter, divide. The formula works in both directions.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: adding 4.5 + 4.5 + 4.5 + 4.5 + 4.5 + 4.5 individually. All sides are equal in a regular polygon — multiply the side length by the number of sides.",
+    "audioNarration": "Regular means all sides equal. One multiplication gives the perimeter — n times the side length. No need to add every side separately."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}
