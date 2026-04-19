@@ -1,0 +1,74 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N2.16",
+  "skillName": "Add and subtract numbers given in standard form",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students add the A values and add the exponents, instead of converting to equal powers first.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "must-match-powers",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "You can only add or subtract standard form numbers that have the same power of 10",
+          "subText": "Convert both numbers to the same power first, then add the A values"
+        }
+      ],
+      "narration": "Addition and subtraction require matching units. In standard form, the power of ten is the unit. Before adding, rewrite both numbers using the same power of ten.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "convert-to-match",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "3.2 × 10⁵ + 4.7 × 10⁴",                  "highlight": null },
+            { "text": "Convert 3.2 × 10⁵ = 32 × 10⁴",            "highlight": "accent" },
+            { "text": "32 × 10⁴ + 4.7 × 10⁴ = 36.7 × 10⁴",      "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Rewrite three point two times ten to the five as thirty-two times ten to the four — same value, different form. Now both share the power ten to the four and the A values can be added directly.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "restore-standard-form",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "36.7 × 10⁴ → A = 36.7 (too big — not 1 ≤ A < 10)", "highlight": "accent" },
+            { "text": "36.7 × 10⁴ = 3.67 × 10⁵",                          "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "The result thirty-six point seven is not between one and ten — it is not in standard form. Divide by ten and increase the exponent by one: three point six seven times ten to the five.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "3.2 × 10⁵ + 4.7 × 10⁴ = 3.67 × 10⁵",
+          "label": "Match powers → add A values → restore to standard form"
+        }
+      ],
+      "narration": "Three point six seven times ten to the five. Match the powers, add the A values, then adjust back to standard form if needed.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: 3.2 × 10⁵ + 4.7 × 10⁴ → (3.2+4.7) × 10⁹ = 7.9 × 10⁹. You cannot add A values and exponents separately. Match the powers first, then add A values.",
+    "audioNarration": "Never add A values and exponents independently. Rewrite both numbers using the same power of ten first — then add the A values and adjust back to standard form."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

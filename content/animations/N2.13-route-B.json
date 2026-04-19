@@ -1,0 +1,74 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N2.13",
+  "skillName": "Perimeter of a compound shape",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students add the perimeters of the component rectangles and do not subtract the shared internal edges.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "joining-removes-edges",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "When two shapes are joined, the shared edge disappears from both boundaries — subtract it twice",
+          "subText": "Each shape loses one edge at the join — total perimeter = P₁ + P₂ − 2 × shared edge"
+        }
+      ],
+      "narration": "When two rectangles are placed side by side, the edge where they touch is no longer on the boundary of either shape. It disappears from both perimeters — so it must be subtracted twice from the combined total.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "worked-example",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Two 6×4 rectangles joined along a 4 cm edge", "highlight": null },
+            { "text": "P₁ = 20 cm,  P₂ = 20 cm",                    "highlight": "accent" },
+            { "text": "Compound P = 20 + 20 − 2×4 = 32 cm",          "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Each rectangle has perimeter twenty. Together they would be forty — but the four-centimetre join is hidden on both sides. Subtract twice four: forty minus eight is thirty-two centimetres.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "trace-confirms",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Tracing the boundary: 6+4+6+4+6+4+... → 32 cm", "highlight": "green" },
+            { "text": "Confirms: formula and trace agree",              "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Tracing the outer boundary of the compound shape and adding each edge directly confirms the thirty-two centimetre answer. Both methods agree — the formula is reliable.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "P = P₁ + P₂ − 2 × shared edge",
+          "label": "Joining removes the shared edge from both boundaries"
+        }
+      ],
+      "narration": "Joining two shapes removes the shared edge from both perimeters. Subtract it twice from the sum of the individual perimeters.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: P = P₁ + P₂ without subtracting the shared join. The join edge disappears from both shapes — subtract it twice: P = P₁ + P₂ − 2 × shared.",
+    "audioNarration": "When shapes join, the shared edge vanishes from the boundary of each shape. Subtract it twice — once for each shape that loses it."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

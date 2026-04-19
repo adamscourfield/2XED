@@ -1,0 +1,74 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N2.13",
+  "skillName": "Perimeter of a compound shape",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students include internal shared edges in the perimeter instead of only counting the outer boundary.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "identify-boundary",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Perimeter = the outer boundary only — internal edges where shapes join are NOT included",
+          "subText": "Trace the outside of the compound shape with a finger to identify every boundary edge"
+        }
+      ],
+      "narration": "A compound shape is two or more shapes joined together. The perimeter is only the outer edge — the boundary you would walk around. Any edge where two component shapes share a join is an internal edge and must not be counted.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "find-missing-sides",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "L-shape: overall 10 × 8, cut-out 4 × 3",  "highlight": null },
+            { "text": "Missing horizontal = 10 − 4 = 6 cm",      "highlight": "accent" },
+            { "text": "Missing vertical = 8 − 3 = 5 cm",         "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Calculate unlabelled boundary edges before adding. Use the overall dimensions minus the cut-out dimensions — as with any rectilinear compound shape.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "add-boundary",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Boundary sides: 10, 8, 6, 3, 4, 5",       "highlight": "accent" },
+            { "text": "Perimeter = 10 + 8 + 6 + 3 + 4 + 5 = 36 cm", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Add only the outer boundary edges. Six boundary sides: ten, eight, six, three, four, five. Total thirty-six centimetres.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Perimeter = 36 cm",
+          "label": "Trace boundary → calculate missing sides → add outer edges only"
+        }
+      ],
+      "narration": "Thirty-six centimetres. Trace the outside, find any missing lengths by subtraction, then add every outer edge.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: including the internal join edge in the perimeter. Only the outer boundary counts — trace the shape with a finger to check every edge you include is on the outside.",
+    "audioNarration": "Internal edges where shapes join are not part of the perimeter. Only the outer boundary counts. Trace the outside edge to identify exactly which lengths to add."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

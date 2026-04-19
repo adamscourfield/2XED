@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N2.14",
+  "skillName": "Solve problems involving tables and timetables",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students treat time as base-10, not understanding that 60 minutes = 1 hour.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "time-is-base-60",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Time uses base 60 for minutes and seconds — NOT base 10",
+          "subText": "60 minutes = 1 hour; there is no such thing as 1:75 or 2:80"
+        }
+      ],
+      "narration": "Unlike our decimal number system, time uses base sixty for minutes and seconds. Sixty minutes fills an hour completely — there is no seventieth minute. This is why standard subtraction breaks down with time.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "reading-24-hour",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "24-hour clock: 00:00 midnight to 23:59",  "highlight": null },
+            { "text": "13:00 = 1 pm,  18:30 = 6:30 pm",         "highlight": "accent" },
+            { "text": "Subtract 12 from hours 13–23 to get pm",  "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Timetables use twenty-four hour clock to avoid am/pm ambiguity. Hours from thirteen to twenty-three are in the afternoon and evening — subtract twelve to convert to twelve-hour time.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "reading-tables",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Read across a row for one train's journey",  "highlight": "accent" },
+            { "text": "Read down a column for all trains at a stop", "highlight": "accent" },
+            { "text": "Dash (—) means the train does not stop there", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Timetable rows show one service's journey from start to end. Columns show all services passing through one stop. A dash means the service does not call at that stop — do not treat it as midnight or zero.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "60 min = 1 h — time is base 60, not base 10",
+          "label": "Count on in stages — standard subtraction fails for time"
+        }
+      ],
+      "narration": "Time works in base sixty. Count on in stages — to the next hour, through whole hours, then to the destination — rather than subtracting digits directly.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: treating time arithmetic like decimal arithmetic. 60 minutes make 1 hour — you cannot subtract minutes from hours directly without converting. Count on instead.",
+    "audioNarration": "Time is base 60 for minutes. You cannot borrow 1 hour as 10 minutes — it becomes 60. Count forward in stages to find durations accurately."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

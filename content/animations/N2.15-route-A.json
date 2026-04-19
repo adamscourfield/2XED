@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N2.15",
+  "skillName": "Solve problems with frequency trees",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students fill branches without checking that sibling branches sum to their parent node.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "tree-structure",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "At every branch point, the two child nodes must sum to the parent node",
+          "subText": "Start with the root total and work outward — never guess a branch value"
+        }
+      ],
+      "narration": "A frequency tree divides a total into categories at each branch. At every split, the two branches must add back to the node above. Fill in using addition and subtraction — never guess.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "fill-top-level",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Total: 120 students",                      "highlight": null },
+            { "text": "Boys: 70 → Girls: 120 − 70 = 50",         "highlight": "accent" },
+            { "text": "Check: 70 + 50 = 120 ✓",                  "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "The root is one hundred and twenty. Boys is seventy, so girls must be fifty — the two branches sum to the root. Always check before moving further down the tree.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "fill-lower-branches",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Boys (70): passed 45 → failed 70 − 45 = 25",   "highlight": "accent" },
+            { "text": "Girls (50): passed 32 → failed 50 − 32 = 18",   "highlight": "accent" },
+            { "text": "Total passed: 45 + 32 = 77",                    "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Work down each branch: boys who passed is forty-five, so boys who failed is seventy minus forty-five equals twenty-five. Similarly for girls. Read across the leaves to find totals for pass or fail.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Total passed = 45 + 32 = 77",
+          "label": "Each branch pair sums to parent → work outward from root"
+        }
+      ],
+      "narration": "Seventy-seven students passed. Fill the tree systematically from the root, checking each branch pair sums correctly before moving on.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: filling in a branch without checking it sums with its sibling to the parent. Every pair of sibling branches must add to their parent — verify at each split.",
+    "audioNarration": "Every branch split must balance: left + right = parent. Fill one branch from given information, subtract to find the other. Check before moving to the next level."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

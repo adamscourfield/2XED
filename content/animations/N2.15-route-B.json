@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N2.15",
+  "skillName": "Solve problems with frequency trees",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students confuse a frequency tree with a probability tree, expecting decimals or fractions at each branch.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "frequency-not-probability",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "A frequency tree shows actual counts — whole numbers, not probabilities or fractions",
+          "subText": "Every node is a number of people, items, or events — never a proportion"
+        }
+      ],
+      "narration": "A frequency tree stores actual counts — whole number frequencies. Unlike a probability tree, the branches hold numbers of people or items, not decimals between zero and one. All nodes are whole numbers that sum to the root total.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "how-to-read",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Root = total sample size",            "highlight": "accent" },
+            { "text": "First branches = first category split", "highlight": "null" },
+            { "text": "Leaves = final sub-groups",           "highlight": "green" },
+            { "text": "All leaves sum to the root",          "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "The root is the total. Branches split by category. The leaves — the final endpoints — are the smallest sub-groups. Add all the leaves and you get back to the root total.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "cross-reading",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Reading across leaves gives totals for a sub-category", "highlight": "accent" },
+            { "text": "e.g. all who passed regardless of gender: add pass leaves", "highlight": "green" },
+            { "text": "e.g. all boys regardless of outcome: read the boys node",   "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "You can extract information in two ways: read a single branch node for a first-level category total, or add the matching leaves across branches for a second-level category total.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Sum of all leaves = root total",
+          "label": "Frequency tree = actual counts; leaves sum to root"
+        }
+      ],
+      "narration": "Every leaf is a count. All leaves sum to the root. This self-checking property makes it easy to spot an error — if the leaves don't total the root, a branch value is wrong.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: writing probabilities (e.g. 0.6) on a frequency tree branch. Frequency trees hold whole-number counts. Each branch holds a number of people or items — never a decimal proportion.",
+    "audioNarration": "Frequency trees contain counts, not probabilities. Every number in the tree is a whole number of people or events. If you see a decimal, you have switched to a probability tree."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}
