@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.10",
+  "skillName": "Multiples",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students confuse multiples with factors, listing numbers that divide into the target rather than the target's times-table members.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "what-are-multiples",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Multiples of n are the results of multiplying n by 1, 2, 3, 4, …",
+          "subText": "They are the members of n's times table"
+        }
+      ],
+      "narration": "Multiples of a number are what you get by multiplying it by any positive whole number. The multiples of six are six, twelve, eighteen, twenty-four — the six times table continuing indefinitely.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "list-multiples",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Multiples of 6:",                                  "highlight": null },
+            { "text": "6×1=6, 6×2=12, 6×3=18, 6×4=24, 6×5=30, …",     "highlight": "accent" },
+            { "text": "All are greater than or equal to 6",               "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "List multiples by multiplying: six, twelve, eighteen, twenty-four, thirty, and so on. Multiples are always equal to or greater than the original number, and there are infinitely many of them.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "test-for-multiple",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Is 42 a multiple of 6?",                           "highlight": null },
+            { "text": "42 ÷ 6 = 7 exactly → yes, 42 = 6 × 7  ✓",       "highlight": "accent" },
+            { "text": "Is 44 a multiple of 6?  44 ÷ 6 = 7.33… → no  ✗", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "To test whether a number is a multiple, divide it by the original. If the result is a whole number, it is a multiple. Forty-two divided by six is seven exactly — so forty-two is a multiple. Forty-four does not divide exactly, so it is not.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Multiples of 6: 6, 12, 18, 24, 30, 36, 42, …",
+          "label": "Multiples = n × 1, n × 2, n × 3, … — the times table of n"
+        }
+      ],
+      "narration": "Six, twelve, eighteen, and so on. Every multiple of six is divisible by six with no remainder — that is the test for membership.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: listing factors of 6 (1, 2, 3, 6) when asked for multiples. Multiples of 6 are 6 × 1, 6 × 2, 6 × 3, … — they are always ≥ 6 and continue forever.",
+    "audioNarration": "Multiples grow — they are the times table. Factors shrink — they are what divides in. Multiples of 6 start at 6 and go up: 6, 12, 18, 24 and so on."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

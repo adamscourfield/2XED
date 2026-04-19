@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "G1.1",
+  "skillName": "Identify and name types of angles",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students identify angles by the length of the arms rather than the amount of turn between them.",
+  "generatedAt": "2026-04-19T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "angle-is-turn",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "An angle measures the amount of turn between two lines — not the length of those lines",
+          "subText": "Long arms and short arms at the same opening make the same angle"
+        }
+      ],
+      "narration": "An angle is a measure of rotation — how much one line has turned from another. The length of the arms is irrelevant. A very short opening and a very wide opening are what create different angle types, not the size of the lines themselves.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "clock-analogy",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Clock hand from 12 to 3 → quarter turn → 90° right angle",    "highlight": "accent" },
+            { "text": "Clock hand from 12 to 6 → half turn → 180° straight line",    "highlight": "accent" },
+            { "text": "Clock hand from 12 past 6 back toward 12 → more than half → reflex", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Think of a clock hand sweeping from twelve. To three is a quarter turn — a right angle. To six is a half turn — a straight line at one hundred and eighty degrees. Continuing past six toward twelve again is more than a half turn — a reflex angle.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "arm-length-irrelevant",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Two angles both opening to 45° — same angle type",           "highlight": "accent" },
+            { "text": "One has arms 1 cm long, the other 10 cm long",              "highlight": "accent" },
+            { "text": "Both are acute — arm length changes nothing  ✓",            "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Two angles both open to forty-five degrees — one with short arms, one with long arms. They are both acute. The arm length tells you nothing about the angle type. Only the amount of rotation matters.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Angle type = amount of turn, not arm length",
+          "label": "Quarter turn = right (90°).  Half turn = straight (180°).  More = reflex."
+        }
+      ],
+      "narration": "Angle type is determined entirely by the rotation between the two arms. A quarter turn is a right angle, a half turn is a straight line, and more than that is reflex. Arm length plays no part.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: thinking a longer arm makes a bigger angle. Arm length is irrelevant — only the opening between the arms determines the angle type. A tiny gap between long arms can still be acute.",
+    "audioNarration": "Angles measure rotation, not length. Two angles with the same opening are the same type regardless of how long their arms are. Focus on the gap between the arms — that is the angle."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

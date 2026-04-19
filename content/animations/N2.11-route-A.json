@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N2.11",
+  "skillName": "Perimeter of rectangles and parallelograms",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students add only two sides rather than all four, forgetting opposite sides are equal.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "opposite-sides-equal",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Rectangles and parallelograms have two pairs of equal opposite sides",
+          "subText": "Perimeter = 2 × length + 2 × width = 2(l + w)"
+        }
+      ],
+      "narration": "In a rectangle or parallelogram, opposite sides are equal. That means you only need to know two different measurements — the length and the width — then double each and add, or add them and double.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "apply-formula",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Rectangle: length 8 cm, width 5 cm",  "highlight": null },
+            { "text": "P = 2 × 8 + 2 × 5 = 16 + 10",        "highlight": "accent" },
+            { "text": "P = 26 cm",                           "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Two times eight plus two times five: sixteen plus ten equals twenty-six centimetres. Or equivalently, eight plus five is thirteen, doubled is twenty-six.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "parallelogram",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Parallelogram: sides 7 cm and 4 cm",  "highlight": null },
+            { "text": "P = 2 × (7 + 4) = 2 × 11",           "highlight": "accent" },
+            { "text": "P = 22 cm",                           "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "A parallelogram uses the same formula. The slant sides are the equal pair, and the top and bottom are the equal pair. Two times seven plus four equals twenty-two centimetres.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "P = 2(l + w)",
+          "label": "Opposite sides equal → add one pair → double the total"
+        }
+      ],
+      "narration": "Two times the sum of length and width gives the perimeter for any rectangle or parallelogram.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: adding length + width = 13 cm and stopping. The perimeter includes all four sides — double the sum: 2 × (8 + 5) = 26 cm.",
+    "audioNarration": "Adding length and width gives only half the perimeter. Multiply by 2 — opposite sides are equal and must both be counted."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

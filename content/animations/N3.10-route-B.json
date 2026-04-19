@@ -1,0 +1,74 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.10",
+  "skillName": "Multiples",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students think multiples are finite — they stop at some point rather than continuing forever.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "multiples-as-skip-counting",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Multiples are what you land on when skip-counting in steps of n",
+          "subText": "They form an infinite sequence with equal gaps of n"
+        }
+      ],
+      "narration": "Imagine counting along a number line in equal jumps. If each jump is six units, you land on six, twelve, eighteen, twenty-four — these are the multiples of six. The jumps never stop, so neither does the list of multiples.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "number-line-view",
+      "visuals": [
+        {
+          "type": "number_line",
+          "start": 0,
+          "end": 36,
+          "marked": [6, 12, 18, 24, 30, 36],
+          "labelEvery": 6
+        }
+      ],
+      "narration": "On a number line from zero to thirty-six, the multiples of six are evenly spaced at every sixth position. The pattern continues beyond thirty-six without end — every sixth number is a multiple.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "divisibility-link",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Multiple of n ↔ divisible by n",             "highlight": null },
+            { "text": "24 is a multiple of 6 because 24 ÷ 6 = 4",  "highlight": "accent" },
+            { "text": "25 is NOT because 25 ÷ 6 = 4 remainder 1",  "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "A number is a multiple of six if and only if it is exactly divisible by six. Twenty-four divides by six perfectly — it is a multiple. Twenty-five leaves a remainder — it is not.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Multiples of 6: 6, 12, 18, 24, 30, … (infinite)",
+          "label": "Equal gaps of 6 — divisible by 6 with no remainder"
+        }
+      ],
+      "narration": "Six, twelve, eighteen — an infinite sequence of equal steps. Every multiple is exactly divisible by the original number, and the sequence has no end.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: thinking multiples stop at a certain point (e.g. stopping at 60). Multiples are infinite — any number in the times table of n, no matter how large, is a multiple of n.",
+    "audioNarration": "Multiples never stop. You can always multiply n by a larger whole number to get the next multiple. The list is infinite."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

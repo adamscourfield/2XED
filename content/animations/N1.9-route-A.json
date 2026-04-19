@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N1.9",
+  "skillName": "Position integers on a number line",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students place numbers without counting intervals — they guess position by proportion of the visible range.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "read-the-scale",
+      "visuals": [
+        {
+          "type": "number_line",
+          "min": 0,
+          "max": 50,
+          "markers": [0, 10, 20, 30, 40, 50],
+          "highlight": null
+        }
+      ],
+      "narration": "Start by reading the scale. Find the two labelled values at each end, count the intervals between tick marks, and calculate the gap each interval represents.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "count-intervals",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Line runs 0 to 50 in 5 equal gaps", "highlight": null },
+            { "text": "Each gap = 50 ÷ 5 = 10",            "highlight": "accent" },
+            { "text": "Place 35: count 3 full gaps + half a gap", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Divide the total range by the number of gaps to find each interval's value. Thirty-five is three full intervals of ten plus half of the next — place it exactly there.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "mark-point",
+      "visuals": [
+        {
+          "type": "number_line",
+          "min": 0,
+          "max": 50,
+          "markers": [0, 10, 20, 30, 40, 50],
+          "points": [{ "value": 35, "label": "35", "highlight": "green" }]
+        }
+      ],
+      "narration": "Mark the point with a dot or arrow, then label it. The label confirms the position — it sits exactly halfway between thirty and forty.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "35 is halfway between 30 and 40",
+          "label": "Read scale → calculate interval → count from nearest labelled mark"
+        }
+      ],
+      "narration": "Count intervals from a labelled mark, not from the left edge. That prevents accumulation of counting errors.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: eyeballing position as a rough fraction of the line length. Always calculate the interval value and count tick marks — guessing introduces avoidable errors.",
+    "audioNarration": "Don't guess. Divide the range by the number of gaps to find what each gap is worth, then count from the nearest labelled point."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

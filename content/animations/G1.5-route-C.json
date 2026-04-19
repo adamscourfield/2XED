@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "G1.5",
+  "skillName": "Angles around a point sum to 360°",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students confuse angles around a point (360°) with angles on a straight line (180°) and subtract from 180° instead of 360°.",
+  "generatedAt": "2026-04-19T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Angles around a point: 100°, 50°, and y°",          "highlight": null },
+            { "text": "Student: y = 180° − 100° − 50° = 30°  ✗",           "highlight": "accent" },
+            { "text": "Used 180° — but these angles go all the way round",  "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The student used one hundred and eighty instead of three hundred and sixty. But these three angles go all the way around the point in every direction — that is a full turn, not a straight line. One hundred and eighty applies only when angles are on one side of a straight line.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "diagnostic-question",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Ask: do these angles go all the way around, or only on one side of a line?",
+          "subText": "All the way around → 360°.   One side of a straight line → 180°."
+        }
+      ],
+      "narration": "Before writing the equation, ask: do these angles surround the point completely, or are they on just one side of a straight line? Completely surrounding means three hundred and sixty. One side of a line means one hundred and eighty.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "correct-calculation",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Angles all the way around: 100° + 50° + y° = 360°", "highlight": "accent" },
+            { "text": "y = 360° − 150° = 210°  ✓",                        "highlight": "green" },
+            { "text": "Check: 100 + 50 + 210 = 360  ✓",                   "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "With three hundred and sixty as the total: one hundred plus fifty plus y equals three hundred and sixty. Y equals two hundred and ten — a reflex angle. Check: one hundred plus fifty plus two hundred and ten is three hundred and sixty. Correct.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "100° + 50° + 210° = 360°  ✓",
+          "label": "All-the-way-round → 360°.   One-side-of-a-line → 180°."
+        }
+      ],
+      "narration": "Two hundred and ten degrees — a reflex angle completing the full rotation. Three hundred and sixty for a full point, one hundred and eighty for a straight line. The geometry of the situation determines which to use.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: 180° − 100° − 50° = 30° for angles around a full point. Full rotation around a point is 360°, not 180°. The answer is 360° − 150° = 210°.",
+    "audioNarration": "Straight line gives 180°; full point gives 360°. If the angles go all the way around, use 360°. If they are on just one side of a line, use 180°. The diagram tells you which situation applies."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N2.2",
+  "skillName": "Mental strategies for addition and subtraction",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students round up but forget to adjust back, giving an answer that is too large or too small.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "385 + 97",                               "highlight": null },
+            { "text": "Student: 385 + 100 = 485  ✗",           "highlight": "accent" },
+            { "text": "Rounded up to 100 but forgot to subtract 3", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The student correctly replaced ninety-seven with one hundred but then stopped. Adding one hundred instead of ninety-seven adds three too many — the answer must be reduced by three.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "track-the-difference",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "When you round up, you must adjust down by the same amount afterwards",
+          "subText": "97 = 100 − 3 → add 100 then subtract 3"
+        }
+      ],
+      "narration": "The adjustment is always the gap between the actual number and the rounded number. Ninety-seven is three less than one hundred, so after adding one hundred you subtract three to correct the overshoot.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "correct-method",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "385 + 97 = 385 + 100 − 3",  "highlight": null },
+            { "text": "385 + 100 = 485",            "highlight": "accent" },
+            { "text": "485 − 3 = 482  ✓",           "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Three eighty-five plus one hundred is four eighty-five. Subtract the three we overshoot by: four eighty-five minus three is four eighty-two. Always complete the two-step.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "385 + 97 = 482",
+          "label": "+100 then −3 to correct the overshoot"
+        }
+      ],
+      "narration": "Four hundred and eighty-two. Round up, calculate, adjust back — three steps, always.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: adding 100 for 97 and stopping at 485. You over-added by 3, so subtract 3: 485 − 3 = 482. The adjustment step is not optional.",
+    "audioNarration": "Rounding up borrows from the future — you must pay it back. Add the rounded amount, then subtract the difference between it and the real number."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

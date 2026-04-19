@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.17",
+  "skillName": "Multiply by 0.1 and 0.01",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students multiply by 0.1 and get a larger answer, confusing it with multiplying by 10.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "what-0.1-means",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "× 0.1 = ÷ 10   |   × 0.01 = ÷ 100",
+          "subText": "Multiplying by one tenth is the same as dividing by ten"
+        }
+      ],
+      "narration": "One tenth written as a decimal is zero point one. Multiplying by zero point one means taking one tenth of the number — which is the same as dividing by ten. Multiplying by zero point zero one means taking one hundredth — dividing by one hundred.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "multiply-by-0.1",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "45 × 0.1",                                        "highlight": null },
+            { "text": "= 45 ÷ 10",                                       "highlight": "accent" },
+            { "text": "= 4.5  ✓",                                       "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Forty-five times zero point one equals forty-five divided by ten. Dividing by ten shifts digits one place to the right: forty-five becomes four point five.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "multiply-by-0.01",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "45 × 0.01",                                       "highlight": null },
+            { "text": "= 45 ÷ 100",                                      "highlight": "accent" },
+            { "text": "= 0.45  ✓",                                      "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Forty-five times zero point zero one equals forty-five divided by one hundred. Dividing by one hundred shifts digits two places to the right: forty-five becomes zero point four five.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "45 × 0.1 = 4.5   |   45 × 0.01 = 0.45",
+          "label": "× 0.1 → ÷ 10 → shift right 1 place.  × 0.01 → ÷ 100 → shift right 2 places."
+        }
+      ],
+      "narration": "Four point five and zero point four five. Multiplying by zero point one or zero point zero one makes the number smaller — it is equivalent to dividing by ten or one hundred.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: 45 × 0.1 = 450 (treated 0.1 like 10). Multiplying by 0.1 is dividing by 10 — the answer gets smaller: 45 × 0.1 = 4.5.",
+    "audioNarration": "Zero point one is one tenth — multiplying by it divides the number by ten. The result gets smaller, not larger. 45 × 0.1 = 4.5, not 450."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

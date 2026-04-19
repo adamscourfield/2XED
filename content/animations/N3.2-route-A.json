@@ -1,0 +1,78 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.2",
+  "skillName": "Mental strategies for multiplication and division",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students use long multiplication mentally for every calculation, losing track of partial products.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "factor-pairs",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "16 × 25: split into factor pairs",       "highlight": null },
+            { "text": "16 × 25 = 4 × 4 × 25 = 4 × 100 = 400", "highlight": "accent" },
+            { "text": "Regroup to create a round number",       "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Factor pairs unlock round numbers. Sixteen is four times four; four times twenty-five is one hundred. So sixteen times twenty-five equals four times one hundred — four hundred. One rearrangement, no long multiplication.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "doubling-halving",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "24 × 5: halve one, double the other",    "highlight": null },
+            { "text": "24 × 5 = 12 × 10 = 120",                "highlight": "accent" },
+            { "text": "Product is unchanged — simpler to calculate", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Halve one factor and double the other — the product stays the same. Twenty-four times five becomes twelve times ten, which is instantly one hundred and twenty.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "division-by-factors",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "840 ÷ 24: split 24 into factors",        "highlight": null },
+            { "text": "840 ÷ 24 = 840 ÷ 4 ÷ 6 = 210 ÷ 6 = 35", "highlight": "accent" },
+            { "text": "Divide in stages using factor pairs",    "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Split the divisor into its factors and divide in stages. Eight hundred and forty divided by twenty-four: divide by four first to get two hundred and ten, then divide by six to get thirty-five.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "840 ÷ 24 = 35",
+          "label": "Factor-split: 840 ÷ 4 = 210, then 210 ÷ 6 = 35"
+        }
+      ],
+      "narration": "Thirty-five. Splitting into factor steps keeps each division simple — no long division needed.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: using long multiplication or long division mentally for numbers like 16 × 25. Look for factor pairs that create round numbers — 16 × 25 = 4 × 4 × 25 = 4 × 100.",
+    "audioNarration": "Before calculating, look for shortcuts. Factor pairs, doubling and halving, and dividing in stages all turn difficult calculations into trivial ones."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

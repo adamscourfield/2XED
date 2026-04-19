@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.11",
+  "skillName": "Factors",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students miss factor pairs by not working systematically, often omitting 1 and the number itself.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "factor-pairs",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Find factors by testing divisors from 1 upward — list pairs",
+          "subText": "Stop when the divisor reaches or crosses the square root of the number"
+        }
+      ],
+      "narration": "Factors come in pairs. For any factor smaller than the square root, there is a corresponding larger factor. Work systematically from one upward, checking each potential divisor and stopping when the pairs meet in the middle.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "find-factors-of-24",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Factors of 24 — test divisors 1, 2, 3, 4, …",  "highlight": null },
+            { "text": "1 × 24, 2 × 12, 3 × 8, 4 × 6",               "highlight": "accent" },
+            { "text": "5 × ? → 24 ÷ 5 = 4.8 ✗  |  √24 ≈ 4.9 — done", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Test each number starting from one. One times twenty-four, two times twelve, three times eight, four times six — all exact divisions. Testing five gives a decimal, so five is not a factor. The square root of twenty-four is about four point nine, so we stop after four.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "list-all-factors",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Pairs: (1,24), (2,12), (3,8), (4,6)",          "highlight": "accent" },
+            { "text": "All factors: 1, 2, 3, 4, 6, 8, 12, 24",       "highlight": "green" },
+            { "text": "8 factors total",                              "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "From the pairs, list both members in order: one, two, three, four, six, eight, twelve, twenty-four. Twenty-four has eight factors. Always include one and the number itself.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Factors of 24: 1, 2, 3, 4, 6, 8, 12, 24",
+          "label": "Work in pairs from 1 upward — stop at the square root"
+        }
+      ],
+      "narration": "One, two, three, four, six, eight, twelve, twenty-four. Systematic pair-testing ensures no factors are missed.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: listing only some factors and missing others — especially 1 and the number itself. Work in pairs from 1 upward and stop at the square root to guarantee a complete list.",
+    "audioNarration": "Work in factor pairs from 1 upward. Every factor below the square root has a matching factor above it. Stop when the pairs meet — and always include 1 and the number itself."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

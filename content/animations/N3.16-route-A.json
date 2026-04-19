@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.16",
+  "skillName": "Decimal multiplication (decimal × decimal)",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students add decimal places correctly but miscount, treating them from the left rather than the right of the answer.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "total-decimal-places",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Add the decimal places in both factors — the answer has that many",
+          "subText": "2.3 × 1.4: 1 + 1 = 2 decimal places in the answer"
+        }
+      ],
+      "narration": "When multiplying two decimals, add together the number of decimal places in each factor. Two point three has one decimal place, one point four has one decimal place — so the answer has two decimal places in total.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "whole-number-multiply",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Calculate 2.3 × 1.4",                             "highlight": null },
+            { "text": "Ignore decimals: 23 × 14 = 322",                  "highlight": "accent" },
+            { "text": "Total decimal places: 1 + 1 = 2",                 "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Ignore the decimal points and multiply twenty-three by fourteen. Twenty-three times fourteen: twenty-three times four is ninety-two, twenty-three times ten is two hundred and thirty, total three hundred and twenty-two. The answer needs two decimal places.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "place-decimal",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "322 → place decimal 2 places from right",         "highlight": "accent" },
+            { "text": "322 → 3.22  ✓",                                  "highlight": "green" },
+            { "text": "Check: 2 × 1 = 2, answer ≈ 3 ✓",                "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Place the decimal two places from the right of three hundred and twenty-two: three point two two. Estimate to check: two times one is two, so the answer should be close to two or three — three point two two is reasonable.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "2.3 × 1.4 = 3.22",
+          "label": "Add decimal places: 1+1=2 → 322 → 3.22"
+        }
+      ],
+      "narration": "Three point two two. Add the decimal places in both factors to find the total, multiply as whole numbers, then count that many places from the right in the answer.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: 2.3 × 1.4 = 32.2 (placed decimal 1 place instead of 2). Add decimal places: 1 + 1 = 2. Place 2 from the right: 322 → 3.22.",
+    "audioNarration": "Add the decimal places from both factors — not just one of them. Two point three and one point four each have one decimal place, so the answer has two: 322 → 3.22."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

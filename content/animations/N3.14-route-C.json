@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.14",
+  "skillName": "Convert metric units",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students divide when converting to a larger unit but forget that the answer must be smaller.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Convert 450 cm to metres",                          "highlight": null },
+            { "text": "Student: 450 × 100 = 45 000 m  ✗",                "highlight": "accent" },
+            { "text": "Multiplied — but metres are bigger than cm",        "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The student multiplied by one hundred but got a much larger number. Since metres are larger than centimetres, the answer in metres must be smaller than four hundred and fifty. Multiplying made the number bigger — the wrong direction.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "direction-check",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Before converting, ask: am I going to a larger or smaller unit?",
+          "subText": "Larger unit → divide.  Smaller unit → multiply."
+        }
+      ],
+      "narration": "Always check the direction first. If the target unit is larger — like going from centimetres to metres — divide by the conversion factor. If the target unit is smaller, multiply. The answer size moves opposite to the unit size.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "correct-conversion",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "cm → m: metre is larger → divide",               "highlight": "accent" },
+            { "text": "1 m = 100 cm → conversion factor 100",           "highlight": "accent" },
+            { "text": "450 ÷ 100 = 4.5 m  ✓",                         "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Metre is larger than centimetre, so divide. One metre equals one hundred centimetres, so the conversion factor is one hundred. Four hundred and fifty divided by one hundred is four point five metres — a smaller, sensible answer.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "450 cm = 4.5 m",
+          "label": "Larger unit → smaller number → divide by the conversion factor"
+        }
+      ],
+      "narration": "Four point five metres. The answer is smaller than four hundred and fifty because metres are larger than centimetres — always sanity-check that the answer size matches the unit size direction.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: 450 cm × 100 = 45 000 m. Since metres are larger than centimetres, the answer in metres must be smaller: 450 ÷ 100 = 4.5 m. Larger unit → divide.",
+    "audioNarration": "Ask yourself: is the new unit bigger or smaller? Bigger unit means a smaller number — divide. Smaller unit means a bigger number — multiply. The answer and unit size always move in opposite directions."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

@@ -1,0 +1,78 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.12",
+  "skillName": "LCM",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students multiply the two numbers together rather than finding the smallest shared multiple.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "LCM of 6 and 9",                                   "highlight": null },
+            { "text": "Student: 6 × 9 = 54 → LCM = 54  ✗",               "highlight": "accent" },
+            { "text": "54 is a common multiple but NOT the lowest",        "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Multiplying six by nine gives fifty-four, which is a common multiple — both six and nine divide into it. But it is not the lowest. There is a smaller number that both divide into exactly.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "find-true-lcm",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Multiples of 6: 6, 12, 18, 24, 30, …",             "highlight": "accent" },
+            { "text": "Multiples of 9: 9, 18, 27, 36, …",                 "highlight": "accent" },
+            { "text": "First shared: 18  ✓  (54 ÷ 3 = 18)",              "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Listing multiples of six and nine, the first number in both lists is eighteen. Eighteen is the LCM — it is three times smaller than fifty-four, which is why the product method gives a common multiple but often not the lowest one.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "when-product-works",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "LCM = product only when the numbers share no factors", "highlight": "accent" },
+            { "text": "6 and 9 share factor 3 → LCM < 6 × 9",              "highlight": "accent" },
+            { "text": "4 and 9 share no factors → LCM = 4 × 9 = 36  ✓",   "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Multiplying works only when the two numbers share no common factors other than one. Six and nine both share the factor three, so their LCM is smaller than their product. Four and nine share no factors, so their LCM equals their product.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "LCM(6, 9) = 18",
+          "label": "18, not 54 — list multiples to find the LOWEST common multiple"
+        }
+      ],
+      "narration": "Eighteen, not fifty-four. Always list multiples and find the first shared one — the product method is a shortcut that only works when numbers share no common factors.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: LCM(6, 9) = 54 (just multiplied). The LCM is 18. Multiplying gives a common multiple but not the lowest — list multiples of each and find the first that appears in both lists.",
+    "audioNarration": "The product of two numbers is always a common multiple — but rarely the lowest. List multiples of each number and find the first they share. That is the LCM."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

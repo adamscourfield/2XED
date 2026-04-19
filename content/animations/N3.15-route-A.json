@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.15",
+  "skillName": "Decimal multiplication (decimal × integer)",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students misplace the decimal point in the product, often placing it incorrectly after the whole-number multiplication.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "ignore-decimal-method",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Multiply as whole numbers, then place the decimal point",
+          "subText": "Count decimal places in the question — use the same count in the answer"
+        }
+      ],
+      "narration": "To multiply a decimal by a whole number, first ignore the decimal point and multiply as whole numbers. Then restore the decimal point by counting the decimal places in the original decimal and placing the point the same number of places from the right in the answer.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "whole-number-multiply",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Calculate 3.4 × 7",                               "highlight": null },
+            { "text": "Ignore decimal: 34 × 7 = 238",                   "highlight": "accent" },
+            { "text": "3.4 has 1 decimal place",                        "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Multiply thirty-four by seven as whole numbers: seven times four is twenty-eight, carry two, seven times three is twenty-one plus two is twenty-three. The product is two hundred and thirty-eight. Now note that three point four has one decimal place.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "place-decimal",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "238 → place decimal 1 place from right",          "highlight": "accent" },
+            { "text": "23.8  ✓",                                        "highlight": "green" },
+            { "text": "Check: 3 × 7 = 21, 0.4 × 7 = 2.8 → 23.8  ✓",   "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Place the decimal point one place from the right in two hundred and thirty-eight, giving twenty-three point eight. Check using partitioning: three times seven is twenty-one, zero point four times seven is two point eight, total twenty-three point eight.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "3.4 × 7 = 23.8",
+          "label": "Whole-number multiply → count decimal places → place point from right"
+        }
+      ],
+      "narration": "Twenty-three point eight. Multiply ignoring the decimal, then restore the decimal by counting places from the right.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: 3.4 × 7 = 2.38 or 238 (decimal misplaced). Count the decimal places in the question (1 place) and put the point 1 from the right in the answer: 238 → 23.8.",
+    "audioNarration": "After whole-number multiplication, count the decimal places in the original decimal. Place the decimal point that many digits from the right in your answer — one decimal place means one digit after the point."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

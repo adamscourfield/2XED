@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.17",
+  "skillName": "Multiply by 0.1 and 0.01",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students expect multiplication to always increase a value, not realising that multiplying by a fraction reduces it.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "fractions-scale-down",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Multiplication by a number less than 1 scales DOWN",
+          "subText": "× 0.1 means 'find one tenth of' — the result is smaller than the original"
+        }
+      ],
+      "narration": "Multiplication does not always make things larger. When the multiplier is between zero and one, the result is smaller than what you started with. Multiplying by zero point one is the same as finding one tenth of the original — a tenth is smaller.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "fraction-decimal-link",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "0.1 = 1/10   →   × 0.1 means × 1/10 = ÷ 10",   "highlight": null },
+            { "text": "0.01 = 1/100 →   × 0.01 means × 1/100 = ÷ 100", "highlight": "accent" },
+            { "text": "60 × 0.1 = 60 × 1/10 = 6  ✓",                   "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Zero point one is the fraction one tenth, and zero point zero one is one hundredth. Multiplying by one tenth is dividing by ten — sixty divided by ten is six. The decimal notation hides the fraction, but the meaning is the same.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "relationship-with-division",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "60 ÷ 10 = 6 (division by 10)",                    "highlight": "accent" },
+            { "text": "60 × 0.1 = 6 (multiplication by one tenth)",      "highlight": "accent" },
+            { "text": "These are equivalent — two ways to say the same thing", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Dividing by ten and multiplying by one tenth are exactly the same operation. This equivalence connects multiplication and division — and shows why multiplying by zero point one shrinks the number rather than growing it.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "60 × 0.1 = 6   (= 60 ÷ 10)",
+          "label": "0.1 = 1/10 — multiplying by a tenth finds a tenth of the number"
+        }
+      ],
+      "narration": "Six. Multiplying by zero point one is finding one tenth — an operation that reduces the value. Understanding the fraction meaning of decimals explains why the result is smaller.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: expecting 60 × 0.1 to give more than 60. Zero point one means one tenth — multiplying by it finds a tenth of 60, which is 6. Multiplication by a fraction makes things smaller.",
+    "audioNarration": "Multiplying by zero point one means finding one tenth of the number — the same as dividing by ten. The result is always smaller because one tenth is a fraction less than one."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

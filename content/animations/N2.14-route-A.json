@@ -1,0 +1,79 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N2.14",
+  "skillName": "Solve problems involving tables and timetables",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students calculate journey time by subtracting hours and minutes independently, ignoring borrowing across the hour boundary.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "read-timetable",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Train departs 09:47, arrives 11:23",     "highlight": null },
+            { "text": "Find the journey time",                 "highlight": "accent" },
+            { "text": "Count on from departure to arrival",   "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Read the departure and arrival times from the timetable. To find journey duration, count forward from the departure time to the arrival time — do not just subtract the digits.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "count-on-method",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "09:47 → 10:00: +13 minutes",    "highlight": "accent" },
+            { "text": "10:00 → 11:00: +60 minutes",    "highlight": "accent" },
+            { "text": "11:00 → 11:23: +23 minutes",    "highlight": "accent" },
+            { "text": "Total: 13 + 60 + 23 = 96 minutes = 1 h 36 min", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Count on in stages: from nine forty-seven to ten o'clock is thirteen minutes; from ten to eleven is sixty minutes; from eleven to eleven twenty-three is twenty-three minutes. Total: ninety-six minutes, which is one hour thirty-six minutes.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "arrival-from-duration",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Departs 14:35, journey 1 h 48 min", "highlight": null },
+            { "text": "14:35 + 48 min = 15:23",           "highlight": "accent" },
+            { "text": "15:23 + 1 h = 16:23",              "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "To find arrival time, add the duration in stages. Add the minutes first: thirty-five plus forty-eight is eighty-three minutes — sixty makes one hour, leaving twenty-three minutes, so fifteen twenty-three. Then add the hour: sixteen twenty-three.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Journey: 09:47 → 11:23 = 1 h 36 min",
+          "label": "Count on in stages: to the hour, through full hours, to arrival"
+        }
+      ],
+      "narration": "One hour thirty-six minutes. Counting on in stages avoids the borrowing errors that come from subtracting directly.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: 11:23 − 09:47 → 11−9=2 hours, 23−47 impossible → error. Count on instead: 09:47 → 10:00 (13 min) → 11:00 (60 min) → 11:23 (23 min) = 96 min.",
+    "audioNarration": "Never subtract hours and minutes independently — minutes don't go up to 100. Count forward from departure in stages: to the next hour, through full hours, to arrival."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

@@ -1,0 +1,73 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.21",
+  "skillName": "Find missing lengths given area",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students treat area problems as always requiring multiplication, not recognising that a known area with one dimension is a division situation.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "area-as-product",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Area is a product of two dimensions — knowing two of the three values lets you find the third",
+          "subText": "area = l × w   →   l = area ÷ w   →   w = area ÷ l"
+        }
+      ],
+      "narration": "Area, length, and width form a multiplication relationship. Any one of the three values can be found if you know the other two — just as in any multiplication family, division is the inverse that finds a missing factor.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "inverse-operations",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "l × w = A   (multiplication)",                     "highlight": null },
+            { "text": "A ÷ w = l   (divide to find missing factor)",      "highlight": "accent" },
+            { "text": "A ÷ l = w   (divide to find other factor)",        "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Multiplication and division are inverse operations. In the relationship length times width equals area, if the area and one dimension are known, division undoes the multiplication to reveal the missing dimension.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "area-model-view",
+      "visuals": [
+        {
+          "type": "area_model",
+          "rows": 8,
+          "cols": 6,
+          "label": "48 squares arranged in 6 columns — how many rows? 48 ÷ 6 = 8"
+        }
+      ],
+      "narration": "Imagine forty-eight unit squares arranged in six columns. The number of rows is forty-eight divided by six — eight. The area model makes clear that finding a missing dimension is a grouping problem, and grouping is division.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Area 48 cm², width 6 cm → length = 48 ÷ 6 = 8 cm",
+          "label": "Missing dimension = area ÷ known dimension — always division"
+        }
+      ],
+      "narration": "Eight centimetres. A known area with one dimension is always a division problem — division is the inverse of the multiplication that produced the area.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: multiplying area by the known side when a dimension is missing. The three values — area, length, width — form a multiplication family. Finding a missing one always uses division.",
+    "audioNarration": "Area equals length times width. If you know the area and one side, use division — not multiplication — to find the other. Division undoes the multiplication that created the area."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

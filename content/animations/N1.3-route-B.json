@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N1.3",
+  "skillName": "Compare two numbers using =, ≠, <, >, ≤, ≥",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students do not know what ≤ and ≥ mean or when to use = versus < or >.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "introduce-symbols",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "<   strictly less than",       "highlight": null },
+            { "text": ">   strictly greater than",    "highlight": null },
+            { "text": "≤   less than OR equal to",    "highlight": "accent" },
+            { "text": "≥   greater than OR equal to", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The symbols with a line underneath include equality. Without the line, the two sides must be different — equality is not allowed.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "equality-included",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "12 ≥ 12   →   TRUE  (12 equals 12)", "highlight": "green" },
+            { "text": "12 > 12   →   FALSE (not strictly greater)", "highlight": "accent" },
+            { "text": "12 = 12   →   TRUE  (exact equality)", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Notice the difference. Greater-than requires the left side to be strictly bigger. Greater-than-or-equal passes even when both sides are the same.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "choosing-symbol",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Use = when equal, < or > when strictly different, ≤ or ≥ when equality is allowed",
+          "subText": "15 ≥ 20 is FALSE — 15 is neither greater than nor equal to 20"
+        }
+      ],
+      "narration": "Pick the most precise symbol that fits. If you see a condition that must allow equality — like 'at least' or 'no more than' — that's when ≤ or ≥ belong.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "12 ≥ 12   is TRUE",
+          "label": "≥ includes equality — one condition is enough"
+        }
+      ],
+      "narration": "Either condition — greater than, or equal to — makes ≥ true. Twelve equals twelve, so the statement passes.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: thinking ≥ requires the left to be strictly bigger. It passes for equality too.",
+    "audioNarration": "The underline on the symbol is a reminder: equal counts. One or both conditions being true is enough."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

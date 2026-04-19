@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N1.13",
+  "skillName": "Position negatives on a number line",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students count negative intervals in the wrong direction, placing -3 to the right of -1.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "read-scale",
+      "visuals": [
+        {
+          "type": "number_line",
+          "min": -5,
+          "max": 5,
+          "markers": [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5],
+          "highlight": null
+        }
+      ],
+      "narration": "Zero sits at the centre. Positive numbers extend to the right; negative numbers extend to the left. Each step left subtracts one from the value.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "count-left",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Place −4 on the line",                       "highlight": null },
+            { "text": "Start at 0 → count 4 steps LEFT",            "highlight": "accent" },
+            { "text": "0, −1, −2, −3, −4  ✓",                      "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Start at zero and count four steps to the left. Each step takes you one further into the negatives. Four steps left lands you at negative four.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "mark-and-label",
+      "visuals": [
+        {
+          "type": "number_line",
+          "min": -5,
+          "max": 5,
+          "markers": [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5],
+          "points": [{ "value": -4, "label": "−4", "highlight": "green" }]
+        }
+      ],
+      "narration": "Mark the point with a dot and label it with the negative sign included. The sign is part of the number — leaving it off changes the meaning entirely.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "−4 is 4 steps left of zero",
+          "label": "Start at 0 → count left → mark and label with − sign"
+        }
+      ],
+      "narration": "Negative four. Start at zero, count left, and always include the negative sign in the label.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: counting steps to the right when placing a negative number. Negatives always go LEFT of zero — the larger the digit, the further left.",
+    "audioNarration": "Negative numbers live to the left of zero. Count left from zero, not right. The digit tells you how many steps — the sign tells you which direction."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

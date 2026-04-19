@@ -1,0 +1,78 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.8",
+  "skillName": "Short division (with carrying)",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students forget to carry the remainder to the next digit, treating each column as independent.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "setup",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Divide 857 ÷ 4",                            "highlight": null },
+            { "text": "Write: 4 ) 8 5 7",                          "highlight": "accent" },
+            { "text": "Work left to right — carry remainders",      "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Write eight fifty-seven divided by four in bus-stop format. This time some digits do not divide exactly, so remainders carry forward to the next column.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "hundreds-digit",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Hundreds: 8 ÷ 4 = 2, remainder 0",          "highlight": "accent" },
+            { "text": "Write 2 above 8, carry 0",                  "highlight": "accent" },
+            { "text": "Tens: now work with 5 (carry was 0)",       "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Eight divided by four is two with no remainder. Write two above the eight. No carry to the tens column, so the tens digit remains five.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "tens-and-ones",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Tens: 5 ÷ 4 = 1 remainder 1 → carry 1",    "highlight": "accent" },
+            { "text": "Ones: 17 ÷ 4 = 4 remainder 1",             "highlight": "accent" },
+            { "text": "Answer: 214 remainder 1",                   "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Five divided by four is one with remainder one. Write one above the five and carry the one to the ones column, making it seventeen. Seventeen divided by four is four with remainder one. Write four above the seven — the final remainder is one.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "857 ÷ 4 = 214 r 1",
+          "label": "Carry remainders to the next column — remainder × 10 adds to that digit"
+        }
+      ],
+      "narration": "Two hundred and fourteen remainder one. Each remainder is carried to the next digit by placing it in front of that digit — effectively multiplying it by ten and adding it to the next column's value.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: ignoring remainders and dividing each digit independently. Remainders must carry to the next column — a remainder of 1 from the tens becomes an extra 10 added to the ones digit.",
+    "audioNarration": "When a digit does not divide exactly, the remainder carries to the next column. Write it as a small digit in front of the next number and include it in that step's calculation."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

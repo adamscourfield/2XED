@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.6",
+  "skillName": "Area of rectangles, parallelograms, triangles and compound shapes",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students use the slant side instead of the perpendicular height in the triangle and parallelogram area formulas.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "rectangle",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Rectangle: Area = length × width",           "highlight": "accent" },
+            { "text": "8 cm × 5 cm = 40 cm²",                     "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Rectangle area is length times width. Eight centimetres by five centimetres is forty square centimetres.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "parallelogram",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Parallelogram: Area = base × perpendicular height", "highlight": "accent" },
+            { "text": "NOT base × slant side",                              "highlight": "accent" },
+            { "text": "Base 9 cm, height 4 cm → 36 cm²",                   "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Parallelogram area uses the perpendicular height — the vertical distance between the parallel sides — not the slant side. Base nine times height four is thirty-six square centimetres.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "triangle",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Triangle: Area = ½ × base × perpendicular height", "highlight": "accent" },
+            { "text": "Base 10 cm, height 6 cm → ½ × 10 × 6 = 30 cm²",   "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "A triangle is half a parallelogram. Area equals one half times base times perpendicular height. Ten times six times one half is thirty square centimetres.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Rectangle: l×w.  Parallelogram: b×h.  Triangle: ½×b×h.",
+          "label": "Always use perpendicular height — never the slant side"
+        }
+      ],
+      "narration": "Three formulas, one rule: always use the perpendicular height. The slant side is for perimeter only.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: using the slant side in the parallelogram or triangle area formula. Area requires the perpendicular height — the right-angle distance between the base and opposite side.",
+    "audioNarration": "Area always uses perpendicular height — the vertical drop from base to opposite side. The slant side is longer and gives an incorrect, too-large area."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

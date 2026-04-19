@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N2.16",
+  "skillName": "Add and subtract numbers given in standard form",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "After adding, students leave the answer as e.g. 36.7 × 10⁴ without converting back to standard form.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "5.8 × 10³ + 6.9 × 10³",              "highlight": null },
+            { "text": "Student: (5.8 + 6.9) × 10³ = 12.7 × 10³  ✗", "highlight": "accent" },
+            { "text": "12.7 is not between 1 and 10 — not standard form", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The arithmetic is correct but the answer is not in standard form. Twelve point seven is greater than ten — A must be less than ten. The answer needs one more adjustment step.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "adjust-a",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "If A ≥ 10 after operating, divide A by 10 and increase the exponent by 1",
+          "subText": "12.7 × 10³ → 1.27 × 10⁴  (divide A by 10, add 1 to exponent)"
+        }
+      ],
+      "narration": "Whenever A is ten or more, rewrite by dividing A by ten and adding one to the exponent. This keeps the overall value the same while restoring the standard form requirement.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "correct-final-step",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "12.7 × 10³",                "highlight": null },
+            { "text": "12.7 ÷ 10 = 1.27",          "highlight": "accent" },
+            { "text": "10³ × 10 = 10⁴",            "highlight": "accent" },
+            { "text": "Answer: 1.27 × 10⁴  ✓",     "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Divide twelve point seven by ten to get one point two seven. Multiply the power of ten by ten — that increases the exponent from three to four. The answer is one point two seven times ten to the four.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "5.8 × 10³ + 6.9 × 10³ = 1.27 × 10⁴",
+          "label": "A ≥ 10 → divide A by 10 and add 1 to exponent"
+        }
+      ],
+      "narration": "One point two seven times ten to the four. Always check that A is between one and ten before writing the final answer.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: leaving 12.7 × 10³ as the answer. Standard form requires 1 ≤ A < 10. Divide A by 10 and increase the exponent by 1: 1.27 × 10⁴.",
+    "audioNarration": "After adding A values, always check the result is between 1 and 10. If A is 10 or more, divide by 10 and add 1 to the exponent to restore standard form."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

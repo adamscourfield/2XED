@@ -1,0 +1,77 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N1.16",
+  "skillName": "Rounding to significant figures",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students confuse significant figures with decimal places — they think 1 s.f. always means one digit after the decimal point.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "what-significant-means",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "A significant figure carries meaningful information about the size of a number",
+          "subText": "Leading zeros just position the decimal point — they are not meaningful digits"
+        }
+      ],
+      "narration": "Significant figures measure how precisely a number is known. A leading zero tells you only where the decimal point sits — it says nothing about the value's precision. Only digits that contribute to the size of the number count.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "sf-vs-dp",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "0.0047  →  2 significant figures (4 and 7)", "highlight": "accent" },
+            { "text": "0.0047  →  4 decimal places",               "highlight": null },
+            { "text": "Sig figs count from first non-zero digit",  "highlight": "green" },
+            { "text": "D.p. counts from the decimal point",        "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "The same number can have very different counts of significant figures and decimal places. Decimal places count from the decimal point; significant figures count from the first non-zero digit.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "large-number-sf",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "47 000 rounded to 2 s.f.",                  "highlight": null },
+            { "text": "1st s.f.: 4   2nd s.f.: 7",                 "highlight": "accent" },
+            { "text": "Replace rest with zeros: 47 000 → 47 000",  "highlight": null },
+            { "text": "Already 2 s.f. — trailing zeros hold place", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "For large integers, trailing zeros after rounding are placeholders — they hold the column positions but are not themselves significant. Forty-seven thousand to two significant figures is still forty-seven thousand.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "3 s.f.: 0.004628 → 0.00463",
+          "label": "Sig figs start at first non-zero digit — not at the decimal point"
+        }
+      ],
+      "narration": "Zero point zero zero four six three. Three significant figures: four, six, three. The leading zeros remain as placeholders but are not counted.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: confusing 1 s.f. with 1 d.p. Decimal places count from the decimal point; significant figures count from the first non-zero digit — they are completely different measures.",
+    "audioNarration": "Significant figures and decimal places are not the same thing. Sig figs count from the first non-zero digit; decimal places count from the decimal point."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

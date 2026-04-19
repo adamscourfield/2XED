@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "G1.10",
+  "skillName": "Exterior angles of any polygon",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students know the exterior angle sum is 360° but do not understand why, or cannot link interior and exterior angles at a vertex.",
+  "generatedAt": "2026-04-19T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "walking-around-polygon",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Walk along the boundary of a convex polygon — each turn is an exterior angle",
+          "subText": "One complete walk = one full turn = 360°"
+        }
+      ],
+      "narration": "Imagine walking along the outside of a convex polygon. At each corner you turn through the exterior angle. By the time you return to your starting point facing the same direction, you have made exactly one full turn — three hundred and sixty degrees. The exterior angles are the turns, and they must total one full turn.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "turn-accumulation",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Equilateral triangle: 3 turns of 120° each",        "highlight": null },
+            { "text": "3 × 120° = 360° — one full turn  ✓",              "highlight": "accent" },
+            { "text": "Square: 4 turns of 90° each = 360°  ✓",           "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Equilateral triangle: three turns of one hundred and twenty degrees — total three hundred and sixty. Square: four turns of ninety degrees — total three hundred and sixty. Any convex polygon, however many sides, produces the same total because the walk is always one full rotation.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "interior-exterior-link",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "At each vertex: interior + exterior = 180°",        "highlight": "accent" },
+            { "text": "The two angles form a straight line at the side",  "highlight": "accent" },
+            { "text": "Exterior = amount you turn at that corner",        "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "At every vertex, the interior and exterior angles sit on a straight line — they sum to one hundred and eighty. The exterior angle is the amount of turn at that corner. A sharp corner has a large exterior angle; a gentle corner has a small one.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "One full walk = one full turn = 360° exterior angle total",
+          "label": "The 360° rule comes from geometry — walking around any convex polygon makes exactly one full turn"
+        }
+      ],
+      "narration": "Three hundred and sixty degrees — one full turn. The exterior angle sum rule is not arbitrary; it describes the physical act of walking around any convex polygon and returning to the start.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: treating the 360° exterior angle rule as arbitrary. It comes from walking around a polygon — each exterior angle is a turn, and one complete circuit is exactly one full turn (360°).",
+    "audioNarration": "Walk around any convex polygon — each turn at a corner is an exterior angle. One complete walk makes one full turn of 360°. The exterior angles are those turns, so they must sum to 360°."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

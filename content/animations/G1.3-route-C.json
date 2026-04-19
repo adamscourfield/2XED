@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "G1.3",
+  "skillName": "Draw angles with a protractor",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students use the wrong protractor scale when drawing, producing 180° minus the intended angle.",
+  "generatedAt": "2026-04-19T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Task: draw an angle of 40°",                       "highlight": null },
+            { "text": "Student draws angle that looks clearly obtuse  ✗", "highlight": "accent" },
+            { "text": "40° is acute — the wrong scale gave 140°",        "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The task is to draw forty degrees — an acute angle. The student's drawing looks obtuse. That is the sign of a wrong-scale error: reading forty from the wrong scale gives one hundred and forty, which is obtuse.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "identify-correct-scale",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "The correct scale starts at 0° where the baseline arm sits — count from there",
+          "subText": "For an acute angle like 40°, the mark must be in the acute region — not past 90°"
+        }
+      ],
+      "narration": "Before marking, identify which scale reads zero at the baseline. Forty degrees on that scale will be in the acute region — between zero and ninety. If the mark would fall past ninety, you have the wrong scale.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "correct-drawing",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Baseline along arm, centre on vertex",             "highlight": "accent" },
+            { "text": "Find 40° on scale starting at 0° on the baseline", "highlight": "accent" },
+            { "text": "Mark, remove, join — angle is acute  ✓",          "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "With the baseline correctly aligned, find forty on the scale that starts at zero there. Make a dot at forty, remove the protractor, and draw a line from the vertex to the dot. The angle should look clearly acute — narrower than a right angle.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "40° drawn correctly — acute, narrower than a right angle",
+          "label": "Use the scale starting at 0° on your baseline — sanity-check the angle type"
+        }
+      ],
+      "narration": "Forty degrees — a correct acute angle. Use the scale starting at zero on the baseline, and always check the finished drawing looks like the intended angle type.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: drawing 140° instead of 40° (read the wrong scale). The correct scale starts at 0° on the baseline arm. A 40° angle is acute — the drawn angle must look narrower than a right angle.",
+    "audioNarration": "When drawing an angle, use the scale that starts at 0° on your baseline. If the result looks like the wrong type — obtuse when you wanted acute — you used the other scale. Subtract from 180° to see what you drew."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

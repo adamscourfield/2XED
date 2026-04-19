@@ -1,0 +1,77 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N1.11",
+  "skillName": "Position decimals on a number line (incl midpoint using a calculator)",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students read only the integer labels and ignore decimal intervals when placing decimal values.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "read-scale",
+      "visuals": [
+        {
+          "type": "number_line",
+          "min": 0,
+          "max": 1,
+          "markers": [0, 0.25, 0.5, 0.75, 1],
+          "highlight": null
+        }
+      ],
+      "narration": "Read the labels at both ends and count the gaps between tick marks. Here the line runs from zero to one with four equal gaps — each gap is worth zero point two five.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "place-decimal",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Place 0.6 on the line",                          "highlight": null },
+            { "text": "0.6 is between 0.5 and 0.75",                   "highlight": "accent" },
+            { "text": "Closer to 0.5: 0.1 away vs 0.15 from 0.75",     "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Zero point six sits between zero point five and zero point seven five. It is one tenth away from zero point five and fifteen hundredths away from zero point seven five — so it sits closer to the left tick.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "find-midpoint",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Midpoint of 0.3 and 0.7:",         "highlight": null },
+            { "text": "(0.3 + 0.7) ÷ 2 = 1.0 ÷ 2 = 0.5", "highlight": "accent" },
+            { "text": "Place 0.5 exactly halfway",         "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "To find the midpoint between two decimals, add them and divide by two. Use a calculator if the numbers are awkward — add, then press divide by two.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Midpoint of 0.3 and 0.7 = 0.5",
+          "label": "Add both values → divide by 2 → place on line"
+        }
+      ],
+      "narration": "Zero point five. Halfway between zero point three and zero point seven. The formula works for any pair of decimals.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: treating each tick as 'one unit' regardless of what the scale says. Always divide the range by the number of gaps to find each interval's value.",
+    "audioNarration": "Read the scale before placing anything. Divide the total range by the number of gaps — that tells you exactly what each tick mark is worth."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

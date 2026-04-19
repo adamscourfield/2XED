@@ -1,0 +1,77 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N1.3",
+  "skillName": "Compare two numbers using =, ≠, <, >, ≤, ≥",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students compare digits in the wrong order or focus on digit count rather than place value.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Compare: 999  and  1,001",          "highlight": null },
+            { "text": "Student: 999 > 1,001  (because 9 > 1)", "highlight": "accent" },
+            { "text": "This is WRONG ✗",                     "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The student is comparing individual digits, not the numbers as a whole. Looking at the leading nine versus the leading one completely ignores what column each digit is in.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "digit-count-first",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "More digits = larger number (when there are no leading zeros)",
+          "subText": "1,001 has 4 digits — 999 has 3 — so 1,001 > 999 immediately"
+        }
+      ],
+      "narration": "Before comparing any individual digits, count how many digits each number has. More digits always wins — you don't need to look any further.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "same-digit-count",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Same digit count → compare left to right", "highlight": null },
+            { "text": "45,231  vs  45,198",                       "highlight": null },
+            { "text": "Tens-thousands: 4 = 4",                    "highlight": "dim" },
+            { "text": "Thousands:      5 = 5",                    "highlight": "dim" },
+            { "text": "Hundreds:       2 > 1  → 45,231 is larger", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Only when the digit counts match do you compare column by column, starting from the left. Stop as soon as you find the first column that differs.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "1,001 > 999",
+          "label": "4 digits beats 3 digits — no further comparison needed"
+        }
+      ],
+      "narration": "One thousand and one beats nine hundred and ninety-nine purely because it has an extra digit. The nine in the hundreds column never even comes into it.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: comparing individual digits instead of digit counts first. Always count the digits before comparing column by column.",
+    "audioNarration": "If one number has more digits, you already know it's bigger. Don't let a large-looking digit in a small number fool you."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

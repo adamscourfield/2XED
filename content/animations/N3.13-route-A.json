@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.13",
+  "skillName": "HCF",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students confuse HCF with LCM, finding the largest common multiple rather than the largest common factor.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "list-factors-method",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "HCF = the largest factor shared by both numbers",
+          "subText": "Method: list all factors of each, find the largest in both lists"
+        }
+      ],
+      "narration": "The highest common factor is the largest number that divides exactly into both values. Find it by listing all factors of each number and identifying the largest one that appears in both lists.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "list-factors",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "HCF of 12 and 18",                               "highlight": null },
+            { "text": "Factors of 12: 1, 2, 3, 4, 6, 12",              "highlight": "accent" },
+            { "text": "Factors of 18: 1, 2, 3, 6, 9, 18",              "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Factors of twelve: one, two, three, four, six, twelve. Factors of eighteen: one, two, three, six, nine, eighteen. The shared factors are one, two, three, and six.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "find-hcf",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Common factors: 1, 2, 3, 6",                      "highlight": "accent" },
+            { "text": "Largest common factor: 6  ✓",                    "highlight": "green" },
+            { "text": "Check: 12 ÷ 6 = 2 ✓   18 ÷ 6 = 3 ✓",          "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "The common factors are one, two, three, and six. The largest is six. Check: twelve divided by six is two, eighteen divided by six is three — both exact. The HCF of twelve and eighteen is six.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "HCF(12, 18) = 6",
+          "label": "Largest shared factor — divides into both numbers exactly"
+        }
+      ],
+      "narration": "Six. The HCF is the largest number that divides into both twelve and eighteen without remainder.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: confusing HCF with LCM. HCF(12, 18) = 6 (largest shared factor, smaller than both). LCM(12, 18) = 36 (smallest shared multiple, larger than both). Factors shrink; multiples grow.",
+    "audioNarration": "HCF is about factors — numbers smaller than or equal to the originals. LCM is about multiples — numbers larger than or equal to the originals. The HCF of 12 and 18 is 6, not 36."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

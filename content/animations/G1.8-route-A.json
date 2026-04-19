@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "G1.8",
+  "skillName": "Angles in a quadrilateral sum to 360°",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students forget that the four interior angles of a quadrilateral always add up to 360° and guess or use 180° instead.",
+  "generatedAt": "2026-04-19T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "the-rule",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "The four interior angles of any quadrilateral add up to 360°",
+          "subText": "Works for squares, rectangles, parallelograms, trapezoids, and irregular quadrilaterals"
+        }
+      ],
+      "narration": "Every quadrilateral — any four-sided shape — has interior angles summing to three hundred and sixty degrees. This includes squares, rectangles, parallelograms, trapezoids, and irregular four-sided shapes. Write the equation: all four angles equal three hundred and sixty.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "find-missing-angle",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Quadrilateral: 90°, 80°, 110°, and x°",            "highlight": null },
+            { "text": "90° + 80° + 110° + x° = 360°",                    "highlight": "accent" },
+            { "text": "x = 360° − 280° = 80°  ✓",                       "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Quadrilateral with angles ninety, eighty, one hundred and ten, and x. Sum: ninety plus eighty plus one hundred and ten is two hundred and eighty. X equals three hundred and sixty minus two hundred and eighty, which is eighty degrees.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "check",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Check: 90 + 80 + 110 + 80 = 360  ✓",               "highlight": "green" },
+            { "text": "4 angles needed — count sides before solving",     "highlight": "accent" },
+            { "text": "All four must be interior angles of the shape",    "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Check: ninety plus eighty plus one hundred and ten plus eighty equals three hundred and sixty. Count four sides before setting up the equation — make sure you have four angles, all interior.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "90° + 80° + 110° + 80° = 360°",
+          "label": "Four interior angles, sum = 360° — subtract three known angles from 360°"
+        }
+      ],
+      "narration": "Eighty degrees. Any quadrilateral, four angles, sum to three hundred and sixty. Subtract the three known angles from three hundred and sixty to find the fourth.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: using 180° for quadrilateral angles, giving a negative or wrong answer. Quadrilaterals have four angles summing to 360°. Subtract three known angles from 360° to find the fourth.",
+    "audioNarration": "Quadrilateral angles sum to 360°, not 180°. 180° is for triangles. Write the equation with all four angles equalling 360°, then subtract the three you know."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

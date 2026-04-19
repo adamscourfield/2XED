@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N1.20",
+  "skillName": "Place value systems beyond base 10",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students think base 10 is the only 'real' number system — they treat other bases as tricks rather than genuine place value systems.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "same-structure",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Every place value system works identically — columns are powers of the base, digits range from 0 to base−1",
+          "subText": "Base 10: columns are 10⁰, 10¹, 10²… Base 2: columns are 2⁰, 2¹, 2²…"
+        }
+      ],
+      "narration": "All place value systems share the same structure. The base is the only thing that changes. Swap ten for two and you get binary — a perfectly consistent number system using only the digits zero and one.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "why-other-bases",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Computers use base 2 — circuits are on or off",  "highlight": "accent" },
+            { "text": "Hex (base 16) compresses binary data compactly", "highlight": null },
+            { "text": "Clocks use base 60 for minutes and seconds",     "highlight": null }
+          ]
+        }
+      ],
+      "narration": "Different bases suit different purposes. Binary matches electronic switches — on or off, one or zero. Hexadecimal is shorthand for binary in computing. Base sixty has been used for time since ancient Babylon.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "columns-comparison",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Base 10:  …  1000   100   10    1",   "highlight": null },
+            { "text": "Base 2:   …    8     4     2    1",   "highlight": "accent" },
+            { "text": "Base 16:  …  4096  256   16    1",   "highlight": null },
+            { "text": "Same idea — different column values",  "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "The column values change with the base, but the logic is identical: each column to the left is the base times bigger than the one to its right.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "101₂ = 1×4 + 0×2 + 1×1 = 5₁₀",
+          "label": "Any base: digit × column power → sum the results"
+        }
+      ],
+      "narration": "One zero one in binary: one four, no twos, one one — equals five in base ten. The method is identical to base ten expansion, just with powers of two.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: thinking base 10 is uniquely 'correct'. Every base is a valid place value system with the same internal logic — only the column sizes differ.",
+    "audioNarration": "Base 10 is not special — it is just the most familiar. Any base works: columns are powers of the base, digits range from 0 to base minus 1."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

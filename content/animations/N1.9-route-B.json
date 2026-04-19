@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N1.9",
+  "skillName": "Position integers on a number line",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students do not understand that equal intervals mean equal numerical steps.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "equal-spacing",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Equal physical gaps on a number line represent equal numerical steps",
+          "subText": "If each gap is 10 wide, every gap adds exactly 10"
+        }
+      ],
+      "narration": "A number line is a ruler for numbers. Equal physical gaps must represent equal numerical jumps — this is what makes the number line a fair measuring tool.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "left-right-meaning",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Moving right → value increases", "highlight": "green" },
+            { "text": "Moving left  → value decreases", "highlight": "accent" },
+            { "text": "Distance from zero = how big the number is", "highlight": null }
+          ]
+        }
+      ],
+      "narration": "Every step right adds the same amount. Every step left subtracts the same amount. Position is not about how far from the edge of the page — it is about how far from zero.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "benchmarks",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Find the nearest labelled marks on each side", "highlight": null },
+            { "text": "Place your number between them",               "highlight": "accent" },
+            { "text": "Closer to 40 than 30? → past the midpoint",  "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Use labelled marks as anchors. Decide which two your number falls between, then judge whether it is closer to the left anchor or the right one.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "37 sits between 30 and 40, closer to 40",
+          "label": "Equal gaps → anchor between two labels → judge closeness"
+        }
+      ],
+      "narration": "Thirty-seven is seven of the ten steps from thirty to forty — past the midpoint, so it sits closer to forty. Anchoring to labels keeps the estimate accurate.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: placing numbers based on how they 'look' rather than counting equal steps. Every gap on a number line represents the same numerical jump.",
+    "audioNarration": "Equal physical spacing means equal numerical spacing. Use labelled marks as anchors, then count equal steps from there."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

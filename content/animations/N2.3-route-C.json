@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N2.3",
+  "skillName": "Use commutative and associative laws",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students apply the associative law to subtraction, changing the value by moving brackets.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "20 − (8 − 3)",                              "highlight": null },
+            { "text": "Student: (20 − 8) − 3 = 12 − 3 = 9  ✗",   "highlight": "accent" },
+            { "text": "Correct: 20 − (8 − 3) = 20 − 5 = 15",     "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "The student moved the brackets as if subtraction were associative. But twenty minus the quantity eight minus three is fifteen, not nine. Moving brackets in a subtraction changes the answer.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "why-subtraction-fails",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Associativity holds for addition only — never apply it across subtraction signs",
+          "subText": "a − (b − c) = a − b + c ≠ (a − b) − c"
+        }
+      ],
+      "narration": "Subtracting a bracket means subtracting everything inside it. When the bracket contains a subtraction, removing the bracket flips the inner sign — minus eight minus three becomes minus eight plus three, not minus eight minus three.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "expand-correctly",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "20 − (8 − 3)",         "highlight": null },
+            { "text": "= 20 − 8 + 3",         "highlight": "accent" },
+            { "text": "= 12 + 3 = 15  ✓",     "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Remove the bracket carefully: subtracting the whole bracket flips every sign inside it. Minus eight minus three becomes minus eight plus three. Then calculate left to right.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "20 − (8 − 3) = 15",
+          "label": "Subtraction flips inner signs — associativity does not apply"
+        }
+      ],
+      "narration": "Fifteen. Always expand brackets in subtraction by flipping every sign inside. The associative law is for addition only.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: treating 20 − (8 − 3) as (20 − 8) − 3 = 9. Subtraction is not associative. Remove the bracket by flipping inner signs: 20 − 8 + 3 = 15.",
+    "audioNarration": "Never move brackets across a minus sign as if it were a plus. Subtracting a bracket flips all the signs inside it. Associativity only applies to addition."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.17",
+  "skillName": "Multiply by 0.1 and 0.01",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students multiply by 0.1 and get a larger answer, confusing it with multiplying by 10.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "8 × 0.1",                                          "highlight": null },
+            { "text": "Student: 8 × 0.1 = 80  ✗",                        "highlight": "accent" },
+            { "text": "Multiplied by 10 instead of dividing by 10",        "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The student got eighty — that is eight times ten. But zero point one is not ten; it is one tenth. Multiplying by one tenth gives a result ten times smaller than the original, not ten times larger.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "visual-check",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "0.1 is less than 1 — so × 0.1 makes the answer SMALLER than 8",
+          "subText": "The answer to 8 × 0.1 must be less than 8"
+        }
+      ],
+      "narration": "A quick sanity check: zero point one is less than one. Any number multiplied by something less than one gives an answer smaller than the original. The answer to eight times zero point one must be less than eight — eighty is far too large.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "correct-calculation",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "8 × 0.1 = 8 ÷ 10",                               "highlight": "accent" },
+            { "text": "= 0.8  ✓",                                        "highlight": "green" },
+            { "text": "Compare: 8 × 10 = 80   8 × 0.1 = 0.8",           "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Eight times zero point one equals eight divided by ten, which is zero point eight. Compare: eight times ten is eighty — ten times the original. Eight times zero point one is zero point eight — one tenth of the original. Opposite effects.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "8 × 0.1 = 0.8   (not 80)",
+          "label": "× 0.1 means ÷ 10 — answer is smaller, not larger"
+        }
+      ],
+      "narration": "Zero point eight, not eighty. Zero point one means one tenth — multiplying by it divides by ten and shrinks the value. Multiplying by ten does the opposite.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: 8 × 0.1 = 80 (treated 0.1 as 10). Zero point one is a tenth, not ten. Multiplying by 0.1 divides by 10: 8 × 0.1 = 0.8.",
+    "audioNarration": "Zero point one is not ten — it is one tenth. Multiplying by 0.1 makes the number smaller: 8 × 0.1 = 0.8. Multiplying by 10 makes it larger: 8 × 10 = 80. These go in opposite directions."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

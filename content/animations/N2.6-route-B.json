@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N2.6",
+  "skillName": "Use formal methods for subtraction of integers",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students think borrowing permanently reduces the number — they confuse the working notation with the value.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "borrowing-is-regrouping",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Borrowing is regrouping: 1 ten becomes 10 ones — the total value is unchanged",
+          "subText": "You are not reducing the number; you are exchanging one unit for ten smaller units"
+        }
+      ],
+      "narration": "Borrowing does not reduce the value of the number. Trading one ten for ten ones gives you more ones to work with while the total stays exactly the same — like exchanging a ten-pound note for ten one-pound coins.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "why-reduce-neighbour",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "52 − 7: ones column 2 − 7 needs borrowing",  "highlight": null },
+            { "text": "Exchange 1 ten for 10 ones: tens 5→4, ones 2→12", "highlight": "accent" },
+            { "text": "12 − 7 = 5, bring down 4 → answer 45",         "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "When we write four in the tens after borrowing, we record that one ten has been moved — exchanged for ten ones. The reduction in the tens column and the increase in the ones column are two sides of the same exchange.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "check-with-addition",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Check: 45 + 7 = 52  ✓",                   "highlight": "green" },
+            { "text": "Addition undoes subtraction",             "highlight": null },
+            { "text": "Use this to verify any column subtraction", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Check every subtraction by adding the answer back to the number subtracted. Forty-five plus seven is fifty-two — that confirms the answer is correct. Inverse operations are a powerful checking tool.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "52 − 7 = 45",
+          "label": "Borrow = regroup 1 ten as 10 ones — total value unchanged"
+        }
+      ],
+      "narration": "Forty-five. Borrowing is a fair exchange — one ten for ten ones — not a reduction in value.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: thinking borrowing 'uses up' part of the number. Borrowing is an exchange — 1 ten becomes 10 ones. The total value before and after the exchange is identical.",
+    "audioNarration": "Borrowing is like breaking a ten-pound note into coins. You have the same amount — just in smaller units. The total value never changes."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

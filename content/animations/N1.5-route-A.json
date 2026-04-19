@@ -1,0 +1,78 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N1.5",
+  "skillName": "Find the median from a set of numbers (incl midpoint using a calculator)",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students pick the middle-positioned value from the original unsorted list rather than sorting first.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "introduce",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Find the median of: 9, 1, 5, 3, 7", "highlight": null },
+            { "text": "Step 1: Sort ascending",             "highlight": "accent" },
+            { "text": "1, 3, 5, 7, 9",                     "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Before you can find the middle, you must sort. The order in which values are given to you is irrelevant — only the sorted order matters.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "find-middle",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Sorted: 1, 3, 5, 7, 9",           "highlight": null },
+            { "text": "5 values → middle is position 3", "highlight": "accent" },
+            { "text": "Median = 5",                       "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Five values means the third one is in the middle — two on either side. Cross off from both ends simultaneously until one remains.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "even-count",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Even count: 2, 4, 8, 10",                   "highlight": null },
+            { "text": "Two middle values: 4 and 8",                "highlight": "accent" },
+            { "text": "Median = (4 + 8) ÷ 2 = 6",                 "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "With an even number of values there is no single middle. Take the two values that share the middle and find their average.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Median of 9, 1, 5, 3, 7  =  5",
+          "label": "Sort first — then find the middle position"
+        }
+      ],
+      "narration": "Sort, find the middle position, read off the value. That is the complete method every time.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: picking the middle value from the unsorted list. Always sort first — the original order is meaningless for finding the median.",
+    "audioNarration": "If you haven't sorted the list, you cannot find the median. Sorting is not optional — it is step one."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

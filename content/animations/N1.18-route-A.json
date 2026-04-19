@@ -1,0 +1,77 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N1.18",
+  "skillName": "Write positive integers in the form A × 10ⁿ",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students count decimal moves incorrectly, writing the wrong exponent.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "place-decimal",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Write 47 000 in standard form",              "highlight": null },
+            { "text": "Place decimal after first digit: 4.7000",    "highlight": "accent" },
+            { "text": "A must satisfy 1 ≤ A < 10 → A = 4.7",       "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Write the number with a decimal point after the first non-zero digit. That gives the value of A. Here A is four point seven — between one and ten, as required.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "count-moves",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "47 000. → 4.7000",                           "highlight": null },
+            { "text": "Decimal moved 4 places to the left",         "highlight": "accent" },
+            { "text": "Moving left → positive exponent → n = 4",    "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Count how many places the decimal point moved. It moved four places to the left — that makes the exponent positive four. Moving left always gives a positive power.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "write-standard-form",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "A = 4.7,  n = 4",         "highlight": null },
+            { "text": "47 000 = 4.7 × 10⁴  ✓",   "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Combine A and the power of ten. Forty-seven thousand equals four point seven times ten to the power four.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "47 000 = 4.7 × 10⁴",
+          "label": "Place decimal after 1st digit → count left moves → write A × 10ⁿ"
+        }
+      ],
+      "narration": "Four point seven times ten to the four. Standard form: a number between one and ten, multiplied by the appropriate power of ten.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: counting 5 moves for 47 000 because there are 5 digits. Count how far the decimal point moves from its original position — 47000. moves 4 places to become 4.7.",
+    "audioNarration": "Count the decimal moves, not the digits. Place the decimal after the first digit and count how many places it shifted — that is the exponent."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

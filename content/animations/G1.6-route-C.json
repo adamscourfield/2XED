@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "G1.6",
+  "skillName": "Vertically opposite angles are equal",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students confuse vertically opposite angles with adjacent angles and incorrectly add them to 180° instead of recognising they are equal.",
+  "generatedAt": "2026-04-19T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Two lines cross. One angle is 50°.",                "highlight": null },
+            { "text": "Student: opposite angle = 180° − 50° = 130°  ✗",   "highlight": "accent" },
+            { "text": "Subtracted from 180° — but opposite angles are equal", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The student subtracted from one hundred and eighty and got one hundred and thirty. But one hundred and thirty is the adjacent angle — the one next to fifty degrees on the straight line. The angle directly opposite fifty is also fifty, because vertically opposite angles are equal.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "opposite-vs-adjacent",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Opposite = across the crossing point = equal.  Adjacent = next door = supplementary (180°).",
+          "subText": "The angle that is across from 50° is 50°, not 130°"
+        }
+      ],
+      "narration": "At a crossing, every angle has two neighbours and one opposite. The two neighbours are supplementary — they add to one hundred and eighty. The opposite is equal. The distinction is direction: next to or across from.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "all-four-angles",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "One angle = 50°",                                   "highlight": "accent" },
+            { "text": "Opposite = 50° (vertically opposite)  ✓",          "highlight": "green" },
+            { "text": "Both adjacent = 180° − 50° = 130° each  ✓",        "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "With one angle of fifty: the opposite angle is fifty. Both adjacent angles are one hundred and thirty. The four angles — fifty, one hundred and thirty, fifty, one hundred and thirty — total three hundred and sixty as expected.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "50° opposite = 50°   adjacent = 130°   (50+130+50+130=360°)",
+          "label": "Opposite → equal (50°).  Adjacent → supplementary (130°).  Not the same."
+        }
+      ],
+      "narration": "Fifty degrees opposite, one hundred and thirty adjacent. Equal opposite, supplementary adjacent. The confusion arises from misidentifying which angle is which — always check whether the angle is across from or next to the known angle.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: opposite angle = 180° − 50° = 130°. That is the ADJACENT angle, not the opposite one. Vertically opposite angles are equal: opposite angle = 50°. Adjacent angles sum to 180°.",
+    "audioNarration": "Opposite means across the crossing — equal. Adjacent means next door — supplementary (180°). The angle that is directly across from 50° is also 50°. The 130° angles are the ones beside it."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

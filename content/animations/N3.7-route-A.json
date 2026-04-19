@@ -1,0 +1,78 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.7",
+  "skillName": "Short division (without carrying)",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students divide the divisor by each digit rather than each digit by the divisor.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "setup",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Divide 693 ÷ 3",                          "highlight": null },
+            { "text": "Write: 3 ) 6 9 3",                        "highlight": "accent" },
+            { "text": "Work left to right, digit by digit",      "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Write the division in bus-stop format — divisor outside, dividend inside. Work from the leftmost digit to the right.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "divide-each-digit",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Hundreds: 6 ÷ 3 = 2 → write 2 above 6",   "highlight": "accent" },
+            { "text": "Tens: 9 ÷ 3 = 3 → write 3 above 9",       "highlight": "accent" },
+            { "text": "Ones: 3 ÷ 3 = 1 → write 1 above 3",       "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Divide each digit by three. Six divided by three is two, nine divided by three is three, three divided by three is one. Write each quotient digit directly above the dividend digit.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "read-answer",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Quotient digits: 2, 3, 1",       "highlight": "accent" },
+            { "text": "Answer: 231",                   "highlight": "green" },
+            { "text": "Check: 231 × 3 = 693 ✓",       "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Read the quotient digits from left to right: two, three, one — two hundred and thirty-one. Check by multiplying: two thirty-one times three is six ninety-three.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "693 ÷ 3 = 231",
+          "label": "Bus-stop: divide each digit left to right, write quotient above"
+        }
+      ],
+      "narration": "Two hundred and thirty-one. Bus-stop division works digit by digit from left to right — straightforward when each digit divides exactly.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: dividing the divisor 3 by each digit instead of each digit by 3. In 693 ÷ 3, you divide 6 by 3, then 9 by 3, then 3 by 3 — not the other way.",
+    "audioNarration": "The dividend digits are divided BY the divisor — not the divisor divided by the digits. Work left to right: each digit of 693 is divided by 3."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

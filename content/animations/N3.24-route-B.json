@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.24",
+  "skillName": "Introduction to primes",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students see primes as random and do not understand why they matter or what makes them special.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "primes-as-building-blocks",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Every whole number greater than 1 can be built by multiplying primes",
+          "subText": "Primes are the 'atoms' of multiplication — they cannot be broken down further"
+        }
+      ],
+      "narration": "Primes are the irreducible building blocks of all whole numbers. Just as atoms combine to form molecules, primes multiply together to form every other number. A prime cannot be broken down into smaller factors — it is already at its simplest.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "prime-factorisation",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "12 = 2 × 2 × 3   (three prime factors)",           "highlight": null },
+            { "text": "30 = 2 × 3 × 5",                                  "highlight": "accent" },
+            { "text": "Every number has a unique prime factorisation",    "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Twelve breaks down into two times two times three — all primes. Thirty breaks into two times three times five. Every number has exactly one prime factorisation — a unique fingerprint made entirely of primes.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "why-1-excluded",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "If 1 were prime: 12 = 2×2×3 = 1×2×2×3 = 1×1×2×2×3…", "highlight": "accent" },
+            { "text": "Factorisation would no longer be unique  ✗",         "highlight": "accent" },
+            { "text": "So 1 is excluded — to preserve unique factorisations  ✓", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "If one were a prime, you could multiply any factorisation by as many ones as you like — the factorisation would no longer be unique. Excluding one preserves the fundamental theorem of arithmetic: every number has exactly one prime factorisation.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "12 = 2 × 2 × 3   30 = 2 × 3 × 5",
+          "label": "Primes are the atoms of arithmetic — every number has a unique prime factorisation"
+        }
+      ],
+      "narration": "Two times two times three, and two times three times five. Primes are not random — they are the fundamental building blocks from which all other whole numbers are constructed.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: seeing primes as a random list with no deeper meaning. Primes are the building blocks of all numbers — every whole number has a unique prime factorisation, like a numerical fingerprint.",
+    "audioNarration": "Primes matter because every whole number is built from them. The prime factorisation of any number is unique — like a fingerprint. That is why 1 is excluded: including it would destroy that uniqueness."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

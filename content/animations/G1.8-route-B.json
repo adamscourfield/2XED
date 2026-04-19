@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "G1.8",
+  "skillName": "Angles in a quadrilateral sum to 360°",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students accept the 360° rule but do not understand why it works or how it connects to the triangle angle-sum rule.",
+  "generatedAt": "2026-04-19T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "split-into-triangles",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Any quadrilateral can be split into two triangles by drawing one diagonal",
+          "subText": "Two triangles × 180° = 360° — that is where the quadrilateral rule comes from"
+        }
+      ],
+      "narration": "Draw a diagonal across any quadrilateral — a line connecting two opposite corners. This splits it into two triangles. Each triangle has angles summing to one hundred and eighty degrees. Together, the two triangles give two times one hundred and eighty, which is three hundred and sixty.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "diagonal-split",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Quadrilateral ABCD: draw diagonal AC",              "highlight": null },
+            { "text": "Triangle ABC: angles sum to 180°",                  "highlight": "accent" },
+            { "text": "Triangle ACD: angles sum to 180°",                  "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Label the quadrilateral ABCD. Draw diagonal AC, creating triangles ABC and ACD. Each triangle's angles sum to one hundred and eighty. The diagonal splits the triangles' angles across the four vertices of the original quadrilateral.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "combine-triangles",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Triangle 1: 180° + Triangle 2: 180° = 360°",        "highlight": "accent" },
+            { "text": "Diagonal's angles cancel — only quadrilateral angles remain", "highlight": "accent" },
+            { "text": "Quadrilateral interior angles = 360°  ✓",          "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "The two triangles' angles sum to three hundred and sixty. The diagonal creates angles inside the quadrilateral that cancel in pairs when the triangles are combined. What remains is exactly the four interior angles of the quadrilateral, totalling three hundred and sixty.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "2 triangles × 180° = 360° = quadrilateral angle sum",
+          "label": "Any quadrilateral splits into 2 triangles — that is why the sum is 2 × 180° = 360°"
+        }
+      ],
+      "narration": "Two triangles, two times one hundred and eighty, three hundred and sixty. The quadrilateral rule follows directly from the triangle rule — no separate memorisation needed.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: treating 360° as an arbitrary fact for quadrilaterals. It comes from splitting into two triangles (2 × 180° = 360°). Any quadrilateral can be divided by a diagonal into two triangles.",
+    "audioNarration": "A quadrilateral splits into two triangles via a diagonal. Two triangles give 2 × 180° = 360°. The quadrilateral angle sum is not a new rule — it follows from the triangle rule."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

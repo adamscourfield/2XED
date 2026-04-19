@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.14",
+  "skillName": "Convert metric units",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students treat unit conversion as arbitrary rules rather than understanding that the quantity stays the same while its representation changes.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "same-quantity-different-label",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Converting units changes the number but not the actual quantity",
+          "subText": "1000 mL and 1 L are the same amount of liquid — just described differently"
+        }
+      ],
+      "narration": "A unit conversion is a change of description, not a change of amount. One thousand millilitres and one litre describe exactly the same volume of liquid. Changing the unit changes the number attached to it, but the underlying quantity is unchanged.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "why-number-changes",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "500 cm — each unit is 1 cm",                     "highlight": null },
+            { "text": "Regrouped as metres — each unit is 100× larger", "highlight": "accent" },
+            { "text": "So you need 100× fewer: 500 ÷ 100 = 5 m  ✓",    "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Five hundred centimetres — each unit is one centimetre. One metre is one hundred times larger than one centimetre. Because each unit is one hundred times bigger, you need one hundred times fewer of them. Five hundred divided by one hundred is five metres.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "inverse-relationship",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Unit size × 100 → number of units ÷ 100",        "highlight": "accent" },
+            { "text": "Unit size ÷ 1000 → number of units × 1000",     "highlight": "accent" },
+            { "text": "Unit and quantity count always balance out",     "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Unit size and the count of units are inversely related. Make the unit one hundred times larger and you need one hundred times fewer. Make the unit one thousand times smaller and you need one thousand times more. The product — quantity — stays constant.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "500 cm = 5 m   (same length, different unit size)",
+          "label": "Quantity unchanged — number × unit size = constant"
+        }
+      ],
+      "narration": "Five metres. The physical length is unchanged — only the unit and its count have been swapped. Understanding this prevents confusion about when to multiply and when to divide.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: thinking the quantity changes when you convert units. 500 cm and 5 m are the same length. The number gets smaller because the unit gets larger — they balance each other out.",
+    "audioNarration": "Converting units changes the label and the number, not the actual quantity. A larger unit needs a smaller count — that is why the number decreases when you convert to bigger units."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

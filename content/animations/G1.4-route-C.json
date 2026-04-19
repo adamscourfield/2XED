@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "G1.4",
+  "skillName": "Angles on a straight line sum to 180°",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students confuse angles on a straight line (180°) with angles around a point (360°) and use the wrong total.",
+  "generatedAt": "2026-04-19T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Two angles on a straight line: 110° and x°",       "highlight": null },
+            { "text": "Student: x = 360° − 110° = 250°  ✗",              "highlight": "accent" },
+            { "text": "250° is reflex — far too large for this context",  "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The student subtracted from three hundred and sixty, giving two hundred and fifty degrees — a reflex angle sitting on a straight line. That is impossible. Angles on a straight line must each be less than one hundred and eighty, and they sum to one hundred and eighty.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "which-rule-applies",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Straight line → 180°.  Full point (all the way round) → 360°.",
+          "subText": "Check: are the angles on ONE side of a line, or ALL the way around a point?"
+        }
+      ],
+      "narration": "The key question: are the angles on one side of a straight line, or do they go all the way around a point in every direction? One side of a straight line — one hundred and eighty. All the way round a point — three hundred and sixty.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "correct-calculation",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Angles on a straight line: 110° + x° = 180°",     "highlight": "accent" },
+            { "text": "x = 180° − 110° = 70°  ✓",                       "highlight": "green" },
+            { "text": "Check: 70° is acute — plausible on a straight line ✓", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Correct equation: one hundred and ten plus x equals one hundred and eighty. Subtract: x equals seventy degrees. Check: seventy is acute — a reasonable angle to sit alongside one hundred and ten on a straight line.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "110° + 70° = 180°  ✓",
+          "label": "Straight line → 180°, not 360°.  360° is for all angles around a full point."
+        }
+      ],
+      "narration": "Seventy degrees. Angles on a straight line sum to one hundred and eighty. Three hundred and sixty is for angles that go all the way around a point — a different situation entirely.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: 360° − 110° = 250° for angles on a straight line. The total is 180°, not 360°. A straight line is a half turn — 360° applies when angles surround a full point.",
+    "audioNarration": "Straight line means 180°, not 360°. Use 360° only when angles go all the way around a point with no straight line. Check: is this one side of a line, or all the way round? That determines which total to use."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.5",
+  "skillName": "Multiplication (with carrying)",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students think carrying in multiplication is different from carrying in addition.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "same-as-addition-carry",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Carrying in multiplication is regrouping — exactly the same as in addition",
+          "subText": "10 ones regroup to 1 ten; 10 tens regroup to 1 hundred"
+        }
+      ],
+      "narration": "Carrying in multiplication is the same idea as in addition — regrouping when a column overflows past nine. Ten ones become one ten, which moves to the tens column. The carry records that regrouping.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "expanded-view",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "347 × 6 expanded:",                            "highlight": null },
+            { "text": "7×6 = 42 = 40 + 2",                           "highlight": "accent" },
+            { "text": "4×6 = 24 → 24 tens + 4 tens (from 42) = 28 tens = 280", "highlight": "accent" },
+            { "text": "3×6 = 18 → 18 hundreds + 2 (from 28) = 2082", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Expanding shows what the carry represents. Seven times six gives forty — that forty is four tens, which get carried to the tens column. The carry is simply the overflow from the partial product.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "estimate-first",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Estimate: 347 × 6 ≈ 350 × 6 = 2100",       "highlight": "accent" },
+            { "text": "Exact answer should be near 2100",          "highlight": null },
+            { "text": "2082 ✓ — close to estimate",               "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Estimate before multiplying. Three hundred and fifty times six is two thousand one hundred — so the answer should be close to that. Two thousand and eighty-two passes the sense check.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "347 × 6 = 2082",
+          "label": "Carry = regrouped overflow from partial product"
+        }
+      ],
+      "narration": "Two thousand and eighty-two. Estimating first, then checking the exact answer is near the estimate, catches most carrying errors.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: treating multiplication carries as an arbitrary rule unconnected to place value. The carry is simply the overflow from a partial product — regrouping, exactly as in column addition.",
+    "audioNarration": "Carrying in multiplication is regrouping — the same idea as in column addition. When a partial product reaches ten or more, the tens overflow into the next column as a carry."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

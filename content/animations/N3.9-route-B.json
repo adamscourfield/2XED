@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.9",
+  "skillName": "Order of Operations",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students see BODMAS as an arbitrary rule rather than a convention needed for expressions to have unique values.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "why-rules-exist",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Without an agreed order, the same expression can give different answers",
+          "subText": "Order of operations is a shared convention — not an arbitrary rule"
+        }
+      ],
+      "narration": "Mathematical notation needs to be unambiguous. If different people calculated the same expression in different orders and got different answers, mathematics could not be reliably communicated. BODMAS is the agreed convention that ensures every expression has exactly one value.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "ambiguity-example",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "2 + 3 × 4: what does it mean?",             "highlight": null },
+            { "text": "Interpretation A: (2 + 3) × 4 = 20",        "highlight": "accent" },
+            { "text": "Interpretation B: 2 + (3 × 4) = 14",        "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Without rules, two plus three times four is ambiguous — it could mean add first to get twenty, or multiply first to get fourteen. BODMAS settles this: multiplication takes priority, so the agreed answer is fourteen.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "brackets-as-communication",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "To mean 20: write (2 + 3) × 4",             "highlight": "accent" },
+            { "text": "To mean 14: write 2 + 3 × 4",               "highlight": "accent" },
+            { "text": "Brackets let you override the default order", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Brackets are how you communicate a non-default order. If you want the addition first, write brackets around it. Without brackets, the default BODMAS order applies and multiplication comes first.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "2 + 3 × 4 = 14  (agreed by convention)",
+          "label": "BODMAS gives every expression a unique, unambiguous value"
+        }
+      ],
+      "narration": "Fourteen — by convention. The order of operations is a shared agreement that makes mathematical expressions unambiguous, allowing everyone who follows it to get the same answer.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: thinking BODMAS is arbitrary. It is a shared convention that ensures every expression has exactly one value — without it, the same expression could give different answers to different people.",
+    "audioNarration": "BODMAS is not arbitrary — it is the agreement that makes maths communication unambiguous. Without it, the same expression could mean different things to different people."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "G1.1",
+  "skillName": "Identify and name types of angles",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students confuse angle types, especially obtuse and reflex, or forget that a right angle is exactly 90°.",
+  "generatedAt": "2026-04-19T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "four-ranges",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Acute: 0°–90°   Right: exactly 90°   Obtuse: 90°–180°   Reflex: 180°–360°",
+          "subText": "Compare any angle to the three boundaries: 90°, 180°, 360°"
+        }
+      ],
+      "narration": "There are four angle types and they are defined by four ranges. Acute is anything strictly between zero and ninety degrees. Right is exactly ninety. Obtuse is between ninety and one hundred and eighty. Reflex is between one hundred and eighty and three hundred and sixty.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "classify-examples",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "35° → less than 90° → acute",       "highlight": "accent" },
+            { "text": "90° → exactly 90° → right",         "highlight": "accent" },
+            { "text": "120° → between 90° and 180° → obtuse", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Thirty-five degrees is less than ninety — acute. Ninety degrees is exactly ninety — right. One hundred and twenty degrees sits between ninety and one hundred and eighty — obtuse.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "reflex-check",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "250° → greater than 180° → reflex",  "highlight": "accent" },
+            { "text": "Key boundary: 180° = a straight line", "highlight": "green" },
+            { "text": "Greater than a straight line → reflex", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Two hundred and fifty degrees is greater than one hundred and eighty — reflex. The boundary between obtuse and reflex is the straight line at one hundred and eighty degrees. Any angle that goes past a straight line is reflex.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "0°–90° acute  |  90° right  |  90°–180° obtuse  |  180°–360° reflex",
+          "label": "Check each angle against the boundary values 90°, 180°, 360°"
+        }
+      ],
+      "narration": "Acute, right, obtuse, reflex — defined by the boundaries ninety, one hundred and eighty, and three hundred and sixty degrees. Always check which range the angle falls in before naming it.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: calling 200° obtuse or 160° reflex. Obtuse is strictly between 90° and 180°. Reflex is strictly between 180° and 360°. The boundary is the straight line at 180°.",
+    "audioNarration": "The key boundary between obtuse and reflex is 180° — a straight line. Anything less than 180° is obtuse; anything more is reflex. Right is exactly 90°, never approximate."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

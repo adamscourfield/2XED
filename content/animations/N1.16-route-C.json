@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N1.16",
+  "skillName": "Rounding to significant figures",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students drop the placeholder zeros after rounding, changing the magnitude of the answer.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Round 38 200 to 2 significant figures",    "highlight": null },
+            { "text": "Student: identifies 3 and 8 → writes 38  ✗", "highlight": "accent" },
+            { "text": "Dropped the three placeholder zeros",       "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The student correctly identified three and eight as the two significant figures, but wrote thirty-eight instead of thirty-eight thousand. Dropping the zeros changed the number from thirty-eight thousand to thirty-eight — a thousand times smaller.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "placeholder-zeros",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "After rounding an integer, replace non-significant digits with zeros — do not drop them",
+          "subText": "The zeros hold the columns so the number stays the right size"
+        }
+      ],
+      "narration": "For integers, the digits you round away must be replaced with zeros. They are no longer precise — but they still tell you the order of magnitude. Without them the answer is in completely the wrong ballpark.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "correct-method",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "38 200 → 1st s.f.: 3,  2nd s.f.: 8",        "highlight": null },
+            { "text": "Decision digit: 2 < 5 → round down",         "highlight": "accent" },
+            { "text": "Replace 2, 0, 0 with zeros → 38 000  ✓",    "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Round down — eight stays as eight. Replace the two and the two trailing zeros with zeros. The answer is thirty-eight thousand, not thirty-eight.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "38 200 ≈ 38 000  (2 s.f.)",
+          "label": "Round the 2nd sig fig → replace remaining digits with zeros"
+        }
+      ],
+      "narration": "Thirty-eight thousand. Two significant figures — three and eight — with three zeros holding the place value intact.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: writing 38 instead of 38 000 when rounding to 2 s.f. The placeholder zeros must stay — they keep the number the right size.",
+    "audioNarration": "Never drop placeholder zeros from an integer when rounding. Replace the rounded digits with zeros — they hold the magnitude even though they are not significant."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

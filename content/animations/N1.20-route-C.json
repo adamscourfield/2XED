@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N1.20",
+  "skillName": "Place value systems beyond base 10",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students use a digit that does not exist in the base — writing a 2 or 3 in a binary number.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Convert 6 to binary",                       "highlight": null },
+            { "text": "Student writes: 2 + 4 = 6, so binary is 24₂  ✗", "highlight": "accent" },
+            { "text": "Digit '2' does not exist in base 2",        "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The student correctly found that four plus two equals six, but wrote the column values as digits. In base two, the only allowed digits are zero and one — two is not a valid binary digit.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "valid-digits",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "In base n, every digit must be less than n — binary allows only 0 and 1",
+          "subText": "A digit of 2 in base 2 would overflow into the next column"
+        }
+      ],
+      "narration": "Each digit represents how many of that column you have — and you can never have as many as the base itself, because that would overflow into the next column. Binary digits are always zero or one.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "correct-conversion",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "6 in binary: which powers of 2 sum to 6?", "highlight": null },
+            { "text": "4 + 2 = 6 → use the 4-column and 2-column", "highlight": "accent" },
+            { "text": "1×4 + 1×2 + 0×1 = 110₂  ✓",               "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Place a one in each column whose value is used and a zero in each that is not. Four and two are used; one is not. The binary digits are one, one, zero — reading from the largest column.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "6₁₀ = 110₂",
+          "label": "Use 0s and 1s only — 1 if column is included, 0 if not"
+        }
+      ],
+      "narration": "Six in base ten is one one zero in base two. Each position records whether that power of two contributes — one if yes, zero if no.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: writing 24₂ for six — using the digit 2 in binary. Binary only has 0 and 1. Write a 1 for each power of 2 that is included and a 0 for each that is not.",
+    "audioNarration": "No digit in a number system can equal or exceed the base. Binary uses only 0 and 1 — never 2 or higher. Place 1s and 0s to show which powers of 2 are included."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

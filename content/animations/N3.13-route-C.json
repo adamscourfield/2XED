@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.13",
+  "skillName": "HCF",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students confuse HCF with LCM, finding the largest common multiple rather than the largest common factor.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "HCF of 8 and 12",                                 "highlight": null },
+            { "text": "Student: LCM(8,12) = 24 → HCF = 24  ✗",          "highlight": "accent" },
+            { "text": "Found the LCM instead — wrong concept",            "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The student found twenty-four — the lowest common multiple of eight and twelve. But HCF asks for the largest factor they share, not the smallest multiple. These are opposite operations with opposite results.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "hcf-vs-lcm",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "HCF: largest number that divides INTO both → result ≤ smaller number",
+          "subText": "LCM: smallest number both divide INTO → result ≥ larger number"
+        }
+      ],
+      "narration": "HCF is found by looking at factors — numbers smaller than or equal to the originals. LCM is found by looking at multiples — numbers larger than or equal to the originals. The HCF of eight and twelve must be eight or smaller.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "correct-hcf",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Factors of 8:  1, 2, 4, 8",                      "highlight": "accent" },
+            { "text": "Factors of 12: 1, 2, 3, 4, 6, 12",              "highlight": "accent" },
+            { "text": "Largest common factor: 4  ✓",                    "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Factors of eight: one, two, four, eight. Factors of twelve: one, two, three, four, six, twelve. Common factors: one, two, four. The largest is four — that is the HCF.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "HCF(8, 12) = 4",
+          "label": "HCF = 4 (largest shared factor).  LCM = 24 (smallest shared multiple)."
+        }
+      ],
+      "narration": "Four — not twenty-four. The HCF is always less than or equal to the smaller number; the LCM is always greater than or equal to the larger number. They point in opposite directions.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: HCF(8, 12) = 24 (found the LCM instead). The HCF is 4 — the largest number that divides into both 8 and 12. It must be ≤ 8, not larger than both.",
+    "audioNarration": "HCF must be smaller than or equal to both original numbers — it is a factor, not a multiple. LCM is always larger. HCF(8,12) = 4. LCM(8,12) = 24. They are not the same."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

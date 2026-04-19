@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N1.2",
+  "skillName": "Write integers in words and figures",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students write words to figures incorrectly by adding extra zeros or misplacing digit groups.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Words: 'forty-two thousand and sixteen'", "highlight": null },
+            { "text": "Student writes: 4,2016  ✗",             "highlight": "accent" },
+            { "text": "Or writes:      42,160  ✗",             "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Both of these wrong answers come from the same problem — not knowing how many digits belong in each group. The right answer has a fixed structure.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "name-the-error",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "After the thousands comma, there are always exactly 3 digits",
+          "subText": "42,016 — the last group is 016, not 16 or 160"
+        }
+      ],
+      "narration": "The group after the comma always has three digits. If the words give you a remainder under a hundred, pad it with a zero on the left. Sixteen becomes zero-one-six.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "correct-method",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "'forty-two thousand' → 42,___",  "highlight": null },
+            { "text": "'and sixteen'        → 016",      "highlight": "accent" },
+            { "text": "Combined:            → 42,016",   "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Forty-two goes to the left of the comma. Sixteen needs three digits on the right — so it becomes zero-one-six. Watch how the zero fills the hundreds slot.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "42,016",
+          "label": "'forty-two thousand and sixteen' in figures"
+        }
+      ],
+      "narration": "Forty-two thousand and sixteen. Six digits total — two before the comma, three after, with a zero holding the hundreds place.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: writing 4,2016 or 42,160 instead of 42,016. The group after the comma always needs exactly three digits — pad with zeros if needed.",
+    "audioNarration": "Always ask yourself: do I have exactly three digits after the comma? If not, add zeros to the left of the remainder until you do."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

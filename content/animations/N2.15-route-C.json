@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N2.15",
+  "skillName": "Solve problems with frequency trees",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students add frequencies from different levels of the tree, double-counting groups.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Tree: total 100, boys 60, girls 40; boys-pass 35, boys-fail 25", "highlight": null },
+            { "text": "Q: how many boys? Student: 60 + 35 + 25 = 120  ✗",               "highlight": "accent" },
+            { "text": "Added the boys node AND both its children — double-counted",      "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The student added the boys node and its two children. But the children are already contained within the boys node — adding them again counts the boys twice. Each person appears in exactly one leaf.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "read-correct-level",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Read from ONE level of the tree for any given question — never mix nodes from different levels",
+          "subText": "A parent node already includes all its children — do not add children to it"
+        }
+      ],
+      "narration": "A parent node is the sum of its children — they are not separate counts to be added together. To find the total in a category, read from one level only: either the parent node or the sum of its leaves, but not both.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "correct-method",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "How many boys? → read the boys node: 60  ✓",      "highlight": "green" },
+            { "text": "How many passed? → add pass leaves: 35 + 28 = 63  ✓", "highlight": "green" },
+            { "text": "Never add a node to its own children",              "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "For the total boys, simply read sixty from the boys node. For total passes, add the pass leaves from each gender branch. Pick the right level — never mix.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Boys = 60 (read the node — do not add its children)",
+          "label": "One level only — parent already contains its children"
+        }
+      ],
+      "narration": "Sixty boys. The node already contains the information — its children are breakdowns of that sixty, not additions to it.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: adding 60 + 35 + 25 = 120 for 'number of boys'. The node 60 already includes 35 and 25 — adding them again doubles the count. Read from one level only.",
+    "audioNarration": "A parent node already includes all its children. Never add a node to its own children — that double-counts everyone in the group."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

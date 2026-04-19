@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N2.11",
+  "skillName": "Perimeter of rectangles and parallelograms",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students think the perimeter formula changes between rectangles and parallelograms.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "same-formula-why",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Rectangles and parallelograms share P = 2(a + b) because both have two pairs of equal opposite sides",
+          "subText": "The right angles in a rectangle do not affect the perimeter calculation"
+        }
+      ],
+      "narration": "The perimeter formula is identical for rectangles and parallelograms because both shapes share the same property: two pairs of equal opposite sides. Angles are irrelevant to perimeter — only the side lengths matter.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "why-2-times",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Walk around a 6 × 4 rectangle:",       "highlight": null },
+            { "text": "→ 6 cm  ↓ 4 cm  ← 6 cm  ↑ 4 cm",     "highlight": "accent" },
+            { "text": "Total = 6 + 4 + 6 + 4 = 2(6 + 4) = 20", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Walking around a rectangle you traverse each length twice and each width twice. Adding a length and a width gives one traverse of each — multiplying by two accounts for both opposite sides.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "finding-missing-side",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Perimeter = 30 cm, one side = 9 cm",    "highlight": null },
+            { "text": "2(9 + w) = 30 → 9 + w = 15",           "highlight": "accent" },
+            { "text": "w = 6 cm",                             "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "If the perimeter and one side are known, find the other. Half the perimeter is the sum of both side lengths: fifteen. Subtract the known side: fifteen minus nine equals six centimetres.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "P = 2(l + w) → w = P/2 − l",
+          "label": "Formula works in reverse: half the perimeter minus one side"
+        }
+      ],
+      "narration": "The formula is fully reversible. Know any two of the three values — perimeter, length, width — and you can find the third.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: using a different method for parallelograms. Both rectangles and parallelograms have two pairs of equal opposite sides — P = 2(a + b) works for both.",
+    "audioNarration": "Perimeter depends only on side lengths, not angles. Whether the shape is a rectangle or a parallelogram, add the two different side lengths and double."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

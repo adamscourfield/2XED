@@ -1,0 +1,79 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N1.14",
+  "skillName": "Compare negatives using =, ≠, <, >, ≤, ≥",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students apply positive-number comparison rules directly to negatives, writing −7 > −3 because 7 > 3.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "place-on-line",
+      "visuals": [
+        {
+          "type": "number_line",
+          "min": -8,
+          "max": 0,
+          "markers": [-8, -7, -6, -5, -4, -3, -2, -1, 0],
+          "points": [
+            { "value": -7, "label": "−7", "highlight": "accent" },
+            { "value": -3, "label": "−3", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Place both numbers on the number line. Negative seven is seven steps left of zero; negative three is three steps left. On the line, negative seven sits to the left of negative three.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "left-means-smaller",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Left of another number → smaller value",   "highlight": "accent" },
+            { "text": "−7 is left of −3",                        "highlight": null },
+            { "text": "Therefore −7 < −3",                       "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "The number further left is always smaller. Negative seven is to the left of negative three, so negative seven is less than negative three.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "write-symbol",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "−7 < −3  (open end points to −3, the larger)", "highlight": "green" },
+            { "text": "−3 > −7  (same fact, reversed)",               "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "The open mouth of the symbol always faces the larger number. Both statements say the same thing — negative seven is the smaller, negative three is the larger.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "−7 < −3",
+          "label": "Further left = smaller — the number line settles it"
+        }
+      ],
+      "narration": "Negative seven is less than negative three. When in doubt, place both on a number line — whichever sits to the left is the smaller value.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: writing −7 > −3 because 7 > 3. For negatives, a larger digit means further LEFT — which means a SMALLER value.",
+    "audioNarration": "Don't compare the digits alone. Place both numbers on a number line — the one on the left is always the smaller, regardless of the digits."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

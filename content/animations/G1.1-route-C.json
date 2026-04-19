@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "G1.1",
+  "skillName": "Identify and name types of angles",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students confuse obtuse and reflex angles because both are 'bigger than a right angle'.",
+  "generatedAt": "2026-04-19T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Student calls 210° an obtuse angle  ✗",            "highlight": "accent" },
+            { "text": "Obtuse ends at 180° — 210° is past a straight line", "highlight": "accent" },
+            { "text": "210° is reflex",                                   "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The student called two hundred and ten degrees obtuse because it is bigger than a right angle. But obtuse ends at one hundred and eighty degrees. Two hundred and ten is past a straight line — that makes it reflex, not obtuse.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "the-key-boundary",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "180° is the boundary: obtuse is below it, reflex is above it",
+          "subText": "Obtuse: 90° to 180°   Reflex: 180° to 360°"
+        }
+      ],
+      "narration": "One hundred and eighty degrees — a straight line — is the exact boundary between obtuse and reflex. Obtuse angles are those that have not yet reached a straight line. Reflex angles have gone past it.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "classify-correctly",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "150° → below 180° → obtuse  ✓",                   "highlight": "green" },
+            { "text": "210° → above 180° → reflex  ✓",                   "highlight": "green" },
+            { "text": "Straight-line check: does it look wider than a flat line?", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "One hundred and fifty degrees is below one hundred and eighty — obtuse. Two hundred and ten is above — reflex. A quick visual check: does the angle look wider than a flat straight line? If yes, it is reflex.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "150° → obtuse   210° → reflex",
+          "label": "180° is the dividing line — below is obtuse, above is reflex"
+        }
+      ],
+      "narration": "One hundred and fifty degrees is obtuse, two hundred and ten is reflex. Always check the angle against one hundred and eighty degrees — the straight line — before naming it.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: calling 210° obtuse because it is bigger than 90°. Obtuse stops at 180°. Any angle greater than 180° is reflex — it has passed the straight line.",
+    "audioNarration": "Both obtuse and reflex are bigger than a right angle, but they are separated at 180°. Obtuse is between 90° and 180°. Reflex is between 180° and 360°. The straight line at 180° is the dividing boundary."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

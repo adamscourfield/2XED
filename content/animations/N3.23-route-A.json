@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.23",
+  "skillName": "Square and cube numbers, roots",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students double a number when asked to square it, or triple it when asked to cube it.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "square-and-cube-defined",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "n² = n × n   |   n³ = n × n × n",
+          "subText": "The exponent tells you how many times to use n as a factor — not a multiplier"
+        }
+      ],
+      "narration": "Squaring means multiplying a number by itself. Cubing means multiplying a number by itself three times. The exponent tells you how many copies of the number to multiply together — not how many times to add it.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "calculate-squares-cubes",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "5² = 5 × 5 = 25   (not 5 × 2 = 10)",              "highlight": "accent" },
+            { "text": "3³ = 3 × 3 × 3 = 27   (not 3 × 3 = 9)",           "highlight": "accent" },
+            { "text": "4² = 16,  2³ = 8,  10² = 100,  10³ = 1000",       "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Five squared is five times five, which is twenty-five — not ten. Three cubed is three times three times three: nine times three is twenty-seven — not nine. The exponent counts multiplications, not the multiplier.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "square-roots",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "√25 = 5   (because 5 × 5 = 25)",                  "highlight": "accent" },
+            { "text": "∛27 = 3   (because 3 × 3 × 3 = 27)",              "highlight": "accent" },
+            { "text": "Roots are inverses of powers",                     "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "The square root of twenty-five is five because five squared is twenty-five. The cube root of twenty-seven is three because three cubed is twenty-seven. Roots undo powers — they are inverse operations.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "5² = 25   3³ = 27   √25 = 5   ∛27 = 3",
+          "label": "Square = multiply by itself once.  Cube = multiply by itself twice more."
+        }
+      ],
+      "narration": "Twenty-five, twenty-seven, five, three. Squaring and cubing are repeated multiplication — roots are the inverse, asking which number was multiplied by itself.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: 5² = 10 (doubled instead of squared). Squaring means 5 × 5 = 25. The exponent 2 means use 5 as a factor twice — it does not mean multiply by 2.",
+    "audioNarration": "The exponent tells you how many times to use the number as a factor — not how many times to add or multiply it by. Five squared is five times five, not five times two."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

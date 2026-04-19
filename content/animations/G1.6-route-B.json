@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "G1.6",
+  "skillName": "Vertically opposite angles are equal",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students accept that vertically opposite angles are equal but do not understand why the rule works.",
+  "generatedAt": "2026-04-19T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "proof-from-straight-lines",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Vertically opposite angles are equal because both equal 180° minus the same adjacent angle",
+          "subText": "The proof uses only the straight-line rule — no new facts needed"
+        }
+      ],
+      "narration": "The equality of vertically opposite angles can be proved from the straight-line rule alone. Both opposite angles are each equal to one hundred and eighty degrees minus the same adjacent angle, so they must equal each other.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "algebra-proof",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Angles a and b on a straight line: a + b = 180°",  "highlight": null },
+            { "text": "Angles b and c on a straight line: b + c = 180°",  "highlight": "accent" },
+            { "text": "Both equal 180° → a + b = b + c → a = c  ✓",     "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Label the angles at the crossing a, b, c, d. A and b are on a straight line: a plus b equals one hundred and eighty. B and c are on the other straight line: b plus c equals one hundred and eighty. Both left sides equal one hundred and eighty — so a plus b equals b plus c, which gives a equals c.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "symmetry-view",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Two crossing lines have rotational symmetry",       "highlight": "accent" },
+            { "text": "Rotating 180° about the crossing maps each angle to its opposite", "highlight": "accent" },
+            { "text": "Symmetry confirms: opposite angles are equal  ✓", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "A geometric way to see it: two crossing lines have rotational symmetry of one hundred and eighty degrees about the crossing point. Rotating the diagram by one hundred and eighty maps each angle exactly onto the opposite angle — so they must be equal.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "a + b = 180° and b + c = 180° → a = c",
+          "label": "Proved from the straight-line rule — no need to memorise it as a separate fact"
+        }
+      ],
+      "narration": "A equals c — proved. Vertically opposite angles are equal because they are both the supplement of the same angle. The rule is not a separate fact to memorise — it follows directly from the straight-line rule.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: accepting the rule without understanding it. Vertically opposite angles are equal because both equal 180° minus the same adjacent angle. The proof uses only the straight-line rule.",
+    "audioNarration": "Vertically opposite angles are equal because both are 180° minus the same adjacent angle — a and c are each 180° minus b, so a must equal c. The rule follows from the straight-line rule, not from memorisation."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

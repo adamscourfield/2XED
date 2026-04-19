@@ -1,0 +1,79 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N2.2",
+  "skillName": "Mental strategies for addition and subtraction",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students always use column methods mentally, losing track of carries.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "near-multiples",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Add 99: add 100, subtract 1",     "highlight": "accent" },
+            { "text": "247 + 99 = 247 + 100 − 1 = 346", "highlight": "green" },
+            { "text": "Add 198: add 200, subtract 2",    "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "When adding a near-multiple of ten or a hundred, round it up then adjust. Adding ninety-nine is quicker as adding one hundred then subtracting one. One step instead of carrying digits.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "partitioning",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "346 + 253:",                        "highlight": null },
+            { "text": "300 + 200 = 500",                  "highlight": "accent" },
+            { "text": "40 + 50 = 90",                     "highlight": "accent" },
+            { "text": "6 + 3 = 9 → total 599",            "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Partition both numbers into hundreds, tens, and ones, then add each group separately. Add the hundreds, then the tens, then the ones, and combine. No columns needed.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "counting-on",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "734 − 698: count up from 698",      "highlight": null },
+            { "text": "698 → 700: add 2",                  "highlight": "accent" },
+            { "text": "700 → 734: add 34 → difference = 36", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "For subtractions where the numbers are close, count up from the smaller to the larger. From six ninety-eight to seven hundred is two; from seven hundred to seven thirty-four is thirty-four. Total difference: thirty-six.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "734 − 698 = 36",
+          "label": "Count up: 698 → 700 (+2) → 734 (+34) = 36"
+        }
+      ],
+      "narration": "Thirty-six. Counting up from six ninety-eight to seven thirty-four in two hops is far faster than a written subtraction.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: always setting up column subtraction for calculations like 734 − 698. When numbers are close, counting up is faster and less error-prone.",
+    "audioNarration": "Choose your strategy based on the numbers. Near-multiples suit rounding and adjusting; close numbers suit counting up; large partitioned numbers suit splitting."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

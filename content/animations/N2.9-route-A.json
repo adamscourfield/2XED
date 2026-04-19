@@ -1,0 +1,74 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N2.9",
+  "skillName": "Perimeter of irregular polygons",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students miss sides when counting, especially when a diagram has unlabelled or implied sides.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "what-is-perimeter",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Perimeter = total distance around the outside of a shape",
+          "subText": "Add every side length — do not skip any, even if sides are equal"
+        }
+      ],
+      "narration": "Perimeter is the total length of the boundary of a shape — the distance you would walk if you went all the way around the outside. Every side must be included in the sum.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "mark-sides",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Strategy: tick each side as you add it",   "highlight": "accent" },
+            { "text": "Start at one vertex, work clockwise",     "highlight": "null" },
+            { "text": "Stop when you reach the starting vertex", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Tick or mark each side as you add its length. Start at any vertex, travel clockwise around the boundary, and stop when you return to the start. A tick on every side confirms none were skipped.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "add-sides",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Sides: 4 cm, 7 cm, 3 cm, 5 cm, 6 cm, 2 cm", "highlight": "accent" },
+            { "text": "4 + 7 + 3 + 5 + 6 + 2 = 27 cm",             "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Add all six side lengths: four, seven, three, five, six, two. Total: twenty-seven centimetres.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Perimeter = 27 cm",
+          "label": "Tick each side → add all lengths → perimeter is the total"
+        }
+      ],
+      "narration": "Twenty-seven centimetres. Ticking each side as you go prevents double-counting or missing any side.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: counting the number of sides rather than adding the lengths, or missing a side on an irregular polygon. Mark each side as you include it in the sum.",
+    "audioNarration": "Tick every side as you add it. Work clockwise from one vertex back to the start — every side gets exactly one tick and one contribution to the total."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

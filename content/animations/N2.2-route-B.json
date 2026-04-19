@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N2.2",
+  "skillName": "Mental strategies for addition and subtraction",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students think mental methods are just informal guessing rather than structured strategies.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "choose-strategy",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Look at the numbers before choosing a method — the right strategy makes calculation nearly instant",
+          "subText": "Near-multiple? Round and adjust. Close together? Count up. Far apart? Partition."
+        }
+      ],
+      "narration": "Mental arithmetic is not guesswork — it is choosing the most efficient path for the specific numbers in front of you. The strategy should fit the numbers, not the other way around.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "why-round-adjust",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "63 + 29: 29 is close to 30",         "highlight": null },
+            { "text": "Adding 30 is trivial: 63 + 30 = 93", "highlight": "accent" },
+            { "text": "Adjust back: 93 − 1 = 92",           "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Round the awkward number to the nearest ten or hundred — something easy to add — then adjust by the small amount you over- or under-added. The mental load is tiny.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "why-count-up-for-subtraction",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Subtraction = finding the gap",          "highlight": null },
+            { "text": "502 − 497: gap is tiny — count up",     "highlight": "accent" },
+            { "text": "497 → 502 = 5 steps  →  answer: 5",    "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "When two numbers are close, subtraction is really asking how big the gap is. Counting up from the smaller number to the larger is the natural way to measure a gap — and it avoids awkward borrowing.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "502 − 497 = 5",
+          "label": "Count up: 497 → 502 in one step"
+        }
+      ],
+      "narration": "Five. Counting up from four ninety-seven to five zero two takes a single mental step — no column method needed.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: using the same written-column approach for every subtraction mentally. Match the strategy to the numbers — counting up is ideal when numbers are close.",
+    "audioNarration": "Mental strategies are deliberate choices, not shortcuts or guessing. Inspect the numbers first, then pick the approach that makes the arithmetic easiest."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

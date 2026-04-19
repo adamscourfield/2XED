@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N2.4",
+  "skillName": "Use formal methods for addition of integers",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students don't understand why carrying works — they see it as an arbitrary rule.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "why-carry",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Carrying is regrouping: 10 ones = 1 ten, 10 tens = 1 hundred",
+          "subText": "When a column overflows past 9, the excess forms a unit in the next column"
+        }
+      ],
+      "narration": "Carrying is not a rule to memorise — it is regrouping. Ten ones fill up a ones column completely and form exactly one ten. That ten moves to the tens column. The column can only hold a single digit.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "expanded-view",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "57 + 36:",                              "highlight": null },
+            { "text": "50 + 30 = 80",                         "highlight": "accent" },
+            { "text": "7 + 6 = 13 = 10 + 3",                  "highlight": "accent" },
+            { "text": "80 + 10 + 3 = 93",                     "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Expand the addition to see what carrying represents. Seven plus six is thirteen — one ten and three ones. That ten joins the eighty from the tens column, giving ninety-three. Carrying is just moving that regrouped ten.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "column-method-mirrors",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Ones: 7 + 6 = 13 → write 3, carry 1 ten", "highlight": "accent" },
+            { "text": "Tens: 5 + 3 + 1 = 9 → write 9",          "highlight": "green" },
+            { "text": "Answer: 93 — same as expanded method",    "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "The column method compresses the expanded addition into a compact notation. The carried digit is the regrouped unit — it is the ten from thirteen moving into the tens column.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "57 + 36 = 93",
+          "label": "Carry = regroup: 10 ones become 1 ten in the next column"
+        }
+      ],
+      "narration": "Ninety-three. The carried digit is a regrouped unit — it is not magic, just place value in action.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: treating carrying as an arbitrary step to memorise. Carrying is regrouping — 10 ones become 1 ten. It follows directly from how place value works.",
+    "audioNarration": "Carrying is just regrouping. When ones reach ten, they form a single ten that moves to the tens column. Place value explains every step."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

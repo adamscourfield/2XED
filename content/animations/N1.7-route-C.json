@@ -1,0 +1,74 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N1.7",
+  "skillName": "Compare decimals using =, ≠, <, >, ≤, ≥",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students compare decimal digits as if they are integers, ignoring column alignment.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Compare 3.09 and 3.9",                     "highlight": null },
+            { "text": "Student: 09 > 9, so 3.09 > 3.9  ✗",       "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The student stripped the decimal point and compared 09 with 9 as if they were whole numbers. But 09 and 9 are not in the same columns — one is hundredths, the other is tenths.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "align-columns",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Always compare digit by digit in the same column — never strip the decimal point",
+          "subText": "Pad the shorter decimal so both have the same number of places"
+        }
+      ],
+      "narration": "Decimal digits can only be compared when they sit in the same column. Pad the shorter number with trailing zeros so every digit has a matching partner.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "correct-method",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "3.09  and  3.9 → pad → 3.09  and  3.90", "highlight": null },
+            { "text": "Ones: 3 = 3 → move right",                "highlight": "dim" },
+            { "text": "Tenths: 0 < 9 → 3.09 is smaller  ✓",      "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "After padding, compare left to right. The ones digits tie, so move to tenths. Zero tenths is less than nine tenths — the comparison is settled right there.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "3.09 < 3.9",
+          "label": "Pad → compare column by column → tenths decide"
+        }
+      ],
+      "narration": "Three point zero nine is less than three point nine. Padding with a zero reveals the truth — never compare decimal tails as if they are integers.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: treating 3.09 and 3.9 as if the parts after the decimal are integers (09 vs 9). Align columns first — 3.09 vs 3.90 shows 3.09 is smaller.",
+    "audioNarration": "You cannot compare decimal digits without column alignment. Pad both decimals to the same length, then compare place by place from the left."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

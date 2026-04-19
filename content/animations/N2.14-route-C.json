@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N2.14",
+  "skillName": "Solve problems involving tables and timetables",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students misread a timetable and use the wrong row or column, selecting an incorrect service.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Need to arrive in Leeds by 10:30",               "highlight": null },
+            { "text": "Student picks train arriving 10:45  ✗",          "highlight": "accent" },
+            { "text": "Read the wrong column — used departure not arrival", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The student read the time from the wrong row — the departure time at another stop rather than the arrival time at Leeds. Timetable errors almost always come from reading the wrong row or column.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "locate-correctly",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Find the destination row first, then scan left to find a suitable time — then read up to find the departure",
+          "subText": "Always confirm which row is arrival and which is departure before reading any time"
+        }
+      ],
+      "narration": "Fix the destination row first — that anchors you to the correct line. Scan across that row for a time that meets the constraint. Then look up to the departure row in the same column to find when to board.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "correct-reading",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Leeds row: 09:52, 10:18, 10:43 (too late)",   "highlight": null },
+            { "text": "10:18 arrives before 10:30 ✓",               "highlight": "green" },
+            { "text": "Same column, departure row: 09:05 — board then", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "In the Leeds row, ten eighteen is before ten thirty — that is the last suitable service. In the same column, the departure row shows nine oh five. Board at nine oh five to arrive by ten thirty.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Board 09:05 → arrive Leeds 10:18",
+          "label": "Find destination row first → suitable time → same column for departure"
+        }
+      ],
+      "narration": "Board at nine oh five, arrive Leeds at ten eighteen — before the ten thirty deadline. Always anchor to the correct row before reading any time.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: reading the departure time when the question asks about arrival. Find the destination row first, then find the arrival time — then look up in the same column for the departure.",
+    "audioNarration": "Always identify the arrival row and departure row before reading times. Find the destination row first, pick the time that fits, then read the departure from the same column."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

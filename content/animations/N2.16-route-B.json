@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N2.16",
+  "skillName": "Add and subtract numbers given in standard form",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students think standard form addition has special rules — they don't connect it to ordinary decimal addition.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "same-as-decimal",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Standard form addition is just decimal addition in disguise — expand, add, rewrite",
+          "subText": "3.2 × 10⁵ = 320 000;  4.7 × 10⁴ = 47 000 → add as decimals"
+        }
+      ],
+      "narration": "There are no new rules for adding in standard form. Expand both numbers into ordinary form, add them as decimals, then rewrite the answer in standard form. The power notation is just a compact way to write the same numbers.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "why-match-powers",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Like units must add to like units",      "highlight": "accent" },
+            { "text": "£5 + 30p ≠ £35 — must convert first",   "highlight": "accent" },
+            { "text": "Same idea: 10⁵ units + 10⁴ units — convert first", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Matching powers is the same idea as matching units in money. You cannot add five pounds and thirty pence without converting — and you cannot add numbers in different powers of ten without converting either.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "subtract-example",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "8.4 × 10⁶ − 3.1 × 10⁶",         "highlight": null },
+            { "text": "Same power → subtract A values directly", "highlight": "accent" },
+            { "text": "(8.4 − 3.1) × 10⁶ = 5.3 × 10⁶",  "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "When powers already match, simply subtract the A values. Eight point four minus three point one is five point three — the power of ten is unchanged. Five point three is between one and ten so no adjustment is needed.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "8.4 × 10⁶ − 3.1 × 10⁶ = 5.3 × 10⁶",
+          "label": "Same power → operate on A values directly"
+        }
+      ],
+      "narration": "Five point three times ten to the six. When powers match, add or subtract A values directly — the power of ten is just the shared unit.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: thinking standard form addition needs special rules. It is ordinary addition — expand both numbers, add, rewrite. Or match powers and add A values directly.",
+    "audioNarration": "Standard form is just a compact notation. Expand to ordinary decimals, add normally, then rewrite in standard form. Matching powers first makes the A-value addition step trivial."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "G1.7",
+  "skillName": "Angles in a triangle sum to 180°",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students confuse the angle sum of a triangle (180°) with the angle sum around a point (360°).",
+  "generatedAt": "2026-04-19T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Triangle with angles 80° and 60° — find the third", "highlight": null },
+            { "text": "Student: 360° − 80° − 60° = 220°  ✗",              "highlight": "accent" },
+            { "text": "220° is reflex — impossible inside a triangle",    "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The student used three hundred and sixty and got two hundred and twenty degrees — a reflex angle. That is impossible inside a triangle. Every interior angle of a triangle must be less than one hundred and eighty, and the three must be less than that combined. Three hundred and sixty is the wrong total.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "why-180-not-360",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Triangle interior angles → 180°.  Angles around a full point → 360°.",
+          "subText": "A triangle has three angles forming a closed shape — they meet at three separate vertices, not one"
+        }
+      ],
+      "narration": "Three hundred and sixty applies when all angles meet at a single point and go all the way around. A triangle's three angles are at three different vertices — they do not go around a single point. The three-corner tearoff shows they form a straight line, not a full turn.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "correct-calculation",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Triangle: 80° + 60° + x° = 180°",                  "highlight": "accent" },
+            { "text": "x = 180° − 140° = 40°  ✓",                       "highlight": "green" },
+            { "text": "Check: all three less than 180°, sum = 180°  ✓",   "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Correct equation: eighty plus sixty plus x equals one hundred and eighty. X equals forty degrees. Check: forty is acute — perfectly valid inside a triangle. Sum: eighty plus sixty plus forty is one hundred and eighty.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "80° + 60° + 40° = 180°  ✓",
+          "label": "Triangle → 180°, not 360°.  No interior angle can exceed 180°."
+        }
+      ],
+      "narration": "Forty degrees. Triangle angles sum to one hundred and eighty — always. Any answer greater than one hundred and eighty for a triangle interior angle signals an error.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: 360° − 80° − 60° = 220° for a triangle angle. Triangle interior angles sum to 180°. A result over 180° is impossible inside a triangle — use 180° − 80° − 60° = 40°.",
+    "audioNarration": "Triangle angles sum to 180°, not 360°. 360° is for angles around a full point. No interior angle of a triangle can be reflex — if your answer is over 180°, you used the wrong total."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

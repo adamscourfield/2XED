@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N1.9",
+  "skillName": "Position integers on a number line",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students assume the line always starts at zero, so they misread scales that start at other values.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "number_line",
+          "min": 200,
+          "max": 300,
+          "markers": [200, 220, 240, 260, 280, 300],
+          "points": [{ "value": 240, "label": "student placed 40 here ✗", "highlight": "accent" }]
+        }
+      ],
+      "narration": "The line runs from two hundred to three hundred, but the student treated the left end as zero and placed forty in the wrong spot. Every scale must be read before placing anything.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "read-start-end",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Step 1: Read the left label  → 200",      "highlight": "green" },
+            { "text": "Step 2: Read the right label → 300",      "highlight": "green" },
+            { "text": "Step 3: Count gaps → 5 gaps of 20 each",  "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Always read both end labels first. The left end is two hundred, not zero. Each of the five gaps spans twenty units.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "place-correctly",
+      "visuals": [
+        {
+          "type": "number_line",
+          "min": 200,
+          "max": 300,
+          "markers": [200, 220, 240, 260, 280, 300],
+          "points": [{ "value": 260, "label": "260 ✓", "highlight": "green" }]
+        }
+      ],
+      "narration": "To place two hundred and sixty: start at two hundred, count three gaps of twenty — two twenty, two forty, two sixty. Mark it there.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "260 → 3 gaps of 20 right of 200",
+          "label": "Read start label → calculate interval → count from start"
+        }
+      ],
+      "narration": "Two hundred and sixty. The scale starts at two hundred, so every position is relative to that — not to zero.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: assuming the number line starts at zero. Always read the label at the left end — the line could start anywhere.",
+    "audioNarration": "Never assume zero. Check both end labels, calculate the interval, and count from the actual start value."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.3",
+  "skillName": "Multiply and divide integers and decimals by powers of 10",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students think the decimal point moves rather than the digits moving.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "point-is-fixed",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "The decimal point is always between the ones and tenths columns — it never moves",
+          "subText": "What changes when you multiply by 10 is which column each digit sits in"
+        }
+      ],
+      "narration": "The decimal point marks the fixed boundary between whole units and fractions. It never moves. When you multiply by ten, the digits shift to higher-value columns — they move left relative to the fixed point.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "column-shift-view",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "3.47: 3 in ones, 4 in tenths, 7 in hundredths", "highlight": null },
+            { "text": "× 10: 3 moves to tens, 4 to ones, 7 to tenths", "highlight": "accent" },
+            { "text": "Result: 34.7 — decimal point unchanged",          "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Each digit moves one column to the left. The three moves from ones to tens, the four from tenths to ones, the seven from hundredths to tenths. The decimal point stays between ones and tenths throughout.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "place-value-table",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Thousands Hundreds Tens Ones . Tenths Hundredths", "highlight": null },
+            { "text": "Before × 10:   –      –    –   3  .   4       7",  "highlight": "accent" },
+            { "text": "After  × 10:   –      –    3   4  .   7       –",  "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "In the place value table, every digit shifts one column to the left. The decimal point column header stays where it is — only the digit positions change.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "3.47 × 10 = 34.7",
+          "label": "Digits shift left — decimal point stays fixed"
+        }
+      ],
+      "narration": "Thirty-four point seven. The decimal point marks the same boundary it always did — the digits moved to the left of it.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: 'moving the decimal point right' to get 34.7 from 3.47. The point is fixed. The digits move left into higher-value columns — the point only appears to move.",
+    "audioNarration": "The decimal point is fixed between ones and tenths. When you multiply by 10, the digits shift into higher columns — the point stays put."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N1.10",
+  "skillName": "Round integers to the nearest 10, 100 or 1000",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students forget to zero digits to the right of the rounded column, leaving the original digits in place.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Round 3 274 to nearest 100",              "highlight": null },
+            { "text": "Student answer: 3 374  ✗",               "highlight": "accent" },
+            { "text": "Rounded hundreds digit but kept 74",      "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The student correctly rounded the hundreds digit from two to three but left the tens and ones unchanged. Any digits to the right of the rounded column must become zeros.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "why-zeros",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Digits to the right of the rounded column become zero",
+          "subText": "They are too small to matter at the precision you are rounding to"
+        }
+      ],
+      "narration": "Rounding to the nearest hundred means the answer must be a whole number of hundreds. Tens and ones cannot survive — they are smaller than the unit of precision you chose.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "correct-method",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "3 274: hundreds = 2, decision digit = 7",  "highlight": null },
+            { "text": "7 ≥ 5 → round up: 2 → 3",                 "highlight": "accent" },
+            { "text": "Tens and ones → 00",                       "highlight": "green" },
+            { "text": "Answer: 3 300  ✓",                         "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Round the hundreds digit up from two to three, then replace the tens and ones with zeros. Three thousand three hundred — not three thousand three hundred and seventy-four.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "3 274 ≈ 3 300",
+          "label": "Round up hundreds → zero the tens and ones"
+        }
+      ],
+      "narration": "Three thousand two hundred and seventy-four rounded to the nearest hundred is three thousand three hundred.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: rounding the target digit but forgetting to zero everything to its right. The rounded answer must end in the right number of zeros — e.g. nearest 100 means last two digits are 00.",
+    "audioNarration": "After rounding the target digit, replace all digits to its right with zeros. A rounded number must be a clean multiple of what you rounded to."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

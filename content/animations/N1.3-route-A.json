@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N1.3",
+  "skillName": "Compare two numbers using =, ≠, <, >, ≤, ≥",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students confuse < and > (pointing the wrong way) or misread which number is larger.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "introduce",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Compare: 3,412  and  3,398", "highlight": null },
+            { "text": "Thousands: 3 = 3  →  move right", "highlight": "dim" },
+            { "text": "Hundreds:  4 > 3  →  3,412 is larger", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Start at the leftmost column and work right. The moment you find a column where the digits differ, that column decides which number is bigger.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "open-mouth-rule",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "The open end always faces the bigger number",
+          "subText": "3,412 > 3,398   ←   mouth opens towards 3,412"
+        }
+      ],
+      "narration": "The symbol is like a mouth eating the larger number. If you write it the wrong way, the mouth would be eating the smaller one — that's how you know something is wrong.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "write-symbol",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "3,412  >  3,398", "highlight": "green" },
+            { "text": "3,398  <  3,412", "highlight": "green" },
+            { "text": "Both are correct — same relationship, reversed", "highlight": "dim" }
+          ]
+        }
+      ],
+      "narration": "Either statement works. The key is keeping the open end pointed at the larger value. Flip the numbers and you must flip the symbol too.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "5,709 < 5,790",
+          "label": "Hundreds differ: 7 = 7 → tens differ: 0 < 9"
+        }
+      ],
+      "narration": "Thousands match, hundreds match, then tens: zero is less than nine. The open mouth faces five thousand seven hundred and ninety.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: writing > when you mean < (pointing the wrong way). Check: does the open end face the bigger number?",
+    "audioNarration": "After writing the symbol, ask yourself: is the open end pointing at the bigger number? If not, flip the symbol."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

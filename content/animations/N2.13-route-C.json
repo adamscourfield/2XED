@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N2.13",
+  "skillName": "Perimeter of a compound shape",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students calculate missing sides by assuming the cut-out corner has sides equal to the full shape's sides.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "L-shape: outer 9 cm wide, 7 cm tall; cut-out 4 cm wide", "highlight": null },
+            { "text": "Student: missing vertical = 7 cm (same as full height)  ✗", "highlight": "accent" },
+            { "text": "Missing vertical depends on cut-out depth, not full height", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The student assumed the step-in on the L-shape goes the full height of seven centimetres. But the cut-out has its own depth — the missing vertical is the overall height minus the cut-out's depth, not the full height.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "two-direction-rule",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "In each direction, all parallel segments sum to the same total as the overall span",
+          "subText": "Missing segment = overall span − sum of all other parallel segments in that direction"
+        }
+      ],
+      "narration": "The key rule: in each direction, the segments on one side sum to the same as the segments on the other side. Use that to calculate any missing length without guessing.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "correct-method",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Horizontal: 9 = 4 + missing → missing = 5 cm",  "highlight": "accent" },
+            { "text": "Vertical: 7 = 3 + missing → missing = 4 cm",    "highlight": "accent" },
+            { "text": "All six sides now known",                        "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Horizontal: the full width is nine; the cut-out is four — the remaining step is five. Vertical: the full height is seven; the cut-out depth is three — the step is four. Now add all six boundary sides.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Missing side = overall span − known parallel segment",
+          "label": "Parallel segments must sum to the overall span in each direction"
+        }
+      ],
+      "narration": "Calculate missing sides using the overall span minus known segments. Never assume a missing side equals the full dimension.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: assuming a missing vertical side equals the full height of the shape. Use overall height − cut-out depth. Parallel segments must total the overall span.",
+    "audioNarration": "Missing sides on a compound shape are found by subtraction — overall span minus known segments in that direction. Never assume a missing side equals the full dimension."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

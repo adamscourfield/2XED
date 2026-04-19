@@ -1,0 +1,78 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N1.8",
+  "skillName": "Order decimals",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students order by number of decimal places — fewer places means smaller.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Order: 0.5,  0.48,  0.375",                         "highlight": null },
+            { "text": "Student order: 0.375 < 0.48 < 0.5  ✗",              "highlight": "accent" },
+            { "text": "Reason given: more digits = larger",                 "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The student put zero point three seven five last because it has the most digits. But digit count is irrelevant — only column values matter.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "pad-to-reveal",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "0.5   → 0.500",    "highlight": null },
+            { "text": "0.48  → 0.480",    "highlight": null },
+            { "text": "0.375 → 0.375",    "highlight": null },
+            { "text": "Tenths: 5, 4, 3 → 3 smallest", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Pad all three to three decimal places. Now the tenths column is clear: five, four, three. Three is the smallest tenths digit, so zero point three seven five comes first.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "correct-order",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "0.375 < 0.48 < 0.5  ✓",  "highlight": "green" },
+            { "text": "3 tenths < 4 tenths < 5 tenths", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "The correct order is zero point three seven five, then zero point four eight, then zero point five. More digits made it smaller here, not larger.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "0.375 < 0.48 < 0.5",
+          "label": "Pad → tenths: 3 < 4 < 5 → order confirmed"
+        }
+      ],
+      "narration": "Zero point three seven five is the smallest. Pad with zeros, trust the columns — never let digit count fool you.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: assuming more decimal digits means a larger number. Zero point three seven five has three decimal places but is the smallest here — the tenths digit three is less than four or five.",
+    "audioNarration": "Digit count is a trap. Pad to equal length and compare the tenths column first — that column decides the order."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

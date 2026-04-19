@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "G1.3",
+  "skillName": "Draw angles with a protractor",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students do not understand why the centre must be on the vertex, and place it at the mid-point of the baseline instead.",
+  "generatedAt": "2026-04-19T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "why-centre-on-vertex",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "The angle is formed at the vertex — so the protractor must be centred there",
+          "subText": "Placing the centre anywhere else measures from the wrong origin point"
+        }
+      ],
+      "narration": "An angle is the opening at a specific point — the vertex. The protractor measures rotation around its centre hole. If the centre is not on the vertex, the protractor is measuring rotation around a different point, and the arms will not meet correctly at the vertex.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "centre-offset-effect",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Centre placed 2 cm from vertex along baseline",    "highlight": "accent" },
+            { "text": "Mark made at the required angle scale reading",    "highlight": "accent" },
+            { "text": "Line from vertex to mark → wrong angle at vertex  ✗", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "If the centre is two centimetres from the vertex, the scale mark is in the right position relative to the centre — but not relative to the vertex. Drawing from the vertex to that mark produces an angle that is not equal to the intended one.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "correct-placement",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Centre hole sits exactly on the vertex  ✓",       "highlight": "green" },
+            { "text": "Baseline runs exactly along the drawn line  ✓",   "highlight": "green" },
+            { "text": "Scale reading gives angle relative to that baseline  ✓", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "With the centre on the vertex and the baseline along the line, every scale reading correctly measures the angle opening at that vertex. Both conditions must be met simultaneously for an accurate drawing.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Centre on vertex + baseline on arm = accurate angle",
+          "label": "The vertex is the origin of the angle — the protractor must be centred there"
+        }
+      ],
+      "narration": "Centre on vertex, baseline on arm — both required. The vertex is where the angle lives; the protractor must be anchored there to measure or draw it correctly.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: placing the protractor centre at the mid-point of the baseline rather than the vertex. The angle opens at the vertex — the centre must go there. Any offset produces a wrong angle.",
+    "audioNarration": "The centre of the protractor must sit exactly on the vertex because that is where the angle originates. Placing it elsewhere shifts the origin of measurement and produces an incorrect angle."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.19",
+  "skillName": "Short division (decimal answers)",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students do not understand why extending with zeros produces the next decimal place — they treat it as a trick rather than a continuation of place value.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "what-extending-means",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Adding a zero extends the dividend into tenths — not changing its value",
+          "subText": "7 and 7.0 are the same number — writing 7.00 just reveals more columns to divide"
+        }
+      ],
+      "narration": "Writing seven point zero zero does not change the value of seven — it just makes the tenths and hundredths columns visible. When a remainder is carried into the tenths column, it is being exchanged into ten tenths, just as a remainder in the hundreds becomes ten tens.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "place-value-carry",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "7 ÷ 4: 1 remainder 3",                             "highlight": null },
+            { "text": "3 ones carried to tenths = 30 tenths",             "highlight": "accent" },
+            { "text": "30 tenths ÷ 4 = 7 tenths remainder 2 tenths",     "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "The remainder of three ones becomes thirty tenths when carried into the tenths column — the same place-value exchange as in whole-number division. Thirty tenths divided by four gives seven tenths with remainder two tenths.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "carry-to-hundredths",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "2 tenths carried to hundredths = 20 hundredths",  "highlight": "accent" },
+            { "text": "20 hundredths ÷ 4 = 5 hundredths r 0",           "highlight": "accent" },
+            { "text": "Quotient: 1.75  ✓",                              "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Two remaining tenths become twenty hundredths in the next column. Twenty hundredths divided by four is five hundredths with no remainder. The quotient reads: one, seven tenths, five hundredths — one point seven five.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "7 ÷ 4 = 1.75",
+          "label": "Remainders carry to smaller place values — same process, smaller columns"
+        }
+      ],
+      "narration": "One point seven five. Extending into decimal columns is simply continuing the same place-value carry process — nothing new, just smaller units.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: thinking the decimal extension is a special trick. It is the same carry process — a remainder of 3 ones becomes 30 tenths, then 2 tenths becomes 20 hundredths. Same logic, smaller columns.",
+    "audioNarration": "Extending into decimals is not a new rule — it is the same carry process applied to smaller place values. A remainder in the ones column is exchanged for tenths, just as ones exchange for tens in whole-number division."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

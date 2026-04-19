@@ -1,0 +1,79 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N1.19",
+  "skillName": "Understand negative powers of 10",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students think 10⁻³ means moving the decimal 3 places to the right instead of the left.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "pattern-down",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "10³ = 1000",    "highlight": null },
+            { "text": "10² = 100",     "highlight": null },
+            { "text": "10¹ = 10",      "highlight": null },
+            { "text": "10⁰ = 1",       "highlight": "accent" },
+            { "text": "10⁻¹ = 0.1",   "highlight": "green" },
+            { "text": "10⁻² = 0.01",  "highlight": "green" },
+            { "text": "10⁻³ = 0.001", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Each step down divides by ten. From one — ten to the zero — dividing by ten again gives one tenth, then one hundredth, then one thousandth. The pattern continues smoothly through zero.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "exponent-equals-places",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "For 10⁻ⁿ, the absolute value of the exponent equals the number of decimal places",
+          "subText": "10⁻³ = 0.001 — three decimal places, digit 1 in the thousandths column"
+        }
+      ],
+      "narration": "The size of the negative exponent tells you exactly how many zeros appear after the decimal point before the one. Ten to the minus three has three decimal places.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "reverse-direction",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "0.000 01 → how many decimal places? 5", "highlight": null },
+            { "text": "5 decimal places → 10⁻⁵",               "highlight": "accent" },
+            { "text": "0.000 01 = 10⁻⁵  ✓",                   "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Going the other way: count the decimal places to find the exponent. Zero point zero zero zero zero one has five decimal places, so it equals ten to the minus five.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "10⁻⁴ = 0.0001",
+          "label": "Negative exponent → count decimal places before the 1"
+        }
+      ],
+      "narration": "Ten to the minus four is zero point zero zero zero one. Four decimal places, digit one in the ten-thousandths column.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: thinking 10⁻³ = 1000 because the negative 'cancels out'. Negative powers make fractions — 10⁻³ = 0.001, which is one thousandth.",
+    "audioNarration": "A negative exponent does not cancel to give a large positive number. It means a fraction — divide 1 by the positive power. 10⁻³ = 1 ÷ 1000 = 0.001."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

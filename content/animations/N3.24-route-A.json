@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.24",
+  "skillName": "Introduction to primes",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students include 1 as a prime number and sometimes exclude 2.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "prime-definition",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "A prime has exactly two factors: 1 and itself",
+          "subText": "1 is NOT prime (only one factor).  2 IS prime (factors: 1 and 2)."
+        }
+      ],
+      "narration": "A prime number has exactly two distinct factors: one and itself. One has only one factor — itself — so it fails the definition. Two has exactly two factors — one and two — so it is the smallest prime, and the only even prime.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "test-for-primality",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Is 17 prime?  Test divisors up to √17 ≈ 4.1",      "highlight": null },
+            { "text": "17 ÷ 2 = 8.5 ✗   17 ÷ 3 = 5.67 ✗   17 ÷ 4 = 4.25 ✗", "highlight": "accent" },
+            { "text": "No exact divisors → 17 is prime  ✓",               "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "To test whether seventeen is prime, try dividing by every integer from two up to the square root of seventeen, which is about four point one. None divide exactly, so seventeen is prime.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "first-ten-primes",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Primes: 2, 3, 5, 7, 11, 13, 17, 19, 23, 29",     "highlight": "accent" },
+            { "text": "Note: 1 is not prime, 2 is the only even prime",   "highlight": "green" },
+            { "text": "After 2, all primes are odd",                      "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "The first ten primes are two, three, five, seven, eleven, thirteen, seventeen, nineteen, twenty-three, and twenty-nine. All are odd except two. One is not in the list — it has only one factor.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Primes: 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, …",
+          "label": "Exactly 2 factors: 1 and itself — 1 is excluded, 2 is included"
+        }
+      ],
+      "narration": "Two, three, five, seven — and on indefinitely. Every prime has exactly two factors, no more and no fewer.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: including 1 as prime or excluding 2. A prime has EXACTLY two factors. 1 has only one factor (itself) — not prime. 2 has factors 1 and 2 — prime.",
+    "audioNarration": "One is not prime — it has only one factor, not two. Two is prime — its only factors are one and two. Exactly two factors is the requirement, and one does not meet it."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

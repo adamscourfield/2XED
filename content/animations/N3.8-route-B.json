@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.8",
+  "skillName": "Short division (with carrying)",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students do not understand why a remainder carries — they see it as a rule rather than a place-value exchange.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "why-carry",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "A remainder from one column becomes extra units in the next column",
+          "subText": "1 remaining hundred = 10 tens — it joins the tens digit"
+        }
+      ],
+      "narration": "When a column does not divide exactly, the remainder represents whole units that cannot be shared yet. One leftover hundred equals ten tens, so it passes into the tens column and is included in the next step's calculation.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "place-value-exchange",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "5 ÷ 4 = 1 remainder 1 (from tens column)",      "highlight": null },
+            { "text": "That 1 ten = 10 ones",                          "highlight": "accent" },
+            { "text": "Ones column becomes 10 + 7 = 17",              "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "A remainder of one in the tens column means one ten is left over. One ten equals ten ones. Those ten ones join the seven ones already in the ones column, giving seventeen ones to divide next.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "full-picture",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "800 ÷ 4 = 200  (no remainder)",                "highlight": "accent" },
+            { "text": "50 ÷ 4 = 10 remainder 10  (carry 10 to ones)", "highlight": "accent" },
+            { "text": "17 ÷ 4 = 4 remainder 1  → 214 r 1  ✓",        "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Thinking in full place value: eight hundred divides into two hundred exactly. Fifty divides into ten with remainder ten. That ten joins the seven to make seventeen, which divides into four with remainder one.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "857 ÷ 4 = 214 r 1",
+          "label": "Remainders are place-value exchanges — not random rules"
+        }
+      ],
+      "narration": "Two hundred and fourteen remainder one. Every carry in short division is a place-value exchange — a leftover unit from one column becomes ten units in the next.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: seeing the carry as a rule rather than a meaning. A remainder of 1 ten really is 10 ones — it joins the next digit because those units are being regrouped into the smaller denomination.",
+    "audioNarration": "A remainder carries because leftover units regroup: one leftover ten equals ten ones, which join the next column. The carry is a place-value exchange, not an arbitrary step."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

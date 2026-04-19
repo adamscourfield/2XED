@@ -1,0 +1,73 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.11",
+  "skillName": "Factors",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students think factors are just the small numbers that divide in, not recognising that every number has the number itself as a factor.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "what-factor-means",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "A factor of n divides into n exactly — no remainder",
+          "subText": "Every number is a factor of itself. 1 is a factor of every number."
+        }
+      ],
+      "narration": "A factor is a number that divides into the target exactly. Every whole number is a factor of itself — because any number divided by itself is one, with no remainder. And one is a factor of everything, because everything divided by one equals itself.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "factors-as-rectangle-dimensions",
+      "visuals": [
+        {
+          "type": "area_model",
+          "rows": 3,
+          "cols": 8,
+          "label": "3 × 8 = 24 → 3 and 8 are both factors of 24"
+        }
+      ],
+      "narration": "Think of factors as rectangle dimensions. If you can tile a rectangle with exactly twenty-four unit squares using whole-number side lengths, those lengths are a factor pair. Three by eight gives twenty-four — so both three and eight are factors.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "all-rectangles",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "1×24, 2×12, 3×8, 4×6 — all rectangles for 24", "highlight": "accent" },
+            { "text": "Each gives a pair of factors",                   "highlight": "accent" },
+            { "text": "No other whole-number rectangle fits 24 tiles",  "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Every factor pair corresponds to a distinct rectangle. One by twenty-four, two by twelve, three by eight, four by six — these are all the whole-number rectangles with area twenty-four. Each edge length is a factor.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Factors of 24: 1, 2, 3, 4, 6, 8, 12, 24",
+          "label": "Factors = whole-number rectangle dimensions with area n"
+        }
+      ],
+      "narration": "One, two, three, four, six, eight, twelve, twenty-four. Each pair of factors is a pair of rectangle dimensions — a geometric way to see why factors always come in pairs.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: not including the number itself as a factor. Every number n is a factor of itself because n ÷ n = 1 exactly. Both 1 and n are always factors of n.",
+    "audioNarration": "One and the number itself are always factors — every number divides into itself exactly once. Factors are the whole-number rectangle dimensions that give the number as area."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

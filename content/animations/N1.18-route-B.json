@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N1.18",
+  "skillName": "Write positive integers in the form A × 10ⁿ",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students think standard form is just a different way of writing a number — they don't see that A and 10ⁿ carry separate information.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "two-pieces-of-info",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Standard form separates a number into its significant digits (A) and its magnitude (10ⁿ)",
+          "subText": "A tells you the precise value; 10ⁿ tells you the order of magnitude"
+        }
+      ],
+      "narration": "Standard form packs two pieces of information into one expression. The value of A holds all the significant digits. The power of ten tells you roughly how big the number is — its order of magnitude.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "why-1-to-10",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Rule: 1 ≤ A < 10",                               "highlight": "accent" },
+            { "text": "Ensures exactly one digit before the decimal point", "highlight": null },
+            { "text": "Makes comparison of magnitudes instant",           "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Keeping A between one and ten ensures there is always exactly one non-zero digit before the decimal point. This makes it trivial to compare sizes: the number with the larger exponent is always larger.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "comparing-sizes",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "3.2 × 10⁶  vs  8.9 × 10⁴",               "highlight": null },
+            { "text": "Exponents: 6 vs 4 → 10⁶ is larger",       "highlight": "accent" },
+            { "text": "3.2 × 10⁶ is the bigger number",          "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Comparing three point two times ten to the six with eight point nine times ten to the four: the exponents six and four immediately reveal which is larger — six wins, regardless of the A values.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "3 200 000 = 3.2 × 10⁶",
+          "label": "A = significant digits; 10⁶ = magnitude (millions)"
+        }
+      ],
+      "narration": "Three point two times ten to the six. A is three point two — two significant figures. The exponent six says the number is in the millions.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: writing 32 × 10⁵ (A not between 1 and 10). Standard form requires exactly one digit before the decimal point in A — rewrite as 3.2 × 10⁶.",
+    "audioNarration": "A must be at least 1 and less than 10. If A has more than one digit before the decimal, adjust it and change the exponent to compensate."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

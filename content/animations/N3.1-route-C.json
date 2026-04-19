@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.1",
+  "skillName": "Properties of multiplication and division",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students apply the associative law incorrectly to division, changing the value.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "48 ÷ (4 ÷ 2)",                              "highlight": null },
+            { "text": "Student: (48 ÷ 4) ÷ 2 = 12 ÷ 2 = 6  ✗",   "highlight": "accent" },
+            { "text": "Correct: 48 ÷ (4 ÷ 2) = 48 ÷ 2 = 24",     "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "The student moved the brackets as if division is associative. But forty-eight divided by the quantity four divided by two is twenty-four, not six. Moving brackets changes division results.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "division-not-associative",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Division is NOT associative — brackets must stay where they are written",
+          "subText": "a ÷ (b ÷ c) = a × c ÷ b ≠ (a ÷ b) ÷ c"
+        }
+      ],
+      "narration": "Division in a bracket means dividing by the whole bracketed expression. When that bracket contains a division, removing it is not straightforward — the inner operation flips to multiplication.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "evaluate-bracket-first",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "48 ÷ (4 ÷ 2)",         "highlight": null },
+            { "text": "Evaluate bracket: 4 ÷ 2 = 2", "highlight": "accent" },
+            { "text": "48 ÷ 2 = 24  ✓",       "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Always evaluate the bracket first. Four divided by two is two. Then forty-eight divided by two is twenty-four. Brackets before anything else — that is the rule.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "48 ÷ (4 ÷ 2) = 48 ÷ 2 = 24",
+          "label": "Division is not associative — evaluate brackets first"
+        }
+      ],
+      "narration": "Twenty-four. Brackets always go first, and division brackets cannot be moved freely — evaluate what is inside before dividing.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: treating 48 ÷ (4 ÷ 2) as (48 ÷ 4) ÷ 2 = 6. Division is not associative. Evaluate the bracket first: 4 ÷ 2 = 2, then 48 ÷ 2 = 24.",
+    "audioNarration": "Brackets cannot be moved in a division expression. Evaluate what is inside the bracket first — only then divide by the result."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

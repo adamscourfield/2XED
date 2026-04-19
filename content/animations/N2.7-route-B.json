@@ -1,0 +1,74 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N2.7",
+  "skillName": "Use formal methods for subtraction of decimals; complement of a decimal (1 − p)",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students don't see the complement as a meaningful concept — they treat 1 − p as just another subtraction.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "complement-meaning",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "The complement of p is the amount you add to p to reach 1",
+          "subText": "p + (1 − p) = 1 always — they are two parts that make a whole"
+        }
+      ],
+      "narration": "The complement of a decimal is the gap between that decimal and one. If you have zero point four, you need zero point six more to reach one. Zero point four and zero point six are complements — together they make one whole.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "fraction-bar-view",
+      "visuals": [
+        {
+          "type": "fraction_bar",
+          "total": 1,
+          "filled": 0.37,
+          "filledLabel": "0.37",
+          "remainderLabel": "0.63"
+        }
+      ],
+      "narration": "Picture a bar representing one whole. If zero point three seven is filled in, the remainder zero point six three must be empty. The two parts sum to the whole — one. This is what complement means visually.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "applications",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Probability: P(not A) = 1 − P(A)",          "highlight": "accent" },
+            { "text": "If P(A) = 0.6 → P(not A) = 0.4",          "highlight": "green" },
+            { "text": "Percentage: 100% − 35% = 65% remaining",   "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Complements appear throughout mathematics. If the probability of an event is zero point six, the probability it does not happen is zero point four. If thirty-five percent of something is used, sixty-five percent remains.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "1 − 0.37 = 0.63",
+          "label": "Complement: two parts that sum to exactly 1"
+        }
+      ],
+      "narration": "Zero point three seven and zero point six three. Two parts, one whole. The complement idea makes percentage, probability, and proportion calculations much faster to reason about.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: treating 1 − p as just a subtraction with no special meaning. The complement is the gap to 1 — knowing p immediately tells you 1 − p without calculating.",
+    "audioNarration": "If you know p, you know its complement instantly — it is whatever makes p up to 1. The two decimals always sum to exactly one whole."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

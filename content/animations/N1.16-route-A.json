@@ -1,0 +1,78 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N1.16",
+  "skillName": "Rounding to significant figures",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students start counting significant figures from the first digit written, including leading zeros.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "find-first-sf",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Round 0.004 628 to 2 significant figures", "highlight": null },
+            { "text": "Skip leading zeros: 0, 0, 0 — not significant", "highlight": "accent" },
+            { "text": "First significant figure: 4",                "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Start from the left and skip every zero until you reach the first non-zero digit. That digit is the first significant figure. Here the zeros before four are just placeholders — they carry no information about precision.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "count-and-decide",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "1st s.f.: 4   2nd s.f.: 6",              "highlight": "accent" },
+            { "text": "Decision digit (3rd s.f.): 2",            "highlight": null },
+            { "text": "2 < 5 → round down: keep 6 as 6",        "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Count to the required number of significant figures — four and six. The next digit is two. Two is less than five, so round down: the second significant figure stays as six.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "write-answer",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Keep: 0.0046  (drop 28)",             "highlight": null },
+            { "text": "Leading zeros stay — they hold place value", "highlight": "accent" },
+            { "text": "Answer: 0.0046",                      "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Drop all digits after the second significant figure. The leading zeros must stay — without them the decimal point would be in the wrong position. The answer is zero point zero zero four six.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "0.004628 ≈ 0.0046  (2 s.f.)",
+          "label": "Skip leading zeros → count sig figs → round at the next digit"
+        }
+      ],
+      "narration": "Zero point zero zero four six. Two significant figures — four and six. The leading zeros are placeholders, not significant.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: counting the leading zeros in 0.004628 as significant figures. Always skip zeros before the first non-zero digit — the first significant figure is 4.",
+    "audioNarration": "Leading zeros are never significant. Skip them, find the first non-zero digit, and start counting significant figures from there."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

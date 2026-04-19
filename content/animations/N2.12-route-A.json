@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N2.12",
+  "skillName": "Perimeter of an isosceles triangle or an isosceles trapezium",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students treat all three sides of an isosceles triangle as equal, using the equilateral formula.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "isosceles-properties",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "An isosceles triangle has exactly 2 equal sides (legs) and 1 different side (base)",
+          "subText": "Perimeter = 2 × leg + base"
+        }
+      ],
+      "narration": "Isosceles means two equal sides — the legs. The third side, the base, is different. The perimeter is two times the leg length plus the base.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "triangle-example",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Isosceles triangle: legs 8 cm, base 5 cm", "highlight": null },
+            { "text": "P = 2 × 8 + 5",                           "highlight": "accent" },
+            { "text": "P = 16 + 5 = 21 cm",                      "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Two times eight plus five: sixteen plus five equals twenty-one centimetres.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "trapezium",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Isosceles trapezium: parallel sides 9 cm and 5 cm, legs 4 cm each", "highlight": null },
+            { "text": "P = 9 + 5 + 4 + 4 = 9 + 5 + 2 × 4",                               "highlight": "accent" },
+            { "text": "P = 22 cm",                                                         "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "An isosceles trapezium has two parallel sides of different lengths and two equal legs. Add both parallel sides and double the leg length: nine plus five plus eight equals twenty-two centimetres.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Triangle: 2 × leg + base. Trapezium: a + b + 2 × leg",
+          "label": "Isosceles = 2 equal sides — identify which sides are equal first"
+        }
+      ],
+      "narration": "Identify the equal pair first, then build the perimeter formula. Two equal sides plus the remaining different sides.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: using 3 × side for an isosceles triangle. Isosceles has 2 equal sides, not 3. Use 2 × leg + base — not the equilateral formula.",
+    "audioNarration": "Isosceles means two equal sides, not three. The base is a different length. Always use 2 × leg + base for an isosceles triangle's perimeter."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

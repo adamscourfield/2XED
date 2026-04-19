@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.1",
+  "skillName": "Properties of multiplication and division",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students think multiplying always makes a number bigger and dividing always makes it smaller.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "multiply-by-fraction",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Multiplying by a number less than 1 makes the result smaller",
+          "subText": "20 × 0.5 = 10 — multiplied but got less"
+        }
+      ],
+      "narration": "Multiplication does not always increase a value. Multiplying by a fraction between zero and one shrinks the result. Twenty times one half is ten — smaller than twenty.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "divide-by-fraction",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "20 ÷ 0.5 = 40  (dividing made it bigger!)", "highlight": "accent" },
+            { "text": "÷ 0.5 = × 2  — dividing by a half doubles", "highlight": "green" },
+            { "text": "Dividing by a number < 1 increases the result", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Dividing by a number less than one makes the result bigger. Twenty divided by one half asks how many halves fit in twenty — the answer is forty. Division can increase a value.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "one-as-identity",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "a × 1 = a  (multiplying by 1 changes nothing)", "highlight": "accent" },
+            { "text": "a ÷ 1 = a  (dividing by 1 changes nothing)",    "highlight": "accent" },
+            { "text": "1 is the identity for multiplication and division", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "One is the identity for multiplication and division. Multiplying or dividing any number by one leaves it unchanged. This is the boundary: multiply by more than one to grow, less than one to shrink.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "× > 1 → bigger.  × < 1 → smaller.  ÷ < 1 → bigger.",
+          "label": "Effect depends on the multiplier/divisor, not just the operation"
+        }
+      ],
+      "narration": "The effect of multiplying or dividing depends entirely on the number you use — not just the operation symbol. Always check whether the multiplier is greater or less than one.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: assuming multiplication always increases a number. 20 × 0.5 = 10 — multiplying by less than 1 shrinks. 20 ÷ 0.5 = 40 — dividing by less than 1 grows.",
+    "audioNarration": "Multiplication can shrink and division can grow. It depends on whether the second number is greater or less than 1 — not on which symbol you use."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

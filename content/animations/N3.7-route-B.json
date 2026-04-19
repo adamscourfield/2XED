@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.7",
+  "skillName": "Short division (without carrying)",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students treat short division as a mechanical process without understanding what each step represents.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "what-division-means",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Division means sharing or grouping equally",
+          "subText": "693 ÷ 3 asks: how many threes fit into 693?"
+        }
+      ],
+      "narration": "Division is about equal sharing. Six hundred and ninety-three divided by three asks how many groups of three fit into six hundred and ninety-three — or equivalently, what each share is when six hundred and ninety-three is split into three equal parts.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "digit-by-digit-meaning",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "600 ÷ 3 = 200 → 2 hundreds",  "highlight": null },
+            { "text": "90 ÷ 3 = 30 → 3 tens",         "highlight": "accent" },
+            { "text": "3 ÷ 3 = 1 → 1 one",            "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Each digit in the dividend represents a group of hundreds, tens, or ones. Dividing six hundreds by three gives two hundreds. Dividing nine tens by three gives three tens. Dividing three ones by three gives one one. Short division does this column by column.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "place-value-result",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "2 hundreds + 3 tens + 1 one",   "highlight": "accent" },
+            { "text": "= 200 + 30 + 1",                "highlight": "accent" },
+            { "text": "= 231  ✓",                      "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "The quotient digits two, three, and one represent two hundreds, three tens, and one one. Assembled by place value, that is two hundred and thirty-one — which is exactly one-third of six hundred and ninety-three.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "693 ÷ 3 = 231",
+          "label": "Each digit shows how many hundreds, tens, ones fit when divided equally"
+        }
+      ],
+      "narration": "Two hundred and thirty-one. Each step in short division divides one place-value column — the digit you write above records how many of that unit fits into the equal share.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: treating each step as a separate unrelated calculation. Each digit in the quotient represents a place value — hundreds, tens, ones — and together they build the final answer.",
+    "audioNarration": "Short division works column by column through place values. Each quotient digit tells you how many of that unit — hundreds, tens, or ones — fit into the equal share."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

@@ -1,0 +1,99 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N1.1",
+  "skillName": "Recognise the place value of each digit in whole numbers up to millions",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students read the face value of a digit rather than its positional value, especially in multi-digit numbers.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "show_expression",
+          "expression": "254,031",
+          "parts": [
+            { "text": "2", "id": "d-hth",  "highlight": "dim" },
+            { "text": "5", "id": "d-tth",  "highlight": "accent" },
+            { "text": "4", "id": "d-thou", "highlight": "dim" },
+            { "text": ",", "id": "sep1",   "highlight": "dim" },
+            { "text": "0", "id": "d-hund", "highlight": "dim" },
+            { "text": "3", "id": "d-tens", "highlight": "dim" },
+            { "text": "1", "id": "d-ones", "highlight": "dim" }
+          ]
+        },
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Student answer: the 5 is worth '5'", "highlight": "accent" },
+            { "text": "This is the face value — not the place value", "highlight": "dim" }
+          ]
+        }
+      ],
+      "narration": "Here's the mistake. The student sees a five and writes five. But that five isn't sitting in the ones column — so it is not worth five.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "name-the-error",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Face value ≠ Place value",
+          "subText": "Face value = the digit itself. Place value = digit × column value."
+        }
+      ],
+      "narration": "There are two different things here — what the digit looks like, and what it is actually worth. They are only the same when the digit is in the ones column.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "correct-method",
+      "visuals": [
+        {
+          "type": "show_expression",
+          "expression": "254,031",
+          "parts": [
+            { "text": "2", "id": "d-hth",  "highlight": "dim" },
+            { "text": "5", "id": "d-tth",  "highlight": "green" },
+            { "text": "4", "id": "d-thou", "highlight": "dim" },
+            { "text": ",", "id": "sep1",   "highlight": "dim" },
+            { "text": "0", "id": "d-hund", "highlight": "dim" },
+            { "text": "3", "id": "d-tens", "highlight": "dim" },
+            { "text": "1", "id": "d-ones", "highlight": "dim" }
+          ]
+        },
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "5 is in the ten-thousands column", "highlight": null },
+            { "text": "5 × 10,000 = 50,000",             "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Count from the right — the five is in the fifth position, the ten-thousands column. Multiply by ten thousand and you get fifty thousand. That's its true value.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Value of 5 in 254,031 = 50,000",
+          "label": "Always find the column first, then multiply"
+        }
+      ],
+      "narration": "Fifty thousand, not five. The column it sits in is what makes the difference. Find the column first — every time.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: writing the digit itself as the answer (face value) instead of multiplying by the column value (place value).",
+    "audioNarration": "If you find yourself just copying the digit as your answer, stop — you've given the face value, not the place value. Find the column first."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

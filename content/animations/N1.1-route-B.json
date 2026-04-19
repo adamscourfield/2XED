@@ -1,0 +1,83 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N1.1",
+  "skillName": "Recognise the place value of each digit in whole numbers up to millions",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students struggle with zeros as place holders and mis-read the number of digits.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "introduce",
+      "visuals": [
+        {
+          "type": "show_expression",
+          "expression": "3,040,002",
+          "parts": [
+            { "text": "3", "id": "d-mil",   "highlight": null },
+            { "text": ",", "id": "sep1",    "highlight": "dim" },
+            { "text": "0", "id": "d-hth",   "highlight": "blue" },
+            { "text": "4", "id": "d-tth",   "highlight": null },
+            { "text": "0", "id": "d-thou",  "highlight": "blue" },
+            { "text": ",", "id": "sep2",    "highlight": "dim" },
+            { "text": "0", "id": "d-hund",  "highlight": "blue" },
+            { "text": "0", "id": "d-tens",  "highlight": "blue" },
+            { "text": "2", "id": "d-ones",  "highlight": null }
+          ]
+        }
+      ],
+      "narration": "Look at all the zeros in this number. They aren't mistakes — each one is doing an important job. Without them, the other digits would slip into the wrong columns.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "zeros-hold-columns",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "A zero holds a column open",
+          "subText": "It means: no groups of this size — but the column still exists"
+        }
+      ],
+      "narration": "Think of a zero as a seat-saver. The column is occupied even though no groups of that size are present. Remove the zero and everything shifts — changing the number completely.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "count-from-right",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "3,040,002 — count from the right:", "highlight": null },
+            { "text": "Position 1 (ones):            2",    "highlight": null },
+            { "text": "Positions 2–5 (tens–tth):     0,0,4,0", "highlight": "accent" },
+            { "text": "Position 7 (millions):        3",    "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Count every digit from the right — zeros included. The zeros keep four and three in their correct positions. Skip a zero and you've misread the whole number.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Value of 3 in 3,040,002 = 3,000,000",
+          "label": "Zeros are place holders — always count them"
+        }
+      ],
+      "narration": "The three is in the millions column because four zeros are keeping it there. Never skip zeros when counting positions from the right.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: ignoring zeros when counting digit positions, which shifts every other digit into the wrong column.",
+    "audioNarration": "When you see zeros, count them — don't skip them. Each one holds a column open for the digits around it."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

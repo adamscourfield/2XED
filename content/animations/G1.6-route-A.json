@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "G1.6",
+  "skillName": "Vertically opposite angles are equal",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students do not recognise which angles are vertically opposite and instead try to add them to 180° or 360° without using the equality rule.",
+  "generatedAt": "2026-04-19T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "identify-vertically-opposite",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "When two straight lines cross, the angles directly opposite each other are equal",
+          "subText": "Vertically opposite angles are across the crossing point — not next to each other"
+        }
+      ],
+      "narration": "When two straight lines intersect, they create four angles. The two angles that are directly across the crossing point from each other — not adjacent, but opposite — are equal. These are called vertically opposite angles.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "find-the-pairs",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Two lines cross → four angles: a, b, c, d",         "highlight": null },
+            { "text": "a and c are vertically opposite → a = c",          "highlight": "accent" },
+            { "text": "b and d are vertically opposite → b = d",          "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Label the four angles a, b, c, d going around. Angle a is opposite angle c — they are equal. Angle b is opposite angle d — they are equal. Adjacent angles such as a and b are supplementary, adding to one hundred and eighty.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "use-the-rule",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Two lines cross. One angle is 70°.",                "highlight": null },
+            { "text": "Opposite angle = 70° (vertically opposite)  ✓",    "highlight": "green" },
+            { "text": "Adjacent angles = 180° − 70° = 110° each  ✓",      "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "One angle is seventy degrees. The vertically opposite angle is also seventy. The two adjacent angles are each one hundred and eighty minus seventy — one hundred and ten degrees. The four angles total three hundred and sixty.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Opposite = 70°   Adjacent = 110°   Total: 70+110+70+110 = 360°",
+          "label": "Vertically opposite → equal.  Adjacent → supplementary (sum to 180°)."
+        }
+      ],
+      "narration": "Seventy, one hundred and ten, seventy, one hundred and ten — totalling three hundred and sixty. Opposite pairs are equal; adjacent pairs add to one hundred and eighty.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: adding vertically opposite angles to 180° or 360° instead of recognising they are equal. Vertically opposite angles are across the crossing point — they are always equal, not supplementary.",
+    "audioNarration": "Vertically opposite angles are equal — not supplementary. They sit across the crossing point, not next to each other. Adjacent angles (next to each other) are the ones that sum to 180°."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

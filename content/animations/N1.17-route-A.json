@@ -1,0 +1,79 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N1.17",
+  "skillName": "Write 10, 100, 1000 etc. as powers of 10",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students use the total number of digits as the exponent rather than the number of zeros.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "count-zeros",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "10    → 1 zero  → 10¹",   "highlight": null },
+            { "text": "100   → 2 zeros → 10²",   "highlight": "accent" },
+            { "text": "1000  → 3 zeros → 10³",   "highlight": null },
+            { "text": "10000 → 4 zeros → 10⁴",   "highlight": null }
+          ]
+        }
+      ],
+      "narration": "Count the zeros after the one. That count becomes the exponent. One zero gives ten to the power one, two zeros give ten to the power two, and so on.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "reverse-direction",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "10⁵ → how many zeros?",    "highlight": null },
+            { "text": "Exponent 5 → 5 zeros",      "highlight": "accent" },
+            { "text": "10⁵ = 100 000",             "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Going the other way: the exponent tells you how many zeros to write after the one. Ten to the power five has five zeros — one hundred thousand.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "special-case",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "10⁰ = 1  (zero zeros — just the 1)", "highlight": "accent" },
+            { "text": "10¹ = 10",                           "highlight": null },
+            { "text": "Any number to the power 0 equals 1", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Ten to the power zero is one. There are no zeros after the digit one — just the one itself. This is consistent with the pattern: each step down removes a zero.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "1 000 000 = 10⁶",
+          "label": "Count the zeros → that number is the exponent"
+        }
+      ],
+      "narration": "One million has six zeros, so it is ten to the power six. Count zeros — write the exponent.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: writing 10² for 1000 because 1000 has 4 digits and 'two digits left over'. Count the zeros only — 1000 has 3 zeros, so it is 10³.",
+    "audioNarration": "The exponent equals the number of zeros, not the total number of digits. Count the zeros after the 1 and use that as the power."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

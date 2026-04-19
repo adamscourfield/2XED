@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "G1.10",
+  "skillName": "Exterior angles of any polygon",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students confuse interior and exterior angles, using the interior angle where the exterior angle is needed, or forget that interior + exterior = 180° at each vertex.",
+  "generatedAt": "2026-04-19T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Find each exterior angle of a regular hexagon",     "highlight": null },
+            { "text": "Student: exterior angle = 120°  ✗",                 "highlight": "accent" },
+            { "text": "120° is the INTERIOR angle — exterior is 60°",     "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The student gave one hundred and twenty degrees — that is the interior angle of a regular hexagon, not the exterior. The exterior angle is the supplement of the interior: one hundred and eighty minus one hundred and twenty, which is sixty.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "which-is-which",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Exterior angle: formed OUTSIDE the polygon by extending a side",
+          "subText": "Interior + exterior = 180° at each vertex (straight line).  Exterior = 360° ÷ n for regular polygons."
+        }
+      ],
+      "narration": "The interior angle is inside the polygon. The exterior angle is the one formed outside, when a side is extended beyond the vertex. Together they form a straight line, so they always add to one hundred and eighty. For a regular polygon, each exterior angle is three hundred and sixty divided by the number of sides.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "correct-calculation",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Regular hexagon: n = 6",                            "highlight": "accent" },
+            { "text": "Exterior angle = 360° ÷ 6 = 60°  ✓",              "highlight": "green" },
+            { "text": "Interior angle = 180° − 60° = 120°  ✓",           "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Regular hexagon: exterior angle equals three hundred and sixty divided by six, which is sixty degrees. The interior angle is one hundred and eighty minus sixty, which is one hundred and twenty. Both checks: the exterior and interior add to one hundred and eighty, and six times sixty is three hundred and sixty.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Hexagon exterior = 60°   interior = 120°   (60° + 120° = 180° ✓)",
+          "label": "Exterior = 360° ÷ n.  Interior = 180° − exterior.  Never swap them."
+        }
+      ],
+      "narration": "Sixty degrees exterior, one hundred and twenty interior. Exterior angles are found by dividing three hundred and sixty by n. Interior angles are then one hundred and eighty minus the exterior — never mix the two up.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: giving 120° as the exterior angle of a regular hexagon. 120° is the interior angle. The exterior angle = 360° ÷ 6 = 60°. Interior + exterior = 180° at every vertex.",
+    "audioNarration": "Interior and exterior are different angles at the same vertex — they sum to 180°. The exterior angle faces outward when a side is extended. For a regular polygon: exterior = 360° ÷ n. Interior = 180° − exterior."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

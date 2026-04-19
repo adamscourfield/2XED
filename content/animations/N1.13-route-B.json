@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N1.13",
+  "skillName": "Position negatives on a number line",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students think −5 is greater than −1 because 5 is greater than 1.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "mirror-of-positives",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Negative numbers are a mirror of the positives — reflected through zero",
+          "subText": "+3 is 3 steps right of zero; −3 is 3 steps left of zero"
+        }
+      ],
+      "narration": "Every positive number has a negative mirror on the other side of zero. Three and negative three are the same distance from zero — but in opposite directions.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "further-left-means-smaller",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "−1 is 1 step left of zero",    "highlight": null },
+            { "text": "−5 is 5 steps left of zero",    "highlight": null },
+            { "text": "Further left = smaller value",   "highlight": "accent" },
+            { "text": "−5 < −1",                       "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Moving left always decreases the value. Negative five is further from zero than negative one — so negative five is the smaller number, even though five is bigger than one as a digit.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "temperature-anchor",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "−10°C is colder than −2°C",           "highlight": null },
+            { "text": "Colder = smaller = further left",      "highlight": "accent" },
+            { "text": "The bigger the negative digit, the smaller the number", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Think of temperature. Minus ten is much colder — and much further left on the number line — than minus two. A bigger digit after the minus sign means a smaller, colder, further-left number.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "−5 < −1",
+          "label": "Further left of zero → smaller value"
+        }
+      ],
+      "narration": "Negative five is less than negative one. On the number line, it sits further to the left — and left always means smaller.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: thinking −5 > −1 because 5 > 1. For negatives, the larger the digit, the further LEFT and the SMALLER the value.",
+    "audioNarration": "With negatives, size works in reverse. A bigger digit after the minus sign puts you further left — and further left always means a smaller number."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

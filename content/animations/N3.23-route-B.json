@@ -1,0 +1,73 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.23",
+  "skillName": "Square and cube numbers, roots",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students do not connect the words 'square' and 'cube' to the geometric shapes they describe.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "geometric-origin",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Square numbers count unit squares in a square grid — cube numbers count unit cubes in a cube",
+          "subText": "The names come directly from 2D and 3D geometry"
+        }
+      ],
+      "narration": "The word 'square' in square numbers refers to a literal square shape. A four-by-four grid contains sixteen unit squares — so sixteen is a square number. A three-by-three-by-three cube contains twenty-seven unit cubes — so twenty-seven is a cube number.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "area-and-volume-link",
+      "visuals": [
+        {
+          "type": "area_model",
+          "rows": 4,
+          "cols": 4,
+          "label": "4 × 4 = 16 unit squares → 4² = 16"
+        }
+      ],
+      "narration": "A square with side length four contains four times four, or sixteen, unit squares. The area of any square with integer sides is a square number. This is why we write the unit for area as centimetres squared — the exponent records the dimension.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "inverse-as-side-length",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "√36: what side length gives a square of area 36?",  "highlight": null },
+            { "text": "6 × 6 = 36 → √36 = 6",                            "highlight": "accent" },
+            { "text": "∛125: what side gives a cube of volume 125?",      "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The square root answers: what side length gives this area? A square of area thirty-six has side length six, so the square root of thirty-six is six. The cube root answers: what side length gives this volume?",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "4² = 16 (area of 4×4 square)   4³ = 64 (volume of 4×4×4 cube)",
+          "label": "Square = area of square.  Cube = volume of cube.  Roots find the side length."
+        }
+      ],
+      "narration": "Sixteen and sixty-four. Square numbers are areas, cube numbers are volumes, and roots find the side length — the geometric meaning makes the names easier to remember.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: treating square and cube numbers as unrelated to geometry. Four squared is the area of a 4×4 square (16 unit squares). Four cubed is the volume of a 4×4×4 cube (64 unit cubes).",
+    "audioNarration": "Square numbers count unit squares in a square — they are areas. Cube numbers count unit cubes in a cube — they are volumes. The names are geometric, and that is why the units cm² and cm³ use those exponents."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

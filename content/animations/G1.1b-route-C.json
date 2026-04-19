@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "G1.1b",
+  "skillName": "Understand angle notation and label angles correctly",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students read ∠ABC and incorrectly think A is the vertex instead of the middle letter B.",
+  "generatedAt": "2026-04-19T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "∠MNP — which point is the vertex?",               "highlight": null },
+            { "text": "Student: M is the vertex (reads left to right)  ✗", "highlight": "accent" },
+            { "text": "The first letter is NOT the vertex",               "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The student read angle MNP left to right and assumed M is the vertex. This is a natural but incorrect assumption. In angle notation, reading order does not place the vertex first — the vertex is always the middle letter.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "middle-always-vertex",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Vertex = middle letter — always, regardless of reading order",
+          "subText": "∠MNP → N is the vertex.  ∠ABC → B is the vertex."
+        }
+      ],
+      "narration": "In three-letter angle notation, the vertex is always the middle letter. It does not matter which order the letters are written — the one in the middle names the corner of the angle.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "apply-the-rule",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "∠MNP → middle letter N → vertex is N  ✓",        "highlight": "green" },
+            { "text": "Arms run from N toward M and from N toward P",    "highlight": "accent" },
+            { "text": "∠PNM names the same angle — N still in middle",  "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Angle MNP: the middle letter is N, so the vertex is N. The arms run from N toward M and from N toward P. Note that angle PNM names the same angle — reversing the outer letters is allowed, because N remains in the middle.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "∠MNP → vertex N   ∠PNM → vertex N   (same angle)",
+          "label": "Middle letter = vertex — the order of outer letters does not matter"
+        }
+      ],
+      "narration": "The vertex is N in both cases, because N is the middle letter. Whether you write MNP or PNM, the angle is the same. Always look at the middle letter to find the vertex.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: taking the first letter as the vertex in ∠MNP. The vertex is always the MIDDLE letter — N in ∠MNP. Reading left to right is a trap; the convention puts the vertex in the middle.",
+    "audioNarration": "Do not read angle notation like a word — the vertex is not the first letter. It is always the middle letter. In ∠MNP, the vertex is N. In ∠ABC, the vertex is B."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

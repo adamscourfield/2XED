@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N2.12",
+  "skillName": "Perimeter of an isosceles triangle or an isosceles trapezium",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students don't understand what 'isosceles' means geometrically, so they can't identify the equal sides.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "isosceles-meaning",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "'Isosceles' means exactly two sides are equal — marked with matching tick marks on diagrams",
+          "subText": "The equal sides are called legs; the unequal side is the base"
+        }
+      ],
+      "narration": "Isosceles comes from Greek meaning 'equal legs'. On a diagram, tick marks on two sides show they are equal. One tick on each of those sides — the base has no tick because it is different.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "symmetry-connection",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Isosceles triangle has a line of symmetry",   "highlight": "accent" },
+            { "text": "The axis runs from apex to midpoint of base", "highlight": "null" },
+            { "text": "The two halves mirror each other → legs equal", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "An isosceles triangle has one line of symmetry through the apex — the top vertex. This symmetry is what makes the two legs equal: each is the mirror image of the other.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "trapezium-symmetry",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Isosceles trapezium: symmetric about vertical axis", "highlight": "accent" },
+            { "text": "Two parallel sides (different lengths)",              "highlight": null },
+            { "text": "Two equal legs (mirror images)",                     "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "An isosceles trapezium also has a vertical line of symmetry. The two parallel sides are different lengths — that is what makes it a trapezium. The two non-parallel legs are mirror images — that is what makes it isosceles.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Isosceles = one line of symmetry → two equal sides",
+          "label": "Tick marks show equal sides — use symmetry to identify them"
+        }
+      ],
+      "narration": "Symmetry reveals the equal sides. Find the axis of symmetry, identify the mirror-image sides — those are the equal legs for the perimeter formula.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: not identifying which sides are equal before calculating. Look for tick marks or the axis of symmetry — those reveal the two equal legs.",
+    "audioNarration": "Isosceles means one line of symmetry and two equal sides. Find the axis of symmetry first, then use 2 × leg + remaining sides for the perimeter."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

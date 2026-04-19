@@ -1,0 +1,79 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N1.2",
+  "skillName": "Write integers in words and figures",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students omit groups entirely when digits are zero (e.g. writing 2,005 as 'two thousand five' without 'and').",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "introduce",
+      "visuals": [
+        {
+          "type": "show_expression",
+          "expression": "2,005",
+          "parts": [
+            { "text": "2", "id": "d-thou", "highlight": null },
+            { "text": ",", "id": "sep1",   "highlight": "dim" },
+            { "text": "0", "id": "d-hund", "highlight": "blue" },
+            { "text": "0", "id": "d-tens", "highlight": "blue" },
+            { "text": "5", "id": "d-ones", "highlight": null }
+          ]
+        }
+      ],
+      "narration": "Two zeros sit between the two and the five. They don't get spoken — but they do affect how you connect the parts you do say.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "zeros-are-silent",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "2 thousands → say: 'two thousand'",   "highlight": null },
+            { "text": "0 hundreds  → silent",                "highlight": "dim" },
+            { "text": "0 tens      → silent",                "highlight": "dim" },
+            { "text": "5 ones      → say: 'five'",           "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Zeros are never spoken. You skip right over them. But you can't skip the gap they create between 'thousand' and 'five' — that gap needs 'and'.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "and-bridges-the-gap",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "'And' bridges from thousands to a small remainder",
+          "subText": "two thousand AND five — not 'two thousand five'"
+        }
+      ],
+      "narration": "When the remainder after the thousands is less than a hundred, 'and' introduces it. The zeros created a gap — 'and' closes it in speech.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "two thousand and five",
+          "label": "2,005 written in words"
+        }
+      ],
+      "narration": "Two thousand and five. The zeros disappear from speech but the 'and' remains to signal the jump from thousands to the small remainder.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: 'two thousand five' — missing 'and'. When the remainder after thousands is under 100, always include 'and'.",
+    "audioNarration": "If you jump straight from 'thousand' to a small number without saying 'and', it sounds wrong and it is wrong. The 'and' is required."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

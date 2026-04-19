@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "G1.10",
+  "skillName": "Exterior angles of any polygon",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students do not know that the exterior angles of any convex polygon always sum to 360°, or they confuse exterior and interior angles.",
+  "generatedAt": "2026-04-19T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "exterior-angle-defined",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Exterior angle = 180° − interior angle (they are on a straight line)",
+          "subText": "Sum of all exterior angles of any convex polygon = 360°"
+        }
+      ],
+      "narration": "An exterior angle is formed by extending one side of the polygon. It sits on a straight line with the interior angle, so interior plus exterior equals one hundred and eighty. The exterior angles of any convex polygon — however many sides — always sum to three hundred and sixty.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "regular-polygon-calculation",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Regular hexagon: 6 equal exterior angles",          "highlight": null },
+            { "text": "Each exterior angle = 360° ÷ 6 = 60°",             "highlight": "accent" },
+            { "text": "Interior angle = 180° − 60° = 120°  ✓",           "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Regular hexagon: six equal exterior angles. Each is three hundred and sixty divided by six, which is sixty degrees. The interior angle at each vertex is one hundred and eighty minus sixty, which is one hundred and twenty degrees.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "find-sides-from-exterior",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Regular polygon with exterior angle 45°",           "highlight": "accent" },
+            { "text": "Number of sides = 360° ÷ 45° = 8",                "highlight": "accent" },
+            { "text": "It is a regular octagon  ✓",                      "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "If each exterior angle of a regular polygon is forty-five degrees, the number of sides is three hundred and sixty divided by forty-five, which is eight. It is a regular octagon.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Exterior angle = 360° ÷ n   |   n = 360° ÷ exterior angle",
+          "label": "Exterior angles always sum to 360° — for any convex polygon"
+        }
+      ],
+      "narration": "Exterior angle equals three hundred and sixty divided by n. Number of sides equals three hundred and sixty divided by the exterior angle. Both follow from the three-hundred-and-sixty-degree total for exterior angles.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: confusing exterior and interior angles, or not knowing the exterior angle sum is 360°. Exterior angles sum to 360° for any convex polygon. Each exterior angle = 360° ÷ n for a regular polygon.",
+    "audioNarration": "The exterior angles of any convex polygon sum to 360°. For a regular polygon, divide 360° by the number of sides to find each exterior angle. The interior angle is 180° minus the exterior angle."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

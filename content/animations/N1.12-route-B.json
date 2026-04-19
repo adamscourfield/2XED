@@ -1,0 +1,74 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N1.12",
+  "skillName": "Rounding to decimal places",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students think rounding to 2 d.p. always gives a 'shorter' or 'simpler' number — they don't see it as finding the nearest value with that precision.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "what-dp-means",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Rounding to 2 d.p. finds the nearest hundredth",
+          "subText": "The answer must have exactly 2 digits after the decimal point"
+        }
+      ],
+      "narration": "Rounding to two decimal places means replacing a number with the nearest value that stops at the hundredths column. You are choosing between the hundredth just below and the hundredth just above.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "two-neighbours",
+      "visuals": [
+        {
+          "type": "number_line",
+          "min": 3.84,
+          "max": 3.86,
+          "markers": [3.84, 3.85, 3.86],
+          "points": [{ "value": 3.847, "label": "3.847", "highlight": "accent" }]
+        }
+      ],
+      "narration": "Three point eight four seven sits between the hundredths three point eight four and three point eight six. Which is it closer to? It is closer to three point eight five — less than halfway to three point eight six.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "decision-digit-as-midpoint",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Midpoint between 3.84 and 3.85 is 3.845",            "highlight": null },
+            { "text": "3.847 > 3.845 → closer to 3.85",                    "highlight": "accent" },
+            { "text": "Decision digit ≥ 5 ↔ number is past the midpoint",   "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "A decision digit of five or more means the number has passed the midpoint — so the upper hundredth is nearer. That is why five rounds up: it sits exactly on or above the halfway mark.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "3.847 ≈ 3.85",
+          "label": "Nearest hundredth to 3.847 is 3.85"
+        }
+      ],
+      "narration": "Three point eight five is the nearest hundredth. The rounding rule is just a shortcut for asking: which neighbouring hundredth is closer?",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: thinking rounding just 'cuts off' digits. Rounding finds the NEAREST value at the given precision — sometimes that means the last kept digit increases by 1.",
+    "audioNarration": "Rounding is not truncating. You are choosing the closest neighbour at the required precision — the decision digit tells you which neighbour is nearer."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

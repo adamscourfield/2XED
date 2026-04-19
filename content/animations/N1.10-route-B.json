@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N1.10",
+  "skillName": "Round integers to the nearest 10, 100 or 1000",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students do not understand why 5 rounds up — they think it should round to the nearest even.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "what-rounding-means",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Rounding finds the nearest multiple of 10, 100 or 1000",
+          "subText": "Think: which multiple is this number closest to?"
+        }
+      ],
+      "narration": "Rounding is not a rule to memorise — it is finding the nearest landmark. Rounding four hundred and sixty to the nearest hundred asks: is it closer to four hundred or to five hundred?",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "number-line-view",
+      "visuals": [
+        {
+          "type": "number_line",
+          "min": 400,
+          "max": 500,
+          "markers": [400, 450, 500],
+          "points": [
+            { "value": 463, "label": "463", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Four sixty-three sits between four hundred and five hundred. The midpoint is four hundred and fifty. Since four sixty-three is above the midpoint, it is closer to five hundred.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "why-five-rounds-up",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Midpoint of any range always rounds up",      "highlight": "accent" },
+            { "text": "450 → 500 (not 400)",                        "highlight": "green" },
+            { "text": "Convention: halfway goes to the larger value", "highlight": null }
+          ]
+        }
+      ],
+      "narration": "When a number sits exactly on the midpoint — like four hundred and fifty — convention says round up to the larger multiple. This is consistent and agreed upon, even though both multiples are equally close.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "463 ≈ 500",
+          "label": "463 > 450 (midpoint) → closer to 500 → round up"
+        }
+      ],
+      "narration": "Four hundred and sixty-three rounds to five hundred. It is past the midpoint, so the upper hundred is the nearest multiple.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: thinking the midpoint (e.g. 450) should round down because it is 'not yet past' the upper value. By convention, halfway always rounds up to the larger multiple.",
+    "audioNarration": "Rounding finds the nearest multiple. At the exact midpoint, the rule is to round up — this is a convention everyone agrees to use."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

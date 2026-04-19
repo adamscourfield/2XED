@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.10",
+  "skillName": "Multiples",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students confuse multiples with factors, listing numbers that divide into the target rather than the target's times-table members.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "List multiples of 12",                              "highlight": null },
+            { "text": "Student: 1, 2, 3, 4, 6, 12  ✗",                  "highlight": "accent" },
+            { "text": "These are FACTORS of 12 — not multiples",          "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The student listed the numbers that divide into twelve — those are factors. Multiples are the opposite: numbers that twelve divides into. Multiples of twelve are always twelve or larger.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "key-distinction",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Factors of n are smaller than or equal to n — they divide INTO n",
+          "subText": "Multiples of n are n or larger — n divides INTO them"
+        }
+      ],
+      "narration": "Factors divide into the number — they are smaller. Multiples are what the number divides into — they are larger. Twelve is both a factor and a multiple of itself, but everything else is on one side or the other.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "correct-multiples",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Multiples of 12: 12×1, 12×2, 12×3, …",           "highlight": "accent" },
+            { "text": "= 12, 24, 36, 48, 60, 72, …",                   "highlight": "accent" },
+            { "text": "All are ≥ 12 and divisible by 12  ✓",            "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "The correct multiples of twelve are twelve, twenty-four, thirty-six, forty-eight, sixty, and so on — the twelve times table. Each is divisible by twelve with no remainder.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Multiples of 12: 12, 24, 36, 48, 60, …",
+          "label": "Multiples ≥ n — n divides into them. Factors ≤ n — they divide into n."
+        }
+      ],
+      "narration": "Twelve, twenty-four, thirty-six — multiples grow upward from the number. Factors shrink downward toward one. The two lists go in opposite directions.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: listing factors (1, 2, 3, 4, 6, 12) when asked for multiples of 12. Multiples are 12, 24, 36, … — they go upward. Factors go downward toward 1.",
+    "audioNarration": "Multiples and factors are opposites in direction. Factors of 12 are smaller: 1, 2, 3, 4, 6, 12. Multiples of 12 are larger: 12, 24, 36, 48 and so on."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

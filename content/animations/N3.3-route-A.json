@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.3",
+  "skillName": "Multiply and divide integers and decimals by powers of 10",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students add zeros to the end of decimal numbers when multiplying by 10, giving wrong answers.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "digits-shift-left",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Multiplying by 10 shifts every digit one place to the LEFT — the decimal point stays fixed",
+          "subText": "3.47 × 10 = 34.7  (digits move left, point stays)"
+        }
+      ],
+      "narration": "When you multiply by ten, every digit moves one place to the left in the place value table. The decimal point does not move — the digits do. Three point four seven becomes thirty-four point seven.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "powers-of-ten",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "× 10   → shift 1 place left",  "highlight": null },
+            { "text": "× 100  → shift 2 places left",  "highlight": "accent" },
+            { "text": "× 1000 → shift 3 places left",  "highlight": null },
+            { "text": "2.5 × 100 = 250",               "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Each extra power of ten is an extra shift. Multiplying by one hundred shifts two places left. Two point five becomes two hundred and fifty.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "dividing-shifts-right",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "÷ 10   → shift 1 place right",  "highlight": null },
+            { "text": "÷ 100  → shift 2 places right",  "highlight": "accent" },
+            { "text": "470 ÷ 100 = 4.7",                "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Division by a power of ten shifts digits to the right. Four hundred and seventy divided by one hundred shifts two places right — the answer is four point seven.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "2.5 × 100 = 250  and  470 ÷ 100 = 4.7",
+          "label": "× 10ⁿ → shift n left.  ÷ 10ⁿ → shift n right."
+        }
+      ],
+      "narration": "Multiply — shift left. Divide — shift right. Count the zeros in the power of ten to find how many places to shift.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: 3.47 × 10 = 3.470 (adding a zero at the end). The digits shift left — 3.47 × 10 = 34.7. Never add a zero to a decimal when multiplying by 10.",
+    "audioNarration": "Multiplying by 10 moves digits left — it does not add a zero. 3.47 × 10 = 34.7. Adding a zero gives 3.470, which equals 3.47 — unchanged."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

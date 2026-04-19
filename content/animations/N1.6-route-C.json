@@ -1,0 +1,83 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N1.6",
+  "skillName": "Decimal place value",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students swap column names: calling tenths 'tens' and hundredths 'hundreds'.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "show_expression",
+          "expression": "3.47",
+          "parts": [
+            { "text": "3", "id": "ones",  "highlight": "dim" },
+            { "text": ".", "id": "point", "highlight": "dim" },
+            { "text": "4", "id": "tenth", "highlight": "accent" },
+            { "text": "7", "id": "hundr", "highlight": "dim" }
+          ]
+        },
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Student: 4 is in the 'tens' column ✗", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The four is to the right of the decimal point. That is the tenths column, not the tens column. Tens is to the left — it would make the number much bigger.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "left-vs-right",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Left of the decimal = whole-number columns (tens, hundreds…). Right of the decimal = fraction columns (tenths, hundredths…).",
+          "subText": "The 'th' ending signals a fraction column"
+        }
+      ],
+      "narration": "The 'th' suffix is the clue. Tenths, hundredths, thousandths — all fractions, all to the right. Tens, hundreds, thousands — all whole multiples, all to the left.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "correct-value",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "4 is in the TENTHS column", "highlight": "green" },
+            { "text": "Value = 4 × 0.1 = 0.4",     "highlight": "green" },
+            { "text": "NOT 4 × 10 = 40",            "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Four in the tenths column is worth four tenths — point four. If it were in the tens column it would be worth forty. The decimal point makes all the difference.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Value of 4 in 3.47 = 0.4 (four tenths)",
+          "label": "Right of the decimal point → fraction column"
+        }
+      ],
+      "narration": "Zero point four. Tenths, not tens. The position right of the decimal point tells you it is a fraction.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: saying the first digit right of the decimal is in the 'tens' column. That column is 'tenths' — a fraction, not a multiple.",
+    "audioNarration": "The 'th' ending is the giveaway. Tenths means divided by ten. Tens means multiplied by ten. They are on opposite sides of the decimal point."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

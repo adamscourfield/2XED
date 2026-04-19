@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.2",
+  "skillName": "Mental strategies for multiplication and division",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students think halving one number and doubling the other changes the product.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "why-double-halve-works",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Doubling one factor and halving the other keeps the product the same",
+          "subText": "a × b = (2a) × (b/2) — you multiply by 2 and divide by 2, net effect zero"
+        }
+      ],
+      "narration": "Doubling one number multiplies the product by two. Halving the other divides it by two. The two effects cancel — the product is unchanged. This is a guaranteed equivalence, not a trick.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "rectangular-area",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Area of 18 × 5 rectangle = 90",             "highlight": null },
+            { "text": "Reshape to 9 × 10 — same area = 90",        "highlight": "accent" },
+            { "text": "Halved width, doubled height — area unchanged", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Think of it as reshaping a rectangle. An eighteen by five rectangle has area ninety. Halve the width to nine and double the height to ten — it is a nine by ten rectangle, still area ninety.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "chain-of-doublings",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "13 × 8 = 13 × 2 × 2 × 2",          "highlight": null },
+            { "text": "= 26 × 4 = 52 × 2 = 104",           "highlight": "accent" },
+            { "text": "Build up by repeated doubling",      "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Chained doubling works the same way. Thirteen times eight — double thirteen three times: twenty-six, fifty-two, one hundred and four. Each doubling is trivial; the chain gives the answer.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "13 × 8 = 104",
+          "label": "Double 13 three times: 26 → 52 → 104"
+        }
+      ],
+      "narration": "One hundred and four. Three doublings of thirteen. The product of any number and a power of two can be found by repeated doubling alone.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: thinking 24 × 5 ≠ 12 × 10 because 'the numbers changed'. The product is invariant — halving one factor and doubling the other always preserves the result.",
+    "audioNarration": "Halving and doubling cancel each other. The product stays the same because you multiplied by two and divided by two — a net change of zero."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

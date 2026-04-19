@@ -1,0 +1,78 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N1.5",
+  "skillName": "Find the median from a set of numbers (incl midpoint using a calculator)",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students are thrown off by outliers, thinking the median shifts towards extreme values.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Find median of: 1, 3, 100, 5, 7", "highlight": null },
+            { "text": "Student: 'the median must be near 100'", "highlight": "accent" },
+            { "text": "This is WRONG ✗", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The outlier grabs attention, but it has no power to move the median. Sorting reveals exactly where the middle falls — and the outlier always ends up at the edge.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "sort-first",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Unsorted: 1, 3, 100, 5, 7",  "highlight": null },
+            { "text": "Sorted:   1, 3, 5, 7, 100",   "highlight": "accent" },
+            { "text": "Outlier sits at the end",      "highlight": "dim" }
+          ]
+        }
+      ],
+      "narration": "Once sorted, the outlier is pushed to the very end. It takes up position five out of five — nowhere near the middle.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "find-middle-ignoring-outlier",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "1, 3, [5], 7, 100",      "highlight": null },
+            { "text": "Position 3 of 5 = 5",    "highlight": "green" },
+            { "text": "100 has zero influence", "highlight": "dim" }
+          ]
+        }
+      ],
+      "narration": "The middle position is position three. That value is five. The one hundred is nowhere near the middle — it plays no part in this calculation.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Median = 5",
+          "label": "Outliers go to the ends — they cannot move the median"
+        }
+      ],
+      "narration": "Five. Not influenced by one hundred at all. That is one of the most powerful features of the median — extreme values cannot pull it away from the true centre.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: assuming extreme values shift the median. After sorting, outliers sit at the ends and have no effect on the middle position.",
+    "audioNarration": "An outlier can only sit at the edge of the sorted list. It cannot reach the middle — and the median only cares about the middle."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

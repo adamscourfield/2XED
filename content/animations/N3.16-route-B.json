@@ -1,0 +1,73 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.16",
+  "skillName": "Decimal multiplication (decimal × decimal)",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students do not understand why multiplying two numbers less than 1 gives an even smaller result.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "why-result-is-smaller",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Multiplying by a number less than 1 makes things smaller",
+          "subText": "0.4 × 0.3 = 0.12 — less than either factor"
+        }
+      ],
+      "narration": "When a factor is less than one, multiplication scales down instead of up. Zero point four times zero point three means 'find forty percent of zero point three' — which is twelve percent of one, or zero point one two. The result is smaller than both factors.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "area-interpretation",
+      "visuals": [
+        {
+          "type": "area_model",
+          "rows": 3,
+          "cols": 4,
+          "label": "0.3 × 0.4 = shaded area of a 1×1 square (3 rows of 0.1 × 4 cols of 0.1)"
+        }
+      ],
+      "narration": "Think of a square with side length one. Shade three tenths of the height and four tenths of the width. The shaded rectangle covers twelve hundredths of the full square — that is zero point one two. Area equals length times width, so zero point three times zero point four equals zero point one two.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "place-value-explanation",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "0.3 = 3 tenths   0.4 = 4 tenths",                "highlight": null },
+            { "text": "3 tenths × 4 tenths = 12 hundredths",             "highlight": "accent" },
+            { "text": "= 0.12  ✓  (tenths × tenths = hundredths)",      "highlight": "green" }
+          ]
+        }
+      ],
+      "narname": "Three tenths times four tenths: the digits multiply to give twelve, and tenths times tenths gives hundredths. Twelve hundredths is zero point one two — the decimal place count reflects the unit-size multiplication.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "0.3 × 0.4 = 0.12",
+          "label": "Tenths × tenths = hundredths — two decimal places in each factor → two in answer"
+        }
+      ],
+      "narration": "Zero point one two. Tenths multiplied by tenths produce hundredths — that is why the answer has two decimal places when both factors have one each. The decimal-place count is a place-value consequence, not an arbitrary rule.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: expecting 0.3 × 0.4 to be larger than both factors. Multiplying by a value less than 1 scales down — 0.3 × 0.4 = 0.12, smaller than either factor.",
+    "audioNarration": "Multiplying by something less than 1 makes the answer smaller. Zero point three of zero point four is twelve hundredths — smaller than both factors. Tenths times tenths give hundredths."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

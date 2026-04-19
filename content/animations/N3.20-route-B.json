@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.20",
+  "skillName": "Divide decimals",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students do not understand why multiplying both dividend and divisor by the same number leaves the quotient unchanged.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "division-as-ratio",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Division is a ratio — scaling both parts equally leaves the ratio unchanged",
+          "subText": "4.8 ÷ 0.6 and 48 ÷ 6 are the same ratio — just expressed differently"
+        }
+      ],
+      "narration": "Division measures how many times one quantity fits into another — it is a ratio. If you scale both quantities by the same factor, the ratio is unchanged. Four point eight and zero point six, each multiplied by ten, become forty-eight and six — the same ratio, easier to compute.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "fraction-representation",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "4.8 ÷ 0.6 = 4.8 / 0.6",                          "highlight": null },
+            { "text": "× 10 on top and bottom: = 48 / 6",                "highlight": "accent" },
+            { "text": "= 8  ✓  (same as multiplying num and denom by 10)", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Write the division as a fraction. Multiplying numerator and denominator by ten is the same as multiplying a fraction by ten over ten — which equals one. Multiplying by one never changes the value.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "real-world-analogy",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "£4.80 shared between 60p portions",                "highlight": null },
+            { "text": "= 480p shared between 60p portions",               "highlight": "accent" },
+            { "text": "480 ÷ 60 = 8 portions  ✓ — same answer",          "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "How many sixty-pence portions fit into four pounds eighty? Converting both to pence: four hundred and eighty pence divided by sixty pence equals eight portions. Same quantities, expressed in a different unit — the ratio is unchanged.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "4.8 ÷ 0.6 = 8",
+          "label": "Ratio unchanged by scaling — multiply both by 10 to work with whole numbers"
+        }
+      ],
+      "narration": "Eight. Scaling both values by ten is like changing units — the ratio, and therefore the answer, stays the same.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: worrying that multiplying changes the answer. It doesn't — division is a ratio, and scaling both parts equally preserves the ratio. 4.8 ÷ 0.6 = 48 ÷ 6 = 8.",
+    "audioNarration": "Division is a ratio. Multiplying both the dividend and divisor by the same number is like changing units — the ratio stays the same, so the answer is unchanged."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

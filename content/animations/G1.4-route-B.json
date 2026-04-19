@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "G1.4",
+  "skillName": "Angles on a straight line sum to 180°",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students do not understand why angles on a straight line total 180° — they apply the rule mechanically without grasping the half-turn concept.",
+  "generatedAt": "2026-04-19T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "half-turn-origin",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "A straight line represents a half turn — exactly 180° of rotation",
+          "subText": "Any angles that together fill that half turn must add to 180°"
+        }
+      ],
+      "narration": "A full turn is three hundred and sixty degrees. A straight line is exactly half of that — one hundred and eighty degrees. Any angles that together exactly fill the space on one side of that straight line must sum to one hundred and eighty.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "filling-the-half-turn",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Full turn = 360°",                                 "highlight": null },
+            { "text": "Half turn (straight line) = 360° ÷ 2 = 180°",    "highlight": "accent" },
+            { "text": "Angles on one side of the line fill that 180°",   "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Full turn is three hundred and sixty. Half turn is one hundred and eighty. A straight line is a half turn. Any number of angles arranged on one side of a straight line, sharing the same point, together fill exactly one hundred and eighty degrees.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "why-not-360",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Angles on one side only — not both sides",          "highlight": "accent" },
+            { "text": "Both sides together would give 360° (full turn)",  "highlight": "accent" },
+            { "text": "One side = half turn = 180°  ✓",                  "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "The rule applies to angles on one side of the line only. Angles on both sides together would give three hundred and sixty — a full turn. The one-hundred-and-eighty-degree rule is specifically for the angles on a single side.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Straight line = half turn = 180°",
+          "label": "Angles on one side of a straight line fill a half turn — they must sum to 180°"
+        }
+      ],
+      "narration": "One hundred and eighty degrees — a half turn. The rule is not arbitrary: a straight line is a half rotation, and any angles that subdivide it must add up to that same half turn.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: treating the 180° rule as a fact to memorise with no reason. A straight line is a half turn (180°). Any angles filling one side of it must sum to that half turn — that is where the rule comes from.",
+    "audioNarration": "The rule comes from rotation: a straight line is a half turn, which is 180°. Angles on one side of it together fill exactly that half turn. The rule has a geometric reason, not just a number to remember."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

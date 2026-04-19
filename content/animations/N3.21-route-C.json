@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.21",
+  "skillName": "Find missing lengths given area",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students multiply the known side by the area instead of dividing the area by the known side.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Rectangle: Area = 30 cm², one side = 5 cm",         "highlight": null },
+            { "text": "Student: missing side = 5 × 30 = 150 cm  ✗",        "highlight": "accent" },
+            { "text": "Multiplied — but a side of 150 cm is larger than the area!", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The student multiplied five by thirty to get one hundred and fifty. But a side length of one hundred and fifty centimetres would give an area far larger than thirty square centimetres — the answer cannot be larger than the area itself. This is a clear sign of the wrong operation.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "sense-check",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "The missing side must be smaller than the area — a sanity check",
+          "subText": "If the known side is 5 and area is 30, the other side is somewhere around 6"
+        }
+      ],
+      "narration": "A quick sense-check: if one side is five and the area is thirty, the other side must be around six — because five times six is thirty. A missing side of one hundred and fifty is wildly too large. Use this estimate to recognise when something has gone wrong.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "correct-method",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Missing side = Area ÷ known side",                  "highlight": "accent" },
+            { "text": "= 30 ÷ 5 = 6 cm  ✓",                             "highlight": "green" },
+            { "text": "Check: 6 × 5 = 30 cm²  ✓",                       "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Divide the area by the known side: thirty divided by five is six centimetres. Check: six times five is thirty — correct. Division is the right operation when a factor is missing.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "30 ÷ 5 = 6 cm",
+          "label": "Missing side = area ÷ known side — not area × known side"
+        }
+      ],
+      "narration": "Six centimetres. Divide the area by the side you know — and always estimate first to catch answers that are impossibly large or small.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: area × known side = missing side. A side of 150 cm with the other side of 5 cm gives area 750 cm² — not 30. Divide: 30 ÷ 5 = 6 cm.",
+    "audioNarration": "When finding a missing side from area, divide — never multiply. The missing side must be smaller than the area, not larger. Estimate first: if area is 30 and one side is 5, the other side is about 6."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.15",
+  "skillName": "Decimal multiplication (decimal × integer)",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students do not understand why the decimal place count method works — they apply it mechanically and lose track of the size of the answer.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "scaling-view",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Multiplying by 10 scales up; the decimal method undoes that scaling",
+          "subText": "3.4 × 7 = (34 × 7) ÷ 10 — the ÷10 restores the original scale"
+        }
+      ],
+      "narration": "The decimal method works by scaling. Three point four is thirty-four divided by ten. So three point four times seven equals thirty-four times seven, then divided by ten. Multiplying as whole numbers and then dividing by ten is exactly what placing the decimal point one place from the right achieves.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "scaling-calculation",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "3.4 × 7 = (34 ÷ 10) × 7",                       "highlight": null },
+            { "text": "= (34 × 7) ÷ 10",                               "highlight": "accent" },
+            { "text": "= 238 ÷ 10 = 23.8  ✓",                         "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Three point four times seven equals thirty-four divided by ten times seven, which equals thirty-four times seven divided by ten. Thirty-four times seven is two hundred and thirty-eight. Dividing by ten gives twenty-three point eight.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "size-estimate",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "3.4 × 7 — estimate: 3 × 7 = 21",               "highlight": "accent" },
+            { "text": "Answer should be close to 21",                   "highlight": "accent" },
+            { "text": "23.8 ✓  (not 2.38 or 238)",                    "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Before calculating, estimate: three times seven is twenty-one. The answer should be close to twenty-one — around twenty to twenty-five. Twenty-three point eight fits. Two point three eight is too small, two hundred and thirty-eight is far too large.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "3.4 × 7 = 23.8",
+          "label": "= (34 × 7) ÷ 10 — decimal place is the ÷10 in disguise"
+        }
+      ],
+      "narration": "Twenty-three point eight. Estimating first gives a target range, and the scaling argument explains why the decimal place method is not just a rule — it is dividing by ten hidden in notation.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: placing the decimal by feel rather than by counting. Estimate first — 3.4 × 7 ≈ 21 — then use the count: 1 decimal place in the question means 1 in the answer: 23.8.",
+    "audioNarration": "Estimate first to know the right scale. Then the decimal-place count confirms where the point goes. The method is really multiplying as integers and dividing by the appropriate power of ten."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

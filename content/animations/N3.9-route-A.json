@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.9",
+  "skillName": "Order of Operations",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students calculate left to right regardless of operation, ignoring priority rules.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "bodmas-order",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "BODMAS: Brackets → Orders → Division/Multiplication → Addition/Subtraction",
+          "subText": "Higher-priority operations are calculated first, regardless of position"
+        }
+      ],
+      "narration": "BODMAS gives the order for mixed calculations. Brackets first, then powers and roots, then multiplication and division left to right, and finally addition and subtraction left to right.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "apply-to-example",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Calculate: 3 + 4 × 2",                     "highlight": null },
+            { "text": "Step 1 — Multiplication first: 4 × 2 = 8", "highlight": "accent" },
+            { "text": "Step 2 — Addition: 3 + 8 = 11  ✓",        "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "In three plus four times two, multiplication comes before addition. Calculate four times two first to get eight, then add three to get eleven — not left to right, which would give fourteen.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "brackets-override",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Calculate: (3 + 4) × 2",                   "highlight": null },
+            { "text": "Step 1 — Brackets first: (3 + 4) = 7",    "highlight": "accent" },
+            { "text": "Step 2 — Multiply: 7 × 2 = 14  ✓",       "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Brackets change the order. With brackets around three plus four, the addition happens first: three plus four is seven, then seven times two is fourteen. Brackets override the default multiplication-first rule.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "3 + 4 × 2 = 11   (3 + 4) × 2 = 14",
+          "label": "Same numbers, different order of operations — different answers"
+        }
+      ],
+      "narration": "Eleven without brackets, fourteen with brackets. The order of operations determines the answer — always follow BODMAS, and use brackets to override when needed.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: 3 + 4 × 2 calculated left to right as 7 × 2 = 14. Multiplication takes priority over addition — calculate 4 × 2 = 8 first, then 3 + 8 = 11.",
+    "audioNarration": "Left to right is not always right. Multiplication and division take priority over addition and subtraction — always check for higher-priority operations before working left to right."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

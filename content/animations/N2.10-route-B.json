@@ -1,0 +1,77 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N2.10",
+  "skillName": "Perimeter of regular polygons",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students think 'regular' just means 'neat-looking' rather than mathematically precise equal sides and angles.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "define-regular",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "'Regular' has a precise mathematical meaning: ALL sides equal AND all angles equal",
+          "subText": "A rhombus has equal sides but is not regular — angles differ"
+        }
+      ],
+      "narration": "Regular is a precise geometric term. Both conditions must hold: all sides equal and all angles equal. A rhombus has four equal sides but its angles are not all equal — so it is not regular.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "why-formula-works",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "n equal sides, each of length s",         "highlight": null },
+            { "text": "Perimeter = s + s + s + … (n times)",    "highlight": "accent" },
+            { "text": "           = n × s",                     "highlight": "green" },
+            { "text": "Repeated addition is multiplication",    "highlight": null }
+          ]
+        }
+      ],
+      "narration": "Adding n copies of the same length s is exactly what multiplication means. The perimeter formula is not a separate rule to memorise — it falls directly from the definition of multiplication.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "naming-polygons",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "3 sides: equilateral triangle (regular)",  "highlight": null },
+            { "text": "4 sides: square (regular)",               "highlight": null },
+            { "text": "5 sides: regular pentagon",               "highlight": "accent" },
+            { "text": "6 sides: regular hexagon",               "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Regular polygons have specific names. Three equal sides is an equilateral triangle; four equal sides and angles is a square. From five sides onward, we say 'regular pentagon', 'regular hexagon', and so on.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "P = n × s  because all n sides equal s",
+          "label": "Regular = all sides equal → multiply one side by n"
+        }
+      ],
+      "narration": "The formula works because regularity guarantees every side is the same length. Knowing one side tells you all of them.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: applying the n × s formula to irregular polygons. The formula only works when ALL sides are equal — check the shape is truly regular first.",
+    "audioNarration": "The n × s formula requires every side to be the same length. If even one side differs, the polygon is not regular and you must add all sides individually."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.16",
+  "skillName": "Decimal multiplication (decimal × decimal)",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students add decimal places correctly but miscount, treating them from the left rather than the right of the answer.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "1.2 × 3.4",                                        "highlight": null },
+            { "text": "Student: 12×34=408 → 4.08 (moved from left)  ✗",   "highlight": "accent" },
+            { "text": "Counted 2 places from the LEFT — should be right",  "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The student correctly found four hundred and eight and knew the answer needed two decimal places. But they counted two places from the left, giving four point zero eight. The decimal point must be placed counting from the right.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "count-from-right",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Always count decimal places from the RIGHT of the whole-number answer",
+          "subText": "408 with 2 decimal places from the right: 4.08 ✗  →  4.08 is correct only if the number is 408"
+        }
+      ],
+      "narration": "Count from the right. In four hundred and eight, two places from the right gives four point zero eight. But wait — check the estimate: one point two times three point four, approximately one times three equals three. The answer should be near four, not four hundred.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "correct-answer",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "12 × 34 = 408",                                    "highlight": "accent" },
+            { "text": "2 decimal places from right: 4.08  ✓",             "highlight": "green" },
+            { "text": "Estimate: 1×3 = 3 → 4.08 is plausible  ✓",        "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Four hundred and eight with two decimal places from the right gives four point zero eight. The estimate of about three confirms this is the right scale. The student's confusion arose from a labelling mistake, not a counting mistake.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "1.2 × 3.4 = 4.08",
+          "label": "Count decimal places from the RIGHT — always estimate to check scale"
+        }
+      ],
+      "narration": "Four point zero eight. Count from the right, and always use an estimate to verify the answer is in the right ballpark.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: counting decimal places from the left of the answer instead of the right. 12 × 34 = 408; place 2 decimal places from the RIGHT: 4.08. Estimate (1×3≈3) confirms the scale.",
+    "audioNarration": "Decimal places are always counted from the right-hand end of the whole-number answer. Use an estimate to check you have the right scale — if your answer is far from the estimate, recount from the right."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}
