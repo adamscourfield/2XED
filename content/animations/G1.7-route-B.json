@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "G1.7",
+  "skillName": "Angles in a triangle sum to 180°",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students know the rule but do not understand why the angles in a triangle sum to 180°.",
+  "generatedAt": "2026-04-19T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "tear-and-place",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Tear the three corners off any paper triangle — they always fit together to make a straight line",
+          "subText": "A straight line is 180° — so the three angles always sum to 180°"
+        }
+      ],
+      "narration": "Here is a way to see why: draw any triangle on paper and tear off all three corners. Place the three corner points together. They always fit perfectly to form a straight line — one hundred and eighty degrees. This works for every triangle, no matter the shape.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "parallel-line-proof",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Draw a line through the top vertex, parallel to the base", "highlight": null },
+            { "text": "Alternate angles: left base angle = left angle at top",     "highlight": "accent" },
+            { "text": "Three angles at the top form a straight line = 180°  ✓",   "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Draw a line through the top vertex parallel to the base. The base angles appear again as alternate angles at the top. Together with the triangle's top angle, the three angles at that line make a straight line — one hundred and eighty degrees. All three triangle angles collected at one point make a half turn.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "equilateral-check",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Equilateral triangle: all sides and angles equal",  "highlight": "accent" },
+            { "text": "3 equal angles summing to 180° → each is 60°",     "highlight": "accent" },
+            { "text": "Confirms the rule — every triangle, any shape  ✓", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "An equilateral triangle has three equal angles. If they sum to one hundred and eighty, each must be sixty degrees. This is a special case confirming the general rule — one hundred and eighty divided equally among three gives sixty.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Three corners fit together → straight line → 180°",
+          "label": "The rule is geometric — three angles of any triangle always complete a half turn"
+        }
+      ],
+      "narration": "The three angles of any triangle always combine to make a straight line — one hundred and eighty degrees. The rule is not arbitrary; it comes from the geometry of parallel lines and half turns.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: treating the 180° rule as a fact with no reason. Tear off the corners of any triangle — they fit together as a straight line (180°). The proof uses parallel lines and alternate angles.",
+    "audioNarration": "The angles in any triangle sum to 180° because, when rearranged, they form a straight line — a half turn. This is provable using parallel lines and alternate angles — it is not just a number to memorise."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

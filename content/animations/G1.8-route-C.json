@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "G1.8",
+  "skillName": "Angles in a quadrilateral sum to 360°",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students confuse the quadrilateral angle sum (360°) with the triangle angle sum (180°) and subtract known angles from 180° instead of 360°.",
+  "generatedAt": "2026-04-19T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Quadrilateral: 100°, 90°, 80°, and x°",            "highlight": null },
+            { "text": "Student: x = 180° − 100° − 90° − 80° = −90°  ✗", "highlight": "accent" },
+            { "text": "Negative angle — impossible. Wrong total used.",    "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The student used one hundred and eighty and got a negative result — an impossible angle. This is a reliable sign of using the triangle total for a quadrilateral. Four angles require three hundred and sixty, not one hundred and eighty.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "sides-determine-total",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Count the sides: 3 sides → 180°.   4 sides → 360°.",
+          "subText": "A quadrilateral has four angles — the equation must use 360°"
+        }
+      ],
+      "narration": "A simple check: count the sides. Three sides — triangle — use one hundred and eighty. Four sides — quadrilateral — use three hundred and sixty. The total scales with the number of sides because each extra side allows another triangle to be formed.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "correct-calculation",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Quadrilateral: 100° + 90° + 80° + x° = 360°",      "highlight": "accent" },
+            { "text": "x = 360° − 270° = 90°  ✓",                       "highlight": "green" },
+            { "text": "Check: 100 + 90 + 80 + 90 = 360  ✓",              "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Correct equation: one hundred plus ninety plus eighty plus x equals three hundred and sixty. X equals three hundred and sixty minus two hundred and seventy, which is ninety degrees. Check: one hundred plus ninety plus eighty plus ninety is three hundred and sixty.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "100° + 90° + 80° + 90° = 360°  ✓",
+          "label": "4 sides → 360°.  A negative result means you used 180° — wrong for a quadrilateral."
+        }
+      ],
+      "narration": "Ninety degrees. Four sides, three hundred and sixty. A negative result is always a signal that the wrong total was used — switch to three hundred and sixty for four-sided shapes.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: 180° − 100° − 90° − 80° = −90° (used triangle total for a quadrilateral). Quadrilateral angles sum to 360°. Count the sides first: 4 sides → 360°.",
+    "audioNarration": "A negative angle is impossible — it means the wrong total was used. For a quadrilateral, use 360°, not 180°. Count the sides: three sides gives 180°, four sides gives 360°."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

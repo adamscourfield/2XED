@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "G1.7",
+  "skillName": "Angles in a triangle sum to 180°",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students forget that the three interior angles of any triangle must add up to 180° and guess the missing angle rather than calculating it.",
+  "generatedAt": "2026-04-19T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "the-rule",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "The three interior angles of any triangle add up to 180°",
+          "subText": "Works for all triangles — scalene, isosceles, equilateral, right-angled"
+        }
+      ],
+      "narration": "Every triangle, regardless of shape, has interior angles summing to one hundred and eighty degrees. This holds for all types: right-angled, equilateral, isosceles, scalene. Write the equation: all three angles equal one hundred and eighty.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "find-missing-angle",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Triangle with angles 50°, 70°, and x°",            "highlight": null },
+            { "text": "50° + 70° + x° = 180°",                           "highlight": "accent" },
+            { "text": "x = 180° − 120° = 60°  ✓",                       "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Triangle with angles fifty, seventy, and x. Equation: fifty plus seventy plus x equals one hundred and eighty. Fifty plus seventy is one hundred and twenty, so x equals sixty degrees.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "right-angle-triangle",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Right-angled triangle: 90°, 35°, and y°",          "highlight": "accent" },
+            { "text": "90° + 35° + y° = 180°",                           "highlight": "accent" },
+            { "text": "y = 180° − 125° = 55°  ✓",                       "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Right-angled triangle: one angle is ninety, one is thirty-five, find the third. Ninety plus thirty-five plus y equals one hundred and eighty. Y equals fifty-five degrees. The two acute angles in a right-angled triangle always add to ninety.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "50° + 70° + 60° = 180°   |   90° + 35° + 55° = 180°",
+          "label": "All triangle angles sum to 180° — subtract known angles from 180° to find missing one"
+        }
+      ],
+      "narration": "Sixty and fifty-five degrees. Both triangles confirm the rule. Subtract the known angles from one hundred and eighty — do not guess.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: guessing the missing angle or using 360°. Any triangle's angles sum to 180°. Write the equation: known angles + unknown = 180°, then subtract.",
+    "audioNarration": "All triangles — every shape and size — have angles summing to 180°. Write the equation, add up the known angles, and subtract from 180°. Never guess when the rule gives an exact answer."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}
