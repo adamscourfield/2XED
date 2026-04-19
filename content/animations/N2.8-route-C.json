@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N2.8",
+  "skillName": "Money problems involving addition and subtraction",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students give change answers as a decimal without checking that pence make sense (e.g. writing £2.5 instead of £2.50).",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Change from £5 for an item costing £2.50", "highlight": null },
+            { "text": "Student: £5.00 − £2.50 = £2.5  ✗",        "highlight": "accent" },
+            { "text": "£2.5 is ambiguous — is that £2.05 or £2.50?", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The arithmetic is correct but the presentation is wrong. Money always requires two decimal places because pence are hundredths. Writing two point five leaves the pence column empty and the amount ambiguous.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "always-two-dp",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Money amounts always show exactly two decimal places — the pence column must never be left blank",
+          "subText": "£2.5 → £2.50   £3.4 → £3.40   £10 → £10.00"
+        }
+      ],
+      "narration": "Two decimal places in a money amount is a convention, not a mathematical rule — but it prevents ambiguity. Always write both pence digits, even when the second is zero.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "correct-presentation",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "£5.00 − £2.50 = £2.50  ✓",            "highlight": "green" },
+            { "text": "Two decimal places: tens of pence and pence", "highlight": "accent" },
+            { "text": "The trailing zero is required in money context", "highlight": "null" }
+          ]
+        }
+      ],
+      "narration": "The answer is two pounds fifty — written as two point five zero. The trailing zero after fifty is required in a money context to make clear the amount is fifty pence, not five pence.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Change = £2.50",
+          "label": "Money always uses exactly two decimal places"
+        }
+      ],
+      "narration": "Two pounds fifty. In money contexts, always write two decimal places — a trailing zero after pence is never optional.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: writing £2.5 instead of £2.50. Money always needs two decimal places — the second digit shows individual pence. £2.5 could mean £2.05 or £2.50.",
+    "audioNarration": "Money requires two decimal places at all times. Write £2.50, not £2.5 — the zero is not optional because it specifies the pence column unambiguously."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

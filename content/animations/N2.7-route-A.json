@@ -1,0 +1,79 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N2.7",
+  "skillName": "Use formal methods for subtraction of decimals; complement of a decimal (1 − p)",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students misalign decimal points when subtracting, especially when one number is a whole number.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "align-and-pad",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Subtract 5.3 − 2.847",                          "highlight": null },
+            { "text": "Align decimal points, pad: 5.300",              "highlight": "accent" },
+            { "text": "                        − 2.847",              "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Align the decimal points and pad the shorter number with trailing zeros. Five point three becomes five point three zero zero so both numbers have three decimal places.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "subtract-columns",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Thousandths: 0 − 7 → borrow → 10 − 7 = 3",    "highlight": "accent" },
+            { "text": "Hundredths: (0−1) − 4 → borrow → 9 − 4 = 5",  "highlight": "accent" },
+            { "text": "Tenths: (3−1) − 8 → borrow → 12 − 8 = 4",     "highlight": "accent" },
+            { "text": "Ones: (5−1) − 2 = 2 → answer: 2.453",         "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Subtract right to left, borrowing as needed. Multiple borrows cascade left — each borrow reduces the next column by one.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "complement",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Complement: 1 − 0.37",                          "highlight": null },
+            { "text": "1.00 − 0.37: pad 1 as 1.00",                  "highlight": "accent" },
+            { "text": "Ones: 0 − 3 → borrow… → answer: 0.63",        "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "The complement of a decimal p is one minus p — the amount needed to reach one. Write one as one point zero zero, pad to match, then subtract normally. One minus zero point three seven is zero point six three.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "1 − 0.37 = 0.63",
+          "label": "Pad 1 as 1.00 → subtract → complement fills the gap to 1"
+        }
+      ],
+      "narration": "Zero point six three. Adding zero point three seven and zero point six three gives exactly one — they are complements.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: subtracting 1 − 0.37 as 1 − 37 = −36. Write 1 as 1.00 first, then subtract column by column to get 0.63.",
+    "audioNarration": "Always pad a whole number with .00 before subtracting decimals. One becomes 1.00 — then the decimal columns exist and subtraction proceeds normally."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

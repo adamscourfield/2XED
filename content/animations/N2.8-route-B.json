@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N2.8",
+  "skillName": "Money problems involving addition and subtraction",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students don't connect money notation to decimal place value — they see £ and p as separate systems.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "money-is-decimal",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "£1 = 100p, so 1p = £0.01 — pence are hundredths of a pound",
+          "subText": "£4.73 means 4 pounds and 73 hundredths of a pound"
+        }
+      ],
+      "narration": "Money is a decimal system. One pound is one hundred pence, so each penny is one hundredth of a pound. The digits after the decimal point in a price are always hundredths — pence.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "tens-of-pence",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "£4.73:",                             "highlight": null },
+            { "text": "4 = pounds (ones)",                  "highlight": "accent" },
+            { "text": "7 = tens of pence (tenths of £)",    "highlight": "accent" },
+            { "text": "3 = pence (hundredths of £)",        "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Four pounds seventy-three: four is the whole pounds, seven is the tens of pence which are tenths of a pound, and three is the pence which are hundredths of a pound. The decimal point separates whole pounds from fractions of a pound.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "estimation-check",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "£2.49 + £3.85 ≈ £2.50 + £4 = £6.50",  "highlight": "accent" },
+            { "text": "Exact: £6.34",                          "highlight": null },
+            { "text": "£6.34 is close to £6.50 ✓ — sense check passes", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Always estimate before calculating. Round each price to the nearest fifty pence or pound and add mentally. If the exact answer is far from the estimate, a mistake has been made.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "£2.49 + £3.85 = £6.34",
+          "label": "Pence = hundredths of £ — money obeys decimal place value"
+        }
+      ],
+      "narration": "Six pounds thirty-four. Money and decimals are the same system — the decimal point is the boundary between whole pounds and fractions of a pound.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: treating pence as a separate number system. Pence are hundredths of a pound — £4.73 is four and seventy-three hundredths, exactly like any other decimal.",
+    "audioNarration": "Money is a decimal system. Pence are hundredths of a pound — the two digits after the decimal point. All decimal addition and subtraction rules apply directly."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

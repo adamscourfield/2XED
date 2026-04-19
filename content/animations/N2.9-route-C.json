@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N2.9",
+  "skillName": "Perimeter of irregular polygons",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students calculate missing sides by guessing rather than using known lengths and shape properties.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "L-shape: two sides unlabelled",                   "highlight": null },
+            { "text": "Student guesses: missing sides = 3 cm each  ✗",  "highlight": "accent" },
+            { "text": "Missing sides can be calculated from given lengths", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "On compound shapes, unlabelled sides are not unknown — they can be calculated from the sides that are labelled. Guessing random values gives a wrong perimeter.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "parallel-side-rule",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "On a rectilinear shape, opposite parallel sides add to the same total in each direction",
+          "subText": "Missing horizontal side = total width − known horizontal side"
+        }
+      ],
+      "narration": "For L-shapes and other rectilinear shapes, the unlabelled sides can be found by subtraction. The total horizontal extent equals the sum of all horizontal segments — so the missing one is the total minus the known ones.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "find-missing",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Overall width = 9 cm. Known horizontal = 5 cm", "highlight": null },
+            { "text": "Missing horizontal = 9 − 5 = 4 cm",              "highlight": "accent" },
+            { "text": "Overall height = 7 cm. Known vertical = 3 cm",   "highlight": null },
+            { "text": "Missing vertical = 7 − 3 = 4 cm",               "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Find each missing side by subtracting: overall width nine minus known width five gives four centimetres. Overall height seven minus known height three gives four centimetres. Now all sides are known.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Missing side = overall span − known side",
+          "label": "Use parallel-side subtraction — never guess missing lengths"
+        }
+      ],
+      "narration": "Calculate missing sides before summing — never guess. The parallel-side rule gives exact values from the information already on the diagram.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: guessing unlabelled sides on an L-shape. Use the overall width and height: missing side = overall span − known sides in that direction.",
+    "audioNarration": "Unlabelled sides on rectilinear shapes are never truly unknown. Subtract the known sides from the overall span in each direction to find the exact missing lengths."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

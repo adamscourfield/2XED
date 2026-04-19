@@ -1,0 +1,77 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N2.7",
+  "skillName": "Use formal methods for subtraction of decimals; complement of a decimal (1 − p)",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students subtract digit by digit in the wrong order — right digit of top minus left digit of bottom.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "8.3 − 4.75",                                "highlight": null },
+            { "text": "Student pads: 8.30 − 4.75",                 "highlight": null },
+            { "text": "Ones: 8 − 5 = 3  ✗  (subtracted wrong pair)", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The student subtracted eight in the ones from five in the tenths — pairs of digits from different columns. Every digit must be subtracted from the digit directly above it in the same column.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "column-discipline",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Each digit subtracts only from the digit in the same column directly above it",
+          "subText": "Align decimal points → pad → then every column pair is clear"
+        }
+      ],
+      "narration": "After aligning and padding, each column contains exactly one pair of digits — the top number's digit and the bottom number's digit in that place value. Subtract only within the same column.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "correct-method",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "  8.30",                      "highlight": null },
+            { "text": "− 4.75",                      "highlight": null },
+            { "text": "Hundredths: 0 − 5 → borrow → 10 − 5 = 5", "highlight": "accent" },
+            { "text": "Tenths: (3−1) − 7 → borrow → 12 − 7 = 5", "highlight": "accent" },
+            { "text": "Ones: (8−1) − 4 = 3 → answer: 3.55  ✓",   "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Work right to left within aligned columns. Hundredths: zero minus five needs a borrow; tenths: two minus seven needs a borrow; ones: seven minus four is three. Answer: three point five five.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "8.3 − 4.75 = 3.55",
+          "label": "Subtract within columns only — right to left, borrowing as needed"
+        }
+      ],
+      "narration": "Three point five five. Aligning the decimal point guarantees that every column pair is correct before you subtract a single digit.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: subtracting digits from different columns — e.g. ones digit of top with tenths digit of bottom. Align decimal points first so every column pair is unambiguous.",
+    "audioNarration": "Never subtract across columns. After aligning and padding, each column has one pair of digits. Subtract only within that pair, right to left."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

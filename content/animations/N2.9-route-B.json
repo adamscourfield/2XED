@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N2.9",
+  "skillName": "Perimeter of irregular polygons",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students confuse perimeter (length of boundary) with area (space inside).",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "perimeter-vs-area",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Perimeter is a length — measured in cm, m, km. Area is a surface — measured in cm², m², km².",
+          "subText": "Perimeter goes around the edge; area fills the inside"
+        }
+      ],
+      "narration": "Perimeter and area are completely different measurements. Perimeter measures the length of the boundary — one-dimensional. Area measures the surface enclosed — two-dimensional. The units confirm which you have: cm for perimeter, cm squared for area.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "same-area-different-perimeter",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Rectangle A: 2 × 6 = 12 cm² area, perimeter = 16 cm", "highlight": null },
+            { "text": "Rectangle B: 3 × 4 = 12 cm² area, perimeter = 14 cm", "highlight": "accent" },
+            { "text": "Same area — different perimeter",                       "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Two shapes can have identical areas but very different perimeters. A two by six rectangle and a three by four rectangle both have twelve square centimetres inside, but their boundaries are different lengths.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "units-confirm",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Perimeter answer: 27 cm  (not cm²)", "highlight": "accent" },
+            { "text": "Area answer:      27 cm² (not cm)",  "highlight": "accent" },
+            { "text": "Wrong units = wrong concept",        "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Always write the units. If your answer is in centimetres, you have found a perimeter. If it is in square centimetres, you have found an area. Mismatched units are a reliable signal that the wrong formula was used.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Perimeter = sum of side lengths (cm, m…)",
+          "label": "Perimeter = boundary length; area = enclosed surface"
+        }
+      ],
+      "narration": "Perimeter is a length — always add the side lengths and write the answer in linear units. Never square them.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: giving a perimeter answer in cm² or calculating area instead. Perimeter is a length — add side lengths and write the answer in cm or m, not cm².",
+    "audioNarration": "Perimeter measures the boundary, not the interior. The answer is in cm or m — never cm². If you see cm², you have calculated area instead."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}
