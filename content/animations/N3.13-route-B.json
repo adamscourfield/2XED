@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.13",
+  "skillName": "HCF",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students do not understand what HCF is useful for — they see it as abstract rather than practical.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "hcf-means-equal-groups",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "HCF answers: 'what is the largest equal group size that works for both?'",
+          "subText": "Used for simplifying fractions, tiling, and equal sharing"
+        }
+      ],
+      "narration": "The HCF is the largest equal chunk size that fits exactly into both quantities. If you have twelve apples and eighteen oranges and want to arrange them into identical groups with no leftovers, the HCF tells you the maximum group size.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "sharing-context",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "12 apples and 18 oranges — equal groups, no leftovers", "highlight": null },
+            { "text": "Groups of 6: 12÷6=2 groups, 18÷6=3 groups  ✓",          "highlight": "accent" },
+            { "text": "Groups of 3 also work — but 6 is the largest  ✓",        "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Groups of six work: two groups of six apples, three groups of six oranges. Groups of three also work, but six is bigger — six is the HCF. It represents the largest size that creates whole groups from both quantities.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "simplifying-fractions",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Simplify 12/18",                                   "highlight": null },
+            { "text": "HCF(12, 18) = 6 → divide both by 6",             "highlight": "accent" },
+            { "text": "12÷6 = 2, 18÷6 = 3 → 12/18 = 2/3  ✓",          "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "HCF is also used to simplify fractions. Twelve eighteenths simplifies by dividing top and bottom by their HCF of six. Twelve divided by six is two, eighteen divided by six is three — giving two thirds in its simplest form.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "HCF(12, 18) = 6",
+          "label": "Largest equal group size — also the simplifying factor for 12/18"
+        }
+      ],
+      "narration": "Six. The HCF is the largest equal group that fits both quantities — and the largest number by which you can simplify any fraction made from the two values.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: seeing HCF as purely abstract. HCF(12, 18) = 6 means the largest equal group size for both 12 and 18 — and is the key to simplifying the fraction 12/18 to 2/3.",
+    "audioNarration": "HCF tells you the largest equal group size that works for both quantities. It is also the number to divide by when simplifying a fraction — both numerator and denominator, dividing by their HCF."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

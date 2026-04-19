@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.14",
+  "skillName": "Convert metric units",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students divide when converting to a larger unit but forget that the answer must be smaller.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "metric-prefixes",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "kilo = ×1000   centi = ÷100   milli = ÷1000",
+          "subText": "Larger unit → smaller number.  Smaller unit → larger number."
+        }
+      ],
+      "narration": "Metric prefixes scale units by powers of ten. Kilo means one thousand — so one kilogram is one thousand grams. Centi means one hundredth — so one centimetre is one hundredth of a metre. Converting to a larger unit gives a smaller number, and vice versa.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "to-larger-unit",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Convert 3500 m to km",                              "highlight": null },
+            { "text": "1 km = 1000 m → ÷ 1000",                          "highlight": "accent" },
+            { "text": "3500 ÷ 1000 = 3.5 km  ✓",                        "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Three thousand five hundred metres converted to kilometres. One kilometre equals one thousand metres, so divide by one thousand. Three thousand five hundred divided by one thousand is three point five kilometres — a smaller number for a larger unit.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "to-smaller-unit",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Convert 2.4 kg to g",                              "highlight": null },
+            { "text": "1 kg = 1000 g → × 1000",                         "highlight": "accent" },
+            { "text": "2.4 × 1000 = 2400 g  ✓",                        "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Two point four kilograms converted to grams. One kilogram equals one thousand grams, so multiply by one thousand. Two point four times one thousand is two thousand four hundred grams — a larger number for a smaller unit.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "3500 m = 3.5 km   |   2.4 kg = 2400 g",
+          "label": "Larger unit → ÷ conversion factor.  Smaller unit → × conversion factor."
+        }
+      ],
+      "narration": "Three point five kilometres and two thousand four hundred grams. The size of the number changes in the opposite direction to the size of the unit.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: multiplying when converting to a larger unit (e.g. 3500 m × 1000 = 3,500,000 km). Converting to a larger unit requires dividing — 3500 ÷ 1000 = 3.5 km.",
+    "audioNarration": "Larger unit means a smaller number — so divide. Smaller unit means a larger number — so multiply. The number and unit size always change in opposite directions."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

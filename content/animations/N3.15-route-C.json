@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.15",
+  "skillName": "Decimal multiplication (decimal × integer)",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students misplace the decimal point in the product, often placing it incorrectly after the whole-number multiplication.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "4.6 × 5",                                         "highlight": null },
+            { "text": "Student: 46 × 5 = 230 → 2.30  ✗",                "highlight": "accent" },
+            { "text": "Moved point 2 places — question only has 1",       "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The student correctly multiplied forty-six by five to get two hundred and thirty, but then placed the decimal point two places from the right. Four point six has only one decimal place, so the point should move only one place.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "count-carefully",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Count the total decimal places in all factors — answer has the same count",
+          "subText": "4.6 × 5: only 4.6 has decimals → 1 decimal place total"
+        }
+      ],
+      "narration": "Count the decimal places in every factor being multiplied. Four point six has one decimal place. Five is a whole number with zero decimal places. Total: one decimal place. The answer must have exactly one digit after the decimal point.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "correct-answer",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "46 × 5 = 230",                                    "highlight": "accent" },
+            { "text": "1 decimal place → 23.0 = 23  ✓",                 "highlight": "green" },
+            { "text": "Check: 4 × 5 = 20, 0.6 × 5 = 3.0 → 23.0  ✓",   "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Two hundred and thirty with one decimal place: twenty-three point zero, which equals twenty-three. Checking by partitioning: four times five is twenty, zero point six times five is three point zero, total twenty-three. Correct.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "4.6 × 5 = 23",
+          "label": "1 decimal place in question → 1 decimal place in answer: 230 → 23.0"
+        }
+      ],
+      "narration": "Twenty-three. Count one decimal place in the question, place the point one from the right in the answer. Estimating four times five is twenty confirms the scale is correct.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: 4.6 × 5 = 2.30 (moved decimal 2 places instead of 1). 4.6 has 1 decimal place — the answer has 1 too: 46 × 5 = 230 → 23.0 = 23.",
+    "audioNarration": "Count the decimal places in the question first, before calculating. That count tells you where the point goes in the answer. One decimal place in 4.6 means one decimal place in the answer."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}
