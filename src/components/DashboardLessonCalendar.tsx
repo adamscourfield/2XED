@@ -5,7 +5,7 @@ import Link from 'next/link';
 
 type LessonEvent = {
   at: string;
-  kind: 'skill_review' | 'practice_due' | 'live_session' | 'class_review';
+  kind: 'skill_review' | 'practice_due' | 'live_session' | 'class_review' | 'timetable_slot';
   title: string;
   href?: string;
   meta?: string;
@@ -47,6 +47,8 @@ function kindLabel(kind: LessonEvent['kind']): string {
       return 'Live';
     case 'class_review':
       return 'Class';
+    case 'timetable_slot':
+      return 'Timetable';
     default:
       return '';
   }
@@ -62,6 +64,8 @@ function kindClass(kind: LessonEvent['kind']): string {
       return 'border-amber-200 bg-amber-50 text-amber-900';
     case 'class_review':
       return 'border-sky-200 bg-sky-50 text-sky-900';
+    case 'timetable_slot':
+      return 'border-indigo-200 bg-indigo-50 text-indigo-900';
     default:
       return 'border-[var(--anx-border)] bg-[var(--anx-surface-soft)] text-[var(--anx-text)]';
   }

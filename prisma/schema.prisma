@@ -84,6 +84,12 @@ enum LiveSessionPhase {
   REVIEW
 }
 
+enum TimetableSlotRecurrence {
+  WEEKLY
+  BIWEEKLY
+  MONTHLY_NTH
+}
+
 enum StudentLane {
   LANE_1
   LANE_2
@@ -620,8 +626,33 @@ model Classroom {
   teachers         TeacherClassroom[]
   enrollments      ClassroomEnrollment[]
   liveSessions     LiveSession[]
+  timetableSlots   ClassroomTimetableSlot[]
 
   @@unique([externalSource, externalClassId])
+}
+
+/// Recurring school-style timetable entry (wall-clock in `timezone`).
+model ClassroomTimetableSlot {
+  id                String                   @id @default(cuid())
+  classroomId       String
+  label             String?
+  room              String?
+  /// 0 = Monday … 6 = Sunday
+  dayOfWeek         Int
+  /// Minutes from midnight (0–1439) in `timezone`
+  minuteOfDay       Int
+  durationMinutes   Int                      @default(60)
+  recurrence        TimetableSlotRecurrence  @default(WEEKLY)
+  /// Anchor Monday (any date in that week) for BIWEEKLY; ignored otherwise
+  week0Anchor       DateTime?
+  /// 1–4 = Nth weekday of month, 5 = last matching weekday
+  nthWeekOfMonth    Int?
+  timezone          String                   @default("Europe/London")
+  createdAt         DateTime                 @default(now())
+  updatedAt         DateTime                 @updatedAt
+  classroom         Classroom                @relation(fields: [classroomId], references: [id], onDelete: Cascade)
+
+  @@index([classroomId])
 }
 
 model TeacherClassroom {

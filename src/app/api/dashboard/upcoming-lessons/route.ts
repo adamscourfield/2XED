@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { z } from 'zod';
 import { authOptions } from '@/features/auth/authOptions';
 import { prisma } from '@/db/prisma';
+import { expandTimetableSlots, type TimetableRecurrence, type TimetableSlotForExpansion } from '@/features/timetable/expandTimetableSlots';
 
 const querySchema = z.object({
   from: z.string().min(4),
@@ -11,13 +12,18 @@ const querySchema = z.object({
 
 type UpcomingLessonEvent = {
   at: string;
-  kind: 'skill_review' | 'practice_due' | 'live_session' | 'class_review';
+  kind: 'skill_review' | 'practice_due' | 'live_session' | 'class_review' | 'timetable_slot';
   title: string;
   href?: string;
   meta?: string;
 };
 
 const MAX_EVENTS = 400;
+
+function mapRecurrence(r: string): TimetableRecurrence {
+  if (r === 'BIWEEKLY' || r === 'MONTHLY_NTH') return r;
+  return 'WEEKLY';
+}
 
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -86,6 +92,53 @@ export async function GET(req: NextRequest) {
         title: m.skill.name,
         href: `/learn/${m.skill.subject.slug}`,
         meta: 'Practice due',
+      });
+    }
+
+    const enrollRows = await prisma.classroomEnrollment.findMany({
+      where: { studentUserId: user.id },
+      select: {
+        classroom: {
+          select: {
+            id: true,
+            name: true,
+            subjectSlug: true,
+            timetableSlots: true,
+          },
+        },
+      },
+    });
+
+    const slotPayloads: TimetableSlotForExpansion[] = [];
+    for (const row of enrollRows) {
+      const cls = row.classroom;
+      for (const s of cls.timetableSlots) {
+        slotPayloads.push({
+          id: s.id,
+          classroomId: cls.id,
+          classroomName: cls.name,
+          label: s.label,
+          room: s.room,
+          dayOfWeek: s.dayOfWeek,
+          minuteOfDay: s.minuteOfDay,
+          durationMinutes: s.durationMinutes,
+          recurrence: mapRecurrence(s.recurrence),
+          week0Anchor: s.week0Anchor,
+          nthWeekOfMonth: s.nthWeekOfMonth,
+          timezone: s.timezone,
+        });
+      }
+    }
+
+    for (const occ of expandTimetableSlots(slotPayloads, rangeStart, rangeEnd)) {
+      const cls = enrollRows.find((r) => r.classroom.id === occ.classroomId)?.classroom;
+      const href = cls?.subjectSlug ? `/learn/${cls.subjectSlug}` : undefined;
+      events.push({
+        at: occ.startsAtUtc.toISOString(),
+        kind: 'timetable_slot',
+        title: occ.title,
+        href,
+        meta: occ.meta,
       });
     }
   } else if (role === 'TEACHER' || role === 'ADMIN' || role === 'LEADERSHIP') {
@@ -194,6 +247,47 @@ export async function GET(req: NextRequest) {
         title: m.skill.name,
         href: `/learn/${m.skill.subject.slug}`,
         meta: `${studentLabel(m.userId)} · Practice due`,
+      });
+    }
+
+    const classrooms = await prisma.classroom.findMany({
+      where: { id: { in: classroomIds } },
+      select: {
+        id: true,
+        name: true,
+        subjectSlug: true,
+        timetableSlots: true,
+      },
+    });
+
+    const teacherSlotPayloads: TimetableSlotForExpansion[] = [];
+    for (const cls of classrooms) {
+      for (const s of cls.timetableSlots) {
+        teacherSlotPayloads.push({
+          id: s.id,
+          classroomId: cls.id,
+          classroomName: cls.name,
+          label: s.label,
+          room: s.room,
+          dayOfWeek: s.dayOfWeek,
+          minuteOfDay: s.minuteOfDay,
+          durationMinutes: s.durationMinutes,
+          recurrence: mapRecurrence(s.recurrence),
+          week0Anchor: s.week0Anchor,
+          nthWeekOfMonth: s.nthWeekOfMonth,
+          timezone: s.timezone,
+        });
+      }
+    }
+
+    for (const occ of expandTimetableSlots(teacherSlotPayloads, rangeStart, rangeEnd)) {
+      const cls = classrooms.find((c) => c.id === occ.classroomId);
+      events.push({
+        at: occ.startsAtUtc.toISOString(),
+        kind: 'timetable_slot',
+        title: occ.title,
+        href: cls?.subjectSlug ? `/learn/${cls.subjectSlug}` : `/teacher/timetable`,
+        meta: occ.meta,
       });
     }
   } else {

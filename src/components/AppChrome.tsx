@@ -91,6 +91,11 @@ export function AppChrome({
       description: "Start a session",
     },
     {
+      href: "/teacher/timetable",
+      label: "Timetables",
+      description: "Recurring class slots",
+    },
+    {
       href: "/teacher/content/review",
       label: "Content review",
       description: "English booklet gate",

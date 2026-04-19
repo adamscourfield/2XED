@@ -203,7 +203,7 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      <DashboardLessonCalendar hint="Shows scheduled reviews and practice due dates from your plan." />
+      <DashboardLessonCalendar hint="Shows your class timetable (when set), scheduled reviews, and practice due dates." />
 
       {/* Join live session */}
       <section className="anx-card flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
