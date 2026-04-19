@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N3.18",
+  "skillName": "Short division (remainders)",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students express the remainder as a digit rather than showing it as a fraction or decimal of the divisor.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Give the answer to 19 ÷ 5 as a mixed number",       "highlight": null },
+            { "text": "Student: 3 r 4  ✗",                                 "highlight": "accent" },
+            { "text": "Remainder '4' is not a mixed number — needs fraction", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Three remainder four is correct arithmetic, but the question asked for a mixed number. A mixed number has a whole part and a fraction part. The remainder four must be expressed as four fifths — four parts out of the five that make a whole.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "remainder-as-fraction",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Remainder as a fraction: write remainder over the divisor",
+          "subText": "19 ÷ 5 = 3 r 4 → mixed number = 3 and 4/5"
+        }
+      ],
+      "narration": "To convert a remainder into a fraction, write it over the divisor. The divisor tells you how many equal parts make one whole. Here, five equal parts make one — so the remaining four parts are four fifths.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "check-the-answer",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "19 ÷ 5 = 3 r 4 → 3⁴⁄₅  ✓",                      "highlight": "accent" },
+            { "text": "Check: 3 × 5 = 15, + 4 = 19  ✓",                  "highlight": "green" },
+            { "text": "Decimal form: 4 ÷ 5 = 0.8 → 3.8  ✓",               "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Three and four fifths. Check: three times five is fifteen, plus four is nineteen — correct. In decimal form, four divided by five is zero point eight, so the answer is also three point eight.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "19 ÷ 5 = 3⁴⁄₅ = 3.8",
+          "label": "Remainder over divisor gives the fraction part of the mixed number"
+        }
+      ],
+      "narration": "Three and four fifths, or three point eight. Write the remainder over the divisor to form the fraction — the divisor tells you how many parts make one whole.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: leaving the answer as 3 r 4 when a mixed number is needed. The remainder becomes the numerator and the divisor becomes the denominator: 19 ÷ 5 = 3⁴⁄₅.",
+    "audioNarration": "Remainder and mixed number are not the same thing. To write the remainder as a fraction, put it over the divisor. 19 ÷ 5 = 3 remainder 4 = 3 and four-fifths."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}
