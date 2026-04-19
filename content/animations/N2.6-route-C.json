@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N2.6",
+  "skillName": "Use formal methods for subtraction of integers",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students borrow correctly but forget to reduce the column they borrowed from.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "63 − 28",                                    "highlight": null },
+            { "text": "Student: borrows → ones = 13 − 8 = 5",      "highlight": null },
+            { "text": "Tens: 6 − 2 = 4 (forgot to reduce) → writes 45  ✗", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The student correctly made the ones thirteen and subtracted to get five, but then used six in the tens column without reducing it. Having borrowed one ten, the tens digit drops from six to five.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "two-step-borrow",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Borrowing has two parts: add 10 to the current column AND subtract 1 from the column you borrowed from",
+          "subText": "Both steps must happen — missing either gives a wrong answer"
+        }
+      ],
+      "narration": "Borrowing always has two effects that must both be recorded. The current column gains ten, and the column to its left loses one. Both changes must be written in the working.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "correct-method",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Ones: 3 → 13 (borrowed), 13 − 8 = 5",       "highlight": "accent" },
+            { "text": "Tens: 6 → 5 (reduced by borrow), 5 − 2 = 3", "highlight": "accent" },
+            { "text": "Answer: 35  ✓",                              "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Ones: thirteen minus eight is five. Tens: the six reduces to five because one ten was borrowed; five minus two is three. The answer is thirty-five, not forty-five.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "63 − 28 = 35",
+          "label": "Borrow: +10 to current column AND −1 to left column"
+        }
+      ],
+      "narration": "Thirty-five. Both parts of the borrow must be recorded — adding ten to the ones and subtracting one from the tens.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: adding 10 to the ones when borrowing but forgetting to reduce the tens. Both changes must happen: +10 here and −1 next door.",
+    "audioNarration": "Borrowing is a two-part operation. Add ten to the column that needs it, and cross out and reduce the column you borrowed from. Miss either step and the answer is wrong."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

@@ -1,0 +1,77 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N2.4",
+  "skillName": "Use formal methods for addition of integers",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students add digits without carrying, writing two-digit sums in a single column.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "align-columns",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Add 3 847 + 1 265",                         "highlight": null },
+            { "text": "Align ones under ones, tens under tens…",   "highlight": "accent" },
+            { "text": "Start adding from the ones column",         "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Write the numbers with matching columns aligned — ones under ones, tens under tens, hundreds under hundreds. Always start adding from the ones column on the right.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "carry",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Ones: 7 + 5 = 12 → write 2, carry 1",     "highlight": "accent" },
+            { "text": "Tens: 4 + 6 + 1 = 11 → write 1, carry 1", "highlight": "accent" },
+            { "text": "Hundreds: 8 + 2 + 1 = 11 → write 1, carry 1", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "When a column sums to ten or more, write the units digit and carry the tens digit to the next column. The carried digit is added in with that column's total.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "complete",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Thousands: 3 + 1 + 1 = 5",    "highlight": "accent" },
+            { "text": "Answer: 5 112",                "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Add the thousands including any final carry. Three plus one plus the carried one gives five. The answer is five thousand one hundred and twelve.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "3 847 + 1 265 = 5 112",
+          "label": "Align → start right → add column by column → carry tens"
+        }
+      ],
+      "narration": "Five thousand one hundred and twelve. Column addition with careful carrying gives the exact answer every time.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: writing 12 in the ones column instead of carrying the 1. Each column holds only one digit — when the sum reaches 10 or more, carry the tens digit left.",
+    "audioNarration": "Each column can hold only one digit. When a column sums to 10 or more, write the units digit and carry the ten into the next column to the left."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

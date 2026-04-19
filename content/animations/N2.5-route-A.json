@@ -1,0 +1,79 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N2.5",
+  "skillName": "Use formal methods for addition of decimals",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students ignore the decimal point and add digits as if they are integers.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "align-decimal-points",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Add 12.4 + 7.85",                          "highlight": null },
+            { "text": "Align decimal points: 12.40",              "highlight": "accent" },
+            { "text": "                    +  7.85",              "highlight": "accent" },
+            { "text": "Pad shorter decimal with trailing zero",   "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Line up the decimal points, then pad the shorter decimal with a trailing zero so both numbers have the same number of decimal places. Now every column contains matching place values.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "add-columns",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Hundredths: 0 + 5 = 5",      "highlight": null },
+            { "text": "Tenths: 4 + 8 = 12 → write 2, carry 1", "highlight": "accent" },
+            { "text": "Ones: 2 + 7 + 1 = 10 → write 0, carry 1", "highlight": "accent" },
+            { "text": "Tens: 1 + 0 + 1 = 2",        "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Add column by column from the right, carrying exactly as with integers. The decimal point stays in the same position throughout — it is a fixed divider, not a digit.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "place-decimal-point",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Bring the decimal point straight down", "highlight": "accent" },
+            { "text": "Answer: 20.25",                        "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Bring the decimal point straight down into the answer — it sits directly below the decimal points of the two numbers you added. The answer is twenty point two five.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "12.4 + 7.85 = 20.25",
+          "label": "Align decimal points → pad → add → bring point straight down"
+        }
+      ],
+      "narration": "Twenty point two five. Aligning the decimal points is the only extra step beyond integer column addition.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: ignoring the decimal point and adding 124 + 785 = 909. Align the decimal points first — then every digit is in the correct column.",
+    "audioNarration": "The decimal point must align before you add a single digit. Pad with trailing zeros so columns match, then add as normal and bring the point straight down."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

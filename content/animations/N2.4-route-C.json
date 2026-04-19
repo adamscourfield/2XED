@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N2.4",
+  "skillName": "Use formal methods for addition of integers",
+  "routeType": "C",
+  "routeLabel": "Misconception-corrective",
+  "misconceptionSummary": "Students misalign columns when numbers have different numbers of digits.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-error",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "4 302 + 87",                             "highlight": null },
+            { "text": "Student aligns left edges: 4302 + 87__  ✗", "highlight": "accent" },
+            { "text": "Treats 8 as thousands, 7 as hundreds",   "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The student lined up the left edges, so the eight in eighty-seven landed in the thousands column and the seven in the hundreds. That gives the wrong answer because the digits are in the wrong columns.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "align-right",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Always align the ones digits — then every other column lines up automatically",
+          "subText": "Shorter numbers get leading spaces, not leading zeros in the calculation"
+        }
+      ],
+      "narration": "Align from the right — ones under ones. The shorter number, eighty-seven, has its seven under the two and its eight under the zero. Thousands and hundreds of the shorter number are simply empty.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "correct-layout",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "  4 3 0 2",                  "highlight": null },
+            { "text": "+     8 7",                  "highlight": "accent" },
+            { "text": "= 4 3 8 9  ✓",              "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Aligned correctly: two plus seven is nine, zero plus eight is eight, three plus nothing is three, four plus nothing is four. The answer is four thousand three hundred and eighty-nine.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "4 302 + 87 = 4 389",
+          "label": "Align ones on the right — shorter number gets leading spaces"
+        }
+      ],
+      "narration": "Four thousand three hundred and eighty-nine. Right-align the digits and every column takes care of itself.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: aligning numbers by their left edges. Always align the ones column on the right — shorter numbers have empty spaces on the left, not at the right.",
+    "audioNarration": "Line up digits from the right, not the left. The ones column must sit directly above the ones column. Empty positions on the left stay blank."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

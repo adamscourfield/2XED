@@ -1,0 +1,78 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N2.6",
+  "skillName": "Use formal methods for subtraction of integers",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students subtract the smaller digit from the larger within a column regardless of which is on top.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "setup",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Subtract 4 821 − 2 547",                      "highlight": null },
+            { "text": "Align columns, larger number on top",         "highlight": "accent" },
+            { "text": "Work right to left: ones, tens, hundreds, thousands", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Write the larger number on top, smaller below, with digits aligned by column. Subtract from right to left — ones first, then tens, hundreds, thousands.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "borrowing",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Ones: 1 − 7 → can't do it → borrow",         "highlight": "accent" },
+            { "text": "Borrow 1 ten: ones becomes 11, tens reduces by 1", "highlight": "accent" },
+            { "text": "11 − 7 = 4",                                 "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "When the top digit is smaller, borrow one from the next column. One ten becomes ten ones added to the current ones digit. Eleven minus seven is four.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "continue",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Tens: (2−1) − 4 → 1 − 4 → borrow → 11 − 4 = 7", "highlight": "accent" },
+            { "text": "Hundreds: (8−1) − 5 = 7 − 5 = 2",                 "highlight": "accent" },
+            { "text": "Thousands: 4 − 2 = 2 → answer: 2 274",            "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Continue column by column, borrowing whenever the top digit is smaller. After the borrow the tens digit was reduced to one — one minus four requires another borrow, giving eleven minus four equals seven.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "4 821 − 2 547 = 2 274",
+          "label": "Align → subtract right to left → borrow when top < bottom"
+        }
+      ],
+      "narration": "Two thousand two hundred and seventy-four. Borrow only when needed, always reducing the column you borrowed from by one.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: subtracting the smaller digit from the larger regardless of position — writing 7 − 1 = 6 in the ones column instead of borrowing to get 11 − 7 = 4.",
+    "audioNarration": "Always subtract top minus bottom. If the top digit is smaller, borrow from the next column — never flip the subtraction to avoid a negative."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

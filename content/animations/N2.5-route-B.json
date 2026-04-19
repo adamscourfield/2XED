@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "N2.5",
+  "skillName": "Use formal methods for addition of decimals",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students think trailing zeros after the decimal change the value when padding.",
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "trailing-zeros-safe",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Trailing zeros after the last significant decimal digit never change the value",
+          "subText": "12.4 = 12.40 = 12.400 — all the same point on the number line"
+        }
+      ],
+      "narration": "Padding with trailing zeros is safe because zero hundredths adds nothing. Twelve point four and twelve point four zero are the same number — the zero just makes the column structure visible.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "why-align-matters",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Tenths must add to tenths",         "highlight": "accent" },
+            { "text": "Hundredths must add to hundredths", "highlight": "accent" },
+            { "text": "Misaligned → wrong column values → wrong answer", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Addition only works when matching place values are combined. A tenth added to a hundredth is not a valid column addition — they are different-sized units. Alignment guarantees like adds to like.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "estimate-first",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "12.4 + 7.85 ≈ 12 + 8 = 20",       "highlight": null },
+            { "text": "Exact answer should be near 20",    "highlight": "accent" },
+            { "text": "20.25 ✓ — close to estimate",      "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Estimate before calculating: twelve plus eight is twenty, so the answer should be close to twenty. The exact answer of twenty point two five passes that sense-check — a misaligned answer like ninety point nine clearly would not.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "12.4 + 7.85 = 20.25",
+          "label": "Estimate first → align points → pad → add"
+        }
+      ],
+      "narration": "Twenty point two five. Estimate, align, pad, add — four steps that prevent the most common decimal addition errors.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: thinking 12.40 is different from 12.4 — it is not. Trailing zeros after the last decimal digit are invisible zeros that make column alignment possible without changing value.",
+    "audioNarration": "Padding with zeros does not change the number. Twelve point four and twelve point four zero sit on the same point on the number line — the zero just fills the column."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}
