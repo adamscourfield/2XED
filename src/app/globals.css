@@ -281,6 +281,45 @@
     background: var(--anx-secondary);
   }
 
+  /* Student dashboard compound subject card — matches product visual spec */
+  .anx-compound-card .anx-btn-primary {
+    background: #6b66e5;
+  }
+
+  .anx-compound-card .anx-btn-primary:hover:not(:disabled) {
+    background: #5a55d4;
+  }
+
+  .anx-compound-card .anx-btn-primary:active:not(:disabled) {
+    background: #4f4ac2;
+  }
+
+  .anx-compound-card .anx-compound-metric-label {
+    @apply text-[11px] font-semibold uppercase;
+    letter-spacing: 0.12em;
+    color: #a0a0a0;
+  }
+
+  .anx-compound-card .anx-compound-progress-track {
+    @apply h-2 w-full overflow-hidden rounded-full;
+    background: #e8e6fd;
+  }
+
+  .anx-compound-card .anx-compound-progress-bar {
+    @apply h-full rounded-full transition-all duration-500 ease-out;
+    background: #6b66e5;
+  }
+
+  .anx-compound-card .anx-compound-skill-track {
+    @apply h-1.5 shrink-0 overflow-hidden rounded-full;
+    width: 3.5rem;
+    background: rgba(45, 49, 66, 0.08);
+  }
+
+  .anx-compound-card .anx-compound-skill-bar {
+    @apply h-full rounded-full transition-all duration-500 ease-out;
+  }
+
   /* ── Form inputs — Ghost Border Rule ───────────── */
   /* ── Form inputs — Ghost Border Rule ───────────── */
   /* Background: surface-container-low, Focus: surface-container-highest */
