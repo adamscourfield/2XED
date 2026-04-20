@@ -65,11 +65,12 @@ const config: Config = {
         amber: '#f74b6d',
       },
       borderRadius: {
+        /* Design system: xs 8 / sm 12 / lg 16 / xl 24 / full pill */
         full: '9999px',
         xl: '1.5rem',
         lg: '1rem',
-        md: '0.75rem',
-        sm: '0.5rem',
+        sm: '0.75rem',
+        xs: '0.5rem',
       },
       boxShadow: {
         float: '0 20px 40px rgba(4, 14, 31, 0.06)',
@@ -88,7 +89,14 @@ const config: Config = {
         '220': '220ms',
       },
       spacing: {
-        /* Asymmetrical page margins */
+        /* Design scale: 2→8px … 8→32px; page margins via CSS vars */
+        2: 'var(--anx-space-2)',
+        3: 'var(--anx-space-3)',
+        4: 'var(--anx-space-4)',
+        6: 'var(--anx-space-6)',
+        8: 'var(--anx-space-8)',
+        16: 'var(--anx-spacing-16)',
+        24: 'var(--anx-spacing-24)',
         'left-pg': '80px',
         'right-pg': '120px',
         '16-pg': 'var(--anx-spacing-16)',
