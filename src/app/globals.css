@@ -93,6 +93,13 @@
 
     /* ── Brand blue — kept for legacy references ─────────────────── */
     --anx-brand-blue: #4a40e0;
+
+    /* Dashboard hero + XP badge (marketing accents) */
+    --anx-dashboard-hero-from: #5651e5;
+    --anx-dashboard-hero-to: #8689ef;
+    --anx-dashboard-hero-cta-text: #5651e5;
+    --anx-xp-badge-surface: #f0f2ff;
+    --anx-xp-badge-text: #8587f3;
   }
 
   /* ── Reset ────────────────────────────────────────────────────── */
@@ -495,9 +502,28 @@
   .anx-reward-star:nth-child(6) { top: 25%; right: -3%; animation-delay: 0.4s; }
 
   .anx-xp-badge {
-    @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-semibold;
-    background: var(--anx-primary-soft);
-    color: var(--anx-primary-container);
+    @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-medium;
+    background: var(--anx-xp-badge-surface);
+    color: var(--anx-xp-badge-text);
+  }
+
+  /* Student dashboard — gradient hero (matches design: horizontal purple → periwinkle) */
+  .anx-dashboard-hero {
+    border-radius: 1.125rem;
+    background: linear-gradient(90deg, var(--anx-dashboard-hero-from) 0%, var(--anx-dashboard-hero-to) 100%);
+  }
+
+  .anx-dashboard-hero.anx-card:hover {
+    background: linear-gradient(90deg, var(--anx-dashboard-hero-from) 0%, var(--anx-dashboard-hero-to) 100%);
+  }
+
+  .anx-dashboard-hero-cta {
+    @apply inline-flex items-center gap-1 rounded-full bg-white px-5 py-2.5 text-sm font-semibold transition-transform duration-200;
+    color: var(--anx-dashboard-hero-cta-text);
+  }
+
+  .anx-dashboard-hero-cta:hover {
+    transform: translateY(-1px);
   }
 
   /* ── Dashboard category card ───────────────────── */
