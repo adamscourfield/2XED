@@ -185,17 +185,17 @@ export default async function DashboardPage() {
       }
     >
       {/* Hero banner */}
-      <div className="anx-card overflow-hidden" style={{ background: 'linear-gradient(135deg, var(--anx-primary) 0%, #818cf8 100%)' }}>
-        <div className="px-6 py-6 text-white">
-          <h2 className="text-xl font-bold">Keep Learning</h2>
-          <p className="mt-1 text-sm opacity-90">Start your next session and earn more XP.</p>
-          <div className="mt-4">
+      <div className="anx-card anx-dashboard-hero overflow-hidden">
+        <div className="px-8 py-8 text-white sm:px-10 sm:py-9">
+          <h2 className="text-xl font-bold tracking-tight text-white sm:text-2xl">Keep Learning</h2>
+          <p className="mt-2 max-w-md text-sm font-normal text-white/95">Start your next session and earn more XP.</p>
+          <div className="mt-6">
             {subjectCards.length > 0 && subjectCards[0].onboardingComplete ? (
-              <Link href={`/learn/${subjectCards[0].subject.slug}`} className="inline-flex items-center gap-1 rounded-lg bg-white px-4 py-2 text-sm font-semibold" style={{ color: 'var(--anx-primary)' }}>
+              <Link href={`/learn/${subjectCards[0].subject.slug}`} className="anx-dashboard-hero-cta">
                 Get Started →
               </Link>
             ) : subjectCards.length > 0 ? (
-              <Link href={`/diagnostic/${subjectCards[0].subject.slug}`} className="inline-flex items-center gap-1 rounded-lg bg-white px-4 py-2 text-sm font-semibold" style={{ color: 'var(--anx-primary)' }}>
+              <Link href={`/diagnostic/${subjectCards[0].subject.slug}`} className="anx-dashboard-hero-cta">
                 Get Started →
               </Link>
             ) : null}
