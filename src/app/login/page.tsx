@@ -109,9 +109,6 @@ export default function LoginPage() {
         <p className="text-center text-xs text-[#9ca3af]">
           &copy; 2026 Anaxi. All rights reserved.
         </p>
-        <p className="text-center text-sm font-medium text-[#6b7280]">
-          &rarr; Switch to Teacher view
-        </p>
       </div>
     </main>
   );
