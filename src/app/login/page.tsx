@@ -63,7 +63,7 @@ export default function LoginPage() {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label htmlFor="email" className="mb-2 block text-sm font-medium" style={{ color: 'var(--anx-text-secondary)' }}>
+              <label htmlFor="email" className="mb-2 block text-sm font-semibold text-[#374151]">
                 Email address
               </label>
               <input
@@ -71,13 +71,13 @@ export default function LoginPage() {
                 name="email"
                 type="email"
                 placeholder="student@example.com"
-                className="anx-input"
+                className="w-full rounded-full border-0 bg-[#f0f1f4] px-5 py-3.5 text-sm text-[#111827] placeholder:text-[#9ca3af] outline-none ring-0 transition focus:bg-[#e8eaef] focus:ring-2 focus:ring-[#6366f1]/30"
                 required
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="mb-2 block text-sm font-medium" style={{ color: 'var(--anx-text-secondary)' }}>
+              <label htmlFor="password" className="mb-2 block text-sm font-semibold text-[#374151]">
                 Password
               </label>
               <input
@@ -85,13 +85,13 @@ export default function LoginPage() {
                 name="password"
                 type="password"
                 placeholder="Enter your password"
-                className="anx-input"
+                className="w-full rounded-full border-0 bg-[#f0f1f4] px-5 py-3.5 text-sm text-[#111827] placeholder:text-[#9ca3af] outline-none ring-0 transition focus:bg-[#e8eaef] focus:ring-2 focus:ring-[#6366f1]/30"
                 required
               />
             </div>
 
             <div className="flex justify-end">
-              <a className="anx-btn-ghost text-xs" href="#">
+              <a className="text-xs font-medium text-[#6b7280] transition hover:text-[#374151]" href="#">
                 Forgot password?
               </a>
             </div>
