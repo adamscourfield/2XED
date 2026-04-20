@@ -33,11 +33,8 @@ function skillRowVisual(isDue: boolean, masteryPct: number): SkillRowVisual {
   }
   if (masteryPct >= 80) {
     return {
-      statusLabel: 'Secure',
-      barColor: '#2d6a4f',
-      badgeBg: 'rgba(45, 106, 79, 0.12)',
-      badgeText: '#2d6a4f',
-      dotClass: 'bg-[#2d6a4f]',
+      badge: 'anx-badge anx-badge-blue',
+      barColor: 'var(--anx-warning)',
     };
   }
   return {
@@ -259,7 +256,7 @@ export default async function DashboardPage() {
                     <p className="text-sm font-semibold" style={{ color: 'var(--anx-text)' }}>{rs.subjectTitle}</p>
                     <p className="text-xs" style={{ color: 'var(--anx-text-muted)' }}>{rs.total} questions</p>
                   </div>
-                  <span className={isComplete ? 'anx-badge anx-badge-green' : 'anx-badge anx-badge-amber'}>
+                  <span className={isComplete ? 'anx-badge anx-badge-green' : 'anx-badge anx-badge-blue'}>
                     {isComplete ? 'Completed' : 'In progress'}
                   </span>
                 </Link>
@@ -311,17 +308,45 @@ export default async function DashboardPage() {
                 )}
               </div>
 
-              {/* Metrics — three columns with inset vertical dividers */}
-              <div
-                className="mt-8 border-y py-6"
-                style={{ borderColor: '#eeeeee' }}
-              >
-                <div className="grid grid-cols-1 gap-8 sm:grid-cols-3 sm:gap-0">
-                  <div className="relative px-0 sm:pr-6">
-                    <p className="anx-compound-metric-label">Due now</p>
-                    <p className="anx-stat-value mt-2 text-[#2d3142]">{onboardingComplete ? dueNowCount : '—'}</p>
-                    <p className="mt-2 text-sm text-[#757575]">
-                      {onboardingComplete ? 'skills ready' : 'Shows after your quiz'}
+              <div className="anx-stat">
+                <p className="anx-stat-label">Next step</p>
+                {onboardingComplete && nextSkill ? (
+                  <>
+                    <p className="mt-2 text-base font-semibold text-[color:var(--anx-text)]">{nextSkill.name}</p>
+                    <p className="mt-1 text-sm text-[color:var(--anx-text-secondary)]">
+                      {nextSkillStarted
+                        ? nextSkillIsDue
+                          ? 'Ready now for a short set.'
+                          : 'We will come back to this soon.'
+                        : 'This is the next new skill for you.'}
+                    </p>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <span className="anx-chip">{nextSkillStarted ? 'In progress' : 'New skill'}</span>
+                      <span className={nextSkillIsDue ? 'anx-chip' : 'anx-chip-info'}>{nextSkillIsDue ? 'Due now' : 'Up next'}</span>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <p className="mt-2 text-base font-semibold text-[color:var(--anx-text)]">Start your quiz</p>
+                    <p className="mt-1 text-sm text-[color:var(--anx-text-secondary)]">
+                      It helps us choose the right level and your first lesson.
+                    </p>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <span className="anx-chip">Quiz first</span>
+                      <span className="anx-chip">Short and simple</span>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {onboardingComplete && nextSkill && (
+              <div className="border-t border-[color:var(--anx-border)] bg-[var(--anx-surface-soft)] px-5 py-4">
+                <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                  <div>
+                    <p className="text-sm font-semibold text-[color:var(--anx-text)]">What happens next</p>
+                    <p className="mt-1 text-sm text-[color:var(--anx-text-secondary)]">
+                      You will do a short set of questions. Then we will choose the best next step for you.
                     </p>
                     <div
                       className="pointer-events-none absolute right-0 top-3 hidden h-[calc(100%-1.5rem)] w-px sm:block"

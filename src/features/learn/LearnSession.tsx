@@ -346,7 +346,7 @@ export function LearnSession({ subject, skill, items, userId, gamification }: Pr
           {/* XP badge */}
           {xpEarned > 0 && (
             <div className="flex justify-center">
-              <span className="anx-xp-badge">🏅 {xpEarned} XP</span>
+              <span className="anx-xp-badge">🥇 {xpEarned} XP</span>
             </div>
           )}
 

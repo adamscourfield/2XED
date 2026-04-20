@@ -7,7 +7,7 @@ export function SignOutButton() {
     <button
       type="button"
       onClick={() => signOut({ callbackUrl: '/login' })}
-      className="anx-btn-secondary px-3 py-2 text-xs sm:text-sm"
+      className="anx-btn-ghost px-3 py-2 text-xs sm:text-sm"
     >
       Sign out
     </button>

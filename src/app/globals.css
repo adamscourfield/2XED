@@ -68,13 +68,27 @@
 
     /* ── Semantic colours ─────────────────────────────────────────── */
     --anx-success:      #006947;
-    --anx-success-soft: #ecfdf5;
+    --anx-success-soft: #e8f8ef;
     --anx-warning:      #f74b6d;
-    --anx-warning-soft: rgba(247, 75, 109, 0.12);
-    --anx-warning-text: #922031;
+    --anx-warning-soft: #ffe8ec;
+    --anx-warning-text: #7a1b2e;
     --anx-danger:       #b41340;
-    --anx-danger-soft:  rgba(180, 19, 64, 0.10);
-    --anx-danger-text:  #870d2f;
+    --anx-danger-soft:  #fce8ee;
+    --anx-danger-text:  #6b0d24;
+
+    /* Info / in-progress (badges, chips, callouts) */
+    --anx-info-soft:     #eceeff;
+    --anx-info-ink:      #2f2a8c;
+    --anx-info-dot:      #2f2a8c;
+
+    /* Callout icon circles */
+    --anx-callout-info-icon-bg:    #4a40e0;
+    --anx-callout-success-icon-bg: #006947;
+    --anx-callout-warning-icon-bg: #e85d6f;
+    --anx-callout-danger-icon-bg:  #9f0f32;
+
+    /* Primary button — soft elevated shadow (30% indigo) */
+    --anx-btn-primary-shadow: 0 10px 28px rgba(74, 64, 224, 0.3);
 
     /* ── Radius — design scale (xs / sm / lg / xl / full) ───────── */
     --anx-radius-xs: 0.5rem;   /* 8px — tiny chips */
@@ -253,30 +267,31 @@
 
   /* ── Buttons ───────────────────────────────────── */
 
-  /* Primary — solid purple (glass modal spec), pill shape */
+  /* Primary — horizontal brand gradient, pill, soft shadow */
   .anx-btn-primary {
-    @apply inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-semibold tracking-[0.01em] disabled:cursor-not-allowed disabled:opacity-40;
+    @apply inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-semibold tracking-[0.01em] disabled:cursor-not-allowed disabled:opacity-55;
     border-radius: 9999px;
     color: var(--anx-on-primary);
-    background: var(--anx-secondary);
-    border: none;
-    box-shadow: 0 10px 28px rgba(112, 42, 225, 0.28);
-    transition: all 200ms cubic-bezier(0.4,0,0.2,1);
+    background: linear-gradient(90deg, var(--anx-primary) 0%, var(--anx-primary-container) 100%);
+    box-shadow: var(--anx-btn-primary-shadow);
+    transition: background 200ms cubic-bezier(0.4,0,0.2,1), box-shadow 200ms cubic-bezier(0.4,0,0.2,1), transform 200ms cubic-bezier(0.4,0,0.2,1), opacity 200ms ease-out, filter 200ms ease-out;
   }
 
   .anx-btn-primary:hover:not(:disabled) {
-    background: #5f32eb;
+    background: linear-gradient(90deg, var(--anx-primary) 0%, #a4a1ff 100%);
+    box-shadow: 0 12px 32px rgba(74, 64, 224, 0.34);
     transform: scale(1.02);
     box-shadow: 0 12px 32px rgba(112, 42, 225, 0.34);
   }
 
   .anx-btn-primary:active:not(:disabled) {
-    background: #5220d4;
+    background: linear-gradient(90deg, var(--anx-primary-active) 0%, var(--anx-primary) 100%);
+    box-shadow: 0 6px 18px rgba(74, 64, 224, 0.22);
     transform: scale(0.98);
     box-shadow: 0 6px 18px rgba(112, 42, 225, 0.22);
   }
 
-  /* Secondary — surface-container-highest background, no border */
+  /* Secondary — surface-highest, primary-container (periwinkle) label */
   .anx-btn-secondary {
     @apply inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-semibold tracking-[0.01em];
     border-radius: 9999px;
@@ -295,30 +310,54 @@
     transform: scale(0.98);
   }
 
-  /* Ghost — minimal, no background */
+  /* Ghost — text-muted, r-sm, hover tonal surface */
   .anx-btn-ghost {
-    @apply inline-flex items-center justify-center rounded-full px-3 py-2 text-sm font-medium;
+    @apply inline-flex items-center justify-center px-3 py-2 text-sm font-medium;
+    border-radius: var(--anx-radius-sm);
     color: var(--anx-text-muted);
-    transition: all 200ms cubic-bezier(0.4,0,0.2,1);
+    transition: background 200ms cubic-bezier(0.4,0,0.2,1), color 200ms cubic-bezier(0.4,0,0.2,1);
   }
 
   .anx-btn-ghost:hover {
     background: var(--anx-surface-container-low);
     color: var(--anx-on-surface);
-    transform: scale(0.98);
   }
 
-  /* Tertiary (Coral) — Single Point of Truth actions / high-priority alerts only */
+  /* Tertiary — success / positive action (tonal mint) */
   .anx-btn-tertiary {
     @apply inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-semibold tracking-[0.01em];
     border-radius: 9999px;
     background: var(--anx-tertiary-container);
     color: var(--anx-on-tertiary-container);
-    transition: all 200ms cubic-bezier(0.4,0,0.2,1);
+    transition: background 200ms cubic-bezier(0.4,0,0.2,1), transform 200ms cubic-bezier(0.4,0,0.2,1);
   }
 
-  .anx-btn-tertiary:hover {
-    background: #5a0b10;
+  .anx-btn-tertiary:hover:not(:disabled) {
+    background: #b5e8cc;
+    transform: scale(1.01);
+  }
+
+  .anx-btn-tertiary:active:not(:disabled) {
+    background: var(--anx-tertiary-container);
+    transform: scale(0.98);
+  }
+
+  /* Danger — tonal rose (destructive, use sparingly) */
+  .anx-btn-danger {
+    @apply inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-semibold tracking-[0.01em] disabled:cursor-not-allowed disabled:opacity-40;
+    border-radius: var(--anx-radius-sm);
+    background: var(--anx-danger-soft);
+    color: var(--anx-danger-text);
+    border: none;
+    transition: background 200ms cubic-bezier(0.4,0,0.2,1), transform 200ms cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .anx-btn-danger:hover:not(:disabled) {
+    background: rgba(180, 19, 64, 0.16);
+    transform: scale(1.01);
+  }
+
+  .anx-btn-danger:active:not(:disabled) {
     transform: scale(0.98);
   }
 
@@ -471,34 +510,58 @@
     color: var(--anx-on-surface);
   }
 
-  /* ── Badges ────────────────────────────────────── */
+  /* ── Badges — pill + leading dot (absolute so inline-block still works) ─ */
   .anx-badge {
-    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium tracking-[0.01em];
+    @apply relative inline-flex items-center rounded-full py-1 pr-3 pl-[26px] text-xs font-medium tracking-[0.01em];
+  }
+
+  .anx-badge-green::before,
+  .anx-badge-blue::before,
+  .anx-badge-amber::before,
+  .anx-badge-red::before,
+  .anx-badge-neutral::before {
+    content: '';
+    position: absolute;
+    left: 0.65rem;
+    top: 50%;
+    width: 6px;
+    height: 6px;
+    margin-top: -3px;
+    border-radius: 50%;
   }
 
   .anx-achievement-badge {
-    @apply inline-flex items-center rounded-full px-4 py-1.5 text-sm font-semibold tracking-wide;
-    background: rgba(255, 255, 255, 0.6);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    box-shadow: 0 4px 12px rgba(4,14,31,0.06);
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    color: var(--anx-on-surface);
+    @apply inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium tracking-[0.01em];
+    background: var(--anx-info-soft);
+    color: var(--anx-info-ink);
   }
 
   .anx-badge-blue {
-    background: var(--anx-primary-soft);
-    color: var(--anx-primary-container);
+    background: var(--anx-info-soft);
+    color: var(--anx-info-ink);
+  }
+
+  .anx-badge-blue::before {
+    background: var(--anx-info-dot);
   }
 
   .anx-badge-green {
     background: var(--anx-success-soft);
-    color: #065f46;
+    color: var(--anx-on-tertiary-container);
   }
 
+  .anx-badge-green::before {
+    background: var(--anx-success);
+  }
+
+  /* Urgent / warning — same tonal treatment as “due now” */
   .anx-badge-amber {
     background: var(--anx-warning-soft);
     color: var(--anx-warning-text);
+  }
+
+  .anx-badge-amber::before {
+    background: var(--anx-danger);
   }
 
   .anx-badge-red {
@@ -506,7 +569,20 @@
     color: var(--anx-danger-text);
   }
 
-  /* ── Callout boxes — tonal, no solid borders ───── */
+  .anx-badge-red::before {
+    background: var(--anx-danger);
+  }
+
+  .anx-badge-neutral {
+    background: var(--anx-surface-container-high);
+    color: var(--anx-on-surface-variant);
+  }
+
+  .anx-badge-neutral::before {
+    background: var(--anx-on-surface-variant);
+  }
+
+  /* ── Callout banners — ~16px radius, icon in solid circle ─ */
   .anx-callout-info {
     @apply rounded-lg px-4 py-3 text-sm;
     background: var(--anx-primary-soft);
@@ -519,16 +595,85 @@
     color: var(--anx-warning-text);
   }
 
+  .anx-callout-warning::before {
+    content: '!';
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 9999px;
+    background: var(--anx-callout-warning-icon-bg);
+    color: #fff;
+    font-weight: 700;
+    font-size: 1.1rem;
+    line-height: 2.25rem;
+    text-align: center;
+  }
+
   .anx-callout-success {
     @apply rounded-lg px-4 py-3 text-sm;
     background: var(--anx-success-soft);
-    color: #065f46;
+    color: var(--anx-on-tertiary-container);
+  }
+
+  .anx-callout-success::before {
+    content: '✓';
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 9999px;
+    background: var(--anx-callout-success-icon-bg);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.95rem;
+    line-height: 2.25rem;
+    text-align: center;
   }
 
   .anx-callout-danger {
-    @apply rounded-lg px-4 py-3 text-sm;
+    @apply relative text-sm leading-relaxed;
+    border-radius: 16px;
+    padding: 1rem 1.25rem 1rem 3.75rem;
     background: var(--anx-danger-soft);
     color: var(--anx-danger-text);
+  }
+
+  .anx-callout-danger::before {
+    content: '✕';
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 9999px;
+    background: var(--anx-callout-danger-icon-bg);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.85rem;
+    line-height: 2.25rem;
+    text-align: center;
+  }
+
+  /* Centered one-liners: skip circular icon so text stays visually centered */
+  .anx-callout-info.text-center,
+  .anx-callout-warning.text-center,
+  .anx-callout-success.text-center,
+  .anx-callout-danger.text-center {
+    padding-left: 1.25rem;
+  }
+
+  .anx-callout-info.text-center::before,
+  .anx-callout-warning.text-center::before,
+  .anx-callout-success.text-center::before,
+  .anx-callout-danger.text-center::before {
+    content: none;
+    display: none;
   }
 
   /* ── Divider — use sparingly, prefer tonal spacing ── */
@@ -615,28 +760,9 @@
   .anx-reward-star:nth-child(6) { top: 25%; right: -3%; animation-delay: 0.4s; }
 
   .anx-xp-badge {
-    @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-medium;
-    background: var(--anx-xp-badge-surface);
-    color: var(--anx-xp-badge-text);
-  }
-
-  /* Student dashboard — gradient hero (matches design: horizontal purple → periwinkle) */
-  .anx-dashboard-hero {
-    border-radius: 1.125rem;
-    background: linear-gradient(90deg, var(--anx-dashboard-hero-from) 0%, var(--anx-dashboard-hero-to) 100%);
-  }
-
-  .anx-dashboard-hero.anx-card:hover {
-    background: linear-gradient(90deg, var(--anx-dashboard-hero-from) 0%, var(--anx-dashboard-hero-to) 100%);
-  }
-
-  .anx-dashboard-hero-cta {
-    @apply inline-flex items-center gap-1 rounded-full bg-white px-5 py-2.5 text-sm font-semibold transition-transform duration-200;
-    color: var(--anx-dashboard-hero-cta-text);
-  }
-
-  .anx-dashboard-hero-cta:hover {
-    transform: translateY(-1px);
+    @apply inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold tracking-[0.01em];
+    background: var(--anx-info-soft);
+    color: var(--anx-info-ink);
   }
 
   /* ── Dashboard category card ───────────────────── */
@@ -653,18 +779,29 @@
     cursor: pointer;
   }
 
-  /* ── Intelligence Chips ─────────────────────────── */
-  /* Default chip */
+  /* ── Chips — pill labels (neutral / info / success) ─ */
   .anx-chip {
-    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium tracking-[0.01em];
+    @apply inline-flex items-center justify-center rounded-full px-3 py-1 text-xs font-medium tracking-[0.01em];
     background: var(--anx-surface-container-high);
-    color: var(--anx-on-surface-variant);
+    color: var(--anx-on-surface);
   }
 
-  /* Selected chip — tertiary-container (#3d060b) with on-tertiary-container (#c06c6c) */
+  .anx-chip-info {
+    @apply inline-flex items-center justify-center rounded-full px-3 py-1 text-xs font-medium tracking-[0.01em];
+    background: var(--anx-info-soft);
+    color: var(--anx-info-ink);
+  }
+
+  .anx-chip-success {
+    @apply inline-flex items-center justify-center rounded-full px-3 py-1 text-xs font-medium tracking-[0.01em];
+    background: var(--anx-success-soft);
+    color: var(--anx-on-tertiary-container);
+  }
+
+  /* Selected / emphasized chip — success tone */
   .anx-chip-selected {
-    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium tracking-[0.01em];
-    background: var(--anx-tertiary-container);
+    @apply inline-flex items-center justify-center rounded-full px-3 py-1 text-xs font-medium tracking-[0.01em];
+    background: var(--anx-success-soft);
     color: var(--anx-on-tertiary-container);
   }
 

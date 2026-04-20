@@ -79,7 +79,7 @@ export default async function BookletReviewPage() {
         subtitle="Human review gate — accept or reject GPT-4o parsed blocks before publish"
         appChrome="teacher"
       >
-        <div className="anx-callout-info p-6 rounded-lg space-y-2">
+        <div className="anx-callout-info p-6 space-y-2">
           <p className="font-semibold">No staging file found.</p>
           <p style={{ color: 'var(--anx-text-muted)' }}>
             Run <code className="font-mono text-sm bg-black/10 px-1.5 py-0.5 rounded">npx ts-node scripts/parseBooklet.ts</code> to generate the staging file.
