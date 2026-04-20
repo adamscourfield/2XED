@@ -242,7 +242,7 @@ export function BookletReviewClient({ blocks, skills, alreadyAccepted }: Booklet
 
       {/* All-resolved banner */}
       {allResolved && (
-        <div className="anx-callout-info p-4 rounded-lg">
+        <div className="anx-callout-info p-4">
           <p className="font-semibold">All blocks resolved — review complete.</p>
         </div>
       )}

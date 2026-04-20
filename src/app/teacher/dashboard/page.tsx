@@ -229,8 +229,8 @@ export default async function TeacherDashboardPage({ searchParams }: Props) {
               const isLive = ls.status === 'ACTIVE' || ls.status === 'LOBBY';
               const statusColour =
                 ls.status === 'ACTIVE' ? 'anx-badge-green' :
-                ls.status === 'LOBBY' ? 'anx-badge-amber' :
-                ls.status === 'PAUSED' ? 'anx-badge-amber' :
+                ls.status === 'LOBBY' ? 'anx-badge-blue' :
+                ls.status === 'PAUSED' ? 'anx-badge-blue' :
                 'anx-badge-blue';
               return (
                 <div key={ls.id} className="flex items-center justify-between gap-4 anx-card px-4 py-3">

@@ -31,7 +31,7 @@ function progressTone(masteryPct: number) {
 
   if (masteryPct >= 50) {
     return {
-      badge: 'anx-badge anx-badge-amber',
+      badge: 'anx-badge anx-badge-blue',
       barColor: 'var(--anx-warning)',
     };
   }
@@ -257,7 +257,7 @@ export default async function DashboardPage() {
                     <p className="text-sm font-semibold" style={{ color: 'var(--anx-text)' }}>{rs.subjectTitle}</p>
                     <p className="text-xs" style={{ color: 'var(--anx-text-muted)' }}>{rs.total} questions</p>
                   </div>
-                  <span className={isComplete ? 'anx-badge anx-badge-green' : 'anx-badge anx-badge-amber'}>
+                  <span className={isComplete ? 'anx-badge anx-badge-green' : 'anx-badge anx-badge-blue'}>
                     {isComplete ? 'Completed' : 'In progress'}
                   </span>
                 </Link>
@@ -334,7 +334,7 @@ export default async function DashboardPage() {
                     </p>
                     <div className="mt-3 flex flex-wrap gap-2">
                       <span className="anx-chip">{nextSkillStarted ? 'In progress' : 'New skill'}</span>
-                      <span className="anx-chip">{nextSkillIsDue ? 'Due now' : 'Up next'}</span>
+                      <span className={nextSkillIsDue ? 'anx-chip' : 'anx-chip-info'}>{nextSkillIsDue ? 'Due now' : 'Up next'}</span>
                     </div>
                   </>
                 ) : (

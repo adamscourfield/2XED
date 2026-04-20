@@ -100,8 +100,8 @@ function ConductorTopBar({
 
   const statusColour =
     snapshot.status === 'ACTIVE' ? 'anx-badge-green' :
-    snapshot.status === 'LOBBY' ? 'anx-badge-amber' :
-    snapshot.status === 'PAUSED' ? 'anx-badge-amber' :
+    snapshot.status === 'LOBBY' ? 'anx-badge-blue' :
+    snapshot.status === 'PAUSED' ? 'anx-badge-blue' :
     'anx-badge-blue';
 
   return (
