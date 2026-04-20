@@ -273,7 +273,7 @@ export function BookletReviewClient({ blocks, skills, alreadyAccepted }: Booklet
           return (
             <div
               key={block.id}
-              className="anx-panel space-y-3"
+              className="anx-card space-y-3"
               style={{
                 borderLeft: state.status === 'accepted'
                   ? '4px solid #16a34a'

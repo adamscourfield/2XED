@@ -393,7 +393,7 @@ export default async function TeacherDashboardPage({ searchParams }: Props) {
             const requiringAction = studentRows.filter((s) => s.needsAction);
 
             return (
-              <section key={cls.id} className="anx-panel p-6">
+              <section key={cls.id} className="anx-card p-6">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
                     <h2 className="text-lg font-semibold" style={{ color: 'var(--anx-text)' }}>{cls.name}</h2>
