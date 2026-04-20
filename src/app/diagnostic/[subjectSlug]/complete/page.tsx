@@ -82,7 +82,7 @@ export default async function DiagnosticCompletePage({ params, searchParams }: P
   }
 
   return (
-    <main className="anx-shell flex items-center justify-center">
+    <main className="anx-shell anx-scene flex items-center justify-center">
       <div className="anx-panel w-full max-w-lg p-8 space-y-6 text-center">
         <div>
           <h1 className="text-2xl font-bold" style={{ color: 'var(--anx-text)' }}>You&apos;re ready to start</h1>

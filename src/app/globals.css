@@ -79,9 +79,22 @@
     /* ── Radius ──────────────────────────────────────────────────── */
     --anx-radius:    1rem;   /* lg: 16px — large containers */
     --anx-radius-sm: 0.75rem;  /* md: 12px — internal components */
+    /* Glass / modal shells — spec: ~32px */
+    --anx-radius-glass: 2rem;
+
+    /* ── Glass panel (modals, floating surfaces) — design tokens ───── */
+    --anx-glass-fill: rgba(255, 255, 255, 0.78);
+    --anx-glass-blur: 20px;
+    --anx-scene-gradient: linear-gradient(
+      110deg,
+      #3d2294 0%,
+      #5b35d4 36%,
+      #7c5ef0 58%,
+      #a894f5 100%
+    );
 
     /* ── Shadows — floating elements only (extra-diffused) ───────── */
-    --anx-shadow-float: 0 20px 40px rgba(4,14,31,0.06);
+    --anx-shadow-float: 0 24px 56px rgba(36, 24, 92, 0.14), 0 8px 24px rgba(4, 14, 31, 0.06);
     --anx-shadow-sm:    0 8px 32px rgba(4,14,31,0.04);
     --anx-shadow-md:    0 12px 36px rgba(4,14,31,0.05);
     --anx-shadow-lg:    0 20px 40px rgba(4,14,31,0.06);
@@ -175,11 +188,50 @@
 
   /* Floating panels (modals, dropdowns) — glassmorphism */
   .anx-panel {
-    border-radius: var(--anx-radius);
-    background: rgba(255,255,255,0.80);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    border-radius: var(--anx-radius-glass);
+    background: var(--anx-glass-fill);
+    backdrop-filter: blur(var(--anx-glass-blur));
+    -webkit-backdrop-filter: blur(var(--anx-glass-blur));
     box-shadow: var(--anx-shadow-float);
+  }
+
+  /* Hero / auth backdrop — purple gradient + soft blobs (glass reads on top) */
+  .anx-scene {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    background: var(--anx-scene-gradient);
+  }
+
+  .anx-scene::before,
+  .anx-scene::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(2px);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .anx-scene::before {
+    width: min(420px, 70vw);
+    height: min(420px, 70vw);
+    left: -12%;
+    bottom: -18%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.22) 0%, transparent 68%);
+  }
+
+  .anx-scene::after {
+    width: min(520px, 85vw);
+    height: min(520px, 85vw);
+    right: -16%;
+    top: -22%;
+    background: radial-gradient(circle, rgba(196, 181, 255, 0.35) 0%, transparent 65%);
+  }
+
+  .anx-scene > * {
+    position: relative;
+    z-index: 1;
   }
 
   /* Regular cards — lifted via background color, no border, no shadow */
@@ -205,23 +257,27 @@
 
   /* ── Buttons ───────────────────────────────────── */
 
-  /* Primary — Electric Aura gradient, full rounding, subtle scale-up */
+  /* Primary — solid purple (glass modal spec), pill shape */
   .anx-btn-primary {
     @apply inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-semibold tracking-[0.01em] disabled:cursor-not-allowed disabled:opacity-40;
     border-radius: 9999px;
     color: var(--anx-on-primary);
-    background: linear-gradient(135deg, var(--anx-primary) 0%, var(--anx-primary-container) 100%);
+    background: var(--anx-secondary);
+    border: none;
+    box-shadow: 0 10px 28px rgba(112, 42, 225, 0.28);
     transition: all 200ms cubic-bezier(0.4,0,0.2,1);
   }
 
   .anx-btn-primary:hover:not(:disabled) {
-    background: linear-gradient(135deg, var(--anx-primary) 0%, #a4a1ff 100%);
+    background: #5f32eb;
     transform: scale(1.02);
+    box-shadow: 0 12px 32px rgba(112, 42, 225, 0.34);
   }
 
   .anx-btn-primary:active:not(:disabled) {
-    background: linear-gradient(135deg, var(--anx-primary-active) 0%, var(--anx-primary) 100%);
+    background: #5220d4;
     transform: scale(0.98);
+    box-shadow: 0 6px 18px rgba(112, 42, 225, 0.22);
   }
 
   /* Secondary — surface-container-highest background, no border */
@@ -346,6 +402,28 @@
     border-color: var(--anx-primary);
     box-shadow: none;
     outline: none;
+  }
+
+  /* Pill inputs on glass — spec: soft translucent fill, no visible border (text fields only) */
+  .anx-panel input.anx-input:not([type='checkbox']):not([type='radio']):not([type='file']):not([type='range']),
+  .anx-glass input.anx-input:not([type='checkbox']):not([type='radio']):not([type='file']):not([type='range']) {
+    border-radius: 9999px;
+    border: none;
+    background: rgba(255, 255, 255, 0.55);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+  }
+
+  .anx-panel input.anx-input:not([type='checkbox']):not([type='radio']):not([type='file']):not([type='range']):hover,
+  .anx-glass input.anx-input:not([type='checkbox']):not([type='radio']):not([type='file']):not([type='range']):hover {
+    border: none;
+    background: rgba(255, 255, 255, 0.72);
+  }
+
+  .anx-panel input.anx-input:not([type='checkbox']):not([type='radio']):not([type='file']):not([type='range']):focus,
+  .anx-glass input.anx-input:not([type='checkbox']):not([type='radio']):not([type='file']):not([type='range']):focus {
+    border: none;
+    background: rgba(255, 255, 255, 0.88);
+    box-shadow: 0 0 0 2px rgba(112, 42, 225, 0.35);
   }
 
   /* ── Option buttons (MCQ, True/False) ──────────── */
@@ -596,9 +674,10 @@
 
   /* ── Glassmorphism utility — floating nav / modals ── */
   .anx-glass {
-    background: rgba(255,255,255,0.80);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    border-radius: var(--anx-radius-glass);
+    background: var(--anx-glass-fill);
+    backdrop-filter: blur(var(--anx-glass-blur));
+    -webkit-backdrop-filter: blur(var(--anx-glass-blur));
     box-shadow: var(--anx-shadow-float);
   }
 

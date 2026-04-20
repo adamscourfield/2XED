@@ -36,25 +36,31 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-[#f4f5f7] px-4 py-12">
+    <main className="anx-scene flex min-h-screen items-center justify-center px-4 py-12">
       <div className="w-full max-w-md space-y-8">
-        <div className="text-center">
-          <div className="mx-auto mb-4 flex justify-center">
-            <Image
-              src="/2xed-logo.png"
-              alt="2XED"
-              width={200}
-              height={50}
-              className="h-10 w-auto sm:h-12"
-              priority
-            />
-          </div>
-          <p className="text-sm text-[#6b7280]">Sign in to continue learning</p>
+        <div className="flex justify-center">
+          <Image
+            src="/anaxi-logo.png"
+            alt="Anaxi Logo"
+            width={48}
+            height={48}
+            className="mb-0"
+          />
         </div>
 
-        <div
-          className="rounded-[1.5rem] bg-white p-8 shadow-[0_20px_50px_-12px_rgba(15,23,42,0.08)]"
-        >
+        <div className="anx-panel p-8 sm:p-10">
+          <div className="mb-8 text-center">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: 'var(--anx-text-muted)' }}>
+              2XED
+            </p>
+            <h1 className="mt-3 text-2xl font-bold tracking-tight sm:text-[1.65rem]" style={{ color: 'var(--anx-text)' }}>
+              Sign in to continue learning
+            </h1>
+            <p className="mt-2 text-sm leading-relaxed" style={{ color: 'var(--anx-text-muted)' }}>
+              Enter your credentials to access 2XED.
+            </p>
+          </div>
+
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label htmlFor="email" className="mb-2 block text-sm font-semibold text-[#374151]">
@@ -99,14 +105,14 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-full bg-gradient-to-r from-[#4f46e5] via-[#6366f1] to-[#a5b4fc] py-3.5 text-sm font-bold text-white shadow-sm transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-40"
+              className="anx-btn-primary w-full py-3.5 text-base"
             >
               {loading ? 'Signing in\u2026' : 'Sign in'}
             </button>
           </form>
         </div>
 
-        <p className="text-center text-xs text-[#9ca3af]">
+        <p className="text-center text-xs text-white/70">
           &copy; 2026 Anaxi. All rights reserved.
         </p>
       </div>
