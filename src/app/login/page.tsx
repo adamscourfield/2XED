@@ -36,25 +36,31 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center px-4">
+    <main className="anx-scene flex min-h-screen items-center justify-center px-4 py-12">
       <div className="w-full max-w-md space-y-8">
-        <div className="text-center">
+        <div className="flex justify-center">
           <Image
             src="/anaxi-logo.png"
             alt="Anaxi Logo"
             width={48}
             height={48}
-            className="mx-auto mb-4"
+            className="mb-0"
           />
-          <h1 className="text-3xl font-bold tracking-tight" style={{ color: 'var(--anx-text)' }}>
-            2XED
-          </h1>
-          <p className="mt-1 text-sm" style={{ color: 'var(--anx-text-muted)' }}>
-            Sign in to continue learning
-          </p>
         </div>
 
-        <div className="anx-panel p-8">
+        <div className="anx-panel p-8 sm:p-10">
+          <div className="mb-8 text-center">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: 'var(--anx-text-muted)' }}>
+              2XED
+            </p>
+            <h1 className="mt-3 text-2xl font-bold tracking-tight sm:text-[1.65rem]" style={{ color: 'var(--anx-text)' }}>
+              Sign in to continue learning
+            </h1>
+            <p className="mt-2 text-sm leading-relaxed" style={{ color: 'var(--anx-text-muted)' }}>
+              Enter your credentials to access 2XED.
+            </p>
+          </div>
+
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label htmlFor="email" className="mb-2 block text-sm font-medium" style={{ color: 'var(--anx-text-secondary)' }}>
@@ -99,14 +105,14 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="anx-btn-primary w-full py-3"
+              className="anx-btn-primary w-full py-3.5 text-base"
             >
               {loading ? 'Signing in\u2026' : 'Sign in'}
             </button>
           </form>
         </div>
 
-        <p className="text-center text-xs" style={{ color: 'var(--anx-text-faint)' }}>
+        <p className="text-center text-xs text-white/70">
           &copy; 2026 Anaxi. All rights reserved.
         </p>
       </div>

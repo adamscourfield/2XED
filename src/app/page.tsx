@@ -5,7 +5,7 @@ export default function HomePage() {
   return (
     <main className="anx-shell flex items-center">
       <div className="anx-container">
-        <section className="anx-panel mx-auto max-w-3xl px-8 py-12 sm:px-14 sm:py-16">
+        <section className="anx-card mx-auto max-w-3xl px-8 py-12 sm:px-14 sm:py-16">
           <div className="text-center">
             <Image
               src="/anaxi-logo.png"

@@ -93,7 +93,7 @@ export function EnglishLearnSession({ subject, skill, blocks, userId }: EnglishL
 
   if (phase === 'intro') {
     return (
-      <main className="anx-shell flex items-center justify-center">
+      <main className="anx-shell anx-scene flex items-center justify-center">
         <div className="anx-panel w-full max-w-lg p-8 space-y-6">
           <div>
             <p className="text-sm font-medium mb-1" style={{ color: 'var(--anx-primary)' }}>
@@ -258,7 +258,7 @@ export function EnglishLearnSession({ subject, skill, blocks, userId }: EnglishL
   const pct = totalQuestions > 0 ? Math.round((totalCorrect / totalQuestions) * 100) : null;
 
   return (
-    <main className="anx-shell flex items-center justify-center">
+    <main className="anx-shell anx-scene flex items-center justify-center">
       <div className="anx-panel w-full max-w-md p-8 space-y-6 text-center">
         <div>
           <p className="text-sm font-medium mb-1" style={{ color: 'var(--anx-primary)' }}>

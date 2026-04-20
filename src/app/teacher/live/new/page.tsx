@@ -38,13 +38,15 @@ export default async function TeacherLiveNewPage() {
   });
 
   return (
-    <main className="mx-auto max-w-lg px-4 py-10">
-      <h1 className="mb-6 text-2xl font-bold text-gray-900">Launch Live Session</h1>
+    <main className="anx-shell anx-scene min-h-screen py-10">
+      <div className="mx-auto w-full max-w-lg px-4">
+      <h1 className="mb-6 text-2xl font-bold text-white drop-shadow-sm">Launch Live Session</h1>
       <NewLiveSessionForm
         classrooms={classrooms}
         subjects={subjects}
         skillsBySubject={skillsBySubject}
       />
+      </div>
     </main>
   );
 }

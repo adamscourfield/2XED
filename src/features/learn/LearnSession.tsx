@@ -173,7 +173,7 @@ export function LearnSession({ subject, skill, items, userId, gamification }: Pr
 
   if (phase === 'intro') {
     return (
-      <main className="anx-shell flex items-center justify-center">
+      <main className="anx-shell anx-scene flex items-center justify-center">
         <div className="anx-panel w-full max-w-lg p-8 space-y-6">
           <div>
             <p className="text-sm font-medium mb-1" style={{ color: 'var(--anx-primary)' }}>{subject.title}</p>
@@ -221,7 +221,7 @@ export function LearnSession({ subject, skill, items, userId, gamification }: Pr
 
   if (phase === 'session' && currentItem) {
     return (
-      <main className="anx-shell flex items-center justify-center">
+      <main className="anx-shell anx-scene flex items-center justify-center">
         <div className="anx-panel w-full max-w-lg p-8 space-y-6">
           <div className="flex items-center justify-between">
             <div>
@@ -314,7 +314,7 @@ export function LearnSession({ subject, skill, items, userId, gamification }: Pr
     const xpEarned = gamification?.xp ?? 0;
 
     return (
-      <main className="anx-shell flex items-center justify-center">
+      <main className="anx-shell anx-scene flex items-center justify-center">
         <div className="anx-panel w-full max-w-md p-8 space-y-6 text-center anx-slide-up">
           {/* Celebration ring */}
           <div className="anx-reward-ring">

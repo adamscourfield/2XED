@@ -179,7 +179,7 @@ export default function StudentLivePage() {
   if (status === 'loading') {
     return (
       <AppChrome variant="student">
-        <main className="anx-shell flex flex-1 items-center justify-center">
+        <main className="anx-shell anx-scene flex flex-1 items-center justify-center">
           <p style={{ color: 'var(--anx-text-muted)' }}>Loading…</p>
         </main>
       </AppChrome>
@@ -288,7 +288,7 @@ export default function StudentLivePage() {
   if (appState.phase === 'join') {
     return (
       <AppChrome variant="student">
-        <main className="anx-shell flex flex-1 items-center justify-center">
+        <main className="anx-shell anx-scene flex flex-1 items-center justify-center">
         <div className="anx-panel w-full max-w-sm p-8">
           <h1 className="mb-2 text-center text-2xl font-bold" style={{ color: 'var(--anx-text)' }}>Join Live Session</h1>
           <p className="mb-6 text-center text-sm" style={{ color: 'var(--anx-text-muted)' }}>Enter the code your teacher shows on the board.</p>
@@ -349,7 +349,7 @@ export default function StudentLivePage() {
   if (appState.phase === 'waiting') {
     return (
       <AppChrome variant="student">
-        <main className="anx-shell flex flex-1 items-center justify-center">
+        <main className="anx-shell anx-scene flex flex-1 items-center justify-center">
         <div className="anx-panel w-full max-w-sm p-8 text-center">
           <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-[var(--anx-surface-container-high)] border-t-[var(--anx-primary)]" />
           <h2 className="mb-2 text-xl font-semibold" style={{ color: 'var(--anx-text)' }}>Waiting for your teacher…</h2>
@@ -367,7 +367,7 @@ export default function StudentLivePage() {
   if (appState.phase === 'between-phases') {
     return (
       <AppChrome variant="student">
-        <main className="anx-shell flex flex-1 items-center justify-center">
+        <main className="anx-shell anx-scene flex flex-1 items-center justify-center">
         <div className="anx-panel w-full max-w-sm p-8 text-center">
           <div className="mb-4 text-4xl">💬</div>
           <h2 className="mb-3 text-xl font-semibold" style={{ color: 'var(--anx-text)' }}>
@@ -394,7 +394,7 @@ export default function StudentLivePage() {
     const opts = Array.isArray(item.options) ? (item.options as string[]) : [];
     return (
       <AppChrome variant="student">
-        <main className="anx-shell flex flex-1 items-center justify-center">
+        <main className="anx-shell anx-scene flex flex-1 items-center justify-center">
         <div className="anx-panel w-full max-w-lg p-8">
           {error && <div className="anx-callout-danger mb-4 text-sm">{error}</div>}
           <p className="mb-6 text-base leading-relaxed" style={{ color: 'var(--anx-text)' }}>{item.question}</p>
@@ -446,7 +446,7 @@ export default function StudentLivePage() {
   if (appState.phase === 'feedback') {
     return (
       <AppChrome variant="student">
-        <main className="anx-shell flex flex-1 items-center justify-center">
+        <main className="anx-shell anx-scene flex flex-1 items-center justify-center">
         <div className="anx-panel w-full max-w-sm p-8 text-center">
           <div
             className={`mb-4 text-5xl ${appState.correct ? 'animate-[anxPulseCorrect_220ms_ease-out]' : 'animate-[anxShakeIncorrect_260ms_ease-out]'}`}
@@ -471,7 +471,7 @@ export default function StudentLivePage() {
   // ── Done screen ─────────────────────────────────────────────────────────────
   return (
     <AppChrome variant="student">
-      <main className="anx-shell flex flex-1 items-center justify-center">
+      <main className="anx-shell anx-scene flex flex-1 items-center justify-center">
       <div className="anx-panel w-full max-w-sm p-8 text-center">
         <div className="mb-4 text-5xl">🎉</div>
         <h2 className="mb-2 text-xl font-bold" style={{ color: 'var(--anx-text)' }}>All done!</h2>

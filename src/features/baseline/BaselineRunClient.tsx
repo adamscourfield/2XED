@@ -124,7 +124,7 @@ export function BaselineRunClient({ subjectSlug }: { subjectSlug: string }) {
   if (!item) return <div className="p-8 text-sm" style={{ color: 'var(--anx-text-secondary)' }}>Loading your next question…</div>;
 
   return (
-    <main className="anx-shell flex items-center justify-center">
+    <main className="anx-shell anx-scene flex items-center justify-center">
       <div className="anx-panel w-full max-w-2xl space-y-6 p-7 sm:p-8">
         <div className="flex items-center justify-between">
           <div>
