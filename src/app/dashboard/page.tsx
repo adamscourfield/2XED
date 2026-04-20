@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { hasCompletedOnboardingDiagnostic } from '@/features/learn/onboarding';
 import { selectNextSkill } from '@/features/learn/nextSkill';
 import { LearningPageShell } from '@/components/LearningPageShell';
-import { SignOutButton } from '@/components/SignOutButton';
 import { JoinSessionInput } from '@/components/JoinSessionInput';
 import { DashboardLessonCalendar } from '@/components/DashboardLessonCalendar';
 import { getUserGamificationSummary } from '@/features/gamification/gamificationService';
@@ -177,12 +176,7 @@ export default async function DashboardPage() {
       subtitle="Ready to learn"
       maxWidthClassName="max-w-5xl"
       appChrome="student"
-      actions={
-        <div className="flex items-center gap-3">
-          <span className="anx-xp-badge">🏅 {gamification.xp} XP</span>
-          <SignOutButton />
-        </div>
-      }
+      actions={<span className="anx-xp-badge">🏅 {gamification.xp} XP</span>}
     >
       {/* Hero banner */}
       <div className="anx-card anx-dashboard-hero overflow-hidden">
