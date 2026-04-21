@@ -1,0 +1,98 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "A1.13",
+  "skillName": "Continue linear sequences",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students use the phrase linear sequence without understanding that it means equal first differences.",
+  "generatedAt": "2026-04-20T16:05:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "definition",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "A linear sequence has a constant difference",
+          "subText": "Each step changes by the same amount"
+        }
+      ],
+      "narration": "The defining feature of a linear sequence is a constant difference.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "compare-example",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "2, 5, 8, 11 grows by +3",
+              "highlight": "green"
+            },
+            {
+              "text": "2, 5, 9, 14 does not",
+              "highlight": "accent"
+            }
+          ]
+        }
+      ],
+      "narration": "One sequence is linear because the change is constant. The other is not.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "meaning-of-constant",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "Constant means unchanged from step to step",
+              "highlight": null
+            }
+          ]
+        }
+      ],
+      "narration": "Constant means the size of the step does not change.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "why-it-matters",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "If the difference is constant, the pattern can be continued reliably",
+              "highlight": "accent"
+            }
+          ]
+        }
+      ],
+      "narration": "That is why checking the difference matters so much.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 4,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Linear sequence \u2192 same difference every time",
+          "label": "Equal first differences define the pattern"
+        }
+      ],
+      "narration": "A sequence is linear because the first differences stay equal.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: thinking a sequence is linear just because it increases. It must increase or decrease by the same amount each time.",
+    "audioNarration": "Not every rising sequence is linear. The size of the change must stay constant."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

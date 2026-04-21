@@ -1,0 +1,88 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "A1.8",
+  "skillName": "Substituting into formulae",
+  "routeType": "C",
+  "routeLabel": "Misconception",
+  "misconceptionSummary": "Students put values into the wrong symbols or treat all letters in the formula as the same thing.",
+  "generatedAt": "2026-04-20T15:55:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "wrong-substitution",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "A = l × w, l = 7, w = 4", "highlight": null },
+            { "text": "A = 7 × 7", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "This substitution is wrong. The width value has been ignored and the length value has been used twice.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "match-symbols-correctly",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "l = 7 goes where l is", "highlight": "green" },
+            { "text": "w = 4 goes where w is", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Each value must go into the matching symbol only. L gets seven and w gets four.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "correct-substitution",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "A = 7 × 4", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Now the formula has been substituted correctly.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "calculate",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "A = 28", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Now calculate. Seven times four equals twenty-eight.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 4,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Match each given value to the correct symbol",
+          "label": "Do not reuse one value for every letter"
+        }
+      ],
+      "narration": "To avoid the mistake, read the symbol names carefully before inserting any values.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: substituting one given number into every letter in the formula. Each symbol has its own value and meaning.",
+    "audioNarration": "A formula only works if each quantity is matched to the correct symbol."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

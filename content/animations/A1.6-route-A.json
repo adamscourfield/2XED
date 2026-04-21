@@ -1,0 +1,89 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "A1.6",
+  "skillName": "Substituting into expressions with one operation",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students replace the variable incorrectly or forget that adjacency means multiplication.",
+  "generatedAt": "2026-04-20T15:55:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "given-value",
+      "visuals": [
+        {
+          "type": "show_expression",
+          "expression": "Find 3a when a = 4",
+          "parts": [
+            { "text": "3a", "id": "expr", "highlight": null },
+            { "text": " when a = 4", "id": "value", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "To substitute, replace the variable with its value.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "replace-variable",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "3a = 3 × 4", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Since a equals four, replace a with four. Three a becomes three times four.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "calculate",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "3 × 4 = 12", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Now calculate. Three times four equals twelve.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "second-example",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Find x + 5 when x = 7", "highlight": null },
+            { "text": "7 + 5 = 12", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The same method works for other one-step expressions. Replace the variable, then work out the answer.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 4,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Substitute first, then calculate",
+          "label": "Replace the variable with its value"
+        }
+      ],
+      "narration": "The method is always the same. Put in the value of the variable, then evaluate the expression.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: reading 3a as 34 when a = 4. 3a means 3 multiplied by a, so it becomes 3 × 4, not 34.",
+    "audioNarration": "When a variable sits next to a number, it means multiplication. Three a with a equals four becomes three times four, not thirty-four."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

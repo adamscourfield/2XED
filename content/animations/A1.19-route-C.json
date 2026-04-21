@@ -1,0 +1,106 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "A1.19",
+  "skillName": "Find the nth term of a sequence",
+  "routeType": "C",
+  "routeLabel": "Misconception",
+  "misconceptionSummary": "Students choose the correct coefficient from the common difference but pick the wrong adjustment term.",
+  "generatedAt": "2026-04-20T16:05:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "wrong-rule",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "Sequence: 4, 7, 10, 13",
+              "highlight": null
+            },
+            {
+              "text": "Claimed nth term: 3n + 4",
+              "highlight": "accent"
+            }
+          ]
+        }
+      ],
+      "narration": "This rule is close, but it is wrong.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "test-term-1",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "If n = 1, then 3n + 4 = 7",
+              "highlight": "green"
+            }
+          ]
+        }
+      ],
+      "narration": "That gives seven for the first term, but the first term should be four.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "correct-adjustment",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "Use 3n + 1 instead",
+              "highlight": "accent"
+            },
+            {
+              "text": "3(1) + 1 = 4",
+              "highlight": "green"
+            }
+          ]
+        }
+      ],
+      "narration": "Three n plus one matches the first term correctly.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "confirm-other-terms",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "n=2 \u2192 7, n=3 \u2192 10",
+              "highlight": null
+            }
+          ]
+        }
+      ],
+      "narration": "Checking more terms confirms the rule works.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 4,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Test n=1 to check the adjustment",
+          "label": "A good nth term must match the actual sequence"
+        }
+      ],
+      "narration": "To avoid the mistake, test your rule on the first few terms.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: getting the coefficient right but the constant wrong. Always test the rule against the first term and at least one more term.",
+    "audioNarration": "A tiny error in the adjustment changes the whole sequence, so always verify the rule."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

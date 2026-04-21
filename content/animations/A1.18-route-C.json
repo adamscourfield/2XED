@@ -1,0 +1,102 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "A1.18",
+  "skillName": "Generate sequences from algebraic rules",
+  "routeType": "C",
+  "routeLabel": "Misconception",
+  "misconceptionSummary": "Students use the wrong input in the nth-term rule or evaluate the algebraic expression incorrectly.",
+  "generatedAt": "2026-04-20T16:05:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "wrong-input",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "Rule: 2n + 3",
+              "highlight": null
+            },
+            {
+              "text": "For term 4, answer given: 2(7)+3 = 17",
+              "highlight": "accent"
+            }
+          ]
+        }
+      ],
+      "narration": "This is wrong because the input was not the position number.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "correct-input",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "For term 4, n = 4",
+              "highlight": "green"
+            }
+          ]
+        }
+      ],
+      "narration": "The fourth term means n should be four.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "evaluate-correctly",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "2(4) + 3 = 8 + 3 = 11",
+              "highlight": "accent"
+            }
+          ]
+        }
+      ],
+      "narration": "Now evaluate the rule correctly.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "state-cause",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "The mistake came from using the wrong input value for n",
+              "highlight": null
+            }
+          ]
+        }
+      ],
+      "narration": "The rule itself was fine. The input was wrong.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 4,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Use the term number as n every time",
+          "label": "Correct input gives the correct term"
+        }
+      ],
+      "narration": "To avoid the mistake, write n equals the term position before substituting.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: substituting a term value instead of the term number. In nth-term rules, n is always the position.",
+    "audioNarration": "Anchor yourself by writing the term number first, then substitute that into the rule."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

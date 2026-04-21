@@ -1,0 +1,87 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "A1.11",
+  "skillName": "Factorising into a single bracket",
+  "routeType": "C",
+  "routeLabel": "Misconception",
+  "misconceptionSummary": "Students take out a common factor but do not divide every term correctly inside the bracket.",
+  "generatedAt": "2026-04-20T16:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "wrong-factorisation",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "8x + 12 = 4(x + 12)", "highlight": "accent" },
+            { "text": "Is this correct?", "highlight": null }
+          ]
+        }
+      ],
+      "narration": "This factorisation is wrong because the terms inside the bracket have not both been divided by four.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "check-first-term",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "8x ÷ 4 = 2x", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "If four is taken out, eight x divided by four becomes two x.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "check-second-term",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "12 ÷ 4 = 3", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "And twelve divided by four becomes three.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "correct-factorisation",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "8x + 12 = 4(2x + 3)", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "So the correct factorisation is four bracket two x plus three.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 4,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Every original term must be divided by the factor taken out",
+          "label": "Check both terms inside the bracket"
+        }
+      ],
+      "narration": "To avoid the mistake, test each term separately when building the bracket.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: taking out a factor but leaving one inside term unchanged. If a factor is taken out, every term must be divided by it.",
+    "audioNarration": "A factor outside the bracket affects the whole expression, so every term inside must be adjusted to match it."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

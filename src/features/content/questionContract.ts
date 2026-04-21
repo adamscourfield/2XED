@@ -40,7 +40,7 @@ export const MappingRowSchema = z.object({
     stem: z.string().min(1),
     format: QuestionFormatSchema,
     options: z.array(z.string()).optional(),
-    answer: z.string().min(1),
+    answer: z.union([z.string().min(1), z.array(z.string().min(1)).min(1)]),
     numberLine: z.object({
       min: z.number(),
       max: z.number(),
@@ -79,7 +79,7 @@ export const MappingRowSchema = z.object({
   marking: z.object({
     mark_scheme_type: z.string().optional(),
     max_marks: z.number().optional(),
-    accepted_answers: z.array(z.string()).optional(),
+    accepted_answers: z.array(z.union([z.string(), z.array(z.string())])).optional(),
     tolerance: z.number().optional(),
   }).optional(),
   metadata: z.object({
@@ -96,6 +96,15 @@ export interface StoredItemContract {
   type: string;
   answer: string;
   options?: unknown;
+}
+
+function flattenAcceptedAnswers(values: Array<string | string[]> | undefined): string[] {
+  if (!values) return [];
+  return values.flatMap((value) => (Array.isArray(value) ? value : [value]));
+}
+
+function canonicalizeAnswer(answer: string | string[]): string {
+  return Array.isArray(answer) ? answer.join('|') : answer;
 }
 
 export interface ContractIssue {
@@ -239,10 +248,14 @@ export function deriveStoredItemFromMapping(row: MappingRow): {
   canonicalFormat: CanonicalQuestionFormat;
 } {
   const parsed = MappingRowSchema.parse(row);
-  const answer = parsed.marking?.accepted_answers?.[0] ?? parsed.question.answer;
-  const canonicalFormat = inferCanonicalQuestionFormat(parsed.question.format, parsed.question.stem, answer);
-  const acceptedAnswers = unique(parsed.marking?.accepted_answers ?? [answer]);
-  const choices = deriveChoicesForMapping(parsed.question.stem, answer, canonicalFormat, parsed.question.options);
+  const canonicalAnswer = canonicalizeAnswer(parsed.question.answer);
+  const acceptedAnswersRaw = flattenAcceptedAnswers(parsed.marking?.accepted_answers) ;
+  const answer = acceptedAnswersRaw[0] ? canonicalizeAnswer(acceptedAnswersRaw[0]) : canonicalAnswer;
+  const canonicalFormat = inferCanonicalQuestionFormat(parsed.question.format, parsed.question.stem, canonicalAnswer);
+  const acceptedAnswers = unique(
+    (acceptedAnswersRaw.length > 0 ? acceptedAnswersRaw : [parsed.question.answer]).map((value) => canonicalizeAnswer(value))
+  );
+  const choices = deriveChoicesForMapping(parsed.question.stem, canonicalAnswer, canonicalFormat, parsed.question.options);
 
   const typeByFormat: Record<CanonicalQuestionFormat, ItemInteractionType> = {
     TRUE_FALSE: 'TRUE_FALSE',

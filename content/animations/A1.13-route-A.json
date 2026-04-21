@@ -1,0 +1,110 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "A1.13",
+  "skillName": "Continue linear sequences",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students continue a sequence without checking that the difference stays constant.",
+  "generatedAt": "2026-04-20T16:05:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "given-sequence",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "6, 10, 14, 18",
+              "highlight": null
+            }
+          ]
+        }
+      ],
+      "narration": "Start by looking at the terms in the sequence.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "find-difference",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "10 - 6 = 4",
+              "highlight": "green"
+            },
+            {
+              "text": "14 - 10 = 4",
+              "highlight": "green"
+            },
+            {
+              "text": "18 - 14 = 4",
+              "highlight": "green"
+            }
+          ]
+        }
+      ],
+      "narration": "Check the difference between consecutive terms.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "continue-sequence",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "18 + 4 = 22",
+              "highlight": "accent"
+            },
+            {
+              "text": "22 + 4 = 26",
+              "highlight": "accent"
+            }
+          ]
+        }
+      ],
+      "narration": "Use the same difference to continue the sequence.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "verify-linear",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "Linear sequence = constant difference",
+              "highlight": null
+            }
+          ]
+        }
+      ],
+      "narration": "A linear sequence has the same difference each time.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 4,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "6, 10, 14, 18, 22, 26",
+          "label": "Same difference means linear"
+        }
+      ],
+      "narration": "To continue a linear sequence, find the constant difference and keep adding it.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: using the wrong difference after only checking one gap. Check more than one step to confirm the pattern.",
+    "audioNarration": "A sequence is linear only if the difference stays the same all the way through."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

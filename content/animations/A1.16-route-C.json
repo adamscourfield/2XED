@@ -1,0 +1,102 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "A1.16",
+  "skillName": "Continue geometric sequences",
+  "routeType": "C",
+  "routeLabel": "Misconception",
+  "misconceptionSummary": "Students continue a geometric sequence by adding the last visible difference instead of multiplying.",
+  "generatedAt": "2026-04-20T16:05:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "wrong-method",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "2, 6, 18, 30",
+              "highlight": "accent"
+            }
+          ]
+        }
+      ],
+      "narration": "This continuation is wrong.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "check-pattern",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "2 to 6 is \u00d73",
+              "highlight": "green"
+            },
+            {
+              "text": "6 to 18 is \u00d73",
+              "highlight": "green"
+            }
+          ]
+        }
+      ],
+      "narration": "The pattern is multiplication by three.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "correct-next",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "18 \u00d7 3 = 54",
+              "highlight": "accent"
+            }
+          ]
+        }
+      ],
+      "narration": "So the next term should be fifty-four, not thirty.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "why-addition-fails",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "Adding 12 copies the last difference, not the rule",
+              "highlight": null
+            }
+          ]
+        }
+      ],
+      "narration": "The student copied a difference instead of the multiplier.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 4,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Use the constant multiplier, not the changing differences",
+          "label": "Geometric continuation needs multiplication"
+        }
+      ],
+      "narration": "To avoid the mistake, check the ratio between terms.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: using an additive rule on a multiplicative sequence. Check how one term is multiplied to get the next.",
+    "audioNarration": "If the sequence is geometric, addition will usually give the wrong continuation."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

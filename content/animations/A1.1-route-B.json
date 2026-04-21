@@ -1,0 +1,91 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "A1.1",
+  "skillName": "Algebraic terminology",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students know the words but do not connect them to the structure of an expression.",
+  "generatedAt": "2026-04-20T15:45:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "expression-whole",
+      "visuals": [
+        {
+          "type": "show_expression",
+          "expression": "4y - 7",
+          "parts": [
+            { "text": "4y", "id": "term1", "highlight": null },
+            { "text": " - ", "id": "minus", "highlight": "dim" },
+            { "text": "7", "id": "term2", "highlight": null }
+          ]
+        }
+      ],
+      "narration": "Think of an expression as a complete mathematical phrase. It is the whole thing, not just one part of it.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "terms-as-parts",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Whole expression: 4y - 7", "highlight": null },
+            { "text": "Parts, or terms: 4y and 7", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Terms are the pieces that make up the expression. Plus and minus signs split the expression into separate terms.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "variable-and-coefficient-role",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Variable: y", "highlight": "accent" },
+            { "text": "Coefficient: 4", "highlight": "green" },
+            { "text": "4y means 4 multiplied by y", "highlight": null }
+          ]
+        }
+      ],
+      "narration": "Inside the term 4y, the variable is y and the coefficient is 4. The coefficient tells us how many of the variable we have.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "terminology-link",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "variable = unknown letter   coefficient = number multiplying the variable   term = one part   expression = the whole algebraic phrase",
+          "subText": "The words describe different jobs inside the same expression"
+        }
+      ],
+      "narration": "These words are linked. A variable is a letter, a coefficient is the number multiplying it, a term is one part, and the expression is the complete phrase.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 4,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "4y - 7: variable y, coefficient 4, terms 4y and 7, expression 4y - 7",
+          "label": "Use the structure of the expression to name each part"
+        }
+      ],
+      "narration": "When you understand the structure, the terminology becomes clear. Each word names a different feature of the expression.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: memorising the words without seeing the structure. Terms are parts, coefficients are numbers attached to variables, and the expression is the full statement.",
+    "audioNarration": "Do not treat the words as random labels. They describe the job each part is doing inside the expression."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

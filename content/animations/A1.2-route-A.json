@@ -1,0 +1,90 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "A1.2",
+  "skillName": "Algebraic notation and basic collecting like terms",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students write algebra with unnecessary multiplication signs, misuse powers, or fail to translate repeated addition into standard notation.",
+  "generatedAt": "2026-04-20T15:45:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "repeated-addition",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "y + y + y", "highlight": null },
+            { "text": "= 3y", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Repeated addition of the same variable is written with a coefficient. Y plus y plus y becomes 3y.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "multiplication-notation",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "3 × y = 3y", "highlight": "green" },
+            { "text": "a × b = ab", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "In algebra we usually drop the multiplication sign. Three times y is written 3y, and a times b is written ab.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "power-notation",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "a × a = a^2", "highlight": "accent" },
+            { "text": "a × a × a = a^3", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Repeated multiplication is written using powers. A times a is a squared, and a times a times a is a cubed.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "division-notation",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "a ÷ b = a/b", "highlight": "accent" },
+            { "text": "Use fraction notation for division", "highlight": null }
+          ]
+        }
+      ],
+      "narration": "Division in algebra is usually written as a fraction. A divided by b is written a over b.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 4,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "y+y+y = 3y,  a×b = ab,  a×a = a^2,  a÷b = a/b",
+          "label": "Use standard algebraic notation"
+        }
+      ],
+      "narration": "Standard algebraic notation is shorter and clearer. Write repeated addition with coefficients, repeated multiplication with powers, and division with a fraction bar.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: writing 3 + y instead of 3y, or thinking a^2 means 2a. Powers show repeated multiplication, not multiplication by the index.",
+    "audioNarration": "Three y means three times y, not three plus y. And a squared means a times a, not two a."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

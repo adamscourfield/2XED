@@ -1,0 +1,102 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "A1.17",
+  "skillName": "Generate geometric sequences using term to term rules",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students can generate terms but do not connect geometric generation to repeated multiplicative growth.",
+  "generatedAt": "2026-04-20T16:05:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "rule-meaning",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "A geometric term-to-term rule multiplies the previous term by a constant",
+          "subText": "Each new term is scaled from the one before"
+        }
+      ],
+      "narration": "A geometric term-to-term rule creates multiplicative growth.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "scaling-idea",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "\u00d72 doubles each term",
+              "highlight": "green"
+            },
+            {
+              "text": "\u00d70.5 halves each term",
+              "highlight": "accent"
+            }
+          ]
+        }
+      ],
+      "narration": "The multiplier tells you how the term is scaled.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "chain-growth",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "Because each term depends on the previous one, the numbers can grow very quickly",
+              "highlight": null
+            }
+          ]
+        }
+      ],
+      "narration": "Repeated multiplication compounds the growth.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "compare-linear",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "Linear term-to-term rules add",
+              "highlight": null
+            },
+            {
+              "text": "Geometric term-to-term rules multiply",
+              "highlight": "accent"
+            }
+          ]
+        }
+      ],
+      "narration": "That is the crucial distinction.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 4,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Geometric generation is repeated scaling",
+          "label": "Each term is a multiplied version of the last"
+        }
+      ],
+      "narration": "The conceptual key is repeated multiplicative scaling.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: describing a geometric rule as if it adds the same amount. The amount changes, but the multiplier stays fixed.",
+    "audioNarration": "Focus on how the term is scaled each time, not on the changing size of the jumps."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

@@ -1,0 +1,89 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "A1.7",
+  "skillName": "Substituting into expressions with multiple operations",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students substitute correctly but then evaluate in the wrong order or miss one operation.",
+  "generatedAt": "2026-04-20T15:55:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "introduce-example",
+      "visuals": [
+        {
+          "type": "show_expression",
+          "expression": "Find 2x + 3 when x = 5",
+          "parts": [
+            { "text": "2x + 3", "id": "expr", "highlight": null },
+            { "text": " when x = 5", "id": "value", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "With multiple operations, substitute first and then work through the calculation carefully.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "substitute",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "2x + 3 = 2 × 5 + 3", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Replace x with five. The expression becomes two times five plus three.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "do-multiplication-first",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "2 × 5 + 3", "highlight": null },
+            { "text": "= 10 + 3", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Do the multiplication before the addition. Two times five is ten.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "finish-calculation",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "10 + 3 = 13", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Now finish the calculation. Ten plus three equals thirteen.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 4,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Substitute, then follow the order of operations",
+          "label": "2x + 3 with x=5 gives 13"
+        }
+      ],
+      "narration": "The key method is substitute first, then evaluate in the correct order.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: doing 2 + 5 + 3 or 2 × 8. Keep the structure of the expression after substitution and use the correct order of operations.",
+    "audioNarration": "Do not scramble the numbers. Replace the variable, then follow the operations already shown in the expression."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

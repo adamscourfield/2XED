@@ -1,0 +1,110 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "A1.13",
+  "skillName": "Continue linear sequences",
+  "routeType": "C",
+  "routeLabel": "Misconception",
+  "misconceptionSummary": "Students assume a sequence is linear after checking too little evidence or mix up difference with ratio.",
+  "generatedAt": "2026-04-20T16:05:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "false-linear",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "3, 6, 12, 24",
+              "highlight": null
+            },
+            {
+              "text": "Claim: linear because it keeps going up",
+              "highlight": "accent"
+            }
+          ]
+        }
+      ],
+      "narration": "This claim is wrong.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "check-differences",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "6 - 3 = 3",
+              "highlight": "green"
+            },
+            {
+              "text": "12 - 6 = 6",
+              "highlight": "accent"
+            },
+            {
+              "text": "24 - 12 = 12",
+              "highlight": "accent"
+            }
+          ]
+        }
+      ],
+      "narration": "The differences are not constant, so the sequence is not linear.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "real-pattern",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "This sequence doubles each time",
+              "highlight": null
+            }
+          ]
+        }
+      ],
+      "narration": "The pattern is multiplicative, not additive.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "contrast-linear",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "Linear means add or subtract the same amount each time",
+              "highlight": "green"
+            }
+          ]
+        }
+      ],
+      "narration": "That is what makes a sequence linear.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 4,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Check differences, not just whether the numbers rise",
+          "label": "Linear needs constant difference"
+        }
+      ],
+      "narration": "To avoid the mistake, test the differences carefully.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: confusing a doubling pattern with a linear pattern. Linear sequences depend on constant difference, not constant multiplier.",
+    "audioNarration": "If the difference changes, the sequence is not linear, even if it keeps increasing."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

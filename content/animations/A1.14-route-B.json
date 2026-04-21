@@ -1,0 +1,106 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "A1.14",
+  "skillName": "Generate linear sequences using term to term rules",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students can produce terms but do not see term-to-term rules as local rules depending on the previous term.",
+  "generatedAt": "2026-04-20T16:05:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "local-rule",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "A term-to-term rule tells you how to get from one term to the next",
+          "subText": "You need the previous term each time"
+        }
+      ],
+      "narration": "A term-to-term rule is local. It depends on the term before.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "chain-idea",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "Term 2 comes from term 1",
+              "highlight": null
+            },
+            {
+              "text": "Term 3 comes from term 2",
+              "highlight": null
+            },
+            {
+              "text": "Term 4 comes from term 3",
+              "highlight": "accent"
+            }
+          ]
+        }
+      ],
+      "narration": "Each term depends on the previous one like links in a chain.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "linear-link",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "If the rule is +4, the difference stays 4",
+              "highlight": "green"
+            }
+          ]
+        }
+      ],
+      "narration": "That is why a constant term-to-term add rule creates a linear sequence.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "contrast-with-nth",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "Term-to-term uses the previous term",
+              "highlight": "accent"
+            },
+            {
+              "text": "Nth term uses the position number directly",
+              "highlight": null
+            }
+          ]
+        }
+      ],
+      "narration": "This is different from an nth-term rule.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 4,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Term-to-term rules build sequences step by step",
+          "label": "Each term comes from the one before"
+        }
+      ],
+      "narration": "The big idea is that term-to-term generation is sequential, not direct from position.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: mixing up term-to-term rules and nth-term rules. Term-to-term rules depend on the previous term.",
+    "audioNarration": "If you need the last term to find the next one, you are using a term-to-term rule."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

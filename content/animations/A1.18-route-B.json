@@ -1,0 +1,106 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "A1.18",
+  "skillName": "Generate sequences from algebraic rules",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students can evaluate nth-term rules but do not grasp that the rule links position directly to value.",
+  "generatedAt": "2026-04-20T16:05:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "position-to-term",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "An nth-term rule maps position to term value",
+          "subText": "Input the position number, output the term"
+        }
+      ],
+      "narration": "An nth-term rule is a direct link from term position to term value.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "compare-with-term-to-term",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "Nth term uses n directly",
+              "highlight": "accent"
+            },
+            {
+              "text": "Term-to-term uses the previous term",
+              "highlight": null
+            }
+          ]
+        }
+      ],
+      "narration": "That is why nth-term generation works differently from term-to-term generation.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "example-map",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "n=1 \u2192 5",
+              "highlight": "green"
+            },
+            {
+              "text": "n=2 \u2192 8",
+              "highlight": "green"
+            },
+            {
+              "text": "n=3 \u2192 11",
+              "highlight": "green"
+            }
+          ]
+        }
+      ],
+      "narration": "Each position has its own direct output from the rule.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "why-powerful",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "You can jump straight to any term if you know its position",
+              "highlight": "accent"
+            }
+          ]
+        }
+      ],
+      "narration": "That makes nth-term rules powerful for large positions too.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 4,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Nth term rules connect position and value directly",
+          "label": "Use the position as the input"
+        }
+      ],
+      "narration": "The conceptual key is direct mapping from n to the term.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: thinking nth-term generation still depends on earlier terms. It does not. The rule gives each term directly from its position.",
+    "audioNarration": "If you know n, the rule gives the term without needing the earlier terms."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

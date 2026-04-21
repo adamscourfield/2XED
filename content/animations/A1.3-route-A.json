@@ -1,0 +1,94 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "A1.3",
+  "skillName": "Collecting like terms",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students combine unlike terms or change the variable part when simplifying.",
+  "generatedAt": "2026-04-20T15:45:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "start-expression",
+      "visuals": [
+        {
+          "type": "show_expression",
+          "expression": "3x + 5x - 2",
+          "parts": [
+            { "text": "3x", "id": "t1", "highlight": null },
+            { "text": " + ", "id": "p1", "highlight": "dim" },
+            { "text": "5x", "id": "t2", "highlight": null },
+            { "text": " - ", "id": "m1", "highlight": "dim" },
+            { "text": "2", "id": "t3", "highlight": null }
+          ]
+        }
+      ],
+      "narration": "To collect like terms, first look for terms with the same variable part.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "spot-like-terms",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Like terms: 3x and 5x", "highlight": "accent" },
+            { "text": "Constant term: -2", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Three x and five x are like terms because they both have the same variable part, x. The minus two is a constant term.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "combine-coefficients",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "3x + 5x = 8x", "highlight": "accent" },
+            { "text": "Keep the x, add the coefficients", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Collect the like terms by adding the coefficients. Three x plus five x equals eight x.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "write-simplified",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "3x + 5x - 2", "highlight": null },
+            { "text": "= 8x - 2", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Now rewrite the expression in simplified form. The like terms combine to give eight x minus two.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 4,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "3x + 5x - 2 = 8x - 2",
+          "label": "Collect like terms by combining coefficients only"
+        }
+      ],
+      "narration": "When collecting like terms, the variable part stays the same and only the coefficients change.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: combining 8x and 2 into 10x or 8x2. Constants and x terms are not like terms, so they cannot be collected together.",
+    "audioNarration": "Only combine terms that match exactly in their variable part. X terms combine with x terms, constants combine with constants."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

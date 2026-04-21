@@ -1,0 +1,98 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "A1.15",
+  "skillName": "Recognise and continue special sequences",
+  "routeType": "C",
+  "routeLabel": "Misconception",
+  "misconceptionSummary": "Students identify the first few terms correctly but continue with the wrong sequence rule.",
+  "generatedAt": "2026-04-20T16:05:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "wrong-continuation",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "1, 4, 9, 16, 20",
+              "highlight": "accent"
+            }
+          ]
+        }
+      ],
+      "narration": "This continuation is wrong.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "identify-square",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "1, 4, 9, 16 are square numbers",
+              "highlight": "green"
+            }
+          ]
+        }
+      ],
+      "narration": "These are square numbers.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "correct-next",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "Next square number is 25",
+              "highlight": "accent"
+            }
+          ]
+        }
+      ],
+      "narration": "After sixteen comes twenty-five, not twenty.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "why-20-fails",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "The gaps are +3, +5, +7, so the next gap is +9",
+              "highlight": null
+            }
+          ]
+        }
+      ],
+      "narration": "That is another way to see why twenty-five must come next.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 4,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Check the defining rule before continuing",
+          "label": "Recognise the sequence type accurately"
+        }
+      ],
+      "narration": "To avoid the mistake, confirm which special sequence you are working with before extending it.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: spotting a familiar start but then continuing by guesswork. Use the defining rule of the special sequence.",
+    "audioNarration": "Once you know the type of sequence, let its rule control the next term."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

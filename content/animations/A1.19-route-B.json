@@ -1,0 +1,98 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "A1.19",
+  "skillName": "Find the nth term of a sequence",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students follow a procedure for nth term without understanding why the difference becomes the coefficient of n.",
+  "generatedAt": "2026-04-20T16:05:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "why-coefficient",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "In a linear sequence, the common difference becomes the coefficient of n",
+          "subText": "Because each new position adds one more copy of that difference"
+        }
+      ],
+      "narration": "That is why the coefficient in the nth term comes from the common difference.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "difference-to-pattern",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "Difference +4 suggests 4n",
+              "highlight": "green"
+            }
+          ]
+        }
+      ],
+      "narration": "Four n grows by four each time, so it matches the step size of the sequence.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "need-adjustment",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "4n may not start at the correct first term",
+              "highlight": "accent"
+            }
+          ]
+        }
+      ],
+      "narration": "The adjustment changes the starting point while keeping the same growth rate.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "example-idea",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "7, 11, 15, 19 has difference 4",
+              "highlight": null
+            },
+            {
+              "text": "4n + 3 matches it",
+              "highlight": "green"
+            }
+          ]
+        }
+      ],
+      "narration": "The plus three shifts the 4n pattern into the right place.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 4,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Nth term = (difference)n + adjustment",
+          "label": "Growth rate and starting point both matter"
+        }
+      ],
+      "narration": "The conceptual structure of an nth term is step size plus starting adjustment.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: memorising a method without understanding the roles of difference and adjustment. The difference controls growth; the adjustment fixes the starting position.",
+    "audioNarration": "Think of the nth term as two parts: one for how fast it grows, and one for where it starts."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

@@ -1,0 +1,88 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "A1.9",
+  "skillName": "Expand single brackets",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students multiply only the first term in the bracket or lose the variable structure during expansion.",
+  "generatedAt": "2026-04-20T16:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "introduce-bracket",
+      "visuals": [
+        {
+          "type": "show_expression",
+          "expression": "3(x + 4)",
+          "parts": [
+            { "text": "3", "id": "outside", "highlight": null },
+            { "text": "(x + 4)", "id": "inside", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "To expand a bracket, multiply the outside factor by every term inside the bracket.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "multiply-first-term",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "3 × x = 3x", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "First multiply the outside factor by the first term. Three times x is three x.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "multiply-second-term",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "3 × 4 = 12", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Then multiply the outside factor by the second term. Three times four is twelve.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "write-expanded",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "3(x + 4) = 3x + 12", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Now write both products together. The expanded expression is three x plus twelve.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 4,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Multiply the outside factor by every term inside the bracket",
+          "label": "3(x + 4) = 3x + 12"
+        }
+      ],
+      "narration": "That is the full method for expanding a single bracket. Every term inside the bracket must be multiplied.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: writing 3(x + 4) = 3x + 4. The 3 must multiply both terms inside the bracket, not just the first one.",
+    "audioNarration": "The outside factor has to reach every term in the bracket. If you only multiply the first term, the expansion is incomplete."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

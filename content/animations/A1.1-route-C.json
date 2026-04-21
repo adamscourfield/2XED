@@ -1,0 +1,91 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "A1.1",
+  "skillName": "Algebraic terminology",
+  "routeType": "C",
+  "routeLabel": "Misconception",
+  "misconceptionSummary": "Students confuse coefficient with variable, or think one full expression is a single term.",
+  "generatedAt": "2026-04-20T15:45:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "wrong-statement",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "In 5a + 2, the coefficient is a", "highlight": "accent" },
+            { "text": "Is that correct?", "highlight": null }
+          ]
+        }
+      ],
+      "narration": "Let's test a common mistake. Someone says the coefficient in 5a plus 2 is a. That is not correct.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "separate-roles",
+      "visuals": [
+        {
+          "type": "show_expression",
+          "expression": "5a + 2",
+          "parts": [
+            { "text": "5", "id": "coeff", "highlight": "green" },
+            { "text": "a", "id": "var", "highlight": "accent" },
+            { "text": " + 2", "id": "rest", "highlight": "dim" }
+          ]
+        }
+      ],
+      "narration": "The number 5 is the coefficient because it multiplies the variable. The letter a is the variable.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "term-check",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Terms are split by + or - signs", "highlight": null },
+            { "text": "5a + 2 has two terms: 5a and 2", "highlight": "green" },
+            { "text": "So the whole expression is not one term", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Another common error is calling the whole expression one term. But plus and minus signs split expressions into separate terms.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "correct-language",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "coefficient = number   variable = letter   terms = separate parts   expression = whole statement",
+          "subText": "Ask what job each part is doing"
+        }
+      ],
+      "narration": "To fix the mistake, match each word to its job. Coefficient means number, variable means letter, terms are the separate parts, expression is the whole statement.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 4,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "In 5a + 2: coefficient 5, variable a, terms 5a and 2",
+          "label": "Use the job of each part to choose the right word"
+        }
+      ],
+      "narration": "Now the language is accurate. Five is the coefficient, a is the variable, and 5a plus 2 contains two terms.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: calling the letter the coefficient, or calling the whole expression a term. Coefficients are numbers. Terms are split by plus or minus signs.",
+    "audioNarration": "If you are unsure, ask two questions. Which part is the number multiplying the variable? That is the coefficient. Where do plus or minus signs split the expression? Those are the terms."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

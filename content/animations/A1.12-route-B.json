@@ -1,0 +1,98 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "A1.12",
+  "skillName": "Diagram sequences",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students see each picture separately instead of seeing the structural growth from one term to the next.",
+  "generatedAt": "2026-04-20T16:05:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "pattern-idea",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "A diagram sequence grows by a repeating visual rule",
+          "subText": "Look for what stays the same and what changes"
+        }
+      ],
+      "narration": "Diagram sequences are built from a repeated pattern of growth.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "stable-and-growing",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "Some parts stay fixed",
+              "highlight": null
+            },
+            {
+              "text": "Some parts grow each time",
+              "highlight": "accent"
+            }
+          ]
+        }
+      ],
+      "narration": "It helps to notice which parts of the diagram stay the same and which parts are added each time.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "growth-to-number",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "If 2 tiles are added each time, the totals increase by 2",
+              "highlight": "green"
+            }
+          ]
+        }
+      ],
+      "narration": "The visual growth creates the number pattern.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "prediction-logic",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "Next diagram = previous diagram + same growth",
+              "highlight": "accent"
+            }
+          ]
+        }
+      ],
+      "narration": "Predicting the next term means extending the same structure one more step.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 4,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Diagram growth and number growth are linked",
+          "label": "See the structure, not just the picture"
+        }
+      ],
+      "narration": "The key idea is that each new diagram follows the same structural rule.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: focusing on how the picture looks overall rather than identifying the repeated growth structure.",
+    "audioNarration": "Try to describe exactly what is added from one term to the next. That reveals the rule."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

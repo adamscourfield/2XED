@@ -1,0 +1,88 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "A1.9",
+  "skillName": "Expand single brackets",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students can sometimes expand by memory but do not understand the bracket as grouped multiplication.",
+  "generatedAt": "2026-04-20T16:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "meaning-of-bracket",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "A bracket shows one factor multiplying a whole group",
+          "subText": "Expansion reveals what that multiplication looks like term by term"
+        }
+      ],
+      "narration": "A bracket means the outside factor multiplies the whole group inside. Expanding simply shows that multiplication in full.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "distributive-idea",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "2(a + b)", "highlight": null },
+            { "text": "means 2a + 2b", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "This is the distributive idea. Multiplying a sum by two means multiplying each part of the sum by two.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "algebra-example",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "4(x + 1)", "highlight": null },
+            { "text": "= 4x + 4", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "The same idea works in algebra. Four times the whole bracket becomes four times x plus four times one.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "power-link",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "x(x + 2) = x^2 + 2x", "highlight": "accent" },
+            { "text": "Because x × x = x^2", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "If the outside factor is a variable, the same rule still works. X times x gives x squared, and x times two gives two x.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 4,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Expansion makes grouped multiplication explicit",
+          "label": "Outside factor multiplies every term inside"
+        }
+      ],
+      "narration": "So expanding is not a trick. It is a clear way of showing what bracket multiplication really means.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: seeing the bracket as decoration. The bracket groups terms together so the outside factor multiplies all of them.",
+    "audioNarration": "The bracket is doing an important job. It tells you the multiplication applies to the whole group inside."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

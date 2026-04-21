@@ -1,0 +1,110 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "A1.14",
+  "skillName": "Generate linear sequences using term to term rules",
+  "routeType": "C",
+  "routeLabel": "Misconception",
+  "misconceptionSummary": "Students apply the rule to the starting term only once or change the rule halfway through the sequence.",
+  "generatedAt": "2026-04-20T16:05:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "wrong-sequence",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "Start at 2, add 5 each time",
+              "highlight": null
+            },
+            {
+              "text": "Given answer: 2, 7, 12, 16",
+              "highlight": "accent"
+            }
+          ]
+        }
+      ],
+      "narration": "This sequence is wrong because the rule changes at the end.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "check-steps",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "2 to 7 is +5",
+              "highlight": "green"
+            },
+            {
+              "text": "7 to 12 is +5",
+              "highlight": "green"
+            },
+            {
+              "text": "12 to 16 is +4",
+              "highlight": "accent"
+            }
+          ]
+        }
+      ],
+      "narration": "The last step does not follow the rule.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "correct-last-term",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "12 + 5 = 17",
+              "highlight": "accent"
+            }
+          ]
+        }
+      ],
+      "narration": "The correct next term should be seventeen.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "complete-correctly",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "2, 7, 12, 17",
+              "highlight": "green"
+            }
+          ]
+        }
+      ],
+      "narration": "Now the whole sequence follows the rule consistently.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 4,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Check every gap against the rule",
+          "label": "Consistency matters in generated sequences"
+        }
+      ],
+      "narration": "To avoid the mistake, verify that every step uses the same term-to-term rule.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: losing the rule after two or three terms. Check every consecutive pair to make sure the pattern stays consistent.",
+    "audioNarration": "Do not assume the sequence is correct just because the first few terms work. Check all the steps."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

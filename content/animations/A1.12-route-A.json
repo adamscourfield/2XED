@@ -1,0 +1,110 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "A1.12",
+  "skillName": "Diagram sequences",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students notice some growth in a diagram sequence but miss the repeated pattern or count the wrong parts.",
+  "generatedAt": "2026-04-20T16:05:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "show-diagrams",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "Term 1: 3 tiles",
+              "highlight": null
+            },
+            {
+              "text": "Term 2: 5 tiles",
+              "highlight": null
+            },
+            {
+              "text": "Term 3: 7 tiles",
+              "highlight": "accent"
+            }
+          ]
+        }
+      ],
+      "narration": "Look at the number of tiles in each diagram term.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "spot-growth",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "3, 5, 7",
+              "highlight": null
+            },
+            {
+              "text": "The pattern is +2 each time",
+              "highlight": "green"
+            }
+          ]
+        }
+      ],
+      "narration": "Count how the diagram is growing from one term to the next.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "predict-next",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "Next term: 7 + 2 = 9",
+              "highlight": "accent"
+            }
+          ]
+        }
+      ],
+      "narration": "Add the same growth again to predict the next diagram term.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "check-pattern",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "Sequence: 3, 5, 7, 9",
+              "highlight": "green"
+            }
+          ]
+        }
+      ],
+      "narration": "Check that the same growth rule still works.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 4,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Count the growth in the diagram and repeat it",
+          "label": "Same visual growth gives the next term"
+        }
+      ],
+      "narration": "To continue a diagram sequence, identify the repeated growth and apply it again.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: counting only the new tiles on one side or guessing from appearance instead of counting carefully.",
+    "audioNarration": "Always count the full number of objects in each term, then compare how much the total grows."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

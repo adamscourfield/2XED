@@ -1,0 +1,92 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "A1.1",
+  "skillName": "Algebraic terminology",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students mix up variable, coefficient, term and expression, or label a whole expression as a term.",
+  "generatedAt": "2026-04-20T12:25:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "introduce-example",
+      "visuals": [
+        {
+          "type": "show_expression",
+          "expression": "3x + 5",
+          "parts": [
+            { "text": "3x", "id": "term1", "highlight": null },
+            { "text": " + ", "id": "plus", "highlight": "dim" },
+            { "text": "5", "id": "term2", "highlight": null }
+          ]
+        }
+      ],
+      "narration": "Start with an algebraic expression. We will use it to identify the key words variable, coefficient, term and expression.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "identify-variable",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Variable: x", "highlight": "accent" },
+            { "text": "A variable stands for an unknown number", "highlight": null }
+          ]
+        }
+      ],
+      "narration": "The variable is x. A variable is a letter used to stand for a number we do not yet know.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "identify-coefficient",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Coefficient: 3", "highlight": "accent" },
+            { "text": "It multiplies the variable in 3x", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "The coefficient is 3. A coefficient is the number multiplying the variable.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "identify-terms",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Terms are separated by + or - signs", "highlight": null },
+            { "text": "Terms here: 3x and 5", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Terms are the separate parts of an expression. Addition and subtraction signs split the expression into terms. Here the terms are 3x and 5.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 4,
+      "id": "name-expression",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "3x + 5 is an expression",
+          "label": "Expression = one or more terms combined"
+        }
+      ],
+      "narration": "The whole thing, 3x plus 5, is the expression. An expression is made by combining numbers, variables and operations.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: saying x is the coefficient or calling the whole expression a term. The coefficient is the number multiplying the variable, and terms are the separate parts split by plus or minus signs.",
+    "audioNarration": "Do not mix up the words. X is the variable. Three is the coefficient. Three x and five are the terms. The full 3x plus 5 is the expression."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

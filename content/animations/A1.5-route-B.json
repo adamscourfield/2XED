@@ -1,0 +1,89 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "A1.5",
+  "skillName": "Dividing algebraic terms",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students often see division as acting only on the coefficient and do not understand cancellation in the variable part.",
+  "generatedAt": "2026-04-20T15:50:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "term-structure",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "A term can be split into a number part and variable factors",
+          "subText": "Division works across both parts"
+        }
+      ],
+      "narration": "Dividing algebraic terms works because a term is built from a coefficient and variable factors.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "factor-view",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "x^3 = x × x × x", "highlight": "accent" },
+            { "text": "x^3 ÷ x removes one factor of x", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Thinking in factors helps. X cubed means x times x times x, so dividing by x removes one of those factors.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "example-meaning",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "6a^2 ÷ 2a", "highlight": null },
+            { "text": "Coefficients: 6 ÷ 2 = 3", "highlight": "accent" },
+            { "text": "Variables: a^2 ÷ a = a", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Use the same idea on a full term. Six a squared divided by two a becomes three a.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "context-link",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Area = 12x^2, one side = 3x", "highlight": null },
+            { "text": "Missing side = 12x^2 ÷ 3x = 4x", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "This also appears in context. If you know area and one side of a rectangle, dividing can give the missing side length.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 4,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Division cancels matching factors in the coefficient and variable parts",
+          "label": "Think in factors, not just symbols"
+        }
+      ],
+      "narration": "The main idea is cancellation of matching factors. That is why the powers reduce when dividing algebraic terms.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: dividing the number part only. In algebra, the variable factors are part of the term too, so they must also be simplified.",
+    "audioNarration": "Do not stop after dividing the coefficient. The variable factors matter just as much."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

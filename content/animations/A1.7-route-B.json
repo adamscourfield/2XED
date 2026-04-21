@@ -1,0 +1,87 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "A1.7",
+  "skillName": "Substituting into expressions with multiple operations",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students think substitution changes the order of the original expression instead of simply turning it into arithmetic.",
+  "generatedAt": "2026-04-20T15:55:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "algebra-to-arithmetic",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Substitution turns algebra into arithmetic",
+          "subText": "The structure of the expression stays the same"
+        }
+      ],
+      "narration": "Substitution does not change the shape of the expression. It only replaces letters with numbers.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "structure-preserved",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "3y - 4 when y = 6", "highlight": null },
+            { "text": "becomes 3 × 6 - 4", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Notice that the multiplication and subtraction stay exactly where they were. Only the variable is replaced.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "order-matters",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "3 × 6 - 4 = 18 - 4", "highlight": "green" },
+            { "text": "= 14", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Because substitution gives an arithmetic expression, the usual order of operations now matters.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "multi-step-focus",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "More operations means more care after substitution", "highlight": null }
+          ]
+        }
+      ],
+      "narration": "The challenge in multiple-operation substitution is not the replacement itself. It is evaluating the resulting arithmetic expression accurately.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 4,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Keep the structure, replace the variable, then evaluate",
+          "label": "Substitution preserves the original expression"
+        }
+      ],
+      "narration": "That is the key understanding. The expression keeps its structure, and substitution simply makes it numerical.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: rearranging the expression after substitution. The operations stay in the same order and places as before.",
+    "audioNarration": "Do not rebuild the expression from scratch. Keep the original structure and replace only the variable."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

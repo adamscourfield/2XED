@@ -1,0 +1,89 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "A1.4",
+  "skillName": "Multiplying algebraic terms",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students apply a rule without understanding why powers appear when variables are multiplied together.",
+  "generatedAt": "2026-04-20T15:50:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "structure-of-term",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "An algebraic term has a coefficient part and a variable part",
+          "subText": "Both parts are involved when we multiply terms"
+        }
+      ],
+      "narration": "An algebraic term is built from two pieces, the coefficient and the variable part. Multiplication affects both pieces.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "coeff-and-variable-separation",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "2a × 4b", "highlight": null },
+            { "text": "Coefficients: 2 × 4 = 8", "highlight": "accent" },
+            { "text": "Variables: a × b = ab", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "When the variables are different, we keep both of them. Two a times four b becomes eight a b.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "repeated-variable-meaning",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "x × x = x^2", "highlight": "accent" },
+            { "text": "x × x × x = x^3", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "If the same variable appears more than once, the multiplication is repeated, so we write it as a power.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "area-link",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Rectangle sides: 3x and 2x", "highlight": null },
+            { "text": "Area = 3x × 2x = 6x^2", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "This also makes sense in context. If the side lengths are three x and two x, the area is six x squared.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 4,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Multiplication combines the number parts and combines the variable parts",
+          "label": "Repeated variables create powers"
+        }
+      ],
+      "narration": "The important idea is structure. Multiplying terms combines what is numerical and combines what is algebraic.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: thinking x × x stays as x. Multiplying by x again changes the variable part and creates x squared.",
+    "audioNarration": "The second x matters. It does not disappear. It turns one x into x squared."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

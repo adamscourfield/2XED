@@ -1,0 +1,90 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "A1.10",
+  "skillName": "Expand two single brackets and simplify",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students expand correctly but forget to simplify, or collect unlike terms after expanding.",
+  "generatedAt": "2026-04-20T16:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "introduce-expression",
+      "visuals": [
+        {
+          "type": "show_expression",
+          "expression": "2(x + 1) + 3(x + 4)",
+          "parts": [
+            { "text": "2(x + 1)", "id": "left", "highlight": null },
+            { "text": " + ", "id": "plus", "highlight": "dim" },
+            { "text": "3(x + 4)", "id": "right", "highlight": null }
+          ]
+        }
+      ],
+      "narration": "When there are two brackets, expand each one first and simplify afterwards.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "expand-first-bracket",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "2(x + 1) = 2x + 2", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Expand the first bracket. Two times x plus one becomes two x plus two.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "expand-second-bracket",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "3(x + 4) = 3x + 12", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Now expand the second bracket. Three times x plus four becomes three x plus twelve.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "collect-like-terms",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "2x + 2 + 3x + 12", "highlight": null },
+            { "text": "= 5x + 14", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Now collect the like terms. Two x plus three x gives five x, and two plus twelve gives fourteen.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 4,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Expand each bracket, then simplify the full expression",
+          "label": "2(x + 1) + 3(x + 4) = 5x + 14"
+        }
+      ],
+      "narration": "That is the full method. Expand both brackets first, then collect like terms at the end.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: stopping after expansion and leaving 2x + 2 + 3x + 12. After expanding, you still need to simplify by collecting like terms.",
+    "audioNarration": "Expansion is not always the end. Once the brackets are gone, look for like terms and simplify the expression fully."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

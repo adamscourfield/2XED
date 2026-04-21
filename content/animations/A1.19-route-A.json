@@ -1,0 +1,102 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "A1.19",
+  "skillName": "Find the nth term of a sequence",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students identify the common difference but do not adjust correctly to build the nth-term expression.",
+  "generatedAt": "2026-04-20T16:05:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "given-sequence",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "5, 8, 11, 14",
+              "highlight": null
+            }
+          ]
+        }
+      ],
+      "narration": "Start by finding the common difference.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "find-difference",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "Difference = +3",
+              "highlight": "green"
+            }
+          ]
+        }
+      ],
+      "narration": "The sequence increases by three each time.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "build-multiple",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "Use 3n as the starting pattern",
+              "highlight": "accent"
+            }
+          ]
+        }
+      ],
+      "narration": "If the difference is three, the nth term will start with three n.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "adjust-rule",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "3(1) = 3 but first term is 5",
+              "highlight": null
+            },
+            {
+              "text": "Need +2",
+              "highlight": "green"
+            }
+          ]
+        }
+      ],
+      "narration": "Now compare three n with the actual sequence to find the adjustment.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 4,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Nth term = 3n + 2",
+          "label": "Difference gives the coefficient, then adjust to match term 1"
+        }
+      ],
+      "narration": "So the nth term of the sequence is three n plus two.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: using the common difference alone as the nth term. The difference helps build the rule, but an adjustment is usually needed.",
+    "audioNarration": "Three n gives the right step size, but you must still check whether it matches the first term and adjust if needed."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

@@ -1,0 +1,90 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "A1.10",
+  "skillName": "Expand two single brackets and simplify",
+  "routeType": "C",
+  "routeLabel": "Misconception",
+  "misconceptionSummary": "Students expand each bracket but then combine unlike terms or leave the expression only partly simplified.",
+  "generatedAt": "2026-04-20T16:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "partial-answer",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "2(x + 3) + x = 2x + 6 + x", "highlight": null },
+            { "text": "Answer given: 8x", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "This answer is wrong because the constant term has been mixed into the x terms.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "separate-term-types",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "x terms: 2x and x", "highlight": "green" },
+            { "text": "constant term: 6", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Only the x terms can be combined together. The 6 is a constant, so it stays separate.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "collect-correctly",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "2x + x = 3x", "highlight": "green" },
+            { "text": "So 2x + 6 + x = 3x + 6", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Combine only the like terms. Two x plus x is three x, so the simplified expression is three x plus six.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "compare-answers",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Wrong: 8x", "highlight": "accent" },
+            { "text": "Right: 3x + 6", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "The wrong answer treats the constant like an x term. The correct answer keeps different term types separate.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 4,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "After expansion, collect only like terms",
+          "label": "Do not combine constants with variable terms"
+        }
+      ],
+      "narration": "To avoid this mistake, sort the expanded expression into x terms, y terms and constants before simplifying.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: combining variable terms and constants into one term. After expansion, collect only terms of the same type.",
+    "audioNarration": "If the terms are not alike, they cannot be combined. Keep constants separate from variable terms."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

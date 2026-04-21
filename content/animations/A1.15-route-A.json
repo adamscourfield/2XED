@@ -1,0 +1,106 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "A1.15",
+  "skillName": "Recognise and continue special sequences",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students mix up special sequence types or continue them with the wrong rule.",
+  "generatedAt": "2026-04-20T16:05:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "identify-type",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "1, 1, 2, 3, 5, 8",
+              "highlight": "accent"
+            }
+          ]
+        }
+      ],
+      "narration": "Start by identifying the type of special sequence.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "recognise-fibonacci",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "Each term is the sum of the previous two",
+              "highlight": "green"
+            }
+          ]
+        }
+      ],
+      "narration": "This is a Fibonacci sequence.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "continue-fibonacci",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "5 + 8 = 13",
+              "highlight": "accent"
+            },
+            {
+              "text": "8 + 13 = 21",
+              "highlight": "accent"
+            }
+          ]
+        }
+      ],
+      "narration": "Use the Fibonacci rule to continue the sequence.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "other-specials",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "Square numbers: 1, 4, 9, 16",
+              "highlight": null
+            },
+            {
+              "text": "Triangular numbers: 1, 3, 6, 10",
+              "highlight": null
+            }
+          ]
+        }
+      ],
+      "narration": "Other common special sequences have their own distinctive patterns.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 4,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Recognise the special rule, then continue with it",
+          "label": "Different special sequences have different defining patterns"
+        }
+      ],
+      "narration": "To continue a special sequence, first identify which special pattern it follows.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: treating every sequence like a constant-difference sequence. Special sequences often follow different rules.",
+    "audioNarration": "Do not force a linear rule onto a special sequence. First identify what kind of sequence it is."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

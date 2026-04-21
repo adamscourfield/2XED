@@ -1,0 +1,89 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "A1.4",
+  "skillName": "Multiplying algebraic terms",
+  "routeType": "C",
+  "routeLabel": "Misconception",
+  "misconceptionSummary": "Students add coefficients instead of multiplying, or forget that repeated variables become powers.",
+  "generatedAt": "2026-04-20T15:50:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "wrong-answer",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "2x × 3x = 5x", "highlight": "accent" },
+            { "text": "Is this correct?", "highlight": null }
+          ]
+        }
+      ],
+      "narration": "This answer is wrong. Two x times three x does not equal five x.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "fix-coefficients",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "2 × 3 = 6", "highlight": "green" },
+            { "text": "We multiply coefficients, not add them", "highlight": null }
+          ]
+        }
+      ],
+      "narration": "The coefficients must be multiplied. Two times three equals six, not five.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "fix-variables",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "x × x = x^2", "highlight": "green" },
+            { "text": "The variable part also changes", "highlight": null }
+          ]
+        }
+      ],
+      "narration": "The variable part changes too. X times x gives x squared.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "correct-answer",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "2x × 3x = 6x^2", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Now we can write the correct product. Two x times three x equals six x squared.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 4,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Multiply the coefficients and multiply the variable parts",
+          "label": "2x × 3x = 6x^2"
+        }
+      ],
+      "narration": "To avoid this error, always check both parts of the term. Numbers multiply and repeated variables become powers.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: using addition because the terms look similar. In multiplication, coefficients multiply and variables multiply. 2x × 3x = 6x^2.",
+    "audioNarration": "The operation is multiplication, so do not add the coefficients. Multiply both the number part and the variable part."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

@@ -1,0 +1,98 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "A1.16",
+  "skillName": "Continue geometric sequences",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students can continue a geometric sequence but do not understand what makes it different from a linear one.",
+  "generatedAt": "2026-04-20T16:05:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "definition",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "A geometric sequence has a constant multiplier",
+          "subText": "Each term is found by multiplying the previous term"
+        }
+      ],
+      "narration": "That is the defining idea of a geometric sequence.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "linear-vs-geometric",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "Linear: add the same amount",
+              "highlight": "green"
+            },
+            {
+              "text": "Geometric: multiply by the same number",
+              "highlight": "accent"
+            }
+          ]
+        }
+      ],
+      "narration": "This is the key contrast with linear sequences.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "growth-shape",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "2, 4, 8, 16 grows faster because the multiplier acts on a larger term each time",
+              "highlight": null
+            }
+          ]
+        }
+      ],
+      "narration": "Repeated multiplication causes the size of the jumps to change.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "ratio-idea",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "Same multiplier = same ratio between consecutive terms",
+              "highlight": "accent"
+            }
+          ]
+        }
+      ],
+      "narration": "Another way to describe a geometric sequence is by its constant ratio.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 4,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Geometric sequences are built by repeated multiplication",
+          "label": "Constant ratio, not constant difference"
+        }
+      ],
+      "narration": "The conceptual key is multiplicative growth.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: thinking every evenly increasing-looking sequence is linear. Geometric growth is driven by ratio, not difference.",
+    "audioNarration": "In a geometric sequence the jump size changes, but the multiplier stays the same."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

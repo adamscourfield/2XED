@@ -1,0 +1,86 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "A1.6",
+  "skillName": "Substituting into expressions with one operation",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students can perform substitution mechanically but do not see it as replacing an unknown with a known value.",
+  "generatedAt": "2026-04-20T15:55:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "meaning-of-substitution",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Substitution means replacing a variable with a number",
+          "subText": "The letter is a placeholder for a value"
+        }
+      ],
+      "narration": "Substitution means replacing a letter with the number it stands for.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "placeholder-idea",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "If b = 10, then b + 2 means 10 + 2", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Once the value is known, the letter no longer stays mysterious. It is replaced by that number everywhere it appears.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "multiplication-meaning",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "2p means 2 × p", "highlight": null },
+            { "text": "If p = 6, then 2p = 2 × 6", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "This matters especially with multiplication. Two p means two times p, so after substitution it becomes ordinary multiplication.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "single-step-focus",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "One operation means one calculation after substitution", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "In one-operation substitution, once the value has been inserted, there is just one arithmetic step to do.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 4,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Variable → replace with number → evaluate",
+          "label": "Substitution turns an algebraic expression into arithmetic"
+        }
+      ],
+      "narration": "That is the core idea. Substitution turns algebra into arithmetic by replacing letters with known values.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: treating the letter and number as separate symbols instead of replacement. If p = 6, then p is no longer unknown in that question. It stands for 6.",
+    "audioNarration": "Do not keep the letter once its value has been given. Replace it with the number and then work with the arithmetic expression."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

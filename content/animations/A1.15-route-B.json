@@ -1,0 +1,98 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "A1.15",
+  "skillName": "Recognise and continue special sequences",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students memorise names of special sequences without linking them to their defining growth patterns.",
+  "generatedAt": "2026-04-20T16:05:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "classification-idea",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Special sequences are recognised by their defining pattern",
+          "subText": "The name matches the growth rule"
+        }
+      ],
+      "narration": "Special sequences are identified by how they are built.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "fibonacci-meaning",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "Fibonacci: add the previous two terms",
+              "highlight": "green"
+            }
+          ]
+        }
+      ],
+      "narration": "Fibonacci is defined by combining the last two terms.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "square-cube-link",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "Square numbers: 1^2, 2^2, 3^2, ...",
+              "highlight": "accent"
+            },
+            {
+              "text": "Cube numbers: 1^3, 2^3, 3^3, ...",
+              "highlight": null
+            }
+          ]
+        }
+      ],
+      "narration": "Square and cube sequences come from powers of counting numbers.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "triangular-link",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "Triangular numbers grow by +2, +3, +4, ...",
+              "highlight": "green"
+            }
+          ]
+        }
+      ],
+      "narration": "Triangular numbers build by adding the next counting number each time.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 4,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Recognise the defining rule before continuing the sequence",
+          "label": "Name and pattern belong together"
+        }
+      ],
+      "narration": "The conceptual key is matching each sequence name to its growth structure.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: memorising examples without understanding the rule behind them. The rule is what lets you recognise new examples.",
+    "audioNarration": "If you know the growth rule, you can recognise the sequence even when the numbers are unfamiliar."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

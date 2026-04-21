@@ -1,0 +1,102 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "A1.14",
+  "skillName": "Generate linear sequences using term to term rules",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students apply the term-to-term rule inconsistently or stop after one correct step.",
+  "generatedAt": "2026-04-20T16:05:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "given-rule",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "Start at 5, add 3 each time",
+              "highlight": "accent"
+            }
+          ]
+        }
+      ],
+      "narration": "A term-to-term rule tells you how to move from one term to the next.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "generate-terms",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "5, 8, 11, 14",
+              "highlight": "green"
+            }
+          ]
+        }
+      ],
+      "narration": "Apply the same rule repeatedly to generate the sequence.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "continue-carefully",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "14 + 3 = 17",
+              "highlight": "accent"
+            },
+            {
+              "text": "17 + 3 = 20",
+              "highlight": "accent"
+            }
+          ]
+        }
+      ],
+      "narration": "Keep using the same rule each time.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "state-sequence",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "Generated sequence: 5, 8, 11, 14, 17, 20",
+              "highlight": null
+            }
+          ]
+        }
+      ],
+      "narration": "Write the full sequence clearly.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 4,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Start value + repeated rule gives the sequence",
+          "label": "Term-to-term rules build the sequence one step at a time"
+        }
+      ],
+      "narration": "To generate a linear sequence, start with the first term and apply the same add or subtract rule repeatedly.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: using the rule once and then guessing. The same term-to-term rule must be applied at every step.",
+    "audioNarration": "Each new term comes from the previous term by the same rule. Keep repeating it carefully."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

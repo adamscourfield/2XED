@@ -1,0 +1,90 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "A1.5",
+  "skillName": "Dividing algebraic terms",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students divide the coefficients but ignore the variables, or simplify variable powers incorrectly.",
+  "generatedAt": "2026-04-20T15:50:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "introduce-division",
+      "visuals": [
+        {
+          "type": "show_expression",
+          "expression": "12x^3 ÷ 3x",
+          "parts": [
+            { "text": "12x^3", "id": "left", "highlight": null },
+            { "text": " ÷ ", "id": "divide", "highlight": "dim" },
+            { "text": "3x", "id": "right", "highlight": null }
+          ]
+        }
+      ],
+      "narration": "To divide algebraic terms, divide the number part and simplify the variable part.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "divide-coefficients",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "12 ÷ 3 = 4", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "First divide the coefficients. Twelve divided by three equals four.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "simplify-variables",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "x^3 ÷ x = x^2", "highlight": "green" },
+            { "text": "One factor of x is removed", "highlight": null }
+          ]
+        }
+      ],
+      "narration": "Now simplify the variable part. X cubed divided by x leaves x squared.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "combine-answer",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "12x^3 ÷ 3x = 4x^2", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Combine both parts. The simplified result is four x squared.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 4,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Divide coefficients, then simplify variable factors",
+          "label": "12x^3 ÷ 3x = 4x^2"
+        }
+      ],
+      "narration": "The method is to divide the numbers and then reduce the variable part carefully.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: writing 12x^3 ÷ 3x = 4x^3. Dividing by x reduces the variable part, so the correct result is 4x^2.",
+    "audioNarration": "The x in the divisor matters. It removes one factor of x from x cubed, leaving x squared."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

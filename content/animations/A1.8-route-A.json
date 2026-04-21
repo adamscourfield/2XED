@@ -1,0 +1,89 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "A1.8",
+  "skillName": "Substituting into formulae",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students substitute into a formula inconsistently or confuse the symbols in the formula with each other.",
+  "generatedAt": "2026-04-20T15:55:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "introduce-formula",
+      "visuals": [
+        {
+          "type": "show_expression",
+          "expression": "P = 2l + 2w",
+          "parts": [
+            { "text": "P = 2l + 2w", "id": "formula", "highlight": null }
+          ]
+        }
+      ],
+      "narration": "A formula is a rule that connects quantities. To use it, substitute the given values into the correct places.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "insert-values",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "If l = 5 and w = 3", "highlight": null },
+            { "text": "P = 2 × 5 + 2 × 3", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Replace l with five and w with three. Put each value into the correct position in the formula.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "calculate-steps",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "2 × 5 + 2 × 3 = 10 + 6", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Now do the multiplication steps first. Two times five is ten, and two times three is six.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "finish",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "10 + 6 = 16", "highlight": "accent" },
+            { "text": "So P = 16", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Add the results. The perimeter is sixteen.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 4,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Match each symbol to its value, then calculate",
+          "label": "P = 2l + 2w with l=5, w=3 gives P=16"
+        }
+      ],
+      "narration": "The method is to match each symbol carefully to its given value, then evaluate the formula step by step.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: substituting the same value into every letter or putting the values in the wrong positions. Each symbol has its own meaning in the formula.",
+    "audioNarration": "Treat each letter separately. L and w do different jobs, so they must receive the correct values."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

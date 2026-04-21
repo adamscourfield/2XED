@@ -1,0 +1,89 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "A1.10",
+  "skillName": "Expand two single brackets and simplify",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students see the two brackets as separate finished tasks and miss that the final expression still needs to be simplified as one whole expression.",
+  "generatedAt": "2026-04-20T16:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "two-stage-idea",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Stage 1: expand each bracket   Stage 2: simplify the combined expression",
+          "subText": "Expansion and simplification are different jobs"
+        }
+      ],
+      "narration": "This skill has two stages. First expand each bracket, then simplify the overall expression.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "separate-to-whole",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "(First bracket) + (second bracket)", "highlight": null },
+            { "text": "becomes one larger expression", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "After expansion, the two brackets are no longer separate tasks. They become one whole expression that may contain like terms to combine.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "example-meaning",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "x(x + 2) + 2(x + 1)", "highlight": null },
+            { "text": "= x^2 + 2x + 2x + 2", "highlight": "green" },
+            { "text": "= x^2 + 4x + 2", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Notice how expansion creates new like terms across the whole expression. Those terms still need to be combined.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "why-simplify",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Simplified form is shorter and clearer", "highlight": null },
+            { "text": "It shows the final combined structure", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Simplifying matters because it gives the expression in its clearest form, with like terms already combined.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 4,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Expand to remove brackets, then simplify to combine matching terms",
+          "label": "Two stages, one finished expression"
+        }
+      ],
+      "narration": "So the big idea is this: expansion removes the brackets, and simplification finishes the algebra.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: treating expansion as the final answer. Expansion creates the full expression, but simplification is what completes it.",
+    "audioNarration": "Do not stop once the brackets disappear. Check whether the new expression contains like terms that can still be combined."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

@@ -1,0 +1,90 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "A1.3",
+  "skillName": "Collecting like terms",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students can sometimes simplify mechanically but do not understand why only like terms can be combined.",
+  "generatedAt": "2026-04-20T15:45:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "same-kind-idea",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Like terms must have the same variable part",
+          "subText": "You can add 3x and 2x because they are the same kind of quantity"
+        }
+      ],
+      "narration": "Collecting like terms works because the terms represent the same kind of quantity.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "compare-terms",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "3x and 2x are like terms", "highlight": "green" },
+            { "text": "3x and 2y are not like terms", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Three x and two x are both x terms, so they can be combined. But three x and two y are different kinds of terms, so they cannot be collected together.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "meaning-example",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "3x = 3 copies of x", "highlight": null },
+            { "text": "2x = 2 more copies of x", "highlight": null },
+            { "text": "So 3x + 2x = 5x", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "You can think of three x as three copies of x and two x as two more copies of x. Altogether that makes five copies of x, which is five x.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "context-link",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "Perimeter: x + x + 3 + 3", "highlight": null },
+            { "text": "= 2x + 6", "highlight": "accent" },
+            { "text": "x terms combine, constants combine", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "This also matters in context. In a perimeter expression, x terms collect with x terms and constants collect with constants.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 4,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Collect only terms that match in variable and power",
+          "label": "Same variable part means same kind of algebraic quantity"
+        }
+      ],
+      "narration": "The key idea is matching structure. Terms can only be combined when their variable part is the same.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: combining terms because they both contain letters, for example 2x + 3y = 5xy. Different variable parts mean different kinds of terms.",
+    "audioNarration": "Only like terms combine. Same letter is not enough if the whole variable part is different."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

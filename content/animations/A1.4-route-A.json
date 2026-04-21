@@ -1,0 +1,91 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "A1.4",
+  "skillName": "Multiplying algebraic terms",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students multiply coefficients and variables inconsistently, or fail to combine repeated variables into powers.",
+  "generatedAt": "2026-04-20T15:50:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "introduce-product",
+      "visuals": [
+        {
+          "type": "show_expression",
+          "expression": "3x × 2x",
+          "parts": [
+            { "text": "3x", "id": "left", "highlight": null },
+            { "text": " × ", "id": "times", "highlight": "dim" },
+            { "text": "2x", "id": "right", "highlight": null }
+          ]
+        }
+      ],
+      "narration": "To multiply algebraic terms, deal with the number part and the variable part separately.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "multiply-coefficients",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "3 × 2 = 6", "highlight": "accent" },
+            { "text": "Multiply the coefficients first", "highlight": null }
+          ]
+        }
+      ],
+      "narration": "First multiply the coefficients. Three times two equals six.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "multiply-variables",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "x × x = x^2", "highlight": "green" },
+            { "text": "Repeated multiplication becomes a power", "highlight": null }
+          ]
+        }
+      ],
+      "narration": "Now multiply the variable parts. X times x equals x squared.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "combine-result",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "3x × 2x = 6x^2", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Now combine both parts. The product is six x squared.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 4,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Multiply coefficients, then multiply variable parts",
+          "label": "3x × 2x = 6x^2"
+        }
+      ],
+      "narration": "The method is simple. Multiply the numbers, multiply the variables, then write the result in standard algebraic form.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: writing 3x × 2x as 6x or 5x^2. Multiply the coefficients correctly and remember x × x = x^2.",
+    "audioNarration": "Do not stop at six x. Multiplying x by x gives x squared, so the full answer is six x squared."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

@@ -1,0 +1,89 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "A1.6",
+  "skillName": "Substituting into expressions with one operation",
+  "routeType": "C",
+  "routeLabel": "Misconception",
+  "misconceptionSummary": "Students concatenate digits and letters, or substitute the value but apply the wrong operation afterwards.",
+  "generatedAt": "2026-04-20T15:55:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "wrong-reading",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "4t when t = 3 becomes 43", "highlight": "accent" },
+            { "text": "Is that correct?", "highlight": null }
+          ]
+        }
+      ],
+      "narration": "No, that is not correct. Four t does not become forty-three.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "restore-operation",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "4t means 4 × t", "highlight": "green" },
+            { "text": "So 4t becomes 4 × 3", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The symbol next to the variable means multiplication. Four t means four times t.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "calculate-correctly",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "4 × 3 = 12", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Now calculate correctly. Four times three equals twelve.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "compare-addition-case",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "4 + t when t = 3 becomes 4 + 3 = 7", "highlight": "accent" },
+            { "text": "The operation in the expression tells you what to do", "highlight": null }
+          ]
+        }
+      ],
+      "narration": "Always follow the operation already written in the expression. Sometimes it is multiplication, sometimes it is addition.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 4,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Substitute the value, then follow the operation shown",
+          "label": "4t with t=3 gives 12, not 43"
+        }
+      ],
+      "narration": "To avoid the mistake, rewrite the expression clearly after substitution and then carry out the correct operation.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: turning 4t into 43 when t = 3. Adjacency means multiplication, so 4t becomes 4 × 3.",
+    "audioNarration": "If there is no plus or minus sign, a number next to a variable means multiplication."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

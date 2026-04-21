@@ -1,0 +1,110 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "A1.16",
+  "skillName": "Continue geometric sequences",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students use a difference instead of a multiplier when extending a geometric sequence.",
+  "generatedAt": "2026-04-20T16:05:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "given-sequence",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "3, 6, 12, 24",
+              "highlight": null
+            }
+          ]
+        }
+      ],
+      "narration": "Look at how the sequence changes each time.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "find-multiplier",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "3 \u00d7 2 = 6",
+              "highlight": "green"
+            },
+            {
+              "text": "6 \u00d7 2 = 12",
+              "highlight": "green"
+            },
+            {
+              "text": "12 \u00d7 2 = 24",
+              "highlight": "green"
+            }
+          ]
+        }
+      ],
+      "narration": "The sequence is multiplied by two each time.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "continue-sequence",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "24 \u00d7 2 = 48",
+              "highlight": "accent"
+            },
+            {
+              "text": "48 \u00d7 2 = 96",
+              "highlight": "accent"
+            }
+          ]
+        }
+      ],
+      "narration": "Use the same multiplier to continue the sequence.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "state-geometric",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "Geometric sequence = constant multiplier",
+              "highlight": null
+            }
+          ]
+        }
+      ],
+      "narration": "That makes this a geometric sequence.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 4,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "3, 6, 12, 24, 48, 96",
+          "label": "Geometric sequences grow by multiplying each time"
+        }
+      ],
+      "narration": "To continue a geometric sequence, find the constant multiplier and keep using it.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: looking for a constant difference instead of a constant multiplier. Geometric sequences are multiplicative.",
+    "audioNarration": "Do not subtract to test a geometric sequence first. Check how one term is multiplied to make the next."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

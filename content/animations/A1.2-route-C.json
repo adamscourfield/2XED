@@ -1,0 +1,90 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "A1.2",
+  "skillName": "Algebraic notation and basic collecting like terms",
+  "routeType": "C",
+  "routeLabel": "Misconception",
+  "misconceptionSummary": "Students confuse multiplication with addition, or misread powers and coefficient notation.",
+  "generatedAt": "2026-04-20T15:45:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "wrong-translation",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "3y means y + 3", "highlight": "accent" },
+            { "text": "Is that right?", "highlight": null }
+          ]
+        }
+      ],
+      "narration": "Here is a common mistake. Someone says 3y means y plus 3. That is not correct.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "correct-coefficient",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "3y = 3 × y", "highlight": "green" },
+            { "text": "= y + y + y", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Three y means three times y. It is the same as y plus y plus y, not y plus 3.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "wrong-power",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "a^2 = 2a", "highlight": "accent" },
+            { "text": "This is also incorrect", "highlight": null }
+          ]
+        }
+      ],
+      "narration": "Another common mistake is reading a squared as two a. That is also wrong.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "correct-power",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "a^2 = a × a", "highlight": "green" },
+            { "text": "The power counts factors, not extra added terms", "highlight": null }
+          ]
+        }
+      ],
+      "narration": "A squared means a times a. The power tells you how many equal factors are being multiplied.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 4,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "3y = y+y+y,   a^2 = a×a",
+          "label": "Coefficients show repeated addition, powers show repeated multiplication"
+        }
+      ],
+      "narration": "To avoid these mistakes, ask what operation the notation is showing. Coefficients show repeated addition, and powers show repeated multiplication.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: reading 3y as y+3 or reading a^2 as 2a. The notation is showing multiplication structure, not just two symbols placed together.",
+    "audioNarration": "Check the meaning of the notation, not just the appearance. Three y means three times y, and a squared means a multiplied by itself."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

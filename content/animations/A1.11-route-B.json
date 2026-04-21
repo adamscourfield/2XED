@@ -1,0 +1,89 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "A1.11",
+  "skillName": "Factorising into a single bracket",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students learn factorising as a separate trick instead of seeing it as the reverse of expanding.",
+  "generatedAt": "2026-04-20T16:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "reverse-of-expanding",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Factorising is the reverse of expanding",
+          "subText": "Expanding opens a bracket, factorising rebuilds it"
+        }
+      ],
+      "narration": "Factorising is not a brand-new process. It reverses what expansion does.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "expand-then-reverse",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "4(x + 2) = 4x + 8", "highlight": "green" },
+            { "text": "So 4x + 8 factorises to 4(x + 2)", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "If expansion turns four bracket x plus two into four x plus eight, then factorising takes four x plus eight back to four bracket x plus two.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "common-structure",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "A common factor is a shared building block", "highlight": null },
+            { "text": "That shared part can be pulled outside the bracket", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "A common factor is something both terms are built from. Factorising pulls that shared part outside the bracket.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "variable-factor-example",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "5x + 10x^2", "highlight": null },
+            { "text": "Both terms share 5x", "highlight": "green" },
+            { "text": "= 5x(1 + 2x)", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "The common factor can include a variable too. Here both terms share five x, so five x can be factored out.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 4,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Factorising reveals the shared structure of the expression",
+          "label": "Look for what every term has in common"
+        }
+      ],
+      "narration": "That is the key idea. Factorising is about spotting shared structure and rewriting the expression more compactly.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: seeing factorising as unrelated to expanding. The two are inverse processes, so you can check factorising by re-expanding.",
+    "audioNarration": "If you are unsure whether a factorisation is correct, expand it again and check whether you get back to the original expression."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

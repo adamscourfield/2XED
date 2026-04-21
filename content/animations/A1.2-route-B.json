@@ -1,0 +1,90 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "A1.2",
+  "skillName": "Algebraic notation and basic collecting like terms",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students can copy notation but do not understand why algebra is written in a compact form.",
+  "generatedAt": "2026-04-20T15:45:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "why-shorten",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "Algebra uses compact notation to show structure clearly",
+          "subText": "Shorter notation helps us see multiplication, repetition and pattern"
+        }
+      ],
+      "narration": "Algebraic notation is designed to be compact. We shorten repeated structures so the pattern becomes easier to see.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "coefficient-meaning",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "x + x + x + x", "highlight": null },
+            { "text": "4x", "highlight": "accent" },
+            { "text": "The 4 tells us how many x's there are", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "A coefficient shows how many of a variable we have. Four x means four copies of x added together.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "power-meaning",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "x^2 means x × x", "highlight": "accent" },
+            { "text": "x^3 means x × x × x", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "Powers count repeated multiplication. The power tells you how many equal factors of the variable are being multiplied together.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "collecting-link",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "2y + 3y = 5y", "highlight": "accent" },
+            { "text": "The variable part stays the same", "highlight": null },
+            { "text": "The coefficients combine", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "This notation also explains collecting like terms. In 2y plus 3y, the y stays the same and the coefficients combine to make 5y.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 4,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Coefficients count repeated addition, powers count repeated multiplication",
+          "label": "Algebraic notation shows the structure of the maths"
+        }
+      ],
+      "narration": "Algebraic notation is not just a shortcut. It tells us exactly what kind of repetition is happening.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: seeing notation as arbitrary symbols. In fact, the notation carries meaning: coefficients count copies and powers count repeated multiplication.",
+    "audioNarration": "The symbols are not random. They tell you how the algebra is built."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

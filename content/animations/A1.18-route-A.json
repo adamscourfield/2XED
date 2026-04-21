@@ -1,0 +1,106 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "A1.18",
+  "skillName": "Generate sequences from algebraic rules",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students substitute the wrong position number into the nth-term rule or evaluate the expression inaccurately.",
+  "generatedAt": "2026-04-20T16:05:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "given-rule",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "Nth term rule: 3n + 1",
+              "highlight": "accent"
+            }
+          ]
+        }
+      ],
+      "narration": "Use the rule with n equal to the term position.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "first-terms",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "n=1 \u2192 3(1)+1 = 4",
+              "highlight": "green"
+            },
+            {
+              "text": "n=2 \u2192 3(2)+1 = 7",
+              "highlight": "green"
+            }
+          ]
+        }
+      ],
+      "narration": "Substitute the term numbers one by one.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "continue-generation",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "n=3 \u2192 10",
+              "highlight": "accent"
+            },
+            {
+              "text": "n=4 \u2192 13",
+              "highlight": "accent"
+            }
+          ]
+        }
+      ],
+      "narration": "Keep substituting consecutive positions.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "write-sequence",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            {
+              "text": "Generated sequence: 4, 7, 10, 13",
+              "highlight": null
+            }
+          ]
+        }
+      ],
+      "narration": "List the generated terms in order.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 4,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Use the position number in the rule to generate the terms",
+          "label": "Nth-term rules produce terms directly from n"
+        }
+      ],
+      "narration": "To generate a sequence from an algebraic rule, substitute the term position into the expression.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: substituting the previous term value into the nth-term rule instead of the term number. N stands for position, not the previous answer.",
+    "audioNarration": "Always ask what n means. In an nth-term rule, n is the term position number."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

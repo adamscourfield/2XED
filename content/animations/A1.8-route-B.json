@@ -1,0 +1,88 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "A1.8",
+  "skillName": "Substituting into formulae",
+  "routeType": "B",
+  "routeLabel": "Conceptual",
+  "misconceptionSummary": "Students treat formulae as ordinary expressions and miss that each symbol stands for a quantity in a relationship.",
+  "generatedAt": "2026-04-20T15:55:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "what-is-formula",
+      "visuals": [
+        {
+          "type": "rule_callout",
+          "ruleText": "A formula is a rule linking quantities",
+          "subText": "Each letter stands for a specific quantity"
+        }
+      ],
+      "narration": "A formula is more than an expression. It tells us how different quantities are related.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "symbol-roles",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "A = l × w", "highlight": null },
+            { "text": "A means area", "highlight": "accent" },
+            { "text": "l means length, w means width", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "In a formula, the letters have named roles. They are not interchangeable because each one represents a different quantity.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "substitution-as-replacement",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "If l = 8 and w = 2, then A = 8 × 2", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Substitution into a formula means replacing each symbol with the matching quantity it stands for.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "meaning-of-answer",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "A = 16", "highlight": "green" },
+            { "text": "This is not just a number, it is the area", "highlight": null }
+          ]
+        }
+      ],
+      "narration": "The answer also has meaning. It tells you the value of the quantity named on the left-hand side of the formula.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 4,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Use the meaning of each symbol as well as the algebra",
+          "label": "Formulae connect quantities"
+        }
+      ],
+      "narration": "That is why formula substitution matters. It connects the algebra to the quantities in the context.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: swapping the meanings of symbols or ignoring what the formula represents. In formulae, letters are labels for specific quantities.",
+    "audioNarration": "Do not treat the letters as generic placeholders only. In a formula, each one names a quantity in a real relationship."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}

@@ -1,0 +1,91 @@
+{
+  "schemaVersion": "1.0",
+  "skillCode": "A1.11",
+  "skillName": "Factorising into a single bracket",
+  "routeType": "A",
+  "routeLabel": "Procedural",
+  "misconceptionSummary": "Students identify a common factor inconsistently or factorise only part of the expression.",
+  "generatedAt": "2026-04-20T16:00:00.000Z",
+  "steps": [
+    {
+      "stepIndex": 0,
+      "id": "introduce-expression",
+      "visuals": [
+        {
+          "type": "show_expression",
+          "expression": "6x + 9",
+          "parts": [
+            { "text": "6x", "id": "term1", "highlight": null },
+            { "text": " + ", "id": "plus", "highlight": "dim" },
+            { "text": "9", "id": "term2", "highlight": null }
+          ]
+        }
+      ],
+      "narration": "To factorise into one bracket, find a factor that both terms share.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 1,
+      "id": "find-common-factor",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "6 and 9 are both divisible by 3", "highlight": "accent" },
+            { "text": "So 3 is a common factor", "highlight": "green" }
+          ]
+        }
+      ],
+      "narration": "The terms six x and nine both share a factor of three, so we can factor out three.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 2,
+      "id": "divide-each-term",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "6x ÷ 3 = 2x", "highlight": "green" },
+            { "text": "9 ÷ 3 = 3", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Divide each term by the common factor. Six x divided by three is two x, and nine divided by three is three.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 3,
+      "id": "write-factorised",
+      "visuals": [
+        {
+          "type": "step_reveal",
+          "lines": [
+            { "text": "6x + 9 = 3(2x + 3)", "highlight": "accent" }
+          ]
+        }
+      ],
+      "narration": "Now write the common factor outside the bracket and the divided terms inside the bracket.",
+      "audioFile": null
+    },
+    {
+      "stepIndex": 4,
+      "id": "result",
+      "visuals": [
+        {
+          "type": "result_reveal",
+          "expression": "Find a common factor, divide each term, then write one bracket",
+          "label": "6x + 9 = 3(2x + 3)"
+        }
+      ],
+      "narration": "That is the factorising method. Factorising is the reverse of expanding.",
+      "audioFile": null
+    }
+  ],
+  "misconceptionStrip": {
+    "text": "Common mistake: putting the common factor outside but forgetting to divide both terms inside the bracket. Every term must be divided by the factor taken out.",
+    "audioNarration": "If you factor out three, both terms must shrink by a factor of three inside the bracket."
+  },
+  "loopable": true,
+  "pauseAtEndMs": 2000
+}
