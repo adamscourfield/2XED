@@ -119,15 +119,8 @@ export default async function DashboardPage() {
 
   const subjectCards = subjects.map((subject) => {
     const onboardingComplete = onboardingBySubject.get(subject.id) ?? false;
-    const dueSkills = subject.skills.filter((skill) => {
-      const mastery = skill.masteries[0];
-      if (!mastery) return true;
-      if (!mastery.nextReviewAt) return true;
-      return mastery.nextReviewAt <= now;
-    });
 
     const startedSkills = subject.skills.filter((skill) => Boolean(skill.masteries[0]?.lastPracticedAt)).length;
-    const completedEnoughSkills = subject.skills.filter((skill) => (skill.masteries[0]?.mastery ?? 0) >= 0.8).length;
     const averageMastery = subject.skills.length
       ? Math.round(
           (subject.skills.reduce((sum, skill) => sum + (skill.masteries[0]?.mastery ?? 0), 0) / subject.skills.length) * 100
@@ -163,20 +156,202 @@ export default async function DashboardPage() {
     const nextSkillMastery = nextSkill ? nextSkill.masteries[0] : null;
     const nextSkillStarted = Boolean(nextSkillMastery?.lastPracticedAt);
     const nextSkillIsDue = !nextSkillMastery?.nextReviewAt || nextSkillMastery.nextReviewAt <= now;
-    const dueNowCount = dueSkills.length;
 
     return {
       subject,
       onboardingComplete,
       startedSkills,
-      completedEnoughSkills,
       averageMastery,
       nextSkill,
       nextSkillStarted,
       nextSkillIsDue,
-      dueNowCount,
     };
   });
+
+  const renderSubjectDashboardSection = (card: (typeof subjectCards)[number]) => {
+    const { subject, onboardingComplete, startedSkills, averageMastery, nextSkill, nextSkillStarted, nextSkillIsDue } = card;
+    const previewSkills =
+      onboardingComplete
+        ? [...subject.skills]
+            .sort((a, b) => {
+              const aM = a.masteries[0];
+              const bM = b.masteries[0];
+              const aDue = !aM?.nextReviewAt || aM.nextReviewAt <= now;
+              const bDue = !bM?.nextReviewAt || bM.nextReviewAt <= now;
+              if (aDue !== bDue) return aDue ? -1 : 1;
+              const aPct = aM ? Math.round(aM.mastery * 100) : 0;
+              const bPct = bM ? Math.round(bM.mastery * 100) : 0;
+              return aPct - bPct;
+            })
+            .slice(0, 2)
+        : [];
+
+    return (
+      <section key={subject.id}>
+        <div className="anx-card anx-compound-card overflow-hidden px-6 py-7 sm:px-8 sm:py-8">
+          {/* Header */}
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div className="min-w-0 pr-2">
+              <h2 className="text-xl font-bold tracking-tight text-[#2d3142]">{subject.title}</h2>
+              <p className="mt-1.5 text-sm leading-relaxed text-[#757575]">
+                {onboardingComplete
+                  ? 'We will keep your next step clear and easy to follow.'
+                  : 'Start with a short quiz so we can choose the right place for you.'}
+              </p>
+            </div>
+            {onboardingComplete ? (
+              <Link href={`/learn/${subject.slug}`} className="anx-btn-primary shrink-0 self-start sm:self-auto">
+                {nextSkillStarted ? 'Keep going' : 'Start next skill'}
+              </Link>
+            ) : (
+              <Link href={`/diagnostic/${subject.slug}`} className="anx-btn-primary shrink-0 self-start sm:self-auto">
+                Start quiz
+              </Link>
+            )}
+          </div>
+
+          <div className="anx-stat">
+            <p className="anx-stat-label">Next step</p>
+            {onboardingComplete && nextSkill ? (
+              <>
+                <p className="mt-2 text-base font-semibold text-[color:var(--anx-text)]">{nextSkill.name}</p>
+                <p className="mt-1 text-sm text-[color:var(--anx-text-secondary)]">
+                  {nextSkillStarted
+                    ? nextSkillIsDue
+                      ? 'Ready now for a short set.'
+                      : 'We will come back to this soon.'
+                    : 'This is the next new skill for you.'}
+                </p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <span className="anx-chip">{nextSkillStarted ? 'In progress' : 'New skill'}</span>
+                  <span className={nextSkillIsDue ? 'anx-chip' : 'anx-chip-info'}>{nextSkillIsDue ? 'Due now' : 'Up next'}</span>
+                </div>
+              </>
+            ) : (
+              <>
+                <p className="mt-2 text-base font-semibold text-[color:var(--anx-text)]">Start your quiz</p>
+                <p className="mt-1 text-sm text-[color:var(--anx-text-secondary)]">
+                  It helps us choose the right level and your first lesson.
+                </p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <span className="anx-chip">Quiz first</span>
+                  <span className="anx-chip">Short and simple</span>
+                </div>
+              </>
+            )}
+          </div>
+
+          {onboardingComplete && nextSkill && (
+            <div className="border-t border-[color:var(--anx-border)] bg-[var(--anx-surface-soft)] px-5 py-4">
+              <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                <div>
+                  <p className="text-sm font-semibold text-[color:var(--anx-text)]">What happens next</p>
+                  <p className="mt-1 text-sm text-[color:var(--anx-text-secondary)]">
+                    You will do a short set of questions. Then we will choose the best next step for you.
+                  </p>
+                  <div
+                    className="pointer-events-none absolute right-0 top-3 hidden h-[calc(100%-1.5rem)] w-px sm:block"
+                    style={{ background: '#eeeeee' }}
+                    aria-hidden
+                  />
+                </div>
+
+                <div className="relative px-0 sm:px-6">
+                  <p className="anx-compound-metric-label">Progress</p>
+                  <p className="anx-stat-value mt-2 text-[#2d3142]">{onboardingComplete ? `${averageMastery}%` : '—'}</p>
+                  <div className="mt-3 anx-compound-progress-track">
+                    <div className="anx-compound-progress-bar" style={{ width: `${onboardingComplete ? averageMastery : 0}%` }} />
+                  </div>
+                  <div
+                    className="pointer-events-none absolute right-0 top-3 hidden h-[calc(100%-1.5rem)] w-px sm:block"
+                    style={{ background: '#eeeeee' }}
+                    aria-hidden
+                  />
+                </div>
+
+                <div className="px-0 sm:pl-6">
+                  <p className="anx-compound-metric-label">Next step</p>
+                  {onboardingComplete && nextSkill ? (
+                    <>
+                      <p className="mt-2 text-lg font-semibold leading-snug text-[#2d3142]">{nextSkill.name}</p>
+                      <div className="mt-3">
+                        <span
+                          className="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium text-[#2d3142]"
+                          style={{ background: '#eeeeee' }}
+                        >
+                          {nextSkillIsDue ? 'Due now' : 'Up next'}
+                        </span>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <p className="mt-2 text-lg font-semibold leading-snug text-[#2d3142]">Start your quiz</p>
+                      <div className="mt-3">
+                        <span
+                          className="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium text-[#2d3142]"
+                          style={{ background: '#eeeeee' }}
+                        >
+                          Quiz first
+                        </span>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Skill preview rows */}
+          {onboardingComplete && previewSkills.length > 0 && (
+            <div className="mt-6 divide-y divide-[#eeeeee]">
+              {previewSkills.map((skill) => {
+                const mastery = skill.masteries[0];
+                const masteryPct = mastery ? Math.round(mastery.mastery * 100) : 0;
+                const isDue = !mastery?.nextReviewAt || mastery.nextReviewAt <= now;
+                const row = skillRowVisual(isDue, masteryPct);
+
+                return (
+                  <div key={skill.id} className="flex items-center gap-3 py-4 first:pt-0 last:pb-0">
+                    <p className="min-w-0 flex-1 text-[15px] font-medium leading-snug text-[#2d3142]">
+                      {skill.name}
+                    </p>
+                    <div className="flex shrink-0 items-center gap-2.5 sm:gap-3">
+                      <div className="anx-compound-skill-track">
+                        <div className="anx-compound-skill-bar" style={{ width: `${masteryPct}%`, background: row.barColor }} />
+                      </div>
+                      <span className="w-9 text-right text-xs tabular-nums text-[#a0a0a0]">{masteryPct}%</span>
+                      <span
+                        className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium"
+                        style={{ background: row.badgeBg, color: row.badgeText }}
+                      >
+                        <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${row.dotClass}`} aria-hidden />
+                        {row.statusLabel}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Footer */}
+          {onboardingComplete && (
+            <div
+              className="mt-6 flex flex-col gap-2 border-t pt-5 sm:flex-row sm:items-center sm:justify-between"
+              style={{ borderColor: '#eeeeee' }}
+            >
+              <p className="text-sm text-[#757575]">
+                {startedSkills} of {subject.skills.length} skills started
+              </p>
+              <Link href={`/learn/${subject.slug}`} className="text-sm font-medium text-[#757575] transition-colors hover:text-[#2d3142]">
+                View all skills →
+              </Link>
+            </div>
+          )}
+        </div>
+      </section>
+    );
+  };
 
   return (
     <LearningPageShell
@@ -270,189 +445,7 @@ export default async function DashboardPage() {
       )}
 
       {/* Detailed subject cards — compound card layout */}
-      {subjectCards.map(({ subject, onboardingComplete, startedSkills, averageMastery, nextSkill, nextSkillStarted, nextSkillIsDue, dueNowCount }) => {
-        const previewSkills =
-          onboardingComplete
-            ? [...subject.skills]
-                .sort((a, b) => {
-                  const aM = a.masteries[0];
-                  const bM = b.masteries[0];
-                  const aDue = !aM?.nextReviewAt || aM.nextReviewAt <= now;
-                  const bDue = !bM?.nextReviewAt || bM.nextReviewAt <= now;
-                  if (aDue !== bDue) return aDue ? -1 : 1;
-                  const aPct = aM ? Math.round(aM.mastery * 100) : 0;
-                  const bPct = bM ? Math.round(bM.mastery * 100) : 0;
-                  return aPct - bPct;
-                })
-                .slice(0, 2)
-            : [];
-
-        return (
-          <section key={subject.id}>
-            <div className="anx-card anx-compound-card overflow-hidden px-6 py-7 sm:px-8 sm:py-8">
-              {/* Header */}
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                <div className="min-w-0 pr-2">
-                  <h2 className="text-xl font-bold tracking-tight text-[#2d3142]">{subject.title}</h2>
-                  <p className="mt-1.5 text-sm leading-relaxed text-[#757575]">
-                    {onboardingComplete
-                      ? 'We will keep your next step clear and easy to follow.'
-                      : 'Start with a short quiz so we can choose the right place for you.'}
-                  </p>
-                </div>
-                {onboardingComplete ? (
-                  <Link href={`/learn/${subject.slug}`} className="anx-btn-primary shrink-0 self-start sm:self-auto">
-                    {nextSkillStarted ? 'Keep going' : 'Start next skill'}
-                  </Link>
-                ) : (
-                  <Link href={`/diagnostic/${subject.slug}`} className="anx-btn-primary shrink-0 self-start sm:self-auto">
-                    Start quiz
-                  </Link>
-                )}
-              </div>
-
-              <div className="anx-stat">
-                <p className="anx-stat-label">Next step</p>
-                {onboardingComplete && nextSkill ? (
-                  <>
-                    <p className="mt-2 text-base font-semibold text-[color:var(--anx-text)]">{nextSkill.name}</p>
-                    <p className="mt-1 text-sm text-[color:var(--anx-text-secondary)]">
-                      {nextSkillStarted
-                        ? nextSkillIsDue
-                          ? 'Ready now for a short set.'
-                          : 'We will come back to this soon.'
-                        : 'This is the next new skill for you.'}
-                    </p>
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      <span className="anx-chip">{nextSkillStarted ? 'In progress' : 'New skill'}</span>
-                      <span className={nextSkillIsDue ? 'anx-chip' : 'anx-chip-info'}>{nextSkillIsDue ? 'Due now' : 'Up next'}</span>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <p className="mt-2 text-base font-semibold text-[color:var(--anx-text)]">Start your quiz</p>
-                    <p className="mt-1 text-sm text-[color:var(--anx-text-secondary)]">
-                      It helps us choose the right level and your first lesson.
-                    </p>
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      <span className="anx-chip">Quiz first</span>
-                      <span className="anx-chip">Short and simple</span>
-                    </div>
-                  </>
-                )}
-              </div>
-
-            {onboardingComplete && nextSkill && (
-              <div className="border-t border-[color:var(--anx-border)] bg-[var(--anx-surface-soft)] px-5 py-4">
-                <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-                  <div>
-                    <p className="text-sm font-semibold text-[color:var(--anx-text)]">What happens next</p>
-                    <p className="mt-1 text-sm text-[color:var(--anx-text-secondary)]">
-                      You will do a short set of questions. Then we will choose the best next step for you.
-                    </p>
-                    <div
-                      className="pointer-events-none absolute right-0 top-3 hidden h-[calc(100%-1.5rem)] w-px sm:block"
-                      style={{ background: '#eeeeee' }}
-                      aria-hidden
-                    />
-                  </div>
-
-                  <div className="relative px-0 sm:px-6">
-                    <p className="anx-compound-metric-label">Progress</p>
-                    <p className="anx-stat-value mt-2 text-[#2d3142]">{onboardingComplete ? `${averageMastery}%` : '—'}</p>
-                    <div className="mt-3 anx-compound-progress-track">
-                      <div className="anx-compound-progress-bar" style={{ width: `${onboardingComplete ? averageMastery : 0}%` }} />
-                    </div>
-                    <div
-                      className="pointer-events-none absolute right-0 top-3 hidden h-[calc(100%-1.5rem)] w-px sm:block"
-                      style={{ background: '#eeeeee' }}
-                      aria-hidden
-                    />
-                  </div>
-
-                  <div className="px-0 sm:pl-6">
-                    <p className="anx-compound-metric-label">Next step</p>
-                    {onboardingComplete && nextSkill ? (
-                      <>
-                        <p className="mt-2 text-lg font-semibold leading-snug text-[#2d3142]">{nextSkill.name}</p>
-                        <div className="mt-3">
-                          <span
-                            className="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium text-[#2d3142]"
-                            style={{ background: '#eeeeee' }}
-                          >
-                            {nextSkillIsDue ? 'Due now' : 'Up next'}
-                          </span>
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <p className="mt-2 text-lg font-semibold leading-snug text-[#2d3142]">Start your quiz</p>
-                        <div className="mt-3">
-                          <span
-                            className="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium text-[#2d3142]"
-                            style={{ background: '#eeeeee' }}
-                          >
-                            Quiz first
-                          </span>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
-
-              {/* Skill preview rows */}
-              {onboardingComplete && previewSkills.length > 0 && (
-                <div className="mt-6 divide-y divide-[#eeeeee]">
-                  {previewSkills.map((skill) => {
-                    const mastery = skill.masteries[0];
-                    const masteryPct = mastery ? Math.round(mastery.mastery * 100) : 0;
-                    const isDue = !mastery?.nextReviewAt || mastery.nextReviewAt <= now;
-                    const row = skillRowVisual(isDue, masteryPct);
-
-                    return (
-                      <div key={skill.id} className="flex items-center gap-3 py-4 first:pt-0 last:pb-0">
-                        <p className="min-w-0 flex-1 text-[15px] font-medium leading-snug text-[#2d3142]">
-                          {skill.name}
-                        </p>
-                        <div className="flex shrink-0 items-center gap-2.5 sm:gap-3">
-                          <div className="anx-compound-skill-track">
-                            <div className="anx-compound-skill-bar" style={{ width: `${masteryPct}%`, background: row.barColor }} />
-                          </div>
-                          <span className="w-9 text-right text-xs tabular-nums text-[#a0a0a0]">{masteryPct}%</span>
-                          <span
-                            className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium"
-                            style={{ background: row.badgeBg, color: row.badgeText }}
-                          >
-                            <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${row.dotClass}`} aria-hidden />
-                            {row.statusLabel}
-                          </span>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-
-              {/* Footer */}
-              {onboardingComplete && (
-                <div
-                  className="mt-6 flex flex-col gap-2 border-t pt-5 sm:flex-row sm:items-center sm:justify-between"
-                  style={{ borderColor: '#eeeeee' }}
-                >
-                  <p className="text-sm text-[#757575]">
-                    {startedSkills} of {subject.skills.length} skills started
-                  </p>
-                  <Link href={`/learn/${subject.slug}`} className="text-sm font-medium text-[#757575] transition-colors hover:text-[#2d3142]">
-                    View all skills →
-                  </Link>
-                </div>
-              )}
-            </div>
-          </section>
-        );
-      })}
+      {subjectCards.map(renderSubjectDashboardSection)}
 
       {subjects.length === 0 && (
         <div className="anx-card px-6 py-16 text-center text-[color:var(--anx-text-muted)]">
