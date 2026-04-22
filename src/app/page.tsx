@@ -27,12 +27,9 @@ export default function HomePage() {
             <div className="anx-divider" />
           </div>
 
-          <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+          <div className="mt-8 flex justify-center">
             <Link href="/login" className="anx-btn-primary px-8 py-3.5 text-base">
               Sign In
-            </Link>
-            <Link href="/dashboard" className="anx-btn-secondary px-8 py-3.5 text-base">
-              Open Dashboard
             </Link>
           </div>
         </section>
