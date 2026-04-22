@@ -301,8 +301,38 @@ export function deriveStoredItemFromMapping(row: MappingRow): {
 
 export function getItemContractIssues(item: StoredItemContract): ContractIssue[] {
   const content = getItemContent(item);
-  if (content.type === 'NUMBER_LINE' || content.type === 'PROTRACTOR') return [];
   const issues: ContractIssue[] = [];
+
+  if (content.type === 'NUMBER_LINE') {
+    const cfg = content.numberLine;
+    if (!cfg) {
+      issues.push({ code: 'number_line_missing_config', message: 'Number-line items need numberLine configuration.', severity: 'error' });
+      return issues;
+    }
+    if (!(cfg.max > cfg.min)) {
+      issues.push({ code: 'number_line_invalid_range', message: 'Number-line items need max greater than min.', severity: 'error' });
+    }
+    if (!(cfg.step > 0)) {
+      issues.push({ code: 'number_line_invalid_step', message: 'Number-line items need a positive step size.', severity: 'error' });
+    }
+    if (cfg.task === 'read' && typeof cfg.markerValue !== 'number') {
+      issues.push({ code: 'number_line_missing_marker', message: 'Read-mode number-line items need a markerValue.', severity: 'error' });
+    }
+    if (cfg.task === 'place') {
+      const accepted = content.acceptedAnswers
+        .map((answer) => normalizeAnswer(answer))
+        .map((answer) => Number(answer))
+        .filter((value) => Number.isFinite(value));
+      if (accepted.length === 0) {
+        issues.push({ code: 'number_line_missing_answer', message: 'Place-mode number-line items need at least one numeric accepted answer.', severity: 'error' });
+      } else if (accepted.some((value) => value < cfg.min || value > cfg.max)) {
+        issues.push({ code: 'number_line_answer_out_of_range', message: 'Number-line accepted answers must lie within the configured range.', severity: 'error' });
+      }
+    }
+    return issues;
+  }
+
+  if (content.type === 'PROTRACTOR') return [];
   const rawChoices = rawChoiceList(item.options);
   const normalizedChoiceSet = new Set(content.choices.map((choice) => normalizeAnswer(choice)));
   const normalizedAcceptedAnswers = content.acceptedAnswers.map((answer) => normalizeAnswer(answer));

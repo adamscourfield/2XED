@@ -60,4 +60,48 @@ describe('questionContract', () => {
 
     expect(issues.some((issue) => issue.code === 'duplicate_choices')).toBe(true);
   });
+
+  it('accepts well-formed probability-scale number-line items', () => {
+    const issues = getItemContractIssues({
+      question: 'Place a marker to show an even chance on the probability scale.',
+      type: 'NUMBER_LINE',
+      answer: '0.5',
+      options: {
+        choices: [],
+        acceptedAnswers: ['0.5'],
+        numberLine: {
+          min: 0,
+          max: 1,
+          step: 0.1,
+          labelledValues: [0, 0.5, 1],
+          task: 'place',
+          tolerance: 0.05,
+        },
+      },
+    });
+
+    expect(issues).toEqual([]);
+  });
+
+  it('flags out-of-range probability-scale answers', () => {
+    const issues = getItemContractIssues({
+      question: 'Place a marker to show an impossible event on the probability scale.',
+      type: 'NUMBER_LINE',
+      answer: '2',
+      options: {
+        choices: [],
+        acceptedAnswers: ['2'],
+        numberLine: {
+          min: 0,
+          max: 1,
+          step: 0.1,
+          labelledValues: [0, 0.5, 1],
+          task: 'place',
+          tolerance: 0.05,
+        },
+      },
+    });
+
+    expect(issues.some((issue) => issue.code === 'number_line_answer_out_of_range')).toBe(true);
+  });
 });
