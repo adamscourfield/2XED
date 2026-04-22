@@ -19,6 +19,20 @@ interface LaneStudent {
   name: string | null;
   email: string;
   hasFlag?: boolean;
+  currentExplanationId?: string | null;
+}
+
+interface SupportSummary {
+  shownCount: number;
+  acknowledgedCount: number;
+  recheckStartedCount: number;
+  rejoinedCount: number;
+  escalatedCount: number;
+  latestOutcomes: Array<{
+    studentUserId: string;
+    outcome: 'rejoined_lane_1' | 'stayed_lane_2' | 'escalated_lane_3';
+    createdAt: string;
+  }>;
 }
 
 interface ResponseSummary {
@@ -40,6 +54,7 @@ interface SessionSnapshot {
   laneCounts: { LANE_1: number; LANE_2: number; LANE_3: number };
   laneStudents: { LANE_1: LaneStudent[]; LANE_2: LaneStudent[]; LANE_3: LaneStudent[] };
   responseSummary: ResponseSummary[];
+  supportSummary?: SupportSummary;
 }
 
 interface Props {
@@ -350,6 +365,43 @@ function ClassPulse({ snapshot }: { snapshot: SessionSnapshot }) {
         </div>
       </div>
 
+      {snapshot.supportSummary && (
+        <div>
+          <p className="anx-section-label mb-2" style={{ color: 'var(--anx-text-muted)' }}>Support outcomes</p>
+          <div className="grid grid-cols-2 gap-2">
+            <div className="anx-card p-3 text-center">
+              <p className="text-2xl font-bold font-serif" style={{ color: 'var(--anx-text)' }}>{snapshot.supportSummary.shownCount}</p>
+              <p className="text-xs" style={{ color: 'var(--anx-text-muted)' }}>shown</p>
+            </div>
+            <div className="anx-card p-3 text-center">
+              <p className="text-2xl font-bold font-serif" style={{ color: 'var(--anx-text)' }}>{snapshot.supportSummary.acknowledgedCount}</p>
+              <p className="text-xs" style={{ color: 'var(--anx-text-muted)' }}>acknowledged</p>
+            </div>
+            <div className="anx-card p-3 text-center">
+              <p className="text-2xl font-bold font-serif" style={{ color: 'var(--anx-success)' }}>{snapshot.supportSummary.rejoinedCount}</p>
+              <p className="text-xs" style={{ color: 'var(--anx-text-muted)' }}>rejoined</p>
+            </div>
+            <div className="anx-card p-3 text-center">
+              <p className="text-2xl font-bold font-serif" style={{ color: 'var(--anx-danger-text)' }}>{snapshot.supportSummary.escalatedCount}</p>
+              <p className="text-xs" style={{ color: 'var(--anx-text-muted)' }}>escalated</p>
+            </div>
+          </div>
+
+          {snapshot.supportSummary.latestOutcomes.length > 0 && (
+            <div className="mt-3 space-y-2">
+              {snapshot.supportSummary.latestOutcomes.map((outcome) => (
+                <div key={`${outcome.studentUserId}-${outcome.createdAt}`} className="anx-card flex items-center justify-between p-3 text-xs">
+                  <span style={{ color: 'var(--anx-text-secondary)' }}>{outcome.studentUserId.slice(0, 8)}…</span>
+                  <span style={{ color: outcome.outcome === 'rejoined_lane_1' ? 'var(--anx-success)' : outcome.outcome === 'escalated_lane_3' ? 'var(--anx-danger-text)' : 'var(--anx-warning-text)' }}>
+                    {outcome.outcome === 'rejoined_lane_1' ? 'Rejoined Lane 1' : outcome.outcome === 'escalated_lane_3' ? 'Back to Lane 3' : 'Stayed Lane 2'}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Per-skill breakdown */}
       {snapshot.responseSummary.length > 0 && (
         <div>
@@ -400,15 +452,28 @@ function ClassRoster({
   async function pushExplanationToLane3() {
     setBroadcastLoading(true);
     try {
-      await fetch(`/api/live-sessions/${sessionId}/broadcast`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          lanes: ['LANE_3'],
-          contentType: 'MESSAGE',
-          message: 'Your teacher is coming to help you. Please wait.',
-        }),
-      });
+      const lane3Student = snapshot.laneStudents.LANE_3?.find((student) => Boolean(student.currentExplanationId));
+      if (lane3Student?.currentExplanationId) {
+        await fetch(`/api/live-sessions/${sessionId}/broadcast`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            lanes: ['LANE_3'],
+            contentType: 'EXPLANATION',
+            explanationRouteId: lane3Student.currentExplanationId,
+          }),
+        });
+      } else {
+        await fetch(`/api/live-sessions/${sessionId}/broadcast`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            lanes: ['LANE_3'],
+            contentType: 'MESSAGE',
+            message: 'Your teacher is coming to help you. Please wait.',
+          }),
+        });
+      }
       onBroadcast();
     } finally {
       setBroadcastLoading(false);
@@ -480,7 +545,7 @@ function ClassRoster({
           className="anx-btn-secondary w-full text-sm"
           style={{ borderColor: 'var(--anx-danger)', color: 'var(--anx-danger-text)' }}
         >
-          {broadcastLoading ? 'Sending…' : `Send support message → Lane 3 (${snapshot.laneCounts.LANE_3})`}
+          {broadcastLoading ? 'Sending…' : `Send support to Lane 3 (${snapshot.laneCounts.LANE_3})`}
         </button>
       )}
     </div>

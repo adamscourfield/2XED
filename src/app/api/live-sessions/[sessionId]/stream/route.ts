@@ -110,6 +110,31 @@ export async function GET(req: NextRequest, { params }: Props) {
       }
     }
 
+    const supportEvents = await prisma.event.findMany({
+      where: {
+        name: {
+          in: [
+            'live_explanation_shown',
+            'live_explanation_acknowledged',
+            'live_support_recheck_started',
+            'live_support_recheck_completed',
+          ],
+        },
+        payload: {
+          path: ['liveSessionId'],
+          equals: sessionId,
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+      select: {
+        name: true,
+        studentUserId: true,
+        createdAt: true,
+        payload: true,
+      },
+      take: 50,
+    });
+
     return {
       sessionId: ls.id,
       status: ls.status,
@@ -127,6 +152,21 @@ export async function GET(req: NextRequest, { params }: Props) {
         answeredCount: s.answered.size,
         correctCount: s.correct,
       })),
+      supportSummary: {
+        shownCount: supportEvents.filter((event) => event.name === 'live_explanation_shown').length,
+        acknowledgedCount: supportEvents.filter((event) => event.name === 'live_explanation_acknowledged').length,
+        recheckStartedCount: supportEvents.filter((event) => event.name === 'live_support_recheck_started').length,
+        rejoinedCount: supportEvents.filter((event) => event.name === 'live_support_recheck_completed' && (event.payload as { outcome?: string }).outcome === 'rejoined_lane_1').length,
+        escalatedCount: supportEvents.filter((event) => event.name === 'live_support_recheck_completed' && (event.payload as { outcome?: string }).outcome === 'escalated_lane_3').length,
+        latestOutcomes: supportEvents
+          .filter((event) => event.name === 'live_support_recheck_completed' && typeof (event.payload as { outcome?: string }).outcome === 'string' && Boolean(event.studentUserId))
+          .slice(0, 8)
+          .map((event) => ({
+            studentUserId: event.studentUserId,
+            outcome: (event.payload as { outcome: 'rejoined_lane_1' | 'stayed_lane_2' | 'escalated_lane_3' }).outcome,
+            createdAt: event.createdAt.toISOString(),
+          })),
+      },
     };
   }
 

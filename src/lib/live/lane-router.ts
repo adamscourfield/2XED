@@ -1,4 +1,5 @@
 import { prisma } from '@/db/prisma';
+import { emitEvent } from '@/features/telemetry/eventService';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -27,6 +28,7 @@ export type EscalationResult = {
 export type HandbackResult = {
   newLane: 'LANE_2';
   shadowCheckItemId: string;
+  studentUserId: string;
 };
 
 // ─── assignLane ──────────────────────────────────────────────────────────────
@@ -273,7 +275,7 @@ export async function handleHandback(
 ): Promise<HandbackResult> {
   const participant = await prisma.liveParticipant.findUnique({
     where: { id: participantId },
-    include: { session: { select: { skillId: true } } },
+    include: { session: { select: { skillId: true, subjectId: true } } },
   });
 
   // Step 1 — Update LiveParticipant
@@ -324,7 +326,24 @@ export async function handleHandback(
     shadowCheckItemId = availableItem?.id ?? '';
   }
 
-  return { newLane: 'LANE_2', shadowCheckItemId };
+  await emitEvent({
+    name: 'live_support_recheck_started',
+    actorUserId: teacherUserId,
+    studentUserId: participant!.studentUserId,
+    subjectId: participant?.session.subjectId,
+    skillId: skillId ?? undefined,
+    itemId: shadowCheckItemId || undefined,
+    payload: {
+      liveSessionId: sessionId,
+      participantId,
+      studentUserId: participant!.studentUserId,
+      fromLane: 'LANE_3',
+      toLane: 'LANE_2',
+      shadowCheckItemId: shadowCheckItemId || null,
+    },
+  });
+
+  return { newLane: 'LANE_2', shadowCheckItemId, studentUserId: participant!.studentUserId };
 }
 
 // ─── checkReteachThreshold ───────────────────────────────────────────────────

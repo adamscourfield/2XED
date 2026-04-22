@@ -15,6 +15,8 @@ interface Props {
  *   - status
  *   - currentPhaseIndex
  *   - currentContent (broadcast payload if any)
+ *   - studentLane
+ *   - pendingRecheckItem (if teacher handed the student back to app)
  *
  * Students poll this every 3s while in a session.
  */
@@ -36,7 +38,7 @@ export async function GET(_req: NextRequest, { params }: Props) {
         studentUserId: userId,
       },
     },
-    select: { id: true, currentLane: true },
+    select: { id: true, currentLane: true, currentExplanationId: true },
   });
 
   if (!participant) return NextResponse.json({ error: 'Not a participant' }, { status: 403 });
@@ -47,15 +49,47 @@ export async function GET(_req: NextRequest, { params }: Props) {
       status: true,
       currentPhaseIndex: true,
       currentContent: true,
+      skillId: true,
     },
   });
 
   if (!liveSession) return NextResponse.json({ error: 'Session not found' }, { status: 404 });
+
+  let pendingRecheckItem: { id: string; question: string; type: string; options: unknown } | null = null;
+
+  if (participant.currentLane === 'LANE_2' && participant.currentExplanationId && liveSession.skillId) {
+    const attemptedItems = await prisma.liveAttempt.findMany({
+      where: {
+        liveSessionId: sessionId,
+        studentUserId: userId,
+      },
+      select: { itemId: true },
+    });
+    const attemptedSet = new Set(attemptedItems.map((attempt) => attempt.itemId));
+
+    const nextRecheckItem = await prisma.item.findFirst({
+      where: {
+        skills: { some: { skillId: liveSession.skillId } },
+        id: { notIn: Array.from(attemptedSet) },
+      },
+      select: {
+        id: true,
+        question: true,
+        type: true,
+        options: true,
+      },
+    });
+
+    if (nextRecheckItem) {
+      pendingRecheckItem = nextRecheckItem;
+    }
+  }
 
   return NextResponse.json({
     status: liveSession.status,
     currentPhaseIndex: liveSession.currentPhaseIndex,
     currentContent: liveSession.currentContent,
     studentLane: participant.currentLane,
+    pendingRecheckItem,
   });
 }

@@ -193,6 +193,69 @@ export const StepInteractionEvaluatedPayloadSchema = z.object({
   interactionDurationMs: z.number().int().nonnegative().nullable().optional(),
 });
 
+export const ExplanationShownPayloadSchema = z.object({
+  skillId: z.string(),
+  skillCode: z.string().optional(),
+  subjectId: z.string(),
+  routeType: z.enum(['A', 'B', 'C']),
+  trigger: z.enum(['zero_score', 'repeat_failure']),
+  priorSessionScore: z.string(),
+});
+
+export const ExplanationRetryStartedPayloadSchema = z.object({
+  skillId: z.string(),
+  skillCode: z.string().optional(),
+  subjectId: z.string(),
+  routeType: z.enum(['A', 'B', 'C']),
+  retryItemCount: z.number().int().positive(),
+});
+
+export const ExplanationRetryCompletedPayloadSchema = z.object({
+  skillId: z.string(),
+  skillCode: z.string().optional(),
+  subjectId: z.string(),
+  routeType: z.enum(['A', 'B', 'C']),
+  retryCorrectCount: z.number().int().nonnegative(),
+  retryTotalItems: z.number().int().positive(),
+  recoveryState: z.enum(['recovered', 'improving', 'still_needs_support']),
+});
+
+export const LiveExplanationShownPayloadSchema = z.object({
+  liveSessionId: z.string(),
+  explanationRouteId: z.string(),
+  skillId: z.string(),
+  routeType: z.string(),
+  lane: z.enum(['LANE_1', 'LANE_2', 'LANE_3']).nullable().optional(),
+});
+
+export const LiveExplanationAcknowledgedPayloadSchema = z.object({
+  liveSessionId: z.string(),
+  explanationRouteId: z.string(),
+  skillId: z.string(),
+  routeType: z.string(),
+  acknowledgedFromLane: z.enum(['LANE_1', 'LANE_2', 'LANE_3']).nullable().optional(),
+});
+
+export const LiveSupportRecheckStartedPayloadSchema = z.object({
+  liveSessionId: z.string(),
+  participantId: z.string(),
+  studentUserId: z.string(),
+  fromLane: z.enum(['LANE_1', 'LANE_2', 'LANE_3']),
+  toLane: z.enum(['LANE_1', 'LANE_2', 'LANE_3']),
+  shadowCheckItemId: z.string().nullable(),
+});
+
+export const LiveSupportRecheckCompletedPayloadSchema = z.object({
+  liveSessionId: z.string(),
+  participantId: z.string().optional(),
+  studentUserId: z.string(),
+  itemId: z.string(),
+  skillId: z.string(),
+  correct: z.boolean(),
+  laneAfterAttempt: z.enum(['LANE_1', 'LANE_2', 'LANE_3']).nullable().optional(),
+  outcome: z.enum(['rejoined_lane_1', 'stayed_lane_2', 'escalated_lane_3']),
+});
+
 export const EventPayloadSchemas: Record<string, z.ZodSchema> = {
   attempt_submitted: AttemptSubmittedPayloadSchema,
   attempt_graded: AttemptGradedPayloadSchema,
@@ -213,6 +276,13 @@ export const EventPayloadSchemas: Record<string, z.ZodSchema> = {
   step_interaction_started: StepInteractionStartedPayloadSchema,
   step_interaction_completed: StepInteractionCompletedPayloadSchema,
   step_interaction_evaluated: StepInteractionEvaluatedPayloadSchema,
+  explanation_shown: ExplanationShownPayloadSchema,
+  explanation_retry_started: ExplanationRetryStartedPayloadSchema,
+  explanation_retry_completed: ExplanationRetryCompletedPayloadSchema,
+  live_explanation_shown: LiveExplanationShownPayloadSchema,
+  live_explanation_acknowledged: LiveExplanationAcknowledgedPayloadSchema,
+  live_support_recheck_started: LiveSupportRecheckStartedPayloadSchema,
+  live_support_recheck_completed: LiveSupportRecheckCompletedPayloadSchema,
   diagnostic_completed: DiagnosticCompletedPayloadSchema,
   baseline_started: BaselineStartedPayloadSchema,
   baseline_item_answered: BaselineItemAnsweredPayloadSchema,

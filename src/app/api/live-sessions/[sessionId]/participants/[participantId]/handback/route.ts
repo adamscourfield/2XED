@@ -4,6 +4,13 @@ import { authOptions } from '@/features/auth/authOptions';
 import { prisma } from '@/db/prisma';
 import { handleHandback } from '@/lib/live/lane-router';
 
+interface HandbackItem {
+  id: string;
+  question: string;
+  type: string;
+  options: unknown;
+}
+
 interface Props {
   params: Promise<{ sessionId: string; participantId: string }>;
 }
@@ -35,5 +42,24 @@ export async function POST(_req: NextRequest, { params }: Props) {
 
   const result = await handleHandback(participantId, sessionId, userId);
 
-  return NextResponse.json(result);
+  let handbackItem: HandbackItem | null = null;
+  if (result.shadowCheckItemId) {
+    const item = await prisma.item.findUnique({
+      where: { id: result.shadowCheckItemId },
+      select: {
+        id: true,
+        question: true,
+        type: true,
+        options: true,
+      },
+    });
+    if (item) {
+      handbackItem = item;
+    }
+  }
+
+  return NextResponse.json({
+    ...result,
+    handbackItem,
+  });
 }

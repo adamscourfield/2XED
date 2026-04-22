@@ -16,6 +16,7 @@ export const HandbackSchema = z.object({
 });
 
 export const LaneStudentSchema = z.object({
+  participantId: z.string(),
   studentUserId: z.string(),
   studentName: z.string(),
   masteryProbability: z.number().min(0).max(1),

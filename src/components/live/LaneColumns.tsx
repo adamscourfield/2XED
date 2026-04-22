@@ -8,6 +8,7 @@ type EscalationReason =
   | 'MANUAL_TEACHER';
 
 interface LaneStudent {
+  participantId: string;
   studentUserId: string;
   studentName: string;
   masteryProbability: number;
@@ -27,7 +28,7 @@ interface LaneColumnsProps {
   lane1: LaneGroup;
   lane2: LaneGroup;
   lane3: LaneGroup;
-  onHandback?: (studentUserId: string) => void;
+  onHandback?: (participantId: string) => void;
 }
 
 function WaitingBadge({ minutes }: { minutes: number }) {
@@ -101,7 +102,7 @@ export function LaneColumns({ lane1, lane2, lane3, onHandback }: LaneColumnsProp
                 </div>
                 {onHandback && (
                   <button
-                    onClick={() => onHandback(student.studentUserId)}
+                    onClick={() => onHandback(student.participantId)}
                     className="anx-btn-primary mt-2 w-full text-xs"
                   >
                     Hand back to app

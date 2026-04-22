@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { redirect } from 'next/navigation';
 import { AppChrome } from '@/components/AppChrome';
+import { AnimationRenderer } from '@/components/explanation/AnimationRenderer';
 import { LiveWhiteboardViewer } from '@/components/student/LiveWhiteboardViewer';
 import type { LiveWhiteboardPayload } from '@/lib/live/whiteboard-strokes';
 
@@ -33,6 +34,38 @@ interface Item {
   options: unknown;
 }
 
+interface ExplanationAnimationSchema {
+  schemaVersion: string;
+  skillCode: string;
+  skillName: string;
+  routeType: string;
+  routeLabel: string;
+  misconceptionSummary: string;
+  generatedAt: string;
+  steps: Array<{
+    stepIndex: number;
+    id: string;
+    visuals: unknown[];
+    narration: string;
+    audioFile: string | null;
+  }>;
+  misconceptionStrip: {
+    text: string;
+    audioNarration: string;
+  };
+  loopable: boolean;
+  pauseAtEndMs: number;
+}
+
+interface LiveExplanationPayload {
+  id: string;
+  skillId: string;
+  routeType: string;
+  misconceptionSummary: string;
+  workedExample?: string;
+  animationSchema?: ExplanationAnimationSchema | null;
+}
+
 interface CurrentContent {
   contentType: 'EXPLANATION' | 'MESSAGE' | 'PHASE' | 'WHITEBOARD';
   targetLanes?: string[];
@@ -40,6 +73,7 @@ interface CurrentContent {
   phaseIndex?: number;
   broadcastAt?: string;
   whiteboard?: LiveWhiteboardPayload;
+  explanation?: LiveExplanationPayload;
 }
 
 interface SessionPoll {
@@ -47,6 +81,7 @@ interface SessionPoll {
   currentPhaseIndex: number;
   currentContent: CurrentContent | null;
   studentLane?: string | null;
+  pendingRecheckItem?: Item | null;
 }
 
 type AppState =
@@ -54,6 +89,7 @@ type AppState =
   | { phase: 'waiting'; session: JoinedSession }
   | { phase: 'between-phases'; session: JoinedSession; message: string }
   | { phase: 'whiteboard'; session: JoinedSession; whiteboard: LiveWhiteboardPayload }
+  | { phase: 'explanation'; session: JoinedSession; explanation: LiveExplanationPayload }
   | { phase: 'question'; session: JoinedSession; item: Item }
   | { phase: 'feedback'; session: JoinedSession; correct: boolean; nextItem: Item | null }
   | { phase: 'done'; session: JoinedSession };
@@ -86,6 +122,7 @@ export default function StudentLivePage() {
   const lastWhiteboardVersionRef = useRef<number>(-1);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const sessionRef = useRef<JoinedSession | null>(null);
+  const lastLiveExplanationIdRef = useRef<string | null>(null);
 
   // Update sessionRef when appState changes
   useEffect(() => {
@@ -100,6 +137,7 @@ export default function StudentLivePage() {
       appState.phase === 'waiting' ||
       appState.phase === 'between-phases' ||
       appState.phase === 'whiteboard' ||
+      appState.phase === 'explanation' ||
       appState.phase === 'question' ||
       appState.phase === 'feedback';
     if (!isInSession) {
@@ -135,6 +173,14 @@ export default function StudentLivePage() {
           if (sess) setAppState({ phase: 'between-phases', session: sess, message: 'Your teacher has moved to the next phase. Get ready!' });
         }
 
+        if (data.pendingRecheckItem) {
+          const sess = sessionRef.current;
+          if (sess && appState.phase !== 'question') {
+            setAppState({ phase: 'question', session: sess, item: data.pendingRecheckItem });
+            return;
+          }
+        }
+
         if (newBroadcast && data.currentContent) {
           lastBroadcastAtRef.current = data.currentContent.broadcastAt ?? null;
           const cc = data.currentContent;
@@ -153,6 +199,9 @@ export default function StudentLivePage() {
                 setAppState({ phase: 'whiteboard', session: sess, whiteboard: wb });
               }
             }
+          } else if (cc.contentType === 'EXPLANATION' && laneOk && cc.explanation) {
+            const sess = sessionRef.current;
+            if (sess) setAppState({ phase: 'explanation', session: sess, explanation: cc.explanation });
           } else if (cc.contentType === 'MESSAGE' && laneOk && cc.message) {
             const sess = sessionRef.current;
             if (sess) setAppState({ phase: 'between-phases', session: sess, message: cc.message });
@@ -175,6 +224,26 @@ export default function StudentLivePage() {
     return () => { if (pollRef.current) clearInterval(pollRef.current); };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appState.phase]);
+
+  useEffect(() => {
+    if (appState.phase !== 'explanation') return;
+    const explanationId = appState.explanation.id;
+    if (!explanationId || lastLiveExplanationIdRef.current === explanationId) return;
+
+    lastLiveExplanationIdRef.current = explanationId;
+    void fetch(`/api/live-sessions/${appState.session.sessionId}/explanation-event`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        eventType: 'shown',
+        explanationRouteId: explanationId,
+        skillId: appState.explanation.skillId,
+        routeType: appState.explanation.routeType,
+      }),
+    }).catch(() => {
+      // ignore telemetry failures
+    });
+  }, [appState]);
 
   if (status === 'loading') {
     return (
@@ -259,7 +328,12 @@ export default function StudentLivePage() {
         return;
       }
 
-      const result: { correct: boolean; nextItem: Item | null } = await res.json();
+      const result: {
+        correct: boolean;
+        nextItem: Item | null;
+        recheckOutcome?: 'rejoined_lane_1' | 'stayed_lane_2' | 'escalated_lane_3' | null;
+        laneAfterAttempt?: 'LANE_1' | 'LANE_2' | 'LANE_3' | null;
+      } = await res.json();
       setAnswer('');
       setAppState({
         phase: 'feedback',
@@ -345,6 +419,65 @@ export default function StudentLivePage() {
     );
   }
 
+  // ── Compact live explanation ───────────────────────────────────────────────
+  if (appState.phase === 'explanation') {
+    const { explanation } = appState;
+    return (
+      <AppChrome variant="student">
+        <main className="anx-shell flex flex-1 items-center justify-center px-4 py-6">
+          <div className="anx-panel w-full max-w-4xl p-8 space-y-6">
+            <div className="text-center">
+              <h2 className="text-xl font-bold" style={{ color: 'var(--anx-text)' }}>Quick support</h2>
+              <p className="mt-2 text-sm" style={{ color: 'var(--anx-text-muted)' }}>
+                Stay with this explanation. You may get a short recheck question next.
+              </p>
+            </div>
+
+            {explanation.animationSchema ? (
+              <AnimationRenderer schema={explanation.animationSchema} />
+            ) : (
+              <div className="space-y-4 rounded-2xl border p-6" style={{ borderColor: 'var(--anx-border)', background: 'var(--anx-surface)' }}>
+                <div className="anx-callout-warning">
+                  <p className="font-medium">Watch out for this</p>
+                  <p className="mt-1">{explanation.misconceptionSummary}</p>
+                </div>
+                {explanation.workedExample && (
+                  <div className="anx-callout-info">
+                    <p className="font-medium">Worked example</p>
+                    <p className="mt-1 whitespace-pre-wrap">{explanation.workedExample}</p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="flex justify-center">
+              <button
+                onClick={() => {
+                  void fetch(`/api/live-sessions/${appState.session.sessionId}/explanation-event`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      eventType: 'acknowledged',
+                      explanationRouteId: explanation.id,
+                      skillId: explanation.skillId,
+                      routeType: explanation.routeType,
+                    }),
+                  }).catch(() => {
+                    // ignore telemetry failures
+                  });
+                  setAppState({ phase: 'waiting', session: appState.session });
+                }}
+                className="anx-btn-primary px-6 py-3"
+              >
+                I’m ready
+              </button>
+            </div>
+          </div>
+        </main>
+      </AppChrome>
+    );
+  }
+
   // ── Waiting for session to start ────────────────────────────────────────────
   if (appState.phase === 'waiting') {
     return (
@@ -397,6 +530,9 @@ export default function StudentLivePage() {
         <main className="anx-shell anx-scene flex flex-1 items-center justify-center">
         <div className="anx-panel w-full max-w-lg p-8">
           {error && <div className="anx-callout-danger mb-4 text-sm">{error}</div>}
+          <p className="mb-2 text-xs font-medium uppercase tracking-wide" style={{ color: 'var(--anx-text-muted)' }}>
+            Quick recheck
+          </p>
           <p className="mb-6 text-base leading-relaxed" style={{ color: 'var(--anx-text)' }}>{item.question}</p>
           <form onSubmit={handleAnswer} className="space-y-3">
             {opts.length > 0 ? (
@@ -456,6 +592,11 @@ export default function StudentLivePage() {
           <h2 className="mb-4 text-xl font-bold" style={{ color: appState.correct ? 'var(--anx-success)' : 'var(--anx-danger)' }}>
             {appState.correct ? 'Correct!' : 'Not quite…'}
           </h2>
+          {appState.nextItem ? null : (
+            <p className="mb-4 text-sm" style={{ color: 'var(--anx-text-muted)' }}>
+              Your teacher will decide the next move.
+            </p>
+          )}
           <button
             onClick={handleNext}
             className="anx-btn-primary px-6 py-2"

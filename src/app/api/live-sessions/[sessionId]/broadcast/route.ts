@@ -60,10 +60,16 @@ export async function POST(req: NextRequest, { params }: Props) {
   }
 
   if (contentType === 'EXPLANATION' && explanationRouteId) {
-    // Verify explanation route exists
     const route = await prisma.explanationRoute.findUnique({
       where: { id: explanationRouteId },
-      select: { id: true, skillId: true, routeType: true, misconceptionSummary: true },
+      select: {
+        id: true,
+        skillId: true,
+        routeType: true,
+        misconceptionSummary: true,
+        workedExample: true,
+        animationSchema: true,
+      },
     });
     if (!route) return NextResponse.json({ error: 'Explanation route not found' }, { status: 404 });
     broadcastPayload.explanationRouteId = explanationRouteId;

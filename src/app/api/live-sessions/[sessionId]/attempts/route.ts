@@ -4,6 +4,8 @@ import { z } from 'zod';
 import { authOptions } from '@/features/auth/authOptions';
 import { prisma } from '@/db/prisma';
 import { recordKnowledgeAttempt } from '@/features/knowledge-state/knowledgeStateService';
+import { emitEvent } from '@/features/telemetry/eventService';
+import { escalateLane } from '@/lib/live/lane-router';
 
 const schema = z.object({
   itemId: z.string().min(1),
@@ -54,8 +56,7 @@ export async function POST(req: NextRequest, { params }: Props) {
 
   const correct = item.answer.trim().toLowerCase() === answer.trim().toLowerCase();
 
-  // Create LiveAttempt record
-  await prisma.liveAttempt.create({
+  const createdAttempt = await prisma.liveAttempt.create({
     data: {
       liveSessionId: sessionId,
       studentUserId: userId,
@@ -77,6 +78,60 @@ export async function POST(req: NextRequest, { params }: Props) {
   });
 
   // Find next unanswered item for this student in this session
+  let recheckOutcome: 'rejoined_lane_1' | 'stayed_lane_2' | 'escalated_lane_3' | null = null;
+  let laneAfterAttempt: 'LANE_1' | 'LANE_2' | 'LANE_3' | null = participant.currentLane;
+
+  if (participant.currentLane === 'LANE_2' && participant.currentExplanationId) {
+    if (correct) {
+      await prisma.liveParticipant.update({
+        where: { id: participant.id },
+        data: {
+          currentLane: 'LANE_1',
+          currentExplanationId: null,
+          escalationReason: null,
+          holdingAtFinalCheck: false,
+        },
+      });
+      await prisma.laneTransition.create({
+        data: {
+          liveSessionId: sessionId,
+          participantId: participant.id,
+          studentUserId: userId,
+          fromLane: 'LANE_2',
+          toLane: 'LANE_1',
+          transitionType: 'RESOLVED',
+          triggeredBy: 'shadow_check',
+        },
+      });
+      recheckOutcome = 'rejoined_lane_1';
+      laneAfterAttempt = 'LANE_1';
+    } else {
+      const escalation = await escalateLane(participant.id, sessionId, participant.currentExplanationId);
+      recheckOutcome = 'escalated_lane_3';
+      laneAfterAttempt = escalation.newLane;
+    }
+
+    await emitEvent({
+      name: 'live_support_recheck_completed',
+      actorUserId: userId,
+      studentUserId: userId,
+      subjectId: liveSession.subjectId,
+      skillId,
+      itemId,
+      attemptId: createdAttempt.id,
+      payload: {
+        liveSessionId: sessionId,
+        participantId: participant.id,
+        studentUserId: userId,
+        itemId,
+        skillId,
+        correct,
+        laneAfterAttempt,
+        outcome: recheckOutcome,
+      },
+    });
+  }
+
   const answeredItemIds = await prisma.liveAttempt.findMany({
     where: { liveSessionId: sessionId, studentUserId: userId },
     select: { itemId: true },
@@ -109,5 +164,7 @@ export async function POST(req: NextRequest, { params }: Props) {
           options: nextItem.options,
         }
       : null,
+    recheckOutcome,
+    laneAfterAttempt,
   });
 }

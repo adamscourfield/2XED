@@ -56,6 +56,7 @@ export async function getLaneView(sessionId: string): Promise<LaneViewResponse> 
     }
 
     const student: LaneStudent = {
+      participantId: p.id,
       studentUserId: p.studentUserId,
       studentName: p.student.name ?? 'Unknown',
       masteryProbability: skillStateMap.get(p.studentUserId) ?? 0,

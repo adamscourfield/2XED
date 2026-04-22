@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 
 interface LaneStudent {
+  participantId: string;
   studentUserId: string;
   studentName: string;
   masteryProbability: number;
