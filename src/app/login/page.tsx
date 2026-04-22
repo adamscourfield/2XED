@@ -40,8 +40,8 @@ export default function LoginPage() {
       <div className="w-full max-w-md space-y-8">
         <div className="flex justify-center">
           <Image
-            src="/anaxi-logo.png"
-            alt="Anaxi Logo"
+            src="/2xed-logo.png"
+            alt="2XED"
             width={48}
             height={48}
             className="mb-0"
@@ -113,7 +113,7 @@ export default function LoginPage() {
         </div>
 
         <p className="text-center text-xs text-white/70">
-          &copy; 2026 Anaxi. All rights reserved.
+          &copy; 2026 2XED. All rights reserved.
         </p>
       </div>
     </main>
