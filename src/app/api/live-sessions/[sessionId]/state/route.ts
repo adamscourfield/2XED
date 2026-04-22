@@ -161,7 +161,16 @@ export async function GET(_req: NextRequest, { params }: Props) {
     take: 50,
   });
 
-  const supportSummary: LiveSupportEventSummary = {
+  const studentNameMap = new Map(liveSession.participants.map((participant) => [participant.studentUserId, participant.student.name ?? participant.student.email]));
+
+  const supportSummary: LiveSupportEventSummary & {
+    latestOutcomes: Array<{
+      studentUserId: string;
+      studentName: string;
+      outcome: 'rejoined_lane_1' | 'stayed_lane_2' | 'escalated_lane_3';
+      createdAt: string;
+    }>;
+  } = {
     shownCount: supportEvents.filter((event) => event.name === 'live_explanation_shown').length,
     acknowledgedCount: supportEvents.filter((event) => event.name === 'live_explanation_acknowledged').length,
     recheckStartedCount: supportEvents.filter((event) => event.name === 'live_support_recheck_started').length,
@@ -172,6 +181,7 @@ export async function GET(_req: NextRequest, { params }: Props) {
       .slice(0, 8)
       .map((event) => ({
         studentUserId: event.studentUserId!,
+        studentName: studentNameMap.get(event.studentUserId!) ?? 'Unknown student',
         outcome: (event.payload as { outcome: 'rejoined_lane_1' | 'stayed_lane_2' | 'escalated_lane_3' }).outcome,
         createdAt: event.createdAt.toISOString(),
       })),

@@ -715,6 +715,7 @@ model LiveParticipant {
   studentUserId         String
   currentLane           StudentLane       @default(LANE_3)
   currentExplanationId  String?
+  pendingRecheckItemId  String?
   escalationReason      EscalationReason?
   isUnexpectedFailure   Boolean           @default(false)
   holdingAtFinalCheck   Boolean           @default(false)

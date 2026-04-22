@@ -161,11 +161,15 @@ export async function GET(req: NextRequest, { params }: Props) {
         latestOutcomes: supportEvents
           .filter((event) => event.name === 'live_support_recheck_completed' && typeof (event.payload as { outcome?: string }).outcome === 'string' && Boolean(event.studentUserId))
           .slice(0, 8)
-          .map((event) => ({
-            studentUserId: event.studentUserId,
-            outcome: (event.payload as { outcome: 'rejoined_lane_1' | 'stayed_lane_2' | 'escalated_lane_3' }).outcome,
-            createdAt: event.createdAt.toISOString(),
-          })),
+          .map((event) => {
+            const participant = ls.participants.find((p) => p.studentUserId === event.studentUserId);
+            return {
+              studentUserId: event.studentUserId,
+              studentName: participant?.student.name ?? participant?.student.email ?? 'Unknown student',
+              outcome: (event.payload as { outcome: 'rejoined_lane_1' | 'stayed_lane_2' | 'escalated_lane_3' }).outcome,
+              createdAt: event.createdAt.toISOString(),
+            };
+          }),
       },
     };
   }

@@ -283,6 +283,7 @@ export async function handleHandback(
     where: { id: participantId },
     data: {
       currentLane: 'LANE_2',
+      pendingRecheckItemId: null,
       holdingAtFinalCheck: false,
     },
   });
@@ -325,6 +326,13 @@ export async function handleHandback(
 
     shadowCheckItemId = availableItem?.id ?? '';
   }
+
+  await prisma.liveParticipant.update({
+    where: { id: participantId },
+    data: {
+      pendingRecheckItemId: shadowCheckItemId || null,
+    },
+  });
 
   await emitEvent({
     name: 'live_support_recheck_started',

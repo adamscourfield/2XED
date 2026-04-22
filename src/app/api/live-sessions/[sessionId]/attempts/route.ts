@@ -81,13 +81,14 @@ export async function POST(req: NextRequest, { params }: Props) {
   let recheckOutcome: 'rejoined_lane_1' | 'stayed_lane_2' | 'escalated_lane_3' | null = null;
   let laneAfterAttempt: 'LANE_1' | 'LANE_2' | 'LANE_3' | null = participant.currentLane;
 
-  if (participant.currentLane === 'LANE_2' && participant.currentExplanationId) {
+  if (participant.currentLane === 'LANE_2' && participant.pendingRecheckItemId === itemId) {
     if (correct) {
       await prisma.liveParticipant.update({
         where: { id: participant.id },
         data: {
           currentLane: 'LANE_1',
           currentExplanationId: null,
+          pendingRecheckItemId: null,
           escalationReason: null,
           holdingAtFinalCheck: false,
         },
@@ -106,7 +107,14 @@ export async function POST(req: NextRequest, { params }: Props) {
       recheckOutcome = 'rejoined_lane_1';
       laneAfterAttempt = 'LANE_1';
     } else {
-      const escalation = await escalateLane(participant.id, sessionId, participant.currentExplanationId);
+      await prisma.liveParticipant.update({
+        where: { id: participant.id },
+        data: {
+          pendingRecheckItemId: null,
+        },
+      });
+      const failedExplanationId = participant.currentExplanationId ?? '';
+      const escalation = await escalateLane(participant.id, sessionId, failedExplanationId);
       recheckOutcome = 'escalated_lane_3';
       laneAfterAttempt = escalation.newLane;
     }

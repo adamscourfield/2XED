@@ -38,7 +38,7 @@ export async function GET(_req: NextRequest, { params }: Props) {
         studentUserId: userId,
       },
     },
-    select: { id: true, currentLane: true, currentExplanationId: true },
+    select: { id: true, currentLane: true, currentExplanationId: true, pendingRecheckItemId: true },
   });
 
   if (!participant) return NextResponse.json({ error: 'Not a participant' }, { status: 403 });
@@ -57,21 +57,9 @@ export async function GET(_req: NextRequest, { params }: Props) {
 
   let pendingRecheckItem: { id: string; question: string; type: string; options: unknown } | null = null;
 
-  if (participant.currentLane === 'LANE_2' && participant.currentExplanationId && liveSession.skillId) {
-    const attemptedItems = await prisma.liveAttempt.findMany({
-      where: {
-        liveSessionId: sessionId,
-        studentUserId: userId,
-      },
-      select: { itemId: true },
-    });
-    const attemptedSet = new Set(attemptedItems.map((attempt) => attempt.itemId));
-
-    const nextRecheckItem = await prisma.item.findFirst({
-      where: {
-        skills: { some: { skillId: liveSession.skillId } },
-        id: { notIn: Array.from(attemptedSet) },
-      },
+  if (participant.currentLane === 'LANE_2' && participant.pendingRecheckItemId) {
+    const nextRecheckItem = await prisma.item.findUnique({
+      where: { id: participant.pendingRecheckItemId },
       select: {
         id: true,
         question: true,

@@ -30,6 +30,7 @@ interface SupportSummary {
   escalatedCount: number;
   latestOutcomes: Array<{
     studentUserId: string;
+    studentName: string;
     outcome: 'rejoined_lane_1' | 'stayed_lane_2' | 'escalated_lane_3';
     createdAt: string;
   }>;
@@ -390,10 +391,10 @@ function ClassPulse({ snapshot }: { snapshot: SessionSnapshot }) {
           {snapshot.supportSummary.latestOutcomes.length > 0 && (
             <div className="mt-3 space-y-2">
               {snapshot.supportSummary.latestOutcomes.map((outcome) => (
-                <div key={`${outcome.studentUserId}-${outcome.createdAt}`} className="anx-card flex items-center justify-between p-3 text-xs">
-                  <span style={{ color: 'var(--anx-text-secondary)' }}>{outcome.studentUserId.slice(0, 8)}…</span>
+                <div key={`${outcome.studentUserId}-${outcome.createdAt}`} className="anx-card flex items-center justify-between p-3 text-xs gap-3">
+                  <span style={{ color: 'var(--anx-text-secondary)' }}>{outcome.studentName}</span>
                   <span style={{ color: outcome.outcome === 'rejoined_lane_1' ? 'var(--anx-success)' : outcome.outcome === 'escalated_lane_3' ? 'var(--anx-danger-text)' : 'var(--anx-warning-text)' }}>
-                    {outcome.outcome === 'rejoined_lane_1' ? 'Rejoined Lane 1' : outcome.outcome === 'escalated_lane_3' ? 'Back to Lane 3' : 'Stayed Lane 2'}
+                    {outcome.outcome === 'rejoined_lane_1' ? 'Rejoined Lane 1' : outcome.outcome === 'escalated_lane_3' ? 'Escalated to Lane 3' : 'Stayed in Lane 2'}
                   </span>
                 </div>
               ))}
