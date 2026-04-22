@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { OrderedMagnetInput } from '@/components/learn/OrderedMagnetInput';
 import { NumberLineInput } from '@/components/learn/NumberLineInput';
 import { ProtractorInput } from '@/components/learn/ProtractorInput';
 import { ItemVisualPanel } from '@/components/learn/ItemVisualPanel';
+import { AnimationRenderer } from '@/components/explanation/AnimationRenderer';
 import { getItemContent, ItemInteractionType } from './itemContent';
 import { sanitizeStudentCopy } from './studentCopy';
 
@@ -39,27 +40,70 @@ interface GamificationSummary {
   activeDaysThisWeek: number;
 }
 
+interface ExplanationSchema {
+  schemaVersion: string;
+  skillCode: string;
+  skillName: string;
+  routeType: string;
+  routeLabel: string;
+  misconceptionSummary: string;
+  generatedAt: string;
+  steps: Array<{
+    stepIndex: number;
+    id: string;
+    visuals: unknown[];
+    narration: string;
+    audioFile: string | null;
+  }>;
+  misconceptionStrip: {
+    text: string;
+    audioNarration: string;
+  };
+  loopable: boolean;
+  pauseAtEndMs: number;
+}
+
+interface ExplanationRouteSummary {
+  id: string;
+  routeType: 'A' | 'B' | 'C';
+  misconceptionSummary: string;
+  workedExample: string;
+  animationSchema: ExplanationSchema | null;
+}
+
 interface Props {
   subject: Subject;
   skill: Skill;
   items: Item[];
+  retryItems: Item[];
   userId: string;
   gamification?: GamificationSummary;
+  hadRecentRepeatFailure?: boolean;
+  explanationRoute?: ExplanationRouteSummary | null;
 }
 
-type Phase = 'intro' | 'session' | 'results';
+type Phase = 'intro' | 'session' | 'explanation' | 'results';
+type RecoveryState = 'recovered' | 'improving' | 'still_needs_support';
 
 const SHOW_DEBUG = process.env.NEXT_PUBLIC_SHOW_DEBUG === 'true';
 
-export function LearnSession({ subject, skill, items, userId, gamification }: Props) {
+export function LearnSession({ subject, skill, items, retryItems, userId, gamification, hadRecentRepeatFailure = false, explanationRoute }: Props) {
   const [phase, setPhase] = useState<Phase>('intro');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState('');
   const [results, setResults] = useState<{ itemId: string; correct: boolean }[]>([]);
   const [submitting, setSubmitting] = useState(false);
+  const [hasSeenExplanation, setHasSeenExplanation] = useState(false);
+  const [hasRetriedAfterExplanation, setHasRetriedAfterExplanation] = useState(false);
+  const [explanationTrigger, setExplanationTrigger] = useState<'zero_score' | 'repeat_failure' | null>(null);
+  const [retryResults, setRetryResults] = useState<{ itemId: string; correct: boolean }[]>([]);
   const router = useRouter();
+  const explanationLoggedRef = useRef(false);
+  const retryStartLoggedRef = useRef(false);
+  const retryCompletedLoggedRef = useRef(false);
 
-  const currentItem = items[currentIndex];
+  const currentItems = hasRetriedAfterExplanation && retryItems.length > 0 ? retryItems : items;
+  const currentItem = currentItems[currentIndex];
   const currentItemContent = currentItem ? getItemContent(currentItem) : null;
   const options = currentItemContent?.choices ?? [];
 
@@ -144,6 +188,8 @@ export function LearnSession({ subject, skill, items, userId, gamification }: Pr
     if (!selectedAnswer || !currentItem) return;
     setSubmitting(true);
 
+    const targetResults = hasRetriedAfterExplanation ? retryResults : results;
+
     const res = await fetch('/api/learn/attempt', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -152,24 +198,124 @@ export function LearnSession({ subject, skill, items, userId, gamification }: Pr
         skillId: skill.id,
         subjectId: subject.id,
         answer: selectedAnswer,
-        isLast: currentIndex === items.length - 1,
-        totalItems: items.length,
-        previousResults: results,
+        isLast: currentIndex === currentItems.length - 1,
+        totalItems: currentItems.length,
+        previousResults: targetResults,
       }),
     });
 
     const data = await res.json();
-    const newResults = [...results, { itemId: currentItem.id, correct: data.correct }];
-    setResults(newResults);
+    const newResults = [...targetResults, { itemId: currentItem.id, correct: data.correct }];
 
-    if (currentIndex < items.length - 1) {
+    if (hasRetriedAfterExplanation) setRetryResults(newResults);
+    else setResults(newResults);
+
+    if (currentIndex < currentItems.length - 1) {
       setCurrentIndex(currentIndex + 1);
       setSelectedAnswer('');
     } else {
-      setPhase('results');
+      const correctCount = newResults.filter((r) => r.correct).length;
+      const allWrong = correctCount === 0;
+      const lowScore = correctCount <= 1;
+
+      if (!hasSeenExplanation && explanationRoute && (allWrong || (hadRecentRepeatFailure && lowScore))) {
+        setExplanationTrigger(allWrong ? 'zero_score' : 'repeat_failure');
+        setPhase('explanation');
+      } else {
+        setPhase('results');
+      }
     }
     setSubmitting(false);
   }
+
+  function startRetryAfterExplanation() {
+    setHasSeenExplanation(true);
+    setHasRetriedAfterExplanation(true);
+    setCurrentIndex(0);
+    setSelectedAnswer('');
+    setRetryResults([]);
+    setSubmitting(false);
+    retryCompletedLoggedRef.current = false;
+    setPhase('session');
+  }
+
+  function restartPractice() {
+    setCurrentIndex(0);
+    setSelectedAnswer('');
+    setResults([]);
+    setRetryResults([]);
+    setSubmitting(false);
+    setHasSeenExplanation(false);
+    setHasRetriedAfterExplanation(false);
+    setExplanationTrigger(null);
+    explanationLoggedRef.current = false;
+    retryStartLoggedRef.current = false;
+    retryCompletedLoggedRef.current = false;
+    setPhase('session');
+  }
+
+  const recoveryState: RecoveryState = useMemo(() => {
+    const correctCount = retryResults.filter((r) => r.correct).length;
+    const total = retryResults.length || 1;
+    const accuracy = correctCount / total;
+    if (accuracy >= 0.8) return 'recovered';
+    if (accuracy >= 0.5) return 'improving';
+    return 'still_needs_support';
+  }, [retryResults]);
+
+  useEffect(() => {
+    if (phase !== 'explanation' || !explanationRoute || !explanationTrigger || explanationLoggedRef.current) return;
+    explanationLoggedRef.current = true;
+    void fetch('/api/learn/explanation-event', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        kind: 'shown',
+        subjectId: subject.id,
+        skillId: skill.id,
+        skillCode: skill.code,
+        routeType: explanationRoute.routeType,
+        trigger: explanationTrigger,
+        priorSessionScore: `${results.filter((r) => r.correct).length}/${results.length || items.length}`,
+      }),
+    });
+  }, [phase, explanationRoute, explanationTrigger, subject.id, skill.id, skill.code, results, items.length]);
+
+  useEffect(() => {
+    if (!hasRetriedAfterExplanation || retryStartLoggedRef.current || !explanationRoute) return;
+    retryStartLoggedRef.current = true;
+    void fetch('/api/learn/explanation-event', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        kind: 'retry_started',
+        subjectId: subject.id,
+        skillId: skill.id,
+        skillCode: skill.code,
+        routeType: explanationRoute.routeType,
+        retryItemCount: retryItems.length > 0 ? retryItems.length : items.length,
+      }),
+    });
+  }, [hasRetriedAfterExplanation, explanationRoute, subject.id, skill.id, skill.code, retryItems.length, items.length]);
+
+  useEffect(() => {
+    if (!hasRetriedAfterExplanation || phase !== 'results' || retryResults.length === 0 || !explanationRoute || retryCompletedLoggedRef.current) return;
+    retryCompletedLoggedRef.current = true;
+    void fetch('/api/learn/explanation-event', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        kind: 'retry_completed',
+        subjectId: subject.id,
+        skillId: skill.id,
+        skillCode: skill.code,
+        routeType: explanationRoute.routeType,
+        retryCorrectCount: retryResults.filter((r) => r.correct).length,
+        retryTotalItems: retryResults.length,
+        recoveryState,
+      }),
+    });
+  }, [hasRetriedAfterExplanation, phase, retryResults, explanationRoute, subject.id, skill.id, skill.code, recoveryState]);
 
   if (phase === 'intro') {
     return (
@@ -226,7 +372,9 @@ export function LearnSession({ subject, skill, items, userId, gamification }: Pr
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm" style={{ color: 'var(--anx-text-muted)' }}>One question at a time</p>
-              <p className="text-xs" style={{ color: 'var(--anx-text-faint)' }}>If one feels hard, the next one is a fresh start.</p>
+              <p className="text-xs" style={{ color: 'var(--anx-text-faint)' }}>
+                {hasRetriedAfterExplanation ? 'Fresh set after explanation.' : 'If one feels hard, the next one is a fresh start.'}
+              </p>
             </div>
             <div className="text-right">
               <p className="text-sm" style={{ color: 'var(--anx-text-muted)' }}>
@@ -236,14 +384,14 @@ export function LearnSession({ subject, skill, items, userId, gamification }: Pr
                 )}
               </p>
               <span className="text-sm" style={{ color: 'var(--anx-text-faint)' }}>
-                {currentIndex + 1} / {items.length}
+                {currentIndex + 1} / {currentItems.length}
               </span>
             </div>
           </div>
           <div className="anx-progress-track">
             <div
               className="anx-progress-bar"
-              style={{ width: `${((currentIndex + 1) / items.length) * 100}%` }}
+              style={{ width: `${((currentIndex + 1) / currentItems.length) * 100}%` }}
             />
           </div>
           <ItemVisualPanel item={currentItem} primarySkillCode={skill.code} />
@@ -271,33 +419,103 @@ export function LearnSession({ subject, skill, items, userId, gamification }: Pr
             disabled={!selectedAnswer || submitting}
             className="anx-btn-primary w-full py-3"
           >
-            {submitting ? 'Checking…' : currentIndex < items.length - 1 ? 'Check and go on' : 'Finish for now'}
+            {submitting ? 'Checking…' : currentIndex < currentItems.length - 1 ? 'Check and go on' : 'Finish for now'}
           </button>
         </div>
       </main>
     );
   }
 
+  if (phase === 'explanation') {
+    return (
+      <main className="anx-shell anx-scene flex items-center justify-center">
+        <div className="anx-panel w-full max-w-4xl p-8 space-y-6">
+          <div className="space-y-2">
+            <p className="text-sm font-medium" style={{ color: 'var(--anx-primary)' }}>{subject.title}</p>
+            <h1 className="text-2xl font-bold" style={{ color: 'var(--anx-text)' }}>Let’s look at this together</h1>
+            <p style={{ color: 'var(--anx-text-secondary)' }}>
+              Let’s reset this carefully. Here is a short explanation for <strong>{skill.name}</strong>, then you’ll get a fresh try.
+            </p>
+          </div>
+
+          {explanationTrigger === 'repeat_failure' && (
+            <div className="anx-callout-info">
+              <p className="font-medium">Why you are seeing this</p>
+              <p className="mt-1">This skill has felt shaky more than once, so we are stepping in earlier instead of waiting for another full miss.</p>
+            </div>
+          )}
+
+          {explanationRoute?.animationSchema ? (
+            <AnimationRenderer schema={explanationRoute.animationSchema} />
+          ) : (
+            <div className="space-y-4 rounded-2xl border p-6" style={{ borderColor: 'var(--anx-border)', background: 'var(--anx-surface)' }}>
+              {sanitizeStudentCopy(explanationRoute?.misconceptionSummary) && (
+                <div className="anx-callout-warning">
+                  <p className="font-medium">Watch out for this</p>
+                  <p className="mt-1">{sanitizeStudentCopy(explanationRoute?.misconceptionSummary)}</p>
+                </div>
+              )}
+              {sanitizeStudentCopy(explanationRoute?.workedExample) && (
+                <div className="anx-callout-info">
+                  <p className="font-medium">Worked example</p>
+                  <p className="mt-1 whitespace-pre-wrap">{sanitizeStudentCopy(explanationRoute?.workedExample)}</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          <div className="flex gap-3">
+            <button
+              onClick={startRetryAfterExplanation}
+              className="anx-btn-primary flex-1 py-3"
+            >
+              Try a fresh set now
+            </button>
+            <button
+              onClick={() => setPhase('results')}
+              className="anx-btn-secondary px-4 py-3"
+            >
+              Skip to summary
+            </button>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
   if (phase === 'results') {
-    const correctCount = results.filter((r) => r.correct).length;
-    const masteryPct = Math.round((correctCount / results.length) * 100);
+    const displayResults = hasRetriedAfterExplanation ? retryResults : results;
+    const correctCount = displayResults.filter((r) => r.correct).length;
+    const masteryPct = Math.round((correctCount / Math.max(1, displayResults.length)) * 100);
 
     let outcomeTone: 'success' | 'warning' | 'info';
     if (masteryPct >= 80) outcomeTone = 'success';
     else if (masteryPct >= 50) outcomeTone = 'warning';
     else outcomeTone = 'info';
 
-    const headlineText = {
-      success: 'Congratulations!',
-      warning: 'Good effort!',
-      info: 'Keep going!',
-    }[outcomeTone];
+    const headlineText = hasRetriedAfterExplanation
+      ? {
+          recovered: 'Nice recovery!',
+          improving: 'That is better.',
+          still_needs_support: 'We are not there yet.',
+        }[recoveryState]
+      : {
+          success: 'Congratulations!',
+          warning: 'Good effort!',
+          info: 'Keep going!',
+        }[outcomeTone];
 
-    const subtitleText = {
-      success: `Great job! You have done really well on ${skill.name}.`,
-      warning: `Nice try on ${skill.name}. A little more practice and you will have it.`,
-      info: `You are building up ${skill.name}. The next set will help.`,
-    }[outcomeTone];
+    const subtitleText = hasRetriedAfterExplanation
+      ? {
+          recovered: `You bounced back well on ${skill.name}. The explanation seems to have helped.`,
+          improving: `You improved on ${skill.name}. That is progress, even if it is not secure yet.`,
+          still_needs_support: `You have had another go at ${skill.name}. We should keep support around this skill.`,
+        }[recoveryState]
+      : {
+          success: `Great job! You have done really well on ${skill.name}.`,
+          warning: `Nice try on ${skill.name}. A little more practice and you will have it.`,
+          info: `You are building up ${skill.name}. The next set will help.`,
+        }[outcomeTone];
 
     const scoreColor = {
       success: 'var(--anx-success)',
@@ -305,18 +523,23 @@ export function LearnSession({ subject, skill, items, userId, gamification }: Pr
       info: 'var(--anx-primary)',
     }[outcomeTone];
 
-    const ringEmoji = {
-      success: '🏆',
-      warning: '💪',
-      info: '📚',
-    }[outcomeTone];
+    const ringEmoji = hasRetriedAfterExplanation
+      ? {
+          recovered: '🌟',
+          improving: '💪',
+          still_needs_support: '📘',
+        }[recoveryState]
+      : {
+          success: '🏆',
+          warning: '💪',
+          info: '📚',
+        }[outcomeTone];
 
     const xpEarned = gamification?.xp ?? 0;
 
     return (
       <main className="anx-shell anx-scene flex items-center justify-center">
         <div className="anx-panel w-full max-w-md p-8 space-y-6 text-center anx-slide-up">
-          {/* Celebration ring */}
           <div className="anx-reward-ring">
             <div className="anx-reward-stars">
               <span className="anx-reward-star">⭐</span>
@@ -329,30 +552,26 @@ export function LearnSession({ subject, skill, items, userId, gamification }: Pr
             <span className="text-5xl">{ringEmoji}</span>
           </div>
 
-          {/* Score */}
           <div>
             <p className="text-sm font-medium" style={{ color: 'var(--anx-text-muted)' }}>Your Score</p>
             <p className="text-4xl font-bold" style={{ color: scoreColor }}>
-              {correctCount}/{results.length}
+              {correctCount}/{displayResults.length}
             </p>
           </div>
 
-          {/* Headline */}
           <div>
             <h1 className="text-2xl font-bold" style={{ color: 'var(--anx-text)' }}>{headlineText}</h1>
             <p className="mt-2 text-sm" style={{ color: 'var(--anx-text-secondary)' }}>{subtitleText}</p>
           </div>
 
-          {/* XP badge */}
           {xpEarned > 0 && (
             <div className="flex justify-center">
               <span className="anx-xp-badge">🥇 {xpEarned} XP</span>
             </div>
           )}
 
-          {/* Question results */}
           <div className="flex justify-center gap-2">
-            {results.map((r, i) => (
+            {displayResults.map((r, i) => (
               <span
                 key={r.itemId}
                 className="flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold text-white"
@@ -364,7 +583,6 @@ export function LearnSession({ subject, skill, items, userId, gamification }: Pr
             ))}
           </div>
 
-          {/* Actions */}
           <div className="space-y-3 pt-2">
             <button
               onClick={() => router.push('/dashboard')}
@@ -373,7 +591,7 @@ export function LearnSession({ subject, skill, items, userId, gamification }: Pr
               Back to Home
             </button>
             <button
-              onClick={() => router.push(`/learn/${subject.slug}`)}
+              onClick={restartPractice}
               className="anx-btn-secondary w-full py-3"
             >
               Practice again

@@ -46,8 +46,9 @@ export function numericDistractors(answer: string): string[] {
 export function optionsForQuestion(stem: string, answer: string): string[] {
   const lcStem = stem.toLowerCase();
   const lcAnswer = answer.toLowerCase();
+  const looksBooleanStem = /\b(true or false|correct or incorrect|is this (?:statement )?(?:true|false|correct|incorrect))\b/i.test(stem);
 
-  if (lcAnswer === 'true' || lcAnswer === 'false') {
+  if (looksBooleanStem && (lcAnswer === 'true' || lcAnswer === 'false')) {
     return ['True', 'False'];
   }
 
@@ -67,11 +68,12 @@ export function optionsForQuestion(stem: string, answer: string): string[] {
   return [answer, 'Not sure', 'Cannot be determined', 'None of these'];
 }
 
-export function inferItemType(options: string[], answer: string): 'MCQ' | 'TRUE_FALSE' {
+export function inferItemType(stem: string, options: string[], answer: string): 'MCQ' | 'TRUE_FALSE' {
   const normalized = new Set(options.map((o) => o.trim().toLowerCase()));
   const answerNorm = answer.trim().toLowerCase();
   const tf = normalized.has('true') && normalized.has('false');
-  if (tf && (answerNorm === 'true' || answerNorm === 'false')) return 'TRUE_FALSE';
+  const looksBooleanStem = /\b(true or false|correct or incorrect|is this (?:statement )?(?:true|false|correct|incorrect))\b/i.test(stem);
+  if (looksBooleanStem && tf && (answerNorm === 'true' || answerNorm === 'false')) return 'TRUE_FALSE';
   return 'MCQ';
 }
 
@@ -104,7 +106,7 @@ export async function runUnit1Import(config: ImportConfig) {
         ? unique(row.question.options)
         : unique(optionsForQuestion(row.question.stem, answer));
 
-      const itemType = inferItemType(options, answer);
+      const itemType = inferItemType(row.question.stem, options, answer);
       const questionText = `[${row.source.question_ref}] ${row.question.stem}`;
 
       let item = await prisma.item.findFirst({ where: { question: questionText, subjectId: subject.id } });

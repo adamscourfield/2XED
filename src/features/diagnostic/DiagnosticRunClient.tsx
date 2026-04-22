@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { OrderedMagnetInput } from '@/components/learn/OrderedMagnetInput';
 import { NumberLineInput } from '@/components/learn/NumberLineInput';
 import { ItemVisualPanel } from '@/components/learn/ItemVisualPanel';
 import { getItemContent, ItemInteractionType } from '@/features/learn/itemContent';
+import { stripStudentQuestionLabel } from '@/features/items/itemMeta';
 
 interface Props {
   subject: { id: string; title: string; slug: string };
@@ -20,8 +21,10 @@ interface Props {
 export function DiagnosticRunClient({ subject, skill, item, sessionId, itemsSeen, maxItems, subjectSlug }: Props) {
   const [selectedAnswer, setSelectedAnswer] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const router = useRouter();
   const itemContent = getItemContent(item);
+  const questionText = useMemo(() => stripStudentQuestionLabel(item.question) || item.question, [item.question]);
 
   function renderAnswerInput(type: ItemInteractionType) {
     if (type === 'SHORT_TEXT' || type === 'SHORT_NUMERIC') {
@@ -79,23 +82,34 @@ export function DiagnosticRunClient({ subject, skill, item, sessionId, itemsSeen
   async function submitAnswer() {
     if (!selectedAnswer || submitting) return;
     setSubmitting(true);
+    setSubmitError(null);
 
-    await fetch(`/api/diagnostic/${subjectSlug}/submit`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        sessionId,
-        itemId: item.id,
-        skillId: skill.id,
-        subjectId: subject.id,
-        skillCode: skill.code,
-        strand: skill.strand,
-        answer: selectedAnswer,
-      }),
-    });
+    try {
+      const res = await fetch(`/api/diagnostic/${subjectSlug}/submit`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sessionId,
+          itemId: item.id,
+          skillId: skill.id,
+          subjectId: subject.id,
+          skillCode: skill.code,
+          strand: skill.strand,
+          answer: selectedAnswer,
+        }),
+      });
 
-    router.refresh();
-    router.push(`/diagnostic/${subjectSlug}/run`);
+      if (!res.ok) {
+        const data = await res.json().catch(() => null);
+        throw new Error(data?.error || 'Could not save this answer.');
+      }
+
+      router.refresh();
+      router.push(`/diagnostic/${subjectSlug}/run`);
+    } catch (error) {
+      setSubmitError(error instanceof Error ? error.message : 'Could not save this answer.');
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -117,7 +131,7 @@ export function DiagnosticRunClient({ subject, skill, item, sessionId, itemsSeen
           />
         </div>
         <ItemVisualPanel item={item} primarySkillCode={skill.code} />
-        <h2 className="text-lg font-semibold" style={{ color: 'var(--anx-text)' }}>{item.question}</h2>
+        <h2 className="text-lg font-semibold" style={{ color: 'var(--anx-text)' }}>{questionText}</h2>
         <p className="text-sm" style={{ color: 'var(--anx-text-muted)' }}>
           {itemContent.type === 'SHORT_NUMERIC'
             ? 'Type a number.'
@@ -132,6 +146,11 @@ export function DiagnosticRunClient({ subject, skill, item, sessionId, itemsSeen
                   : 'Pick one answer.'}
         </p>
         {renderAnswerInput(itemContent.type)}
+        {submitError && (
+          <div className="anx-callout-warning">
+            {submitError}
+          </div>
+        )}
         <button
           onClick={submitAnswer}
           disabled={!selectedAnswer || submitting}
