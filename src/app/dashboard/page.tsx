@@ -33,8 +33,11 @@ function skillRowVisual(isDue: boolean, masteryPct: number): SkillRowVisual {
   }
   if (masteryPct >= 80) {
     return {
-      badge: 'anx-badge anx-badge-blue',
-      barColor: 'var(--anx-warning)',
+      statusLabel: 'Strong',
+      barColor: 'var(--anx-success)',
+      badgeBg: 'rgba(0, 105, 71, 0.12)',
+      badgeText: '#006947',
+      dotClass: 'bg-emerald-600',
     };
   }
   return {
@@ -184,7 +187,7 @@ export default async function DashboardPage() {
       actions={<span className="anx-xp-badge">🏅 {gamification.xp} XP</span>}
     >
       {/* Hero banner */}
-      <div className="anx-card anx-dashboard-hero overflow-hidden">
+      <div className="anx-dashboard-hero overflow-hidden">
         <div className="px-8 py-8 text-white sm:px-10 sm:py-9">
           <h2 className="text-xl font-bold tracking-tight text-white sm:text-2xl">Keep Learning</h2>
           <p className="mt-2 max-w-md text-sm font-normal text-white/95">Start your next session and earn more XP.</p>
@@ -338,7 +341,6 @@ export default async function DashboardPage() {
                   </>
                 )}
               </div>
-            </div>
 
             {onboardingComplete && nextSkill && (
               <div className="border-t border-[color:var(--anx-border)] bg-[var(--anx-surface-soft)] px-5 py-4">
@@ -398,6 +400,7 @@ export default async function DashboardPage() {
                   </div>
                 </div>
               </div>
+            )}
 
               {/* Skill preview rows */}
               {onboardingComplete && previewSkills.length > 0 && (
