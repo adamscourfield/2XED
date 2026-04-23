@@ -4,6 +4,7 @@ import { redirect, notFound } from 'next/navigation';
 import { prisma } from '@/db/prisma';
 import { initPayload, shouldStopEarly, selectNextSkill } from '@/features/diagnostic/diagnosticService';
 import { DiagnosticRunClient } from '@/features/diagnostic/DiagnosticRunClient';
+import { StudentFocusedChrome } from '@/components/student/StudentFocusedChrome';
 
 interface Props {
   params: Promise<{ subjectSlug: string }>;
@@ -79,14 +80,16 @@ export default async function DiagnosticRunPage({ params }: Props) {
   }
 
   return (
-    <DiagnosticRunClient
-      subject={{ id: subject.id, title: subject.title, slug: subject.slug }}
-      skill={{ id: nextSkill.id, code: nextSkill.code, name: fullSkill.name, strand: nextSkill.strand }}
-      item={{ id: nextItem.id, question: nextItem.question, options: nextItem.options, answer: nextItem.answer, type: nextItem.type }}
-      sessionId={diagSession.id}
-      itemsSeen={diagSession.itemsSeen}
-      maxItems={diagSession.maxItems}
-      subjectSlug={subjectSlug}
-    />
+    <StudentFocusedChrome contextLabel={`${subject.title} · Diagnostic`}>
+      <DiagnosticRunClient
+        subject={{ id: subject.id, title: subject.title, slug: subject.slug }}
+        skill={{ id: nextSkill.id, code: nextSkill.code, name: fullSkill.name, strand: nextSkill.strand }}
+        item={{ id: nextItem.id, question: nextItem.question, options: nextItem.options, answer: nextItem.answer, type: nextItem.type }}
+        sessionId={diagSession.id}
+        itemsSeen={diagSession.itemsSeen}
+        maxItems={diagSession.maxItems}
+        subjectSlug={subjectSlug}
+      />
+    </StudentFocusedChrome>
   );
 }

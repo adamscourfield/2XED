@@ -4,6 +4,8 @@ import { AppChrome, type AppChromeVariant } from '@/components/AppChrome';
 interface LearningPageShellProps {
   title: string;
   subtitle?: ReactNode;
+  /** Optional full-width strip above the page header (e.g. dashboard-style hero). */
+  hero?: ReactNode;
   meta?: ReactNode;
   actions?: ReactNode;
   children: ReactNode;
@@ -17,6 +19,7 @@ interface LearningPageShellProps {
 export function LearningPageShell({
   title,
   subtitle,
+  hero,
   meta,
   actions,
   children,
@@ -27,6 +30,7 @@ export function LearningPageShell({
   const main = (
     <main className="anx-shell flex-1">
       <div className={`mx-auto w-full ${maxWidthClassName} px-4 sm:px-6`}>
+        {hero ? <div className="mb-8">{hero}</div> : null}
         <header className="mb-8 space-y-4">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="space-y-1">

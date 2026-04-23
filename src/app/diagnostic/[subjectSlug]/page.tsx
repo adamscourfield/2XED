@@ -3,6 +3,8 @@ import { authOptions } from '@/features/auth/authOptions';
 import { redirect, notFound } from 'next/navigation';
 import { prisma } from '@/db/prisma';
 import Link from 'next/link';
+import { LearningPageShell } from '@/components/LearningPageShell';
+import { StudentFlowHero } from '@/components/student/StudentFlowHero';
 
 interface Props {
   params: Promise<{ subjectSlug: string }>;
@@ -26,43 +28,51 @@ export default async function DiagnosticIntroPage({ params }: Props) {
   const sessionData = existing ?? null;
 
   return (
-    <main className="anx-shell anx-scene flex items-center justify-center">
-      <div className="anx-panel w-full max-w-lg p-8 space-y-6">
-        <div>
-          <p className="text-sm font-medium mb-1" style={{ color: 'var(--anx-primary)' }}>{subject.title}</p>
-          <h1 className="text-2xl font-bold" style={{ color: 'var(--anx-text)' }}>Let&apos;s find where to start</h1>
-          <p className="mt-2 text-sm" style={{ color: 'var(--anx-text-muted)' }}>
-            This short quiz helps us find the right place for you. Just try each question.
-          </p>
-        </div>
+    <LearningPageShell
+      appChrome="student"
+      title="Find your starting level"
+      subtitle={`${subject.title} · a short, friendly check-in before practice.`}
+      maxWidthClassName="max-w-2xl"
+      hero={(
+        <StudentFlowHero
+          eyebrow="Diagnostic"
+          title="Let's find where to start"
+          lead="Answer honestly — there is no pass or fail. We use this to place you on the right path."
+        />
+      )}
+    >
+      <div className="anx-card space-y-6 p-6 sm:p-8">
         <div className="anx-callout-info">
-          <p className="font-semibold">What to expect</p>
-          <ul className="mt-2 space-y-1 list-disc list-inside opacity-90">
+          <p className="font-semibold text-[color:var(--anx-text)]">What to expect</p>
+          <ul className="mt-2 list-inside list-disc space-y-1.5 text-sm leading-relaxed opacity-95">
             <li>Usually 12 to 25 questions</li>
-            <li>It checks a few different maths skills</li>
-            <li>It may finish early if we already know enough</li>
+            <li>Mix of skills so we see the big picture</li>
+            <li>May finish early once we are confident</li>
           </ul>
         </div>
-        {sessionData && (
+        {sessionData ? (
           <div className="anx-callout-warning">
-            You have an in-progress diagnostic ({sessionData.itemsSeen} questions answered).
+            <p className="font-semibold">Pick up where you left off</p>
+            <p className="mt-1 text-sm">
+              You have an in-progress diagnostic ({sessionData.itemsSeen} question{sessionData.itemsSeen !== 1 ? 's' : ''} answered so far).
+            </p>
           </div>
-        )}
-        <div className="flex gap-3">
+        ) : null}
+        <div className="flex flex-col gap-3 sm:flex-row">
           <Link
             href={`/diagnostic/${subjectSlug}/run`}
-            className="anx-btn-primary flex-1 py-3 text-center"
+            className="anx-btn-primary flex-1 py-3.5 text-center"
           >
             {sessionData ? 'Resume quiz' : 'Start quiz'}
           </Link>
           <Link
             href="/dashboard"
-            className="anx-btn-secondary px-4 py-3 text-center"
+            className="anx-btn-secondary px-4 py-3.5 text-center sm:shrink-0"
           >
-            Back
+            Back to dashboard
           </Link>
         </div>
       </div>
-    </main>
+    </LearningPageShell>
   );
 }

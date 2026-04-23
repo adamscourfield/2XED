@@ -7,6 +7,7 @@ import { hasCompletedOnboardingDiagnostic } from '@/features/learn/onboarding';
 import { selectNextSkill } from '@/features/learn/nextSkill';
 import { getUserGamificationSummary } from '@/features/gamification/gamificationService';
 import { selectExplanationRoute } from '@/features/diagnostic/routeAssignment';
+import { StudentFocusedChrome } from '@/components/student/StudentFocusedChrome';
 
 const QUESTIONS_PER_SESSION = 3;
 
@@ -112,44 +113,46 @@ export default async function LearnPage({ params }: Props) {
   });
 
   return (
-    <LearnSession
-      subject={subject}
-      skill={targetSkill}
-      items={items}
-      userId={userId}
-      gamification={gamification}
-      retryItems={retryItems}
-      hadRecentRepeatFailure={hadRecentRepeatFailure}
-      explanationRoute={
-        explanationRoute
-          ? {
-              ...explanationRoute,
-              routeType: explanationRoute.routeType as 'A' | 'B' | 'C',
-              animationSchema: explanationRoute.animationSchema as {
-                schemaVersion: string;
-                skillCode: string;
-                skillName: string;
-                routeType: string;
-                routeLabel: string;
-                misconceptionSummary: string;
-                generatedAt: string;
-                steps: Array<{
-                  stepIndex: number;
-                  id: string;
-                  visuals: unknown[];
-                  narration: string;
-                  audioFile: string | null;
-                }>;
-                misconceptionStrip: {
-                  text: string;
-                  audioNarration: string;
-                };
-                loopable: boolean;
-                pauseAtEndMs: number;
-              } | null,
-            }
-          : null
-      }
-    />
+    <StudentFocusedChrome contextLabel={`${subject.title} · ${targetSkill.name}`}>
+      <LearnSession
+        subject={subject}
+        skill={targetSkill}
+        items={items}
+        userId={userId}
+        gamification={gamification}
+        retryItems={retryItems}
+        hadRecentRepeatFailure={hadRecentRepeatFailure}
+        explanationRoute={
+          explanationRoute
+            ? {
+                ...explanationRoute,
+                routeType: explanationRoute.routeType as 'A' | 'B' | 'C',
+                animationSchema: explanationRoute.animationSchema as {
+                  schemaVersion: string;
+                  skillCode: string;
+                  skillName: string;
+                  routeType: string;
+                  routeLabel: string;
+                  misconceptionSummary: string;
+                  generatedAt: string;
+                  steps: Array<{
+                    stepIndex: number;
+                    id: string;
+                    visuals: unknown[];
+                    narration: string;
+                    audioFile: string | null;
+                  }>;
+                  misconceptionStrip: {
+                    text: string;
+                    audioNarration: string;
+                  };
+                  loopable: boolean;
+                  pauseAtEndMs: number;
+                } | null,
+              }
+            : null
+        }
+      />
+    </StudentFocusedChrome>
   );
 }

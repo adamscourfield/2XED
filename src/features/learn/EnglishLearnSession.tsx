@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { StudentFocusedChrome } from '@/components/student/StudentFocusedChrome';
 import { ExplanationBlockRenderer } from '@/components/english/ExplanationBlockRenderer';
 import { QuestionBlock } from '@/components/english/QuestionBlock';
 import type { ExplanationBlock, ExplanationBlockType, QuestionBlock as QuestionBlockType, MarkResult } from '@/features/content/types';
@@ -93,7 +94,8 @@ export function EnglishLearnSession({ subject, skill, blocks, userId }: EnglishL
 
   if (phase === 'intro') {
     return (
-      <main className="anx-shell anx-scene flex items-center justify-center">
+      <StudentFocusedChrome contextLabel={`${subject.title} · ${skill.name}`}>
+        <main className="anx-shell anx-scene flex flex-1 items-center justify-center py-10 sm:py-12">
         <div className="anx-panel w-full max-w-lg p-8 space-y-6">
           <div>
             <p className="text-sm font-medium mb-1" style={{ color: 'var(--anx-primary)' }}>
@@ -139,7 +141,8 @@ export function EnglishLearnSession({ subject, skill, blocks, userId }: EnglishL
             </button>
           </div>
         </div>
-      </main>
+        </main>
+      </StudentFocusedChrome>
     );
   }
 
@@ -147,8 +150,9 @@ export function EnglishLearnSession({ subject, skill, blocks, userId }: EnglishL
 
   if (phase === 'explanation') {
     return (
-      <main className="anx-shell">
-        <div className="mx-auto w-full max-w-2xl px-4 sm:px-6 py-8 space-y-6">
+      <StudentFocusedChrome contextLabel={`${subject.title} · ${skill.name}`}>
+        <main className="anx-shell flex-1">
+        <div className="mx-auto w-full max-w-2xl space-y-6 px-4 py-8 sm:px-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium" style={{ color: 'var(--anx-primary)' }}>
@@ -185,7 +189,8 @@ export function EnglishLearnSession({ subject, skill, blocks, userId }: EnglishL
             </button>
           </div>
         </div>
-      </main>
+        </main>
+      </StudentFocusedChrome>
     );
   }
 
@@ -193,8 +198,9 @@ export function EnglishLearnSession({ subject, skill, blocks, userId }: EnglishL
 
   if (phase === 'questions') {
     return (
-      <main className="anx-shell">
-        <div className="mx-auto w-full max-w-2xl px-4 sm:px-6 py-8 space-y-6">
+      <StudentFocusedChrome contextLabel={`${subject.title} · ${skill.name}`}>
+        <main className="anx-shell flex-1">
+        <div className="mx-auto w-full max-w-2xl space-y-6 px-4 py-8 sm:px-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium" style={{ color: 'var(--anx-primary)' }}>
@@ -249,7 +255,8 @@ export function EnglishLearnSession({ subject, skill, blocks, userId }: EnglishL
             </button>
           </div>
         </div>
-      </main>
+        </main>
+      </StudentFocusedChrome>
     );
   }
 
@@ -258,7 +265,8 @@ export function EnglishLearnSession({ subject, skill, blocks, userId }: EnglishL
   const pct = totalQuestions > 0 ? Math.round((totalCorrect / totalQuestions) * 100) : null;
 
   return (
-    <main className="anx-shell anx-scene flex items-center justify-center">
+    <StudentFocusedChrome contextLabel={`${subject.title} · ${skill.name}`}>
+      <main className="anx-shell anx-scene flex flex-1 items-center justify-center py-10 sm:py-12">
       <div className="anx-panel w-full max-w-md p-8 space-y-6 text-center">
         <div>
           <p className="text-sm font-medium mb-1" style={{ color: 'var(--anx-primary)' }}>
@@ -298,7 +306,7 @@ export function EnglishLearnSession({ subject, skill, blocks, userId }: EnglishL
             onClick={() => router.push('/dashboard')}
             className="anx-btn-primary w-full py-3"
           >
-            Back to Home
+            Back to dashboard
           </button>
           <button
             onClick={() => setPhase('intro')}
@@ -308,6 +316,7 @@ export function EnglishLearnSession({ subject, skill, blocks, userId }: EnglishL
           </button>
         </div>
       </div>
-    </main>
+      </main>
+    </StudentFocusedChrome>
   );
 }
