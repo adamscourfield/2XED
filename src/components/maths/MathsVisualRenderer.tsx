@@ -3,6 +3,8 @@ import { ArithmeticLayoutRenderer } from '@/components/maths/arithmetic/Arithmet
 import { AngleRenderer } from '@/components/maths/geometry/AngleRenderer';
 import { CoordinateGridRenderer } from '@/components/maths/geometry/CoordinateGridRenderer';
 import { ShapeRenderer } from '@/components/maths/geometry/ShapeRenderer';
+import { SampleSpaceGridRenderer } from '@/components/maths/probability/SampleSpaceGridRenderer';
+import { VennTwoSetRenderer } from '@/components/maths/probability/VennTwoSetRenderer';
 import { BarModelRenderer } from '@/components/maths/number/BarModelRenderer';
 import { FractionBarRenderer } from '@/components/maths/number/FractionBarRenderer';
 import { NumberLineRenderer } from '@/components/maths/number/NumberLineRenderer';
@@ -36,6 +38,10 @@ export function MathsVisualRenderer({ visual }: { visual: MathsVisual }) {
       return <ChartRenderer visual={visual} />;
     case 'bar-model':
       return <BarModelRenderer visual={visual} />;
+    case 'sample-space-grid':
+      return <SampleSpaceGridRenderer visual={visual} />;
+    case 'venn-two-set':
+      return <VennTwoSetRenderer visual={visual} />;
     default:
       return null;
   }
