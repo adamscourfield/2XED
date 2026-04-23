@@ -67,7 +67,7 @@ const queue = phase1SkillCodes.map((skillCode) => {
     targetCounts: targets,
     shortfall,
     sampleQuestions: entry?.sampleQuestions ?? [],
-    reviewPackFile: fs.existsSync(reviewPackFile) ? reviewPackFile : null,
+    reviewPackFile: fs.existsSync(reviewPackFile) ? path.relative(repoRoot, reviewPackFile) : null,
     focusNotes: focusNotes(skillCode, entry),
   };
 });

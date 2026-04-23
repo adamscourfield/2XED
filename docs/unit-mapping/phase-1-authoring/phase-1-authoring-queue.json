@@ -26,7 +26,7 @@
       "Which number has digit 5 worth 50,000?",
       "What is the value of 8 in 1,863,205?"
     ],
-    "reviewPackFile": "/Users/adamscourfield/Documents/Anaxi-Learn/docs/unit-mapping/curriculum-review-packs/n1-1.md",
+    "reviewPackFile": "docs/unit-mapping/curriculum-review-packs/n1-1.md",
     "focusNotes": [
       "Current DB still includes 2 placeholder item(s) for this skill."
     ]
@@ -57,7 +57,7 @@
       "Write 13,050 in words.",
       "Write \"two hundred and nine\" in figures."
     ],
-    "reviewPackFile": "/Users/adamscourfield/Documents/Anaxi-Learn/docs/unit-mapping/curriculum-review-packs/n1-2.md",
+    "reviewPackFile": "docs/unit-mapping/curriculum-review-packs/n1-2.md",
     "focusNotes": [
       "Current DB still includes 2 placeholder item(s) for this skill."
     ]
@@ -89,7 +89,7 @@
       "8106 > 8099",
       "3751 < 3699"
     ],
-    "reviewPackFile": "/Users/adamscourfield/Documents/Anaxi-Learn/docs/unit-mapping/curriculum-review-packs/n1-3.md",
+    "reviewPackFile": "docs/unit-mapping/curriculum-review-packs/n1-3.md",
     "focusNotes": [
       "Use TRUE_FALSE for statement checks and SHORT_TEXT for symbol insertion. Avoid padded 4-option MCQ.",
       "Current DB still includes 2 placeholder item(s) for this skill."
@@ -121,7 +121,7 @@
       "Order these integers in ascending order: 8, 5, 9, 10, 2.",
       "Order these integers in ascending order: 11, 20, 9, 15, 14, 3."
     ],
-    "reviewPackFile": "/Users/adamscourfield/Documents/Anaxi-Learn/docs/unit-mapping/curriculum-review-packs/n1-4.md",
+    "reviewPackFile": "docs/unit-mapping/curriculum-review-packs/n1-4.md",
     "focusNotes": [
       "Use ORDER_SEQUENCE or structured short-entry, not standard MCQ.",
       "Current DB still includes 2 placeholder item(s) for this skill."
@@ -151,7 +151,7 @@
       "Find the median of: 22, 18, 15, 7, 9",
       "Find the median of: 19, 20, 1, 5, 7"
     ],
-    "reviewPackFile": "/Users/adamscourfield/Documents/Anaxi-Learn/docs/unit-mapping/curriculum-review-packs/n1-5.md",
+    "reviewPackFile": "docs/unit-mapping/curriculum-review-packs/n1-5.md",
     "focusNotes": [
       "Prefer SHORT_NUMERIC for core practice; MCQ only for onboarding checks or misconception probes.",
       "Current DB still includes 2 placeholder item(s) for this skill."
@@ -177,7 +177,7 @@
     "sampleQuestions": [
       "Which one of the following statements is correct?"
     ],
-    "reviewPackFile": "/Users/adamscourfield/Documents/Anaxi-Learn/docs/unit-mapping/curriculum-review-packs/n1-6.md",
+    "reviewPackFile": "docs/unit-mapping/curriculum-review-packs/n1-6.md",
     "focusNotes": [
       "Current DB still includes 2 placeholder item(s) for this skill."
     ]
@@ -198,7 +198,7 @@
     },
     "shortfall": 20,
     "sampleQuestions": [],
-    "reviewPackFile": "/Users/adamscourfield/Documents/Anaxi-Learn/docs/unit-mapping/curriculum-review-packs/n1-7.md",
+    "reviewPackFile": "docs/unit-mapping/curriculum-review-packs/n1-7.md",
     "focusNotes": [
       "Use TRUE_FALSE for statement checks and SHORT_TEXT for symbol insertion. Avoid padded 4-option MCQ.",
       "Current DB still includes 2 placeholder item(s) for this skill."
@@ -220,7 +220,7 @@
     },
     "shortfall": 20,
     "sampleQuestions": [],
-    "reviewPackFile": "/Users/adamscourfield/Documents/Anaxi-Learn/docs/unit-mapping/curriculum-review-packs/n1-8.md",
+    "reviewPackFile": "docs/unit-mapping/curriculum-review-packs/n1-8.md",
     "focusNotes": [
       "Use ORDER_SEQUENCE or structured short-entry, not standard MCQ.",
       "Current DB still includes 2 placeholder item(s) for this skill."
@@ -252,7 +252,7 @@
       "8106 > 8099",
       "3751 < 3699"
     ],
-    "reviewPackFile": "/Users/adamscourfield/Documents/Anaxi-Learn/docs/unit-mapping/curriculum-review-packs/n1-9.md",
+    "reviewPackFile": "docs/unit-mapping/curriculum-review-packs/n1-9.md",
     "focusNotes": [
       "Prefer number-line interaction or short-entry labels rather than generic MCQ.",
       "Current DB still includes 2 placeholder item(s) for this skill."
@@ -282,7 +282,7 @@
       "Round 95.06 to nearest 100.",
       "Round 10053 to nearest 1000."
     ],
-    "reviewPackFile": "/Users/adamscourfield/Documents/Anaxi-Learn/docs/unit-mapping/curriculum-review-packs/n1-10.md",
+    "reviewPackFile": "docs/unit-mapping/curriculum-review-packs/n1-10.md",
     "focusNotes": [
       "Prefer SHORT_NUMERIC for core practice; MCQ only for onboarding checks or misconception probes.",
       "Current DB still includes 2 placeholder item(s) for this skill."
@@ -304,7 +304,7 @@
     },
     "shortfall": 20,
     "sampleQuestions": [],
-    "reviewPackFile": "/Users/adamscourfield/Documents/Anaxi-Learn/docs/unit-mapping/curriculum-review-packs/n1-11.md",
+    "reviewPackFile": "docs/unit-mapping/curriculum-review-packs/n1-11.md",
     "focusNotes": [
       "Prefer number-line interaction or short-entry labels rather than generic MCQ.",
       "Current DB still includes 2 placeholder item(s) for this skill."
@@ -334,7 +334,7 @@
       "Round 7.2 to the nearest integer.",
       "Round 1.9 to the nearest integer."
     ],
-    "reviewPackFile": "/Users/adamscourfield/Documents/Anaxi-Learn/docs/unit-mapping/curriculum-review-packs/n1-12.md",
+    "reviewPackFile": "docs/unit-mapping/curriculum-review-packs/n1-12.md",
     "focusNotes": [
       "Prefer SHORT_NUMERIC for core practice; MCQ only for onboarding checks or misconception probes.",
       "Current DB still includes 2 placeholder item(s) for this skill."
@@ -356,7 +356,7 @@
     },
     "shortfall": 20,
     "sampleQuestions": [],
-    "reviewPackFile": "/Users/adamscourfield/Documents/Anaxi-Learn/docs/unit-mapping/curriculum-review-packs/n1-13.md",
+    "reviewPackFile": "docs/unit-mapping/curriculum-review-packs/n1-13.md",
     "focusNotes": [
       "Prefer number-line interaction or short-entry labels rather than generic MCQ.",
       "Current DB still includes 2 placeholder item(s) for this skill."
@@ -378,7 +378,7 @@
     },
     "shortfall": 20,
     "sampleQuestions": [],
-    "reviewPackFile": "/Users/adamscourfield/Documents/Anaxi-Learn/docs/unit-mapping/curriculum-review-packs/n1-14.md",
+    "reviewPackFile": "docs/unit-mapping/curriculum-review-packs/n1-14.md",
     "focusNotes": [
       "Use TRUE_FALSE for statement checks and SHORT_TEXT for symbol insertion. Avoid padded 4-option MCQ.",
       "Current DB still includes 2 placeholder item(s) for this skill."
@@ -400,7 +400,7 @@
     },
     "shortfall": 20,
     "sampleQuestions": [],
-    "reviewPackFile": "/Users/adamscourfield/Documents/Anaxi-Learn/docs/unit-mapping/curriculum-review-packs/n1-15.md",
+    "reviewPackFile": "docs/unit-mapping/curriculum-review-packs/n1-15.md",
     "focusNotes": [
       "Use ORDER_SEQUENCE or structured short-entry, not standard MCQ.",
       "Current DB still includes 2 placeholder item(s) for this skill."
@@ -422,7 +422,7 @@
     },
     "shortfall": 24,
     "sampleQuestions": [],
-    "reviewPackFile": "/Users/adamscourfield/Documents/Anaxi-Learn/docs/unit-mapping/curriculum-review-packs/n2-1.md",
+    "reviewPackFile": "docs/unit-mapping/curriculum-review-packs/n2-1.md",
     "focusNotes": [
       "Build concept checks plus worked-example-style reteach items before independent practice."
     ]
@@ -443,7 +443,7 @@
     },
     "shortfall": 24,
     "sampleQuestions": [],
-    "reviewPackFile": "/Users/adamscourfield/Documents/Anaxi-Learn/docs/unit-mapping/curriculum-review-packs/n2-2.md",
+    "reviewPackFile": "docs/unit-mapping/curriculum-review-packs/n2-2.md",
     "focusNotes": [
       "Build concept checks plus worked-example-style reteach items before independent practice."
     ]
@@ -464,7 +464,7 @@
     },
     "shortfall": 24,
     "sampleQuestions": [],
-    "reviewPackFile": "/Users/adamscourfield/Documents/Anaxi-Learn/docs/unit-mapping/curriculum-review-packs/n2-3.md",
+    "reviewPackFile": "docs/unit-mapping/curriculum-review-packs/n2-3.md",
     "focusNotes": [
       "Build concept checks plus worked-example-style reteach items before independent practice.",
       "Current DB still includes 2 placeholder item(s) for this skill."
@@ -486,7 +486,7 @@
     },
     "shortfall": 24,
     "sampleQuestions": [],
-    "reviewPackFile": "/Users/adamscourfield/Documents/Anaxi-Learn/docs/unit-mapping/curriculum-review-packs/n2-4.md",
+    "reviewPackFile": "docs/unit-mapping/curriculum-review-packs/n2-4.md",
     "focusNotes": [
       "Prefer SHORT_NUMERIC for core practice; MCQ only for onboarding checks or misconception probes."
     ]
@@ -507,7 +507,7 @@
     },
     "shortfall": 24,
     "sampleQuestions": [],
-    "reviewPackFile": "/Users/adamscourfield/Documents/Anaxi-Learn/docs/unit-mapping/curriculum-review-packs/n2-5.md",
+    "reviewPackFile": "docs/unit-mapping/curriculum-review-packs/n2-5.md",
     "focusNotes": [
       "Prefer SHORT_NUMERIC for core practice; MCQ only for onboarding checks or misconception probes.",
       "Current DB still includes 2 placeholder item(s) for this skill."
@@ -529,7 +529,7 @@
     },
     "shortfall": 24,
     "sampleQuestions": [],
-    "reviewPackFile": "/Users/adamscourfield/Documents/Anaxi-Learn/docs/unit-mapping/curriculum-review-packs/n2-6.md",
+    "reviewPackFile": "docs/unit-mapping/curriculum-review-packs/n2-6.md",
     "focusNotes": [
       "Prefer SHORT_NUMERIC for core practice; MCQ only for onboarding checks or misconception probes."
     ]
@@ -550,7 +550,7 @@
     },
     "shortfall": 24,
     "sampleQuestions": [],
-    "reviewPackFile": "/Users/adamscourfield/Documents/Anaxi-Learn/docs/unit-mapping/curriculum-review-packs/n2-7.md",
+    "reviewPackFile": "docs/unit-mapping/curriculum-review-packs/n2-7.md",
     "focusNotes": [
       "Prefer SHORT_NUMERIC for core practice; MCQ only for onboarding checks or misconception probes.",
       "Current DB still includes 2 placeholder item(s) for this skill."
@@ -572,7 +572,7 @@
     },
     "shortfall": 24,
     "sampleQuestions": [],
-    "reviewPackFile": "/Users/adamscourfield/Documents/Anaxi-Learn/docs/unit-mapping/curriculum-review-packs/n2-8.md",
+    "reviewPackFile": "docs/unit-mapping/curriculum-review-packs/n2-8.md",
     "focusNotes": [
       "Use contextual stems carefully; keep reading load low in onboarding and reteach.",
       "Current DB still includes 2 placeholder item(s) for this skill."
@@ -594,7 +594,7 @@
     },
     "shortfall": 24,
     "sampleQuestions": [],
-    "reviewPackFile": "/Users/adamscourfield/Documents/Anaxi-Learn/docs/unit-mapping/curriculum-review-packs/n2-9.md",
+    "reviewPackFile": "docs/unit-mapping/curriculum-review-packs/n2-9.md",
     "focusNotes": [
       "Use contextual stems carefully; keep reading load low in onboarding and reteach.",
       "Current DB still includes 2 placeholder item(s) for this skill."
@@ -616,7 +616,7 @@
     },
     "shortfall": 24,
     "sampleQuestions": [],
-    "reviewPackFile": "/Users/adamscourfield/Documents/Anaxi-Learn/docs/unit-mapping/curriculum-review-packs/n2-10.md",
+    "reviewPackFile": "docs/unit-mapping/curriculum-review-packs/n2-10.md",
     "focusNotes": [
       "Use contextual stems carefully; keep reading load low in onboarding and reteach.",
       "Current DB still includes 2 placeholder item(s) for this skill."
@@ -638,7 +638,7 @@
     },
     "shortfall": 24,
     "sampleQuestions": [],
-    "reviewPackFile": "/Users/adamscourfield/Documents/Anaxi-Learn/docs/unit-mapping/curriculum-review-packs/n2-11.md",
+    "reviewPackFile": "docs/unit-mapping/curriculum-review-packs/n2-11.md",
     "focusNotes": [
       "Use contextual stems carefully; keep reading load low in onboarding and reteach.",
       "Current DB still includes 2 placeholder item(s) for this skill."
@@ -660,7 +660,7 @@
     },
     "shortfall": 24,
     "sampleQuestions": [],
-    "reviewPackFile": "/Users/adamscourfield/Documents/Anaxi-Learn/docs/unit-mapping/curriculum-review-packs/n2-12.md",
+    "reviewPackFile": "docs/unit-mapping/curriculum-review-packs/n2-12.md",
     "focusNotes": [
       "Use contextual stems carefully; keep reading load low in onboarding and reteach.",
       "Current DB still includes 2 placeholder item(s) for this skill."
@@ -682,7 +682,7 @@
     },
     "shortfall": 24,
     "sampleQuestions": [],
-    "reviewPackFile": "/Users/adamscourfield/Documents/Anaxi-Learn/docs/unit-mapping/curriculum-review-packs/n2-13.md",
+    "reviewPackFile": "docs/unit-mapping/curriculum-review-packs/n2-13.md",
     "focusNotes": [
       "Use contextual stems carefully; keep reading load low in onboarding and reteach.",
       "Current DB still includes 2 placeholder item(s) for this skill."
