@@ -147,6 +147,46 @@ export interface ChartVisual extends VisualCaptioned {
   series: ChartBarSpec[];
 }
 
+/** Equal-parts bar model for multiplication / division (e.g. N3.1). */
+export interface BarModelSegmentSpec {
+  /** Numeric size of the segment (used for width proportion). */
+  value: number;
+  /** Label inside the part (defaults to string of value). */
+  label?: string;
+}
+
+export interface BarModelVisual extends VisualCaptioned {
+  type: 'bar-model';
+  total: number;
+  segments: BarModelSegmentSpec[];
+}
+
+/** Two-event sample space as a labelled grid (probability S1.4 / S1.5). */
+export interface SampleSpaceGridVisual extends VisualCaptioned {
+  type: 'sample-space-grid';
+  rowLabels: string[];
+  columnLabels: string[];
+  /** rows.length === cells.length; each row has columnLabels.length strings */
+  cells: string[][];
+}
+
+/** Two-set Venn inside a universal rectangle (probability S1.7–S1.12). */
+export interface VennTwoSetVisual extends VisualCaptioned {
+  type: 'venn-two-set';
+  /** Elements listed in each region (empty → show region count only). */
+  aOnly: string[];
+  intersection: string[];
+  bOnly: string[];
+  outside: string[];
+  /** Region sizes when element lists are empty or for quick totals */
+  counts?: {
+    aOnly: number;
+    intersection: number;
+    bOnly: number;
+    outside: number;
+  };
+}
+
 export type MathsVisual =
   | ArithmeticLayoutVisual
   | ShapeVisual
@@ -154,4 +194,7 @@ export type MathsVisual =
   | NumberLineVisual
   | FractionBarVisual
   | CoordinateGridVisual
-  | ChartVisual;
+  | ChartVisual
+  | BarModelVisual
+  | SampleSpaceGridVisual
+  | VennTwoSetVisual;

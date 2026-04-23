@@ -1,11 +1,14 @@
 import type {
   ArithmeticLayoutVisual,
+  BarModelVisual,
   ChartVisual,
   CoordinateGridVisual,
   FractionBarVisual,
   MathsVisual,
   NumberLineVisual,
+  SampleSpaceGridVisual,
   ShapeVisual,
+  VennTwoSetVisual,
 } from './types';
 
 function isObject(value: unknown): value is Record<string, unknown> {
@@ -79,6 +82,68 @@ function validateChart(visual: ChartVisual): string[] {
   return issues;
 }
 
+function validateBarModel(visual: BarModelVisual): string[] {
+  const issues: string[] = [];
+  if (!hasText(visual.altText)) issues.push('missing alt text');
+  if (!(Number.isInteger(visual.total) && visual.total > 0)) {
+    issues.push('bar model requires a positive integer total');
+  }
+  if (!Array.isArray(visual.segments) || visual.segments.length === 0) {
+    issues.push('bar model requires at least one segment');
+  }
+  if (
+    visual.segments.some(
+      (seg) => !(typeof seg.value === 'number' && Number.isFinite(seg.value) && seg.value > 0)
+    )
+  ) {
+    issues.push('bar model segments must have positive numeric values');
+  }
+  const sum = visual.segments.reduce((acc, seg) => acc + seg.value, 0);
+  if (Math.abs(sum - visual.total) > 1e-6) {
+    issues.push('bar model segment values must sum to the total');
+  }
+  return issues;
+}
+
+function validateSampleSpaceGrid(visual: SampleSpaceGridVisual): string[] {
+  const issues: string[] = [];
+  if (!hasText(visual.altText)) issues.push('missing alt text');
+  if (!Array.isArray(visual.rowLabels) || visual.rowLabels.length === 0) {
+    issues.push('sample space grid needs row labels');
+  }
+  if (!Array.isArray(visual.columnLabels) || visual.columnLabels.length === 0) {
+    issues.push('sample space grid needs column labels');
+  }
+  if (!Array.isArray(visual.cells) || visual.cells.length !== visual.rowLabels.length) {
+    issues.push('sample space grid cells must match row count');
+  } else if (
+    visual.cells.some(
+      (row) => !Array.isArray(row) || row.length !== visual.columnLabels.length
+    )
+  ) {
+    issues.push('sample space grid row widths must match column count');
+  }
+  return issues;
+}
+
+function validateVennTwoSet(visual: VennTwoSetVisual): string[] {
+  const issues: string[] = [];
+  if (!hasText(visual.altText)) issues.push('missing alt text');
+  const lists = [visual.aOnly, visual.intersection, visual.bOnly, visual.outside];
+  if (!lists.every((list) => Array.isArray(list))) {
+    issues.push('venn regions must be arrays');
+    return issues;
+  }
+  if (visual.counts) {
+    const { aOnly, intersection, bOnly, outside } = visual.counts;
+    const nums = [aOnly, intersection, bOnly, outside];
+    if (nums.some((n) => !(typeof n === 'number' && Number.isFinite(n) && n >= 0))) {
+      issues.push('venn counts must be non-negative numbers');
+    }
+  }
+  return issues;
+}
+
 export function validateMathsVisual(visual: MathsVisual): string[] {
   switch (visual.type) {
     case 'arithmetic-layout':
@@ -93,8 +158,14 @@ export function validateMathsVisual(visual: MathsVisual): string[] {
       return validateCoordinateGrid(visual);
     case 'chart':
       return validateChart(visual);
+    case 'bar-model':
+      return validateBarModel(visual);
     case 'angle-diagram':
       return hasText(visual.altText) ? [] : ['missing alt text'];
+    case 'sample-space-grid':
+      return validateSampleSpaceGrid(visual);
+    case 'venn-two-set':
+      return validateVennTwoSet(visual);
     default:
       return ['unknown visual type'];
   }
