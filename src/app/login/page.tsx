@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 
@@ -36,34 +37,23 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="anx-scene flex min-h-screen items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md space-y-8">
-        <div className="flex justify-center">
-          <Image
-            src="/2xed-logo.png"
-            alt="2XED"
-            width={48}
-            height={48}
-            className="mb-0"
-          />
+    <main className="anx-scene flex min-h-screen flex-col items-center justify-center px-4 py-12">
+      <div className="w-full max-w-md space-y-6">
+        <div className="text-center">
+          <Image src="/2xed-logo.png" alt="2XED" width={48} height={48} className="mx-auto" />
+          <p className="anx-section-label mt-4">Welcome back</p>
+          <h1 className="mt-2 text-2xl font-bold tracking-tight sm:text-[1.65rem]" style={{ color: 'var(--anx-text)' }}>
+            Sign in to 2XED
+          </h1>
+          <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed" style={{ color: 'var(--anx-text-muted)' }}>
+            Use the email and password from your school. You will land on your dashboard after signing in.
+          </p>
         </div>
 
         <div className="anx-panel p-8 sm:p-10">
-          <div className="mb-8 text-center">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: 'var(--anx-text-muted)' }}>
-              2XED
-            </p>
-            <h1 className="mt-3 text-2xl font-bold tracking-tight sm:text-[1.65rem]" style={{ color: 'var(--anx-text)' }}>
-              Sign in to continue learning
-            </h1>
-            <p className="mt-2 text-sm leading-relaxed" style={{ color: 'var(--anx-text-muted)' }}>
-              Enter your credentials to access 2XED.
-            </p>
-          </div>
-
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label htmlFor="email" className="mb-2 block text-sm font-semibold text-[#374151]">
+              <label htmlFor="email" className="mb-2 block text-sm font-semibold" style={{ color: 'var(--anx-text-secondary)' }}>
                 Email address
               </label>
               <input
@@ -71,13 +61,13 @@ export default function LoginPage() {
                 name="email"
                 type="email"
                 placeholder="student@example.com"
-                className="w-full rounded-full border-0 bg-[#f0f1f4] px-5 py-3.5 text-sm text-[#111827] placeholder:text-[#9ca3af] outline-none ring-0 transition focus:bg-[#e8eaef] focus:ring-2 focus:ring-[#6366f1]/30"
+                className="anx-input w-full"
                 required
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="mb-2 block text-sm font-semibold text-[#374151]">
+              <label htmlFor="password" className="mb-2 block text-sm font-semibold" style={{ color: 'var(--anx-text-secondary)' }}>
                 Password
               </label>
               <input
@@ -85,21 +75,19 @@ export default function LoginPage() {
                 name="password"
                 type="password"
                 placeholder="Enter your password"
-                className="w-full rounded-full border-0 bg-[#f0f1f4] px-5 py-3.5 text-sm text-[#111827] placeholder:text-[#9ca3af] outline-none ring-0 transition focus:bg-[#e8eaef] focus:ring-2 focus:ring-[#6366f1]/30"
+                className="anx-input w-full"
                 required
               />
             </div>
 
             <div className="flex justify-end">
-              <a className="text-xs font-medium text-[#6b7280] transition hover:text-[#374151]" href="#">
-                Forgot password?
-              </a>
+              <span className="text-xs font-medium" style={{ color: 'var(--anx-text-muted)' }}>
+                Forgot password? Contact your school.
+              </span>
             </div>
 
             {error ? (
-              <div className="rounded-xl border px-4 py-3 text-sm" style={{ borderColor: 'var(--anx-danger)', background: 'var(--anx-danger-soft)', color: '#dc2626' }}>
-                {error}
-              </div>
+              <div className="anx-callout-danger text-sm">{error}</div>
             ) : null}
 
             <button
@@ -112,8 +100,12 @@ export default function LoginPage() {
           </form>
         </div>
 
-        <p className="text-center text-xs text-white/70">
-          &copy; 2026 2XED. All rights reserved.
+        <p className="text-center text-xs" style={{ color: 'var(--anx-text-muted)' }}>
+          <Link href="/" className="font-medium no-underline hover:underline" style={{ color: 'var(--anx-primary)' }}>
+            ← Back to home
+          </Link>
+          <span className="mx-2 text-[var(--anx-text-faint)]">·</span>
+          &copy; 2026 2XED
         </p>
       </div>
     </main>
