@@ -28,6 +28,7 @@
     "db:normalize:item-routing-purpose": "ts-node -r tsconfig-paths/register --compiler-options '{\"module\":\"CommonJS\"}' prisma/normalize-item-routing-purpose.ts",
     "validate:learning": "node scripts/validate-learning-config.mjs",
     "validate:items": "node scripts/validate-item-answer-types.mjs",
+    "audit:question-bank:answer-modes": "ts-node -r tsconfig-paths/register --compiler-options '{\"module\":\"CommonJS\"}' scripts/audit-question-bank-answer-modes.ts",
     "validate:explanation-steps": "node scripts/validate-explanations.mjs",
     "validate:n13": "node scripts/validate-n13-content-integrity.mjs",
     "validate:explanations": "node scripts/validate-explanation-integrity.mjs",
