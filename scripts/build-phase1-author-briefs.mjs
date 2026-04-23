@@ -9,6 +9,12 @@ const queuePath = path.join(phase1Root, 'phase-1-authoring-queue.json');
 const queue = JSON.parse(fs.readFileSync(queuePath, 'utf8'));
 fs.mkdirSync(briefsRoot, { recursive: true });
 
+function reviewPackRelative(p) {
+  if (!p) return null;
+  const abs = path.isAbsolute(p) ? p : path.join(repoRoot, p);
+  return path.relative(repoRoot, abs);
+}
+
 function modeRules(skillCode) {
   if (['N1.3', 'N1.7', 'N1.14'].includes(skillCode)) {
     return [
@@ -49,7 +55,7 @@ for (const entry of queue) {
     `- Current real items: ${entry.currentRealItems}`,
     `- Current placeholders: ${entry.currentPlaceholderItems}`,
     `- Target counts: ${entry.targetCounts.onboarding} onboarding, ${entry.targetCounts.learn} learn, ${entry.targetCounts.reteach} reteach`,
-    ...(entry.reviewPackFile ? [`- Review pack: \`${path.relative(repoRoot, entry.reviewPackFile)}\``] : []),
+    ...(entry.reviewPackFile ? [`- Review pack: \`${reviewPackRelative(entry.reviewPackFile)}\``] : []),
     '',
     '## Answer Mode Rules',
     '',

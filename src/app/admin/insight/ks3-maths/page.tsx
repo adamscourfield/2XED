@@ -186,7 +186,7 @@ export default async function InsightDashboardPage() {
     <main className="anx-shell">
       <div className="mx-auto w-full max-w-5xl space-y-10">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-gray-900">Insight Dashboard — KS3 Maths</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Insight Dashboard — Maths</h1>
           <div className="flex items-center gap-4 text-sm">
             <a href="/admin/content/ks3-maths" className="text-blue-600 hover:underline">
               → Content Verification

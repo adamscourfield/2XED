@@ -185,7 +185,7 @@ function writeReadme(manifest) {
     '# Unit 1 Curriculum Extracts',
     '',
     `Generated: ${manifest.generatedAt}`,
-    `Curriculum root: \`${manifest.curriculumRoot}\``,
+    `Curriculum root: \`${manifest.curriculumRoot}\` (relative to the repository root)`,
     '',
     '## Deck Summary',
     '',
@@ -206,7 +206,7 @@ fs.mkdirSync(outputRoot, { recursive: true });
 const extractedDecks = decks.map(extractDeck);
 const manifest = {
   generatedAt: new Date().toISOString(),
-  curriculumRoot,
+  curriculumRoot: path.relative(repoRoot, curriculumRoot),
   decks: extractedDecks.map(({ id, file, part, tier, answers, slideCount, questionSignalSlides, contentsEntries, subtopicCoverage }) => ({
     id,
     file,

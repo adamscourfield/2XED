@@ -1,7 +1,7 @@
 # Unit 1 Curriculum Extracts
 
 Generated: 2026-03-11T09:53:14.900Z
-Curriculum root: `/Users/adamscourfield/Documents/Anaxi-Learn/Curriculum/Year 7/Unit 1 - Applications of Numeracy`
+Curriculum root: `Curriculum/Year 7/Unit 1 - Applications of Numeracy` (relative to the repository root)
 
 ## Deck Summary
 
