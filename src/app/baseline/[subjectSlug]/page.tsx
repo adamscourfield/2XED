@@ -3,6 +3,7 @@ import { authOptions } from '@/features/auth/authOptions';
 import { notFound, redirect } from 'next/navigation';
 import { prisma } from '@/db/prisma';
 import { BaselineRunClient } from '@/features/baseline/BaselineRunClient';
+import { StudentFocusedChrome } from '@/components/student/StudentFocusedChrome';
 
 interface Props {
   params: Promise<{ subjectSlug: string }>;
@@ -26,5 +27,9 @@ export default async function BaselinePage({ params }: Props) {
     redirect(`/learn/${subjectSlug}`);
   }
 
-  return <BaselineRunClient subjectSlug={subjectSlug} />;
+  return (
+    <StudentFocusedChrome contextLabel={`${subject.title} · Baseline`}>
+      <BaselineRunClient subjectSlug={subjectSlug} />
+    </StudentFocusedChrome>
+  );
 }

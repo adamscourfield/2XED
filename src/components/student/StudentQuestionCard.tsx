@@ -1,6 +1,6 @@
 'use client';
 
-import type { ReactNode } from 'react';
+import React, { type ReactNode } from 'react';
 
 export type StudentQuestionCardProps = {
   /** Stable id for the current step (e.g. item id); drives the continuity animation when it changes */

@@ -3,6 +3,7 @@ import { authOptions } from '@/features/auth/authOptions';
 import { redirect } from 'next/navigation';
 import { prisma } from '@/db/prisma';
 import { LearningPageShell } from '@/components/LearningPageShell';
+import { StudentFlowHero } from '@/components/student/StudentFlowHero';
 import { EnglishLearnSession } from '@/features/learn/EnglishLearnSession';
 
 interface Props {
@@ -40,8 +41,17 @@ export default async function EnglishLearnPage({ params }: Props) {
   if (blocks.length === 0) {
     return (
       <LearningPageShell
+        appChrome="student"
         title={skill.name}
         subtitle={`${subject.title} · ${skill.code}`}
+        maxWidthClassName="max-w-2xl"
+        hero={(
+          <StudentFlowHero
+            eyebrow={subject.title}
+            title="Almost there"
+            lead="This skill does not have published content yet. Your teacher can enable it when it is ready."
+          />
+        )}
       >
         <div className="anx-callout-info max-w-lg">
           <p className="font-medium">No content published yet</p>

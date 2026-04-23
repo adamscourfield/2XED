@@ -299,10 +299,13 @@ export function LearnSession({ subject, skill, items, retryItems, userId, gamifi
         skillId: skill.id,
         skillCode: skill.code,
         routeType: explanationRoute.routeType,
-        retryItemCount: retryItems.length > 0 ? retryItems.length : items.length,
+        retryItemCount: (() => {
+          const rlen = retryItems?.length ?? 0;
+          return rlen > 0 ? rlen : items.length;
+        })(),
       }),
     });
-  }, [hasRetriedAfterExplanation, explanationRoute, subject.id, skill.id, skill.code, retryItems.length, items.length]);
+  }, [hasRetriedAfterExplanation, explanationRoute, subject.id, skill.id, skill.code, retryItems, items.length]);
 
   useEffect(() => {
     if (!hasRetriedAfterExplanation || phase !== 'results' || retryResults.length === 0 || !explanationRoute || retryCompletedLoggedRef.current) return;
@@ -603,7 +606,7 @@ export function LearnSession({ subject, skill, items, retryItems, userId, gamifi
               onClick={() => router.push('/dashboard')}
               className="anx-btn-primary w-full py-3"
             >
-              Back to Home
+              Back to dashboard
             </button>
             <button
               onClick={restartPractice}

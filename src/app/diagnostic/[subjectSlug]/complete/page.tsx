@@ -5,6 +5,8 @@ import { prisma } from '@/db/prisma';
 import { emitEvent } from '@/features/telemetry/eventService';
 import { scheduleNextReview } from '@/features/mastery/masteryService';
 import Link from 'next/link';
+import { LearningPageShell } from '@/components/LearningPageShell';
+import { StudentFlowHero } from '@/components/student/StudentFlowHero';
 
 interface Props {
   params: Promise<{ subjectSlug: string }>;
@@ -82,24 +84,41 @@ export default async function DiagnosticCompletePage({ params, searchParams }: P
   }
 
   return (
-    <main className="anx-shell anx-scene flex items-center justify-center">
-      <div className="anx-panel w-full max-w-lg p-8 space-y-6 text-center">
-        <div>
-          <h1 className="text-2xl font-bold" style={{ color: 'var(--anx-text)' }}>You&apos;re ready to start</h1>
-          <p className="mt-2" style={{ color: 'var(--anx-text-muted)' }}>
-            You answered {diagSession.itemsSeen} question{diagSession.itemsSeen !== 1 ? 's' : ''}. We now know a good place to begin.
+    <LearningPageShell
+      appChrome="student"
+      title="You're ready to start"
+      subtitle={`${subject.title} · diagnostic complete.`}
+      maxWidthClassName="max-w-2xl"
+      hero={(
+        <StudentFlowHero
+          eyebrow="Nice work"
+          title="Your path is set"
+          lead={`You answered ${diagSession.itemsSeen} question${diagSession.itemsSeen !== 1 ? 's' : ''}. We have a good place to begin your practice.`}
+        />
+      )}
+    >
+      <div className="anx-card space-y-6 p-6 text-center sm:p-8">
+        <div className="anx-callout-info text-left">
+          <p className="font-semibold text-[color:var(--anx-text)]">What happens next</p>
+          <p className="mt-1 text-sm leading-relaxed">
+            Your first skill is ready. We will guide you question by question — same calm layout as your dashboard.
           </p>
         </div>
-        <div className="anx-callout-info">
-          Your first step is ready. We will guide you to the next skill.
+        <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
+          <Link
+            href={`/learn/${subjectSlug}`}
+            className="anx-btn-primary px-8 py-3.5 text-center"
+          >
+            Start my next skill
+          </Link>
+          <Link
+            href="/dashboard"
+            className="anx-btn-secondary px-6 py-3.5 text-center"
+          >
+            Back to dashboard
+          </Link>
         </div>
-        <Link
-          href={`/learn/${subjectSlug}`}
-          className="anx-btn-primary block w-full py-3"
-        >
-          Go to my next skill
-        </Link>
       </div>
-    </main>
+    </LearningPageShell>
   );
 }

@@ -1,12 +1,14 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { redirect } from 'next/navigation';
 import { AppChrome } from '@/components/AppChrome';
 import { AnimationRenderer } from '@/components/explanation/AnimationRenderer';
 import { LiveWhiteboardViewer } from '@/components/student/LiveWhiteboardViewer';
 import { StudentQuestionCard } from '@/components/student/StudentQuestionCard';
+import { StudentFlowHero } from '@/components/student/StudentFlowHero';
 import { stripStudentQuestionLabel } from '@/features/items/itemMeta';
 import type { LiveWhiteboardPayload } from '@/lib/live/whiteboard-strokes';
 
@@ -250,8 +252,16 @@ export default function StudentLivePage() {
   if (status === 'loading') {
     return (
       <AppChrome variant="student">
-        <main className="anx-shell anx-scene flex flex-1 items-center justify-center">
-          <p style={{ color: 'var(--anx-text-muted)' }}>Loading…</p>
+        <main className="anx-shell anx-scene flex flex-1 flex-col items-center justify-center px-4 py-12">
+          <div className="student-flow-loading-card">
+            <div className="h-11 w-11 animate-spin rounded-full border-4 border-[var(--anx-surface-container-high)] border-t-[var(--anx-primary)]" />
+            <div>
+              <p className="m-0 text-base font-semibold" style={{ color: 'var(--anx-text)' }}>Opening live room…</p>
+              <p className="mt-1 text-sm leading-relaxed" style={{ color: 'var(--anx-text-muted)' }}>
+                One moment while we load your session.
+              </p>
+            </div>
+          </div>
         </main>
       </AppChrome>
     );
@@ -364,36 +374,45 @@ export default function StudentLivePage() {
   if (appState.phase === 'join') {
     return (
       <AppChrome variant="student">
-        <main className="anx-shell anx-scene flex flex-1 items-center justify-center">
-        <div className="anx-panel w-full max-w-sm p-8">
-          <h1 className="mb-2 text-center text-2xl font-bold" style={{ color: 'var(--anx-text)' }}>Join Live Session</h1>
-          <p className="mb-6 text-center text-sm" style={{ color: 'var(--anx-text-muted)' }}>Enter the code your teacher shows on the board.</p>
-          {error && <div className="anx-callout-danger mb-4 text-sm">{error}</div>}
-          <form onSubmit={handleJoin} className="space-y-4">
-            <div>
-              <label htmlFor="joinCode" className="mb-1 block text-sm font-medium" style={{ color: 'var(--anx-text-secondary)' }}>
-                Session code
-              </label>
-              <input
-                id="joinCode"
-                type="text"
-                value={joinCode}
-                onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
-                maxLength={6}
-                placeholder="ABC123"
-                className="anx-input text-center text-2xl font-mono tracking-widest uppercase"
-                required
-              />
+        <main className="anx-shell anx-scene flex flex-1 flex-col items-center justify-center px-4 py-10 sm:py-12">
+          <div className="w-full max-w-md space-y-6">
+            <StudentFlowHero
+              variant="compact"
+              eyebrow="Live lesson"
+              title="Join your class"
+              lead="Enter the six-letter code your teacher shows on the board."
+            />
+            <div className="anx-card space-y-5 p-6 sm:p-8">
+              {error ? <div className="anx-callout-danger text-sm">{error}</div> : null}
+              <form onSubmit={handleJoin} className="space-y-5">
+                <div>
+                  <label htmlFor="joinCode" className="mb-2 block text-sm font-semibold" style={{ color: 'var(--anx-text-secondary)' }}>
+                    Session code
+                  </label>
+                  <input
+                    id="joinCode"
+                    type="text"
+                    value={joinCode}
+                    onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
+                    maxLength={6}
+                    placeholder="ABC123"
+                    className="anx-input text-center text-2xl font-mono tracking-widest uppercase"
+                    required
+                  />
+                  <p className="mt-2 text-xs leading-relaxed" style={{ color: 'var(--anx-text-muted)' }}>
+                    Codes are not case-sensitive. You need all six characters before joining.
+                  </p>
+                </div>
+                <button
+                  type="submit"
+                  disabled={loading || joinCode.length !== 6}
+                  className="anx-btn-primary w-full py-3.5"
+                >
+                  {loading ? 'Joining…' : 'Join lesson'}
+                </button>
+              </form>
             </div>
-            <button
-              type="submit"
-              disabled={loading || joinCode.length !== 6}
-              className="anx-btn-primary w-full"
-            >
-              {loading ? 'Joining…' : 'Join'}
-            </button>
-          </form>
-        </div>
+          </div>
         </main>
       </AppChrome>
     );
@@ -404,17 +423,20 @@ export default function StudentLivePage() {
     const wb = appState.whiteboard;
     return (
       <AppChrome variant="student">
-        <main className="anx-shell flex min-h-0 flex-1 flex-col px-4 py-6">
-          <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-3">
-            <div className="text-center">
-              <h2 className="text-lg font-semibold" style={{ color: 'var(--anx-text)' }}>
+        <main className="anx-shell flex min-h-0 flex-1 flex-col bg-[color:var(--anx-surface-bright)] px-4 py-6 sm:px-6">
+          <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-5">
+            <div className="text-center sm:text-left">
+              <p className="student-dash-eyebrow">Live lesson</p>
+              <h2 className="mt-1 text-xl font-bold tracking-tight" style={{ color: 'var(--anx-text)' }}>
                 Teacher whiteboard
               </h2>
-              <p className="text-sm" style={{ color: 'var(--anx-text-muted)' }}>
-                Your teacher is sketching on the board. This view updates automatically.
+              <p className="mt-1 text-sm leading-relaxed" style={{ color: 'var(--anx-text-muted)' }}>
+                Follow along — this view updates as your teacher draws.
               </p>
             </div>
-            <LiveWhiteboardViewer logicalWidth={wb.width} logicalHeight={wb.height} strokes={wb.strokes} className="min-h-[240px]" />
+            <div className="anx-card min-h-0 flex-1 overflow-hidden p-3 sm:p-4">
+              <LiveWhiteboardViewer logicalWidth={wb.width} logicalHeight={wb.height} strokes={wb.strokes} className="min-h-[260px] w-full rounded-xl" />
+            </div>
           </div>
         </main>
       </AppChrome>
@@ -426,15 +448,15 @@ export default function StudentLivePage() {
     const { explanation } = appState;
     return (
       <AppChrome variant="student">
-        <main className="anx-shell flex flex-1 items-center justify-center px-4 py-6">
-          <div className="anx-panel w-full max-w-4xl p-8 space-y-6">
-            <div className="text-center">
-              <h2 className="text-xl font-bold" style={{ color: 'var(--anx-text)' }}>Quick support</h2>
-              <p className="mt-2 text-sm" style={{ color: 'var(--anx-text-muted)' }}>
-                Stay with this explanation. You may get a short recheck question next.
-              </p>
-            </div>
-
+        <main className="anx-shell anx-scene flex flex-1 flex-col items-center px-4 py-8 sm:py-10">
+          <div className="w-full max-w-4xl space-y-6">
+            <StudentFlowHero
+              variant="compact"
+              eyebrow="Live lesson"
+              title="Quick support"
+              lead="Stay with this walkthrough. A short recheck question may follow."
+            />
+            <div className="anx-card space-y-6 p-6 sm:p-8">
             {explanation.animationSchema ? (
               <AnimationRenderer schema={explanation.animationSchema} />
             ) : (
@@ -452,7 +474,7 @@ export default function StudentLivePage() {
               </div>
             )}
 
-            <div className="flex justify-center">
+            <div className="flex justify-center pt-2">
               <button
                 onClick={() => {
                   void fetch(`/api/live-sessions/${appState.session.sessionId}/explanation-event`, {
@@ -469,10 +491,11 @@ export default function StudentLivePage() {
                   });
                   setAppState({ phase: 'waiting', session: appState.session });
                 }}
-                className="anx-btn-primary px-6 py-3"
+                className="anx-btn-primary px-8 py-3.5"
               >
                 I’m ready
               </button>
+            </div>
             </div>
           </div>
         </main>
@@ -484,15 +507,18 @@ export default function StudentLivePage() {
   if (appState.phase === 'waiting') {
     return (
       <AppChrome variant="student">
-        <main className="anx-shell anx-scene flex flex-1 items-center justify-center">
-        <div className="anx-panel w-full max-w-sm p-8 text-center">
-          <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-[var(--anx-surface-container-high)] border-t-[var(--anx-primary)]" />
-          <h2 className="mb-2 text-xl font-semibold" style={{ color: 'var(--anx-text)' }}>Waiting for your teacher…</h2>
-          <p className="text-sm" style={{ color: 'var(--anx-text-muted)' }}>
-            You&apos;ve joined <strong>{appState.session.subject.title}</strong>.
-            The lesson will begin shortly.
-          </p>
-        </div>
+        <main className="anx-shell anx-scene flex flex-1 items-center justify-center px-4 py-10">
+          <div className="anx-card w-full max-w-md space-y-5 p-8 text-center">
+            <div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-[var(--anx-surface-container-high)] border-t-[var(--anx-primary)]" />
+            <div>
+              <p className="student-dash-eyebrow">Live lesson</p>
+              <h2 className="mt-2 text-xl font-bold tracking-tight" style={{ color: 'var(--anx-text)' }}>Waiting for your teacher</h2>
+              <p className="mt-2 text-sm leading-relaxed" style={{ color: 'var(--anx-text-muted)' }}>
+                You&apos;re in <strong style={{ color: 'var(--anx-text-secondary)' }}>{appState.session.subject.title}</strong>.
+                Sit tight — the next activity will appear here.
+              </p>
+            </div>
+          </div>
         </main>
       </AppChrome>
     );
@@ -502,22 +528,25 @@ export default function StudentLivePage() {
   if (appState.phase === 'between-phases') {
     return (
       <AppChrome variant="student">
-        <main className="anx-shell anx-scene flex flex-1 items-center justify-center">
-        <div className="anx-panel w-full max-w-sm p-8 text-center">
-          <div className="mb-4 text-4xl">💬</div>
-          <h2 className="mb-3 text-xl font-semibold" style={{ color: 'var(--anx-text)' }}>
-            From your teacher
-          </h2>
-          <p className="mb-6 text-base" style={{ color: 'var(--anx-text-secondary)' }}>
-            {appState.message}
-          </p>
-          <button
-            onClick={() => setAppState({ phase: 'waiting', session: appState.session })}
-            className="anx-btn-primary px-6 py-2"
-          >
-            OK
-          </button>
-        </div>
+        <main className="anx-shell anx-scene flex flex-1 items-center justify-center px-4 py-10">
+          <div className="anx-card w-full max-w-md space-y-6 p-8 text-center">
+            <div className="text-4xl" aria-hidden>💬</div>
+            <div>
+              <p className="student-dash-eyebrow">Message</p>
+              <h2 className="mt-2 text-xl font-bold tracking-tight" style={{ color: 'var(--anx-text)' }}>
+                From your teacher
+              </h2>
+              <p className="mt-3 text-base leading-relaxed" style={{ color: 'var(--anx-text-secondary)' }}>
+                {appState.message}
+              </p>
+            </div>
+            <button
+              onClick={() => setAppState({ phase: 'waiting', session: appState.session })}
+              className="anx-btn-primary w-full py-3.5 sm:w-auto sm:px-10"
+            >
+              Got it
+            </button>
+          </div>
         </main>
       </AppChrome>
     );
@@ -601,28 +630,33 @@ export default function StudentLivePage() {
   if (appState.phase === 'feedback') {
     return (
       <AppChrome variant="student">
-        <main className="anx-shell anx-scene flex flex-1 items-center justify-center">
-        <div className="anx-panel w-full max-w-sm p-8 text-center">
-          <div
-            className={`mb-4 text-5xl ${appState.correct ? 'animate-[anxPulseCorrect_220ms_ease-out]' : 'animate-[anxShakeIncorrect_260ms_ease-out]'}`}
-          >
-            {appState.correct ? '✅' : '❌'}
+        <main className="anx-shell anx-scene flex flex-1 items-center justify-center px-4 py-10">
+          <div className="anx-card w-full max-w-md space-y-5 p-8 text-center">
+            <div
+              className={`text-5xl ${appState.correct ? 'animate-[anxPulseCorrect_220ms_ease-out]' : 'animate-[anxShakeIncorrect_260ms_ease-out]'}`}
+              aria-hidden
+            >
+              {appState.correct ? '✅' : '❌'}
+            </div>
+            <div>
+              <p className="student-dash-eyebrow">Live lesson</p>
+              <h2 className="mt-2 text-2xl font-bold tracking-tight" style={{ color: appState.correct ? 'var(--anx-success)' : 'var(--anx-danger)' }}>
+                {appState.correct ? 'Nice one!' : 'Not quite…'}
+              </h2>
+              {appState.nextItem ? null : (
+                <p className="mt-2 text-sm leading-relaxed" style={{ color: 'var(--anx-text-muted)' }}>
+                  Your teacher will guide what happens next.
+                </p>
+              )}
+            </div>
+            <button
+              type="button"
+              onClick={handleNext}
+              className="anx-btn-primary w-full py-3.5 sm:w-auto sm:min-w-[12rem]"
+            >
+              {appState.nextItem ? 'Next question' : 'Keep going'}
+            </button>
           </div>
-          <h2 className="mb-4 text-xl font-bold" style={{ color: appState.correct ? 'var(--anx-success)' : 'var(--anx-danger)' }}>
-            {appState.correct ? 'Correct!' : 'Not quite…'}
-          </h2>
-          {appState.nextItem ? null : (
-            <p className="mb-4 text-sm" style={{ color: 'var(--anx-text-muted)' }}>
-              Your teacher will decide the next move.
-            </p>
-          )}
-          <button
-            onClick={handleNext}
-            className="anx-btn-primary px-6 py-2"
-          >
-            {appState.nextItem ? 'Next question →' : 'Keep going'}
-          </button>
-        </div>
         </main>
       </AppChrome>
     );
@@ -631,14 +665,20 @@ export default function StudentLivePage() {
   // ── Done screen ─────────────────────────────────────────────────────────────
   return (
     <AppChrome variant="student">
-      <main className="anx-shell anx-scene flex flex-1 items-center justify-center">
-      <div className="anx-panel w-full max-w-sm p-8 text-center">
-        <div className="mb-4 text-5xl">🎉</div>
-        <h2 className="mb-2 text-xl font-bold" style={{ color: 'var(--anx-text)' }}>All done!</h2>
-        <p className="text-sm" style={{ color: 'var(--anx-text-muted)' }}>
-          You&apos;ve completed all questions for this session.
-        </p>
-      </div>
+      <main className="anx-shell anx-scene flex flex-1 items-center justify-center px-4 py-10">
+        <div className="anx-card w-full max-w-md space-y-5 p-8 text-center">
+          <div className="text-5xl" aria-hidden>🎉</div>
+          <div>
+            <p className="student-dash-eyebrow">Live lesson</p>
+            <h2 className="mt-2 text-2xl font-bold tracking-tight" style={{ color: 'var(--anx-text)' }}>All done</h2>
+            <p className="mt-2 text-sm leading-relaxed" style={{ color: 'var(--anx-text-muted)' }}>
+              You&apos;ve completed the questions for this session. Head home when your teacher dismisses you.
+            </p>
+          </div>
+          <Link href="/dashboard" className="anx-btn-primary inline-flex w-full justify-center py-3.5 no-underline sm:w-auto sm:min-w-[12rem]">
+            Back to dashboard
+          </Link>
+        </div>
       </main>
     </AppChrome>
   );
