@@ -339,4 +339,103 @@ describe('resolveItemVisuals', () => {
     });
     expect((visuals[0] as { segments: unknown[] }).segments).toHaveLength(5);
   });
+
+  it('A1.12: prefers a term-total bar chart over misleading “square” shape matches', () => {
+    const visuals = resolveItemVisuals(
+      {
+        question: 'A pattern has 1 square in term 1, 3 in term 2, and 5 in term 3. How many squares are in term 4?',
+        options: {},
+      },
+      'A1.12'
+    );
+
+    expect(visuals[0]).toMatchObject({
+      type: 'chart',
+      chartType: 'bar',
+      series: [
+        { label: 'T1', value: 1 },
+        { label: 'T2', value: 3 },
+        { label: 'T3', value: 5 },
+      ],
+    });
+    expect(validateMathsVisual(visuals[0])).toEqual([]);
+    expect(visuals.some((v) => v.type === 'shape')).toBe(false);
+  });
+
+  it('A1.12: builds a bar chart from term-1 start and constant add for a later term', () => {
+    const visuals = resolveItemVisuals(
+      {
+        question:
+          'A diagram grows by adding 4 counters each time. If term 1 has 6 counters, how many counters are in term 3?',
+        options: {},
+      },
+      'A1.12'
+    );
+
+    expect(visuals[0]).toMatchObject({
+      type: 'chart',
+      series: [
+        { label: 'T1', value: 6 },
+        { label: 'T2', value: 10 },
+        { label: 'T3', value: 14 },
+      ],
+    });
+    expect(validateMathsVisual(visuals[0])).toEqual([]);
+  });
+
+  it('A1.4: labels rectangle sides with algebraic expressions from the stem', () => {
+    const visuals = resolveItemVisuals(
+      {
+        question: 'A rectangle has side lengths 3x and 4x. What is its area?',
+        options: {},
+      },
+      'A1.4'
+    );
+
+    expect(visuals[0]).toMatchObject({
+      type: 'shape',
+      shape: 'rectangle',
+    });
+    if (visuals[0].type === 'shape') {
+      expect(visuals[0].edges?.map((e) => e.label)).toEqual(
+        expect.arrayContaining(['3x', '4x'])
+      );
+    }
+    expect(validateMathsVisual(visuals[0])).toEqual([]);
+  });
+
+  it('A1.3: draws an irregular polygon for equal-sided perimeter word problems', () => {
+    const visuals = resolveItemVisuals(
+      {
+        question: 'A shape has sides x, x, x and 6. What is its perimeter?',
+        options: {},
+      },
+      'A1.3'
+    );
+
+    expect(visuals[0]).toMatchObject({
+      type: 'shape',
+      shape: 'irregular-polygon',
+    });
+    expect(validateMathsVisual(visuals[0])).toEqual([]);
+  });
+
+  it('A1.5: shows a rectangle with known side and unknown for area–missing-side stems', () => {
+    const visuals = resolveItemVisuals(
+      {
+        question: 'A rectangle has area 24x^2 and one side length 6x. What is the missing side length?',
+        options: {},
+      },
+      'A1.5'
+    );
+
+    expect(visuals[0]).toMatchObject({
+      type: 'shape',
+      shape: 'rectangle',
+    });
+    if (visuals[0].type === 'shape') {
+      expect(visuals[0].edges?.map((e) => e.label)).toEqual(expect.arrayContaining(['6x', '?']));
+    }
+    expect(validateMathsVisual(visuals[0])).toEqual([]);
+  });
 });
