@@ -68,6 +68,79 @@ describe('resolveItemVisuals', () => {
     });
   });
 
+  it('builds a midpoint segment for N1.9 midpoint prompts', () => {
+    const visuals = resolveItemVisuals(
+      {
+        question: 'Calculate the midpoint of 20 and 30.',
+        options: {},
+      },
+      'N1.9'
+    );
+
+    expect(visuals).toHaveLength(1);
+    expect(visuals[0]).toMatchObject({
+      type: 'number-line',
+      markers: expect.arrayContaining([
+        { value: 20, label: '20', kind: 'point' },
+        { value: 30, label: '30', kind: 'point' },
+        { value: 25, label: 'mid', kind: 'target' },
+      ]),
+    });
+  });
+
+  it('builds tick marks for missing-value-on-the-number-line sequences', () => {
+    const visuals = resolveItemVisuals(
+      {
+        question: 'What is the missing value on the number line? 10, 20, ___, 40, 50',
+        options: {},
+      },
+      'N1.9'
+    );
+
+    expect(visuals).toHaveLength(1);
+    expect(visuals[0]).toMatchObject({
+      type: 'number-line',
+      markers: expect.arrayContaining([
+        expect.objectContaining({ value: 10 }),
+        expect.objectContaining({ value: 20 }),
+        expect.objectContaining({ value: 40 }),
+        expect.objectContaining({ value: 50 }),
+      ]),
+    });
+  });
+
+  it('places P and Q for negative interval word problems', () => {
+    const visuals = resolveItemVisuals(
+      {
+        question:
+          'The difference between P and Q is 24 on a negative number line. If Q is at -12 and P is to the left of Q, what is P?',
+        options: {},
+      },
+      'N1.13'
+    );
+
+    expect(visuals).toHaveLength(1);
+    expect(visuals[0]).toMatchObject({
+      type: 'number-line',
+      markers: expect.arrayContaining([
+        { value: -36, label: 'P', kind: 'point' },
+        { value: -12, label: 'Q', kind: 'point' },
+      ]),
+    });
+  });
+
+  it('does not invent a number line for N1.10 rounding-only stems', () => {
+    const visuals = resolveItemVisuals(
+      {
+        question: 'Round 73 to the nearest 10.',
+        options: {},
+      },
+      'N1.10'
+    );
+
+    expect(visuals).toHaveLength(0);
+  });
+
   it('builds a jump number line for starts-at-and-jumps prompts', () => {
     const visuals = resolveItemVisuals(
       {

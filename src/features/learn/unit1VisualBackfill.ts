@@ -15,7 +15,7 @@ export interface Unit1VisualBackfillResult {
 
 const SHAPE_SKILLS = new Set(['N2.9', 'N2.10', 'N2.11', 'N2.12', 'N2.13']);
 const FORMAL_METHOD_SKILLS = new Set(['N2.4', 'N2.5', 'N2.6', 'N2.7']);
-const NUMBER_LINE_SKILLS = new Set(['N1.9', 'N1.10', 'N1.11', 'N1.12', 'N1.13']);
+const NUMBER_LINE_SKILLS = new Set(['N1.5', 'N1.9', 'N1.11', 'N1.13', 'N1.21', 'N1.22', 'N1.23', 'N1.24']);
 const PLACE_VALUE_SKILLS = new Set(['N1.1', 'N1.6']);
 
 function isShapeQuestion(question: string): boolean {
@@ -27,7 +27,15 @@ function isArithmeticLayoutQuestion(question: string): boolean {
 }
 
 function isNumberLineQuestion(question: string): boolean {
-  return /\b(number line|midpoint|between|left to right|round|nearest|decimal place)\b/i.test(question);
+  const lower = question.toLowerCase();
+  if (/\bnumber line\b/.test(lower)) return true;
+  if (/\bmidpoint\b/.test(lower)) return true;
+  if (/\bhalfway between\b/.test(lower)) return true;
+  if (/\bmissing value on the number line\b/.test(lower)) return true;
+  if (/\bleft to right\b/.test(lower)) return true;
+  if (/starts?\s+at\s+-?\d/.test(lower) && /\bjumps?\b/.test(lower)) return true;
+  if (/\bdifference between P and Q\b/i.test(question)) return true;
+  return false;
 }
 
 function isPlaceValueQuestion(question: string): boolean {

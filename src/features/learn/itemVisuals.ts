@@ -426,18 +426,161 @@ function inferShapeVisual(question: string, primarySkillCode?: string): ShapeVis
   return null;
 }
 
-function inferNumberLine(question: string, primarySkillCode?: string): NumberLineVisual | null {
-  const lower = question.toLowerCase();
+/** Smallest positive difference between sorted distinct values (for tick spacing). */
+function minPositiveGap(values: number[]): number | null {
+  const sorted = [...new Set(values)].sort((a, b) => a - b);
+  let best: number | null = null;
+  for (let i = 1; i < sorted.length; i++) {
+    const d = sorted[i] - sorted[i - 1];
+    if (d > 0 && (best === null || d < best)) best = d;
+  }
+  return best;
+}
+
+function niceStepForRange(range: number, isDecimal: boolean): number {
+  if (!Number.isFinite(range) || range <= 0) return isDecimal ? 0.1 : 1;
+  if (isDecimal && range <= 2) {
+    const candidates = [0.01, 0.02, 0.05, 0.1, 0.2, 0.25, 0.5, 1];
+    for (const c of candidates) {
+      if (range / c <= 12) return c;
+    }
+    return 0.5;
+  }
+  const raw = range / 8;
+  const pow10 = 10 ** Math.floor(Math.log10(raw));
+  const frac = raw / pow10;
+  const niceFrac = frac <= 1 ? 1 : frac <= 2 ? 2 : frac <= 5 ? 5 : 10;
+  return niceFrac * pow10;
+}
+
+function isN1ExtendedLineSkill(code?: string): boolean {
+  return code === 'N1.21' || code === 'N1.22' || code === 'N1.23' || code === 'N1.24';
+}
+
+function inferMidpointSegment(question: string, primarySkillCode?: string): NumberLineVisual | null {
   if (
+    primarySkillCode !== 'N1.5' &&
     primarySkillCode !== 'N1.9' &&
-    primarySkillCode !== 'N1.10' &&
     primarySkillCode !== 'N1.11' &&
-    primarySkillCode !== 'N1.12' &&
-    primarySkillCode !== 'N1.13' &&
-    !lower.includes('number line')
+    !isN1ExtendedLineSkill(primarySkillCode)
   ) {
     return null;
   }
+
+  const midMatch = question.match(
+    /\b(?:find|calculate)\s+the\s+midpoint\s+of\s+(-?\d+(?:\.\d+)?)\s+and\s+(-?\d+(?:\.\d+)?)\b/i
+  );
+  if (!midMatch) return null;
+
+  const a = Number(midMatch[1]);
+  const b = Number(midMatch[2]);
+  if (!Number.isFinite(a) || !Number.isFinite(b)) return null;
+
+  const lo = Math.min(a, b);
+  const hi = Math.max(a, b);
+  const mid = (a + b) / 2;
+  const span = hi - lo || 1;
+  const pad = span * 0.12;
+  const isDecimal =
+    primarySkillCode === 'N1.11' || isN1ExtendedLineSkill(primarySkillCode) || !Number.isInteger(a) || !Number.isInteger(b);
+  const step = niceStepForRange(hi - lo + 2 * pad, isDecimal);
+
+  return {
+    type: 'number-line',
+    min: lo - pad,
+    max: hi + pad,
+    step,
+    markers: [
+      { value: a, label: String(a), kind: 'point' },
+      { value: b, label: String(b), kind: 'point' },
+      { value: mid, label: 'mid', kind: 'target' },
+    ],
+    altText: `Number line from ${a} to ${b} showing the midpoint.`,
+    caption: 'Midpoint shown between the two values on a number line.',
+  };
+}
+
+function inferMissingTickNumberLine(question: string, primarySkillCode?: string): NumberLineVisual | null {
+  if (primarySkillCode !== 'N1.9' && primarySkillCode !== 'N1.11' && !isN1ExtendedLineSkill(primarySkillCode)) return null;
+  if (!/\bmissing value on the number line\b/i.test(question)) return null;
+
+  const parts = question.split(/\bmissing value on the number line\b/i);
+  const tail = parts[1] ?? '';
+  const seq = [...tail.matchAll(/-?\d+(?:\.\d+)?/g)].map((m) => Number(m[0]));
+  if (seq.length < 2) return null;
+
+  const gap = minPositiveGap(seq);
+  const isDecimal = seq.some((n) => !Number.isInteger(n));
+  const step = gap && gap > 0 ? gap : niceStepForRange(Math.max(...seq) - Math.min(...seq), isDecimal);
+
+  const lo = Math.min(...seq);
+  const hi = Math.max(...seq);
+  const pad = Math.max(step, (hi - lo) * 0.08, 0.5);
+
+  return {
+    type: 'number-line',
+    min: lo - pad,
+    max: hi + pad,
+    step,
+    markers: seq.map((value) => ({ value, label: String(value), kind: 'point' })),
+    altText: 'Number line tick marks from the question sequence.',
+    caption: 'Tick marks for the sequence; one value is missing in the question.',
+  };
+}
+
+function inferNegativePQNumberLine(question: string, primarySkillCode?: string): NumberLineVisual | null {
+  if (primarySkillCode !== 'N1.13') return null;
+  const diffMatch = question.match(/\bdifference between P and Q is (\d+(?:\.\d+)?)\b/i);
+  const qMatch = question.match(/\bQ\s+is\s+at\s+(-?\d+(?:\.\d+)?)\b/i);
+  if (!diffMatch || !qMatch) return null;
+
+  const interval = Number(diffMatch[1]);
+  const qVal = Number(qMatch[1]);
+  if (!Number.isFinite(interval) || !Number.isFinite(qVal)) return null;
+
+  const leftOfQ = /\bP\s+is\s+to\s+the\s+left\b/i.test(question);
+  const pVal = leftOfQ ? qVal - interval : qVal + interval;
+
+  const lo = Math.min(pVal, qVal);
+  const hi = Math.max(pVal, qVal);
+  const pad = Math.max(1, interval * 0.25);
+  const step = niceStepForRange(hi - lo + 2 * pad, !Number.isInteger(qVal));
+
+  return {
+    type: 'number-line',
+    min: lo - pad,
+    max: hi + pad,
+    step,
+    markers: [
+      { value: pVal, label: 'P', kind: 'point' },
+      { value: qVal, label: 'Q', kind: 'point' },
+    ],
+    altText: `Number line with P at ${pVal} and Q at ${qVal}.`,
+    caption: 'Points P and Q from the interval description on a number line.',
+  };
+}
+
+function numberLineSkillAllowed(question: string, primarySkillCode?: string): boolean {
+  const lower = question.toLowerCase();
+  if (lower.includes('number line') || primarySkillCode === 'N2.1') return true;
+  if (
+    primarySkillCode === 'N1.5' ||
+    primarySkillCode === 'N1.9' ||
+    primarySkillCode === 'N1.11' ||
+    primarySkillCode === 'N1.13' ||
+    isN1ExtendedLineSkill(primarySkillCode)
+  ) {
+    return true;
+  }
+  if (primarySkillCode === 'N1.14' || primarySkillCode === 'N1.15') {
+    return lower.includes('number line');
+  }
+  return false;
+}
+
+function inferNumberLine(question: string, primarySkillCode?: string): NumberLineVisual | null {
+  const lower = question.toLowerCase();
+  if (!numberLineSkillAllowed(question, primarySkillCode)) return null;
 
   const jumpMatch = question.match(/starts?\s+at\s+(-?\d+(?:\.\d+)?)\s+and\s+jumps?\s+(?:on|by)\s+(-?\d+(?:\.\d+)?)/i);
   if (jumpMatch) {
@@ -460,6 +603,15 @@ function inferNumberLine(question: string, primarySkillCode?: string): NumberLin
       caption: 'Structured number line jump generated from the question.',
     };
   }
+
+  const midpointSeg = inferMidpointSegment(question, primarySkillCode);
+  if (midpointSeg) return midpointSeg;
+
+  const missingTicks = inferMissingTickNumberLine(question, primarySkillCode);
+  if (missingTicks) return missingTicks;
+
+  const pq = inferNegativePQNumberLine(question, primarySkillCode);
+  if (pq) return pq;
 
   if (lower.includes('number line') || primarySkillCode === 'N2.1') {
     const operation = parseOperationTokens(question);
@@ -488,13 +640,16 @@ function inferNumberLine(question: string, primarySkillCode?: string): NumberLin
   const min = Math.min(...tokens);
   const max = Math.max(...tokens);
   const padding = max === min ? 1 : Math.max(1, Math.ceil((max - min) * 0.15));
+  const isDecimal = tokens.some((n) => !Number.isInteger(n));
+  const range = max - min + 2 * padding;
+  const step = niceStepForRange(range, isDecimal);
 
   return {
     type: 'number-line',
-    min: Math.floor(min - padding),
-    max: Math.ceil(max + padding),
-    step: max - min > 10 ? Math.max(1, Math.round((max - min) / 8)) : 1,
-    markers: tokens.map((value) => ({ value })),
+    min: min - padding,
+    max: max + padding,
+    step,
+    markers: unique(tokens).map((value) => ({ value })),
     altText: 'Number line model generated from the numbers in the question.',
     caption: 'Structured number line generated from the values mentioned in the question.',
   };

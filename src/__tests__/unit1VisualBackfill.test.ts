@@ -42,6 +42,19 @@ describe('buildUnit1VisualBackfill', () => {
     expect(result.status).toBe('not_needed');
   });
 
+  it('generates a number line for N1.9 midpoint practice items', () => {
+    const result = buildUnit1VisualBackfill({
+      question: 'Calculate the midpoint of 60 and 70.',
+      answer: '65',
+      type: 'SHORT_NUMERIC',
+      options: {},
+      primarySkillCode: 'N1.9',
+    });
+
+    expect(result.status).toBe('generated');
+    expect(result.visuals[0]).toMatchObject({ type: 'number-line' });
+  });
+
   it('accepts exact arithmetic layouts even when the skill code is broader than the method itself', () => {
     const result = buildUnit1VisualBackfill({
       question: 'Calculate 45 + 32 using column addition.',
