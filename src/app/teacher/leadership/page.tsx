@@ -19,10 +19,10 @@
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/features/auth/authOptions';
 import { redirect } from 'next/navigation';
+import Link from 'next/link';
 import { prisma } from '@/db/prisma';
 import { LearningPageShell } from '@/components/LearningPageShell';
-import { selectNextSkill } from '@/features/learn/nextSkill';
-import { getUserGamificationSummary } from '@/features/gamification/gamificationService';
+import { StaffDashboardShell } from '@/components/staff/StaffDashboardShell';
 
 const DAYS_DEFAULT = 30;
 
@@ -88,11 +88,13 @@ export default async function LeadershipDashboardPage({ searchParams }: Props) {
   // All subjects
   const subjects = await prisma.subject.findMany({ select: { id: true, title: true, slug: true } });
 
-  // All classrooms with enrollments + teacher info
+  // All classrooms with enrollments + teacher info (subject matched via subjectSlug)
   const allClassrooms = await prisma.classroom.findMany({
     include: {
-      subject: true,
-      teacherProfile: { include: { user: { select: { name: true, email: true } } } },
+      teachers: {
+        take: 1,
+        include: { teacherProfile: { include: { user: { select: { name: true, email: true } } } } },
+      },
       enrollments: {
         include: {
           student: {
@@ -122,7 +124,7 @@ export default async function LeadershipDashboardPage({ searchParams }: Props) {
   const subjectGroups = subjects
     .map((subject) => {
       const classrooms = allClassrooms
-        .filter((c) => c.subjectId === subject.id)
+        .filter((c) => c.subjectSlug === subject.slug)
         .filter((c) => subjectFilter === 'ALL' || subject.slug === subjectFilter);
 
       const allStudentIds = [...new Set(classrooms.flatMap((c) => c.enrollments.map((e) => e.studentUserId)))];
@@ -181,7 +183,8 @@ export default async function LeadershipDashboardPage({ searchParams }: Props) {
             clsPrev.length ? clsPrev.filter((a) => a.correct).length / clsPrev.length : 0
           );
 
-          const teacherName = cls.teacherProfile?.user.name ?? cls.teacherProfile?.user.email ?? 'Unassigned';
+          const leadTeacher = cls.teachers[0]?.teacherProfile?.user;
+          const teacherName = leadTeacher?.name ?? leadTeacher?.email ?? 'Unassigned';
 
           const studentRows = cls.enrollments.map((enrollment) => {
             const student = enrollment.student;
@@ -232,14 +235,10 @@ export default async function LeadershipDashboardPage({ searchParams }: Props) {
             yearGroup: cls.yearGroup,
             teacherName,
             studentCount: cls.enrollments.length,
-            avgMastery: cls.enrollments.length
-              ? Math.round(
-                  cls.enrollments
-                    .flatMap((e) => e.student.skillMasteries.map((m) => m.mastery))
-                    .reduce((a, b) => a + b, 0) /
-                    cls.enrollments.flatMap((e) => e.student.skillMasteries.map((m) => m.mastery)).length
-                ) * 100 || 0
-              : 0,
+            avgMastery: (() => {
+              const vals = cls.enrollments.flatMap((e) => e.student.skillMasteries.map((m) => m.mastery));
+              return vals.length ? Math.round((vals.reduce((a, b) => a + b, 0) / vals.length) * 100) : 0;
+            })(),
             clsTrend,
             atRisk: clsAtRisk,
             amber: clsAmber,
@@ -268,215 +267,245 @@ export default async function LeadershipDashboardPage({ searchParams }: Props) {
     0
   );
 
+  const displayName = user.name?.trim() || user.email?.split('@')[0] || 'there';
+  const atRiskKnowledgeStates = subjectGroups.reduce((s, g) => s + g.atRiskCount, 0);
+  const durableKnowledgeStates = subjectGroups.reduce((s, g) => s + g.durableCount, 0);
+
   return (
     <LearningPageShell
-      title="Leadership Dashboard"
-      subtitle={`Full school overview — ${schoolTotalStudents} students across ${allClassrooms.length} classrooms`}
+      title="Leadership dashboard"
+      subtitle="Cross-classroom overview with filters for time range and subject."
       maxWidthClassName="max-w-7xl"
       appChrome="teacher"
       appChromeShowLeadershipNav
-      meta={
-        <div className="flex flex-wrap items-center gap-3 text-xs">
-          <span className="anx-chip">Leadership view</span>
-          <span className="anx-chip">All subjects</span>
-          <span className="anx-chip">
-            Window: <strong>{days}d</strong>
-          </span>
-        </div>
-      }
     >
-      {/* School-wide aggregate */}
-      <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-6">
-        <div className="anx-stat"><p className="anx-stat-label">Total students</p><p className="anx-stat-value">{schoolTotalStudents}</p></div>
-        <div className="anx-stat"><p className="anx-stat-label">Classrooms</p><p className="anx-stat-value">{allClassrooms.length}</p></div>
-        <div className="anx-stat"><p className="anx-stat-label">Questions ({days}d)</p><p className="anx-stat-value">{schoolRecentAttempts.length}</p></div>
-        <div className="anx-stat"><p className="anx-stat-label">Accuracy ({days}d)</p><p className="anx-stat-value">{pct(schoolRecentCorrect, schoolRecentAttempts.length)}</p></div>
-        <div className="anx-stat"><p className="anx-stat-label">At risk</p><p className="anx-stat-value" style={{ color: 'var(--anx-danger)' }}>{subjectGroups.reduce((s, g) => s + g.atRiskCount, 0)}</p></div>
-        <div className="anx-stat"><p className="anx-stat-label">Durable</p><p className="anx-stat-value" style={{ color: 'var(--anx-success)' }}>{subjectGroups.reduce((s, g) => s + g.durableCount, 0)}</p></div>
-      </div>
-
-      {/* Time window + subject filter */}
-      <div className="mb-4 flex flex-wrap items-center gap-3">
-        <div className="flex gap-1.5 text-xs">
-          {[7, 30, 90].map((d) => (
-            <a
-              key={d}
-              href={`/teacher/leadership?days=${d}${subjectFilter !== 'ALL' ? `&subject=${subjectFilter}` : ''}`}
-              className={`rounded-lg border px-3 py-1.5 font-medium transition-all ${
-                days === d
-                  ? 'border-[var(--anx-primary)] bg-[var(--anx-primary-soft)] text-[var(--anx-primary)]'
-                  : 'border-[var(--anx-border)] bg-white text-[var(--anx-text-secondary)]'
-              }`}
-            >
-              {d}d
-            </a>
-          ))}
-        </div>
-        <div className="flex flex-wrap gap-1.5 text-xs">
-          <a
-            href={`/teacher/leadership?days=${days}`}
-            className={`rounded-lg border px-3 py-1.5 font-medium transition-all ${
-              subjectFilter === 'ALL'
-                ? 'border-[var(--anx-primary)] bg-[var(--anx-primary-soft)] text-[var(--anx-primary)]'
-                : 'border-[var(--anx-border)] bg-white text-[var(--anx-text-secondary)]'
-            }`}
-          >
-            All subjects
-          </a>
-          {subjects.map((s) => (
-            <a
-              key={s.id}
-              href={`/teacher/leadership?days=${days}&subject=${s.slug}`}
-              className={`rounded-lg border px-3 py-1.5 font-medium transition-all ${
-                subjectFilter === s.slug
-                  ? 'border-[var(--anx-primary)] bg-[var(--anx-primary-soft)] text-[var(--anx-primary)]'
-                  : 'border-[var(--anx-border)] bg-white text-[var(--anx-text-secondary)]'
-              }`}
-            >
-              {s.title}
-            </a>
-          ))}
-        </div>
-      </div>
-
-      {/* Subject groups */}
-      <div className="space-y-8">
-        {subjectGroups.map((group) => (
-          <section key={group.subject.id}>
-            {/* Subject header */}
-            <div className="mb-3 flex items-center justify-between">
-              <div>
-                <h2 className="text-lg font-semibold" style={{ color: 'var(--anx-text)' }}>
-                  {group.subject.title}
-                </h2>
-                <p className="text-xs" style={{ color: 'var(--anx-text-muted)' }}>
-                  {group.totalStudents} students · {group.classrooms.length} classrooms ·{' '}
-                  <span style={{ color: group.subjectTrend === 'UP' ? 'var(--anx-success)' : group.subjectTrend === 'DOWN' ? 'var(--anx-danger)' : 'var(--anx-text-muted)' }}>
-                    {trendLabel(group.subjectTrend)}
-                  </span>{' '}
-                  · {group.atRiskCount} at risk · {group.durableCount} durable
-                </p>
-              </div>
-              <div className="flex items-center gap-4 text-sm">
-                <div className="text-right">
-                  <p className="text-xs" style={{ color: 'var(--anx-text-muted)' }}>Avg mastery</p>
-                  <p className="font-semibold" style={{ color: group.avgMastery >= 70 ? 'var(--anx-success)' : group.avgMastery >= 50 ? 'var(--anx-warning)' : 'var(--anx-danger)' }}>
-                    {group.avgMastery}%
-                  </p>
-                </div>
+      <StaffDashboardShell
+        variant="leadership"
+        eyebrow="School overview"
+        displayName={displayName}
+        title="Whole-school learning health"
+        lead={`${schoolTotalStudents} students across ${allClassrooms.length} classrooms. Scan risk and mastery by subject, then open a class for detail.`}
+        stats={[
+          { label: 'Students', value: String(schoolTotalStudents) },
+          { label: 'Classrooms', value: String(allClassrooms.length) },
+          {
+            label: `Practice (${days}d)`,
+            value: String(schoolRecentAttempts.length),
+            hint: `${pct(schoolRecentCorrect, schoolRecentAttempts.length)} accuracy · ${trendLabel(schoolTrend)} vs prior window`,
+          },
+          {
+            label: 'Risk / durable',
+            value: `${atRiskKnowledgeStates} / ${durableKnowledgeStates}`,
+            hint: 'Knowledge-state bands aggregated across filtered subjects',
+          },
+        ]}
+        heroActions={
+          <>
+            <Link href="/teacher/dashboard" className="anx-btn-secondary">
+              Teacher dashboard
+            </Link>
+          </>
+        }
+      >
+        <div className="staff-dash-bento">
+          <div className="staff-dash-bento-main">
+            <div className="staff-dash-filter-row">
+              <span className="text-xs font-semibold uppercase tracking-wide text-[color:var(--anx-text-muted)]">Window</span>
+              <div className="staff-dash-pill-group">
+                {[7, 30, 90].map((d) => (
+                  <a
+                    key={d}
+                    href={`/teacher/leadership?days=${d}${subjectFilter !== 'ALL' ? `&subject=${subjectFilter}` : ''}`}
+                    className={`staff-dash-pill${days === d ? ' staff-dash-pill--active' : ''}`}
+                  >
+                    Last {d} days
+                  </a>
+                ))}
               </div>
             </div>
 
-            {/* Classrooms for this subject */}
-            <div className="space-y-3">
-              {group.classrooms.map((cls) => (
-                <div key={cls.id} className="anx-card overflow-hidden">
-                  {/* Classroom summary bar */}
-                  <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--anx-border)] bg-[var(--anx-surface-soft)] px-5 py-3">
+            <div className="staff-dash-filter-row">
+              <span className="text-xs font-semibold uppercase tracking-wide text-[color:var(--anx-text-muted)]">Subject</span>
+              <div className="staff-dash-pill-group">
+                <a href={`/teacher/leadership?days=${days}`} className={`staff-dash-pill${subjectFilter === 'ALL' ? ' staff-dash-pill--active' : ''}`}>
+                  All subjects
+                </a>
+                {subjects.map((s) => (
+                  <a
+                    key={s.id}
+                    href={`/teacher/leadership?days=${days}&subject=${s.slug}`}
+                    className={`staff-dash-pill${subjectFilter === s.slug ? ' staff-dash-pill--active' : ''}`}
+                  >
+                    {s.title}
+                  </a>
+                ))}
+              </div>
+            </div>
+
+            <div className="staff-dash-section-gap">
+              {subjectGroups.map((group) => (
+                <section key={group.subject.id} className="staff-dash-subject-block">
+                  <div className="staff-dash-subject-header">
                     <div>
-                      <p className="font-semibold" style={{ color: 'var(--anx-text)' }}>{cls.name}</p>
-                      <p className="text-xs" style={{ color: 'var(--anx-text-muted)' }}>
-                        {cls.yearGroup ?? '—'} · Teacher: {cls.teacherName} · {cls.studentCount} students
+                      <h2 className="staff-dash-subject-title">{group.subject.title}</h2>
+                      <p className="staff-dash-subject-sub">
+                        {group.totalStudents} students · {group.classrooms.length} classrooms ·{' '}
+                        <span
+                          style={{
+                            color:
+                              group.subjectTrend === 'UP'
+                                ? 'var(--anx-success)'
+                                : group.subjectTrend === 'DOWN'
+                                  ? 'var(--anx-danger)'
+                                  : 'var(--anx-text-muted)',
+                          }}
+                        >
+                          {trendLabel(group.subjectTrend)}
+                        </span>{' '}
+                        · {group.atRiskCount} at risk · {group.durableCount} durable
                       </p>
                     </div>
-                    <div className="flex items-center gap-3">
-                      {(cls.atRisk > 0 || cls.amber > 0) && (
-                        <span className="anx-badge anx-badge-red">{cls.atRisk} at risk</span>
-                      )}
-                      {cls.amber > 0 && (
-                        <span className="anx-badge anx-badge-amber">{cls.amber} amber</span>
-                      )}
-                      <span className="text-xs" style={{ color: 'var(--anx-text-muted)' }}>
-                        {cls.avgMastery}% mastery · {trendLabel(cls.clsTrend)}
-                      </span>
+                    <div className="text-right">
+                      <p className="text-xs text-[color:var(--anx-text-muted)]">Avg mastery</p>
+                      <p
+                        className="text-lg font-bold"
+                        style={{
+                          color:
+                            group.avgMastery >= 70 ? 'var(--anx-success)' : group.avgMastery >= 50 ? 'var(--anx-warning)' : 'var(--anx-danger)',
+                        }}
+                      >
+                        {group.avgMastery}%
+                      </p>
                     </div>
                   </div>
 
-                  {/* Student table */}
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
-                      <thead className="bg-white text-xs" style={{ color: 'var(--anx-text-muted)' }}>
-                        <tr>
-                          <th className="px-4 py-2.5 text-left font-medium">Student</th>
-                          <th className="px-3 py-2.5 text-left font-medium">Risk</th>
-                          <th className="px-3 py-2.5 text-left font-medium">DLE</th>
-                          <th className="px-3 py-2.5 text-left font-medium">Durability</th>
-                          <th className="px-3 py-2.5 text-left font-medium">Mastery</th>
-                          <th className="px-3 py-2.5 text-left font-medium">Accuracy</th>
-                          <th className="px-3 py-2.5 text-left font-medium">Trend</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y" style={{ borderColor: 'var(--anx-border-subtle)' }}>
-                        {cls.studentRows.map((row) => (
-                          <tr
-                            key={row.id}
-                            className={row.riskLevel === 'RED' ? 'bg-rose-50/60' : row.riskLevel === 'AMBER' ? 'bg-amber-50/40' : ''}
-                          >
-                            <td className="px-4 py-2.5 font-medium text-[color:var(--anx-text)]">{row.name}</td>
-                            <td className="px-3 py-2.5">
-                              <span
-                                className={`rounded px-2 py-0.5 text-xs font-bold ${
-                                  row.riskLevel === 'RED'
-                                    ? 'bg-rose-100 text-rose-800'
-                                    : row.riskLevel === 'AMBER'
-                                    ? 'bg-amber-100 text-amber-800'
-                                    : 'bg-emerald-100 text-emerald-800'
-                                }`}
-                              >
-                                {row.riskLevel} ({row.riskScore})
-                              </span>
-                            </td>
-                            <td className="px-3 py-2.5 font-mono text-xs">{row.avgDle}</td>
-                            <td className="px-3 py-2.5">
-                              {row.durability ? (
-                                <span
-                                  className={`rounded px-2 py-0.5 text-xs font-semibold ${
-                                    row.durability === 'AT_RISK'
-                                      ? 'bg-rose-100 text-rose-800'
-                                      : row.durability === 'DEVELOPING'
-                                      ? 'bg-amber-100 text-amber-800'
-                                      : 'bg-emerald-100 text-emerald-800'
-                                  }`}
+                  <div className="flex flex-col gap-3">
+                    {group.classrooms.map((cls) => (
+                      <div key={cls.id} className="staff-dash-class-panel">
+                        <div className="staff-dash-class-head flex flex-wrap items-center justify-between gap-2">
+                          <div>
+                            <p className="staff-dash-class-title m-0">{cls.name}</p>
+                            <p className="staff-dash-class-meta m-0 mt-1">
+                              {cls.yearGroup ?? '—'} · {cls.teacherName} · {cls.studentCount} students
+                            </p>
+                          </div>
+                          <div className="flex flex-wrap items-center gap-2">
+                            {cls.atRisk > 0 && <span className="anx-badge anx-badge-red">{cls.atRisk} at risk</span>}
+                            {cls.amber > 0 && <span className="anx-badge anx-badge-amber">{cls.amber} amber</span>}
+                            <span className="text-xs text-[color:var(--anx-text-muted)]">
+                              {cls.avgMastery}% mastery · {trendLabel(cls.clsTrend)}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="staff-dash-table-wrap">
+                          <table className="staff-dash-table">
+                            <thead>
+                              <tr>
+                                <th>Student</th>
+                                <th>Risk</th>
+                                <th>DLE</th>
+                                <th>Durability</th>
+                                <th>Mastery</th>
+                                <th>Accuracy</th>
+                                <th>Trend</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {cls.studentRows.map((row) => (
+                                <tr
+                                  key={row.id}
+                                  className={row.riskLevel === 'RED' ? 'bg-rose-50/60' : row.riskLevel === 'AMBER' ? 'bg-amber-50/40' : ''}
                                 >
-                                  {row.durability}
-                                </span>
-                              ) : (
-                                <span className="text-[color:var(--anx-text-muted)]">—</span>
+                                  <td className="font-medium">{row.name}</td>
+                                  <td>
+                                    <span
+                                      className={`rounded px-2 py-0.5 text-xs font-bold ${
+                                        row.riskLevel === 'RED'
+                                          ? 'bg-rose-100 text-rose-800'
+                                          : row.riskLevel === 'AMBER'
+                                            ? 'bg-amber-100 text-amber-800'
+                                            : 'bg-emerald-100 text-emerald-800'
+                                      }`}
+                                    >
+                                      {row.riskLevel} ({row.riskScore})
+                                    </span>
+                                  </td>
+                                  <td className="font-mono text-xs">{row.avgDle}</td>
+                                  <td>
+                                    {row.durability ? (
+                                      <span
+                                        className={`rounded px-2 py-0.5 text-xs font-semibold ${
+                                          row.durability === 'AT_RISK'
+                                            ? 'bg-rose-100 text-rose-800'
+                                            : row.durability === 'DEVELOPING'
+                                              ? 'bg-amber-100 text-amber-800'
+                                              : 'bg-emerald-100 text-emerald-800'
+                                        }`}
+                                      >
+                                        {row.durability}
+                                      </span>
+                                    ) : (
+                                      <span className="text-[color:var(--anx-text-muted)]">—</span>
+                                    )}
+                                  </td>
+                                  <td className="font-medium">{row.masteryAvg}%</td>
+                                  <td>{row.accuracy}</td>
+                                  <td className="text-xs text-[color:var(--anx-text-secondary)]">{trendLabel(row.trend)}</td>
+                                </tr>
+                              ))}
+                              {cls.studentRows.length === 0 && (
+                                <tr>
+                                  <td colSpan={7} className="py-8 text-center text-sm text-[color:var(--anx-text-muted)]">
+                                    No students enrolled.
+                                  </td>
+                                </tr>
                               )}
-                            </td>
-                            <td className="px-3 py-2.5 font-medium">{row.masteryAvg}%</td>
-                            <td className="px-3 py-2.5">{row.accuracy}</td>
-                            <td className="px-3 py-2.5 text-xs" style={{ color: 'var(--anx-text-secondary)' }}>
-                              {trendLabel(row.trend)}
-                            </td>
-                          </tr>
-                        ))}
-                        {cls.studentRows.length === 0 && (
-                          <tr>
-                            <td colSpan={7} className="px-4 py-8 text-center text-sm" style={{ color: 'var(--anx-text-muted)' }}>
-                              No students enrolled.
-                            </td>
-                          </tr>
-                        )}
-                      </tbody>
-                    </table>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    ))}
+
+                    {group.classrooms.length === 0 && (
+                      <p className="text-sm text-[color:var(--anx-text-muted)]">No classrooms for this subject.</p>
+                    )}
                   </div>
-                </div>
+                </section>
               ))}
 
-              {group.classrooms.length === 0 && (
-                <p className="text-sm" style={{ color: 'var(--anx-text-muted)' }}>No classrooms for this subject.</p>
+              {subjectGroups.length === 0 && (
+                <div className="staff-dash-class-panel px-6 py-16 text-center text-[color:var(--anx-text-muted)]">
+                  No data available for this filter.
+                </div>
               )}
             </div>
-          </section>
-        ))}
-
-        {subjectGroups.length === 0 && (
-          <div className="anx-card px-6 py-16 text-center" style={{ color: 'var(--anx-text-muted)' }}>
-            No data available for this filter.
           </div>
-        )}
-      </div>
+
+          <aside className="staff-dash-bento-side">
+            <section className="staff-dash-side-card">
+              <p className="student-dash-eyebrow" style={{ color: 'var(--anx-text-muted)' }}>
+                Snapshot
+              </p>
+              <h3 className="staff-dash-side-title">This view</h3>
+              <ul className="staff-dash-meta-list">
+                <li>
+                  <strong>Scope</strong> Leadership (all linked classrooms)
+                </li>
+                <li>
+                  <strong>Window</strong> Last {days} days
+                </li>
+                <li>
+                  <strong>Subject</strong> {subjectFilter === 'ALL' ? 'All' : subjectFilter}
+                </li>
+                <li>
+                  <strong>Question attempts (2× window)</strong> {schoolTotalAttempts} loaded for trends
+                </li>
+              </ul>
+            </section>
+          </aside>
+        </div>
+      </StaffDashboardShell>
     </LearningPageShell>
   );
 }
