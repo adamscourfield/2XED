@@ -319,7 +319,7 @@ Do not write a new renderer component per skill. Do not write new animation code
 To generate schemas for all skills in a subject:
 
 ```bash
-# Generate all Route B schemas for KS3 Maths
+# Generate all Route B schemas for Maths
 npx ts-node scripts/generate-all-animations.ts --subject ks3-maths --route B
 
 # Generate all routes for a single skill

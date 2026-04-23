@@ -4,7 +4,7 @@ import bcrypt from 'bcryptjs';
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('🌱 Seeding KS3 Maths (full curriculum: N1–N6, A1, G1, S1)...');
+  console.log('🌱 Seeding Maths (full curriculum: N1–N6, A1, G1, S1)...');
 
   // 1️⃣ Demo student
   const hashedPassword = await bcrypt.hash('password123', 10);
@@ -108,10 +108,13 @@ async function main() {
   // 2️⃣ Subject
   const subject = await prisma.subject.upsert({
     where: { slug: 'ks3-maths' },
-    update: {},
+    update: {
+      title: 'Maths',
+      description: '2XED - Maths (Year 7 Entry) Number and FDP v1',
+    },
     create: {
       slug: 'ks3-maths',
-      title: 'KS3 Maths',
+      title: 'Maths',
       description: '2XED - Maths (Year 7 Entry) Number and FDP v1',
     },
   });
