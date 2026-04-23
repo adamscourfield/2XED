@@ -9,6 +9,8 @@ import { ItemVisualPanel } from '@/components/learn/ItemVisualPanel';
 import { AnimationRenderer } from '@/components/explanation/AnimationRenderer';
 import { getItemContent, ItemInteractionType } from './itemContent';
 import { sanitizeStudentCopy } from './studentCopy';
+import { stripStudentQuestionLabel } from '@/features/items/itemMeta';
+import { StudentQuestionCard } from '@/components/student/StudentQuestionCard';
 
 interface Item {
   id: string;
@@ -106,6 +108,10 @@ export function LearnSession({ subject, skill, items, retryItems, userId, gamifi
   const currentItem = currentItems[currentIndex];
   const currentItemContent = currentItem ? getItemContent(currentItem) : null;
   const options = currentItemContent?.choices ?? [];
+  const sessionQuestionText = useMemo(
+    () => (currentItem ? stripStudentQuestionLabel(currentItem.question) || currentItem.question : ''),
+    [currentItem]
+  );
 
   function renderAnswerInput(type: ItemInteractionType) {
     if (type === 'SHORT_TEXT' || type === 'SHORT_NUMERIC') {
@@ -367,37 +373,43 @@ export function LearnSession({ subject, skill, items, retryItems, userId, gamifi
 
   if (phase === 'session' && currentItem) {
     return (
-      <main className="anx-shell anx-scene flex items-center justify-center">
-        <div className="anx-panel w-full max-w-lg p-8 space-y-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm" style={{ color: 'var(--anx-text-muted)' }}>One question at a time</p>
-              <p className="text-xs" style={{ color: 'var(--anx-text-faint)' }}>
-                {hasRetriedAfterExplanation ? 'Fresh set after explanation.' : 'If one feels hard, the next one is a fresh start.'}
-              </p>
+      <main className="anx-shell anx-scene flex items-center justify-center py-8 sm:py-10">
+        <StudentQuestionCard
+          questionKey={currentItem.id}
+          header={(
+            <>
+              <div>
+                <p className="text-sm" style={{ color: 'var(--anx-text-muted)' }}>One question at a time</p>
+                <p className="mt-0.5 text-xs" style={{ color: 'var(--anx-text-faint)' }}>
+                  {hasRetriedAfterExplanation ? 'Fresh set after explanation.' : 'If one feels hard, the next one is a fresh start.'}
+                </p>
+              </div>
+              <div className="text-right">
+                <p className="text-sm" style={{ color: 'var(--anx-text-muted)' }}>
+                  {skill.name}
+                  {SHOW_DEBUG && (
+                    <span className="ml-2 text-xs" style={{ color: 'var(--anx-text-faint)' }}>[{skill.code}]</span>
+                  )}
+                </p>
+                <span className="text-sm tabular-nums" style={{ color: 'var(--anx-text-faint)' }}>
+                  {currentIndex + 1} / {currentItems.length}
+                </span>
+              </div>
+            </>
+          )}
+          progress={(
+            <div className="anx-progress-track">
+              <div
+                className="anx-progress-bar"
+                style={{ width: `${((currentIndex + 1) / currentItems.length) * 100}%` }}
+              />
             </div>
-            <div className="text-right">
-              <p className="text-sm" style={{ color: 'var(--anx-text-muted)' }}>
-                {skill.name}
-                {SHOW_DEBUG && (
-                  <span className="ml-2 text-xs" style={{ color: 'var(--anx-text-faint)' }}>[{skill.code}]</span>
-                )}
-              </p>
-              <span className="text-sm" style={{ color: 'var(--anx-text-faint)' }}>
-                {currentIndex + 1} / {currentItems.length}
-              </span>
-            </div>
-          </div>
-          <div className="anx-progress-track">
-            <div
-              className="anx-progress-bar"
-              style={{ width: `${((currentIndex + 1) / currentItems.length) * 100}%` }}
-            />
-          </div>
-          <ItemVisualPanel item={currentItem} primarySkillCode={skill.code} />
-          <h2 className="text-lg font-semibold" style={{ color: 'var(--anx-text)' }}>{currentItem.question}</h2>
-          {currentItemContent && (
-            <p className="text-sm" style={{ color: 'var(--anx-text-muted)' }}>
+          )}
+          visual={<ItemVisualPanel item={currentItem} primarySkillCode={skill.code} />}
+          questionLabel="Question"
+          question={<p className="m-0 whitespace-pre-wrap">{sessionQuestionText}</p>}
+          instruction={currentItemContent ? (
+            <p className="m-0">
               {currentItemContent.type === 'SHORT_NUMERIC'
                 ? 'Type a number.'
                 : currentItemContent.type === 'SHORT_TEXT'
@@ -412,16 +424,19 @@ export function LearnSession({ subject, skill, items, retryItems, userId, gamifi
                         ? 'Position the protractor, then type your reading below.'
                         : 'Pick one answer.'}
             </p>
+          ) : null}
+          answerArea={currentItemContent ? renderAnswerInput(currentItemContent.type) : null}
+          actions={(
+            <button
+              type="button"
+              onClick={submitAnswer}
+              disabled={!selectedAnswer || submitting}
+              className="anx-btn-primary w-full py-3.5"
+            >
+              {submitting ? 'Checking…' : currentIndex < currentItems.length - 1 ? 'Check and go on' : 'Finish for now'}
+            </button>
           )}
-          {currentItemContent && renderAnswerInput(currentItemContent.type)}
-          <button
-            onClick={submitAnswer}
-            disabled={!selectedAnswer || submitting}
-            className="anx-btn-primary w-full py-3"
-          >
-            {submitting ? 'Checking…' : currentIndex < currentItems.length - 1 ? 'Check and go on' : 'Finish for now'}
-          </button>
-        </div>
+        />
       </main>
     );
   }

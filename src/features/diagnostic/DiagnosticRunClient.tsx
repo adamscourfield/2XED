@@ -7,6 +7,7 @@ import { NumberLineInput } from '@/components/learn/NumberLineInput';
 import { ItemVisualPanel } from '@/components/learn/ItemVisualPanel';
 import { getItemContent, ItemInteractionType } from '@/features/learn/itemContent';
 import { stripStudentQuestionLabel } from '@/features/items/itemMeta';
+import { StudentQuestionCard } from '@/components/student/StudentQuestionCard';
 
 interface Props {
   subject: { id: string; title: string; slug: string };
@@ -113,52 +114,67 @@ export function DiagnosticRunClient({ subject, skill, item, sessionId, itemsSeen
   }
 
   return (
-    <main className="anx-shell anx-scene flex items-center justify-center">
-      <div className="anx-panel w-full max-w-lg p-8 space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm" style={{ color: 'var(--anx-text-muted)' }}>One question at a time</p>
-            <p className="text-xs" style={{ color: 'var(--anx-text-faint)' }}>Just try each one. This helps us find the right place to start.</p>
-          </div>
-          <span className="text-sm" style={{ color: 'var(--anx-text-faint)' }}>
-            {itemsSeen + 1} / {maxItems} max
-          </span>
-        </div>
-        <div className="anx-progress-track">
-          <div
-            className="anx-progress-bar"
-            style={{ width: `${((itemsSeen + 1) / maxItems) * 100}%` }}
-          />
-        </div>
-        <ItemVisualPanel item={item} primarySkillCode={skill.code} />
-        <h2 className="text-lg font-semibold" style={{ color: 'var(--anx-text)' }}>{questionText}</h2>
-        <p className="text-sm" style={{ color: 'var(--anx-text-muted)' }}>
-          {itemContent.type === 'SHORT_NUMERIC'
-            ? 'Type a number.'
-            : itemContent.type === 'SHORT_TEXT'
-              ? 'Type your answer.'
-              : itemContent.type === 'ORDER'
-                ? 'Put them in the right order.'
-                : itemContent.type === 'NUMBER_LINE'
-                  ? itemContent.numberLine?.task === 'place'
-                    ? 'Tap the number line to place your marker.'
-                    : 'Estimate the value shown by the arrow.'
-                  : 'Pick one answer.'}
-        </p>
-        {renderAnswerInput(itemContent.type)}
-        {submitError && (
-          <div className="anx-callout-warning">
-            {submitError}
+    <main className="anx-shell anx-scene flex items-center justify-center py-8 sm:py-10">
+      <StudentQuestionCard
+        questionKey={item.id}
+        header={(
+          <>
+            <div>
+              <p className="text-sm" style={{ color: 'var(--anx-text-muted)' }}>One question at a time</p>
+              <p className="mt-0.5 text-xs" style={{ color: 'var(--anx-text-faint)' }}>Just try each one. This helps us find the right place to start.</p>
+            </div>
+            <span className="shrink-0 text-sm tabular-nums" style={{ color: 'var(--anx-text-faint)' }}>
+              {itemsSeen + 1} / {maxItems}
+            </span>
+          </>
+        )}
+        progress={(
+          <div className="anx-progress-track">
+            <div
+              className="anx-progress-bar"
+              style={{ width: `${((itemsSeen + 1) / maxItems) * 100}%` }}
+            />
           </div>
         )}
-        <button
-          onClick={submitAnswer}
-          disabled={!selectedAnswer || submitting}
-          className="anx-btn-primary w-full py-3"
-        >
-          {submitting ? 'Saving…' : 'Check and go on'}
-        </button>
-      </div>
+        visual={<ItemVisualPanel item={item} primarySkillCode={skill.code} />}
+        questionLabel="Question"
+        question={<p className="m-0 whitespace-pre-wrap">{questionText}</p>}
+        instruction={(
+          <p className="m-0">
+            {itemContent.type === 'SHORT_NUMERIC'
+              ? 'Type a number.'
+              : itemContent.type === 'SHORT_TEXT'
+                ? 'Type your answer.'
+                : itemContent.type === 'ORDER'
+                  ? 'Put them in the right order.'
+                  : itemContent.type === 'NUMBER_LINE'
+                    ? itemContent.numberLine?.task === 'place'
+                      ? 'Tap the number line to place your marker.'
+                      : 'Estimate the value shown by the arrow.'
+                    : 'Pick one answer.'}
+          </p>
+        )}
+        answerArea={(
+          <div className="space-y-3">
+            {renderAnswerInput(itemContent.type)}
+            {submitError ? (
+              <div className="anx-callout-warning">
+                {submitError}
+              </div>
+            ) : null}
+          </div>
+        )}
+        actions={(
+          <button
+            type="button"
+            onClick={submitAnswer}
+            disabled={!selectedAnswer || submitting}
+            className="anx-btn-primary w-full py-3.5"
+          >
+            {submitting ? 'Saving…' : 'Check and go on'}
+          </button>
+        )}
+      />
     </main>
   );
 }

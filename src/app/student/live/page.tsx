@@ -6,6 +6,8 @@ import { redirect } from 'next/navigation';
 import { AppChrome } from '@/components/AppChrome';
 import { AnimationRenderer } from '@/components/explanation/AnimationRenderer';
 import { LiveWhiteboardViewer } from '@/components/student/LiveWhiteboardViewer';
+import { StudentQuestionCard } from '@/components/student/StudentQuestionCard';
+import { stripStudentQuestionLabel } from '@/features/items/itemMeta';
 import type { LiveWhiteboardPayload } from '@/lib/live/whiteboard-strokes';
 
 interface SkillMeta {
@@ -525,54 +527,71 @@ export default function StudentLivePage() {
   if (appState.phase === 'question') {
     const { item } = appState;
     const opts = Array.isArray(item.options) ? (item.options as string[]) : [];
+    const questionStem = stripStudentQuestionLabel(item.question) || item.question;
     return (
       <AppChrome variant="student">
-        <main className="anx-shell anx-scene flex flex-1 items-center justify-center">
-        <div className="anx-panel w-full max-w-lg p-8">
-          {error && <div className="anx-callout-danger mb-4 text-sm">{error}</div>}
-          <p className="mb-2 text-xs font-medium uppercase tracking-wide" style={{ color: 'var(--anx-text-muted)' }}>
-            Quick recheck
-          </p>
-          <p className="mb-6 text-base leading-relaxed" style={{ color: 'var(--anx-text)' }}>{item.question}</p>
-          <form onSubmit={handleAnswer} className="space-y-3">
-            {opts.length > 0 ? (
-              opts.map((opt) => (
-                <label
-                  key={opt}
-                  className={`anx-option flex cursor-pointer items-center gap-3 ${
-                    answer === opt ? 'anx-option-selected' : ''
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="answer"
-                    value={opt}
-                    checked={answer === opt}
-                    onChange={() => setAnswer(opt)}
-                    className="accent-[var(--anx-primary)]"
-                  />
-                  {opt}
-                </label>
-              ))
-            ) : (
-              <input
-                type="text"
-                value={answer}
-                onChange={(e) => setAnswer(e.target.value)}
-                placeholder="Your answer…"
-                className="anx-input"
-                required
-              />
+        <main className="anx-shell anx-scene flex flex-1 items-center justify-center px-4 py-8 sm:py-10">
+          <StudentQuestionCard
+            questionKey={item.id}
+            header={(
+              <>
+                <div>
+                  <p className="text-sm font-medium" style={{ color: 'var(--anx-text-secondary)' }}>Live lesson</p>
+                  <p className="mt-0.5 text-xs" style={{ color: 'var(--anx-text-muted)' }}>Quick recheck from your teacher.</p>
+                </div>
+                <span className="shrink-0 text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--anx-text-muted)' }}>
+                  Recheck
+                </span>
+              </>
             )}
-            <button
-              type="submit"
-              disabled={loading || !answer}
-              className="anx-btn-primary mt-2 w-full"
-            >
-              {loading ? 'Submitting…' : 'Submit'}
-            </button>
-          </form>
-        </div>
+            questionLabel="Question"
+            question={<p className="m-0 whitespace-pre-wrap">{questionStem}</p>}
+            instruction={<p className="m-0">{opts.length > 0 ? 'Pick one answer.' : 'Type your answer.'}</p>}
+            answerArea={(
+              <form id="live-recheck-form" onSubmit={handleAnswer} className="flex min-h-0 flex-1 flex-col space-y-3">
+                {error ? <div className="anx-callout-danger text-sm">{error}</div> : null}
+                {opts.length > 0 ? (
+                  opts.map((opt) => (
+                    <label
+                      key={opt}
+                      className={`anx-option flex cursor-pointer items-center gap-3 py-3.5 ${
+                        answer === opt ? 'anx-option-selected' : ''
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="answer"
+                        value={opt}
+                        checked={answer === opt}
+                        onChange={() => setAnswer(opt)}
+                        className="accent-[var(--anx-primary)]"
+                      />
+                      <span className="text-base font-medium">{opt}</span>
+                    </label>
+                  ))
+                ) : (
+                  <input
+                    type="text"
+                    value={answer}
+                    onChange={(e) => setAnswer(e.target.value)}
+                    placeholder="Your answer…"
+                    className="anx-input w-full"
+                    required
+                  />
+                )}
+              </form>
+            )}
+            actions={(
+              <button
+                type="submit"
+                form="live-recheck-form"
+                disabled={loading || !answer}
+                className="anx-btn-primary w-full py-3.5"
+              >
+                {loading ? 'Submitting…' : 'Submit'}
+              </button>
+            )}
+          />
         </main>
       </AppChrome>
     );
