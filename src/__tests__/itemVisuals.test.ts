@@ -160,4 +160,110 @@ describe('resolveItemVisuals', () => {
       shape: 'square',
     });
   });
+
+  it('builds an equal-parts bar model for N3.1 bar-model stems', () => {
+    const visuals = resolveItemVisuals(
+      {
+        question: 'A bar model shows a total of 20 split into 4 equal parts of 5. Write both multiplication facts.',
+        options: {},
+      },
+      'N3.1'
+    );
+
+    expect(visuals[0]).toMatchObject({
+      type: 'bar-model',
+      total: 20,
+      segments: [
+        { value: 5, label: '5' },
+        { value: 5, label: '5' },
+        { value: 5, label: '5' },
+        { value: 5, label: '5' },
+      ],
+    });
+    expect(validateMathsVisual(visuals[0])).toEqual([]);
+  });
+
+  it('builds a bar model for N3.1 “groups of … making …” stems', () => {
+    const visuals = resolveItemVisuals(
+      {
+        question: 'A bar model shows 2 groups of 3 making 6. Write one multiplication fact.',
+        options: {},
+      },
+      'N3.1'
+    );
+
+    expect(visuals[0]).toMatchObject({
+      type: 'bar-model',
+      total: 6,
+      segments: [{ value: 3 }, { value: 3 }],
+    });
+    expect(validateMathsVisual(visuals[0])).toEqual([]);
+  });
+
+  it('builds a bar model for equal-sharing division stems', () => {
+    const visuals = resolveItemVisuals(
+      {
+        question: 'A total of 12 is shared into 4 equal groups. Write one division fact.',
+        options: {},
+      },
+      'N3.1'
+    );
+
+    expect(visuals[0]).toMatchObject({
+      type: 'bar-model',
+      total: 12,
+      segments: [{ value: 3 }, { value: 3 }, { value: 3 }, { value: 3 }],
+    });
+  });
+
+  it('builds a bar model for “shared into groups of” stems', () => {
+    const visuals = resolveItemVisuals(
+      {
+        question: 'A total of 18 is shared into groups of 6. Write one division fact.',
+        options: {},
+      },
+      'N3.1'
+    );
+
+    expect(visuals[0]).toMatchObject({
+      type: 'bar-model',
+      total: 18,
+      segments: [{ value: 6 }, { value: 6 }, { value: 6 }],
+    });
+  });
+
+  it('matches “If a bar model shows …” wording', () => {
+    const visuals = resolveItemVisuals(
+      {
+        question: 'If a bar model shows 63 as 9 equal parts of 7, write one division fact.',
+        options: {},
+      },
+      'N3.1'
+    );
+
+    expect(visuals[0]).toMatchObject({
+      type: 'bar-model',
+      total: 63,
+      segments: expect.arrayContaining([{ value: 7, label: '7' }]),
+    });
+    expect((visuals[0] as { segments: unknown[] }).segments).toHaveLength(9);
+  });
+
+  it('builds a bar model for N3.1 number-family missing-calculation stems', () => {
+    const visuals = resolveItemVisuals(
+      {
+        question:
+          'Which calculation is missing from this number family? 5 × 6 = 30, 6 × 5 = 30, 30 ÷ 5 = 6, ?',
+        options: {},
+      },
+      'N3.1'
+    );
+
+    expect(visuals[0]).toMatchObject({
+      type: 'bar-model',
+      total: 30,
+      segments: expect.arrayContaining([{ value: 6, label: '6' }]),
+    });
+    expect((visuals[0] as { segments: unknown[] }).segments).toHaveLength(5);
+  });
 });
