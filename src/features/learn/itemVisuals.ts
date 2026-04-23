@@ -2,6 +2,7 @@ import { isMathsVisual } from '../../lib/maths/visuals/guards';
 import type {
   ArithmeticLayoutVisual,
   BarModelVisual,
+  ChartVisual,
   FractionBarVisual,
   MathsVisual,
   NumberLineVisual,
@@ -402,9 +403,318 @@ function createCompoundLShape(labels: string[]): ShapeVisual {
   };
 }
 
+/** A1.12 stems describe growing patterns (counts per term), not geometric "find the square" tasks. */
+function isA1PatternSequenceSkill(primarySkillCode?: string): boolean {
+  return primarySkillCode === 'A1.12';
+}
+
+/**
+ * Rectangle with algebraic or unit side labels, e.g. "side lengths 3x and 4x" or "5m and 2m".
+ * Plain numeric cm stems still use parseCentimetreValues via createRectangle(labels).
+ */
+function parseRectangleAlgebraSideLabels(question: string): [string, string] | null {
+  const m = question.match(
+    /\brectangle has (?:side lengths?|sides)\s+([^.\n]+?)\s+and\s+([^.\n]+?)(?:\.|\s+what\b|\s+find\b)/i,
+  );
+  if (!m) return null;
+  const a = m[1].replace(/\s+/g, ' ').trim();
+  const b = m[2].replace(/\s+/g, ' ').trim();
+  if (!a || !b) return null;
+  if (!/[a-z]/i.test(a + b) && !/\d\s*(?:m|cm)\b/i.test(a + b)) return null;
+  return [a, b];
+}
+
+/** "A rectangle has area … and one side …" — label known side and "? " for missing (shown on diagram). */
+function parseRectangleAreaMissingSide(question: string): [string, string] | null {
+  const m = question.match(
+    /\brectangle has area\s+([^\s]+)\s+and one side(?:\s+length)?\s+([^\s.]+)/i,
+  );
+  if (!m) return null;
+  return [m[1].trim(), m[2].trim()];
+}
+
+/** "A shape has sides x, x, x and 6" style irregular perimeter prompts. */
+function parseIrregularSideLabels(question: string): string[] | null {
+  const m = question.match(/\bshape has sides\s+(.+?)\.\s*(?:What|Find)/i);
+  if (!m) return null;
+  const inner = m[1].trim();
+  const parts = inner.split(/\s*,\s*|\s+and\s+/i).map((s) => s.trim()).filter(Boolean);
+  if (parts.length < 3 || parts.length > 8) return null;
+  return parts;
+}
+
+function inferAlgebraRectangleSides(question: string, primarySkillCode?: string): ShapeVisual | null {
+  if (primarySkillCode !== 'A1.3' && primarySkillCode !== 'A1.4') return null;
+  const pair = parseRectangleAlgebraSideLabels(question);
+  if (!pair) return null;
+  return createRectangle(pair);
+}
+
+function inferAlgebraRectangleAreaMissing(question: string, primarySkillCode?: string): ShapeVisual | null {
+  if (primarySkillCode !== 'A1.5') return null;
+  const parsed = parseRectangleAreaMissingSide(question);
+  if (!parsed) return null;
+  const [areaExpr, knownSide] = parsed;
+  return {
+    ...createRectangle([knownSide, '?']),
+    altText: `Rectangle with area ${areaExpr} and one side ${knownSide}.`,
+    caption: 'Rectangle diagram: known side labelled; missing side is unknown.',
+  };
+}
+
+function inferIrregularPerimeterDiagram(question: string, primarySkillCode?: string): ShapeVisual | null {
+  if (primarySkillCode !== 'A1.3') return null;
+  const sides = parseIrregularSideLabels(question);
+  if (!sides) return null;
+  return createIrregularPolygon(sides);
+}
+
+/** Bar heights for the first few terms of an A1.12 linear pattern (from the stem). */
+function inferA1PatternSequenceChart(question: string, primarySkillCode?: string): ChartVisual | null {
+  if (!isA1PatternSequenceSkill(primarySkillCode)) return null;
+
+  const termMap = new Map<number, number>();
+  const inTermRe = /(\d+)(?:\s+[a-z]+)?\s+in term (\d+)/gi;
+  let im: RegExpExecArray | null;
+  while ((im = inTermRe.exec(question)) !== null) {
+    termMap.set(Number(im[2]), Number(im[1]));
+  }
+  if (termMap.has(1) && termMap.has(2) && termMap.has(3)) {
+    const series = [1, 2, 3].map((t) => ({
+      label: `T${t}`,
+      value: termMap.get(t)!,
+    }));
+    return {
+      type: 'chart',
+      chartType: 'bar',
+      series,
+      altText: `Bar chart of pattern totals for terms 1 to 3 (${series.map((s) => s.value).join(', ')}).`,
+      caption: 'Diagram totals for the first three terms.',
+    };
+  }
+
+  const addEach =
+    question.match(/\badd(?:s|ing)?\s+(\d+)\b[^.\n]*?(?:each time|each term)\b/i) ||
+    question.match(/\bincreases?\s+by\s+(\d+)\s+(?:each time|each term)?\b/i) ||
+    question.match(/\bgo(?:es)?\s+up\s+by\s+(\d+)\b/i) ||
+    question.match(/\bgrows?\s+by\s+(\d+)\s+each time\b/i);
+  const startMatch =
+    question.match(/\b(?:If\s+)?term\s+1\s+has\s+(\d+)\b/i) ||
+    question.match(/\bterm\s+1\s+is\s+(\d+)\b/i) ||
+    question.match(/\bstarts?\s+(?:at|with)\s+(\d+)\b/i);
+  const targetTermMatch =
+    question.match(/\bin term (\d+)\s*\?/i) ||
+    question.match(/\bhow many[^?]*\bterm (\d+)\b/i) ||
+    question.match(/\bterm (\d+)\s*\?/i);
+  if (addEach && startMatch && targetTermMatch) {
+    const a = Number(startMatch[1]);
+    const d = Number(addEach[1]);
+    const target = Number(targetTermMatch[1]);
+    if (!Number.isFinite(a) || !Number.isFinite(d) || !Number.isFinite(target) || target < 1) return null;
+    const count = Math.min(target, 6);
+    const series = Array.from({ length: count }, (_, i) => ({
+      label: `T${i + 1}`,
+      value: a + i * d,
+    }));
+    return {
+      type: 'chart',
+      chartType: 'bar',
+      series,
+      altText: `Bar chart: term 1 starts at ${a}, adding ${d} each time, up to term ${count}.`,
+      caption: 'Linear pattern totals by term.',
+    };
+  }
+
+  const growBy = question.match(/\bgrows?\s+by\s+(\d+)\s+each time\b/i);
+  const term1Is = question.match(/\bterm\s+1\s+is\s+(\d+)\b/i);
+  const growTarget =
+    question.match(/\bin term (\d+)\s*\?/i) ||
+    question.match(/\bhow many[^?]*\bterm (\d+)\b/i) ||
+    question.match(/\bterm (\d+)\s*\?/i);
+  if (growBy && term1Is && growTarget) {
+    const a = Number(term1Is[1]);
+    const d = Number(growBy[1]);
+    const target = Number(growTarget[1]);
+    if (!Number.isFinite(a) || !Number.isFinite(d) || !Number.isFinite(target) || target < 1) return null;
+    const count = Math.min(target, 6);
+    const series = Array.from({ length: count }, (_, i) => ({
+      label: `T${i + 1}`,
+      value: a + i * d,
+    }));
+    return {
+      type: 'chart',
+      chartType: 'bar',
+      series,
+      altText: `Bar chart: term 1 is ${a}, growing by ${d} each time, up to term ${count}.`,
+      caption: 'Linear pattern totals by term.',
+    };
+  }
+
+  const listMatch =
+    question.match(/\b(?:diagram sequence|pattern)\s+(?:is|has)\s+([\d,\s]+)\.\s*What is term (\d+)/i) ||
+    question.match(/\bsequence has totals\s+([\d,\s]+)\.\s*What is term (\d+)/i);
+  if (listMatch) {
+    const nums = listMatch[1]
+      .split(',')
+      .map((s) => Number(s.trim().replace(/,/g, '')))
+      .filter((n) => Number.isFinite(n));
+    const targetTerm = Number(listMatch[2]);
+    if (nums.length < 2 || !Number.isFinite(targetTerm) || targetTerm < 1) return null;
+    const d = nums[1] - nums[0];
+    if (d === 0) return null;
+    const shown = Math.min(Math.max(nums.length, Math.min(targetTerm, 6)), 6);
+    const series = Array.from({ length: shown }, (_, i) => ({
+      label: `T${i + 1}`,
+      value: i < nums.length ? nums[i] : nums[nums.length - 1] + (i - (nums.length - 1)) * d,
+    }));
+    return {
+      type: 'chart',
+      chartType: 'bar',
+      series,
+      altText: `Bar chart of listed pattern totals for terms 1 to ${shown}.`,
+      caption: 'Diagram totals by term number.',
+    };
+  }
+
+  const objectsConsec = question.match(/\b([\d,\s]+)\s+objects in consecutive terms\b/i);
+  if (objectsConsec) {
+    const nums = objectsConsec[1]
+      .split(',')
+      .map((s) => Number(s.trim().replace(/,/g, '')))
+      .filter((n) => Number.isFinite(n));
+    const termAsk = question.match(/\bterm\s+(\d+)\b/i);
+    const targetTerm = termAsk ? Number(termAsk[1]) : nums.length + 1;
+    if (nums.length < 2 || !Number.isFinite(targetTerm)) return null;
+    const d = nums[1] - nums[0];
+    if (d === 0) return null;
+    const shown = Math.min(Math.max(nums.length, Math.min(targetTerm, 6)), 6);
+    const series = Array.from({ length: shown }, (_, i) => ({
+      label: `T${i + 1}`,
+      value: i < nums.length ? nums[i] : nums[nums.length - 1] + (i - (nums.length - 1)) * d,
+    }));
+    return {
+      type: 'chart',
+      chartType: 'bar',
+      series,
+      altText: `Bar chart of consecutive-term object counts (${nums.join(', ')}).`,
+      caption: 'Pattern totals by term.',
+    };
+  }
+
+  const showsTotals = question.match(/\bshows totals\s+([\d,\s]+)\.\s*What is term (\d+)/i);
+  if (showsTotals) {
+    const nums = showsTotals[1]
+      .split(',')
+      .map((s) => Number(s.trim().replace(/,/g, '')))
+      .filter((n) => Number.isFinite(n));
+    const targetTerm = Number(showsTotals[2]);
+    if (nums.length < 2 || !Number.isFinite(targetTerm)) return null;
+    const d = nums[1] - nums[0];
+    if (d === 0) return null;
+    const shown = Math.min(Math.max(nums.length, Math.min(targetTerm, 6)), 6);
+    const series = Array.from({ length: shown }, (_, i) => ({
+      label: `T${i + 1}`,
+      value: i < nums.length ? nums[i] : nums[nums.length - 1] + (i - (nums.length - 1)) * d,
+    }));
+    return {
+      type: 'chart',
+      chartType: 'bar',
+      series,
+      altText: `Bar chart of listed totals (${nums.join(', ')}).`,
+      caption: 'Diagram totals by term.',
+    };
+  }
+
+  const diagramTotals = question.match(/\bdiagram totals\s+([\d,\s]+)\.\s*What is term (\d+)/i);
+  if (diagramTotals) {
+    const nums = diagramTotals[1]
+      .split(',')
+      .map((s) => Number(s.trim().replace(/,/g, '')))
+      .filter((n) => Number.isFinite(n));
+    const targetTerm = Number(diagramTotals[2]);
+    if (nums.length >= 2 && Number.isFinite(targetTerm)) {
+      const d = nums[1] - nums[0];
+      if (d !== 0) {
+        const shown = Math.min(Math.max(nums.length, Math.min(targetTerm, 6)), 6);
+        const series = Array.from({ length: shown }, (_, i) => ({
+          label: `T${i + 1}`,
+          value: i < nums.length ? nums[i] : nums[nums.length - 1] + (i - (nums.length - 1)) * d,
+        }));
+        return {
+          type: 'chart',
+          chartType: 'bar',
+          series,
+          altText: `Bar chart of diagram totals (${nums.join(', ')}).`,
+          caption: 'Diagram totals by term.',
+        };
+      }
+    }
+  }
+
+  const patternHasList = question.match(
+    /\bpattern has\s+([\d,\s]+)\.\s*What is term (\d+)/i,
+  );
+  if (patternHasList) {
+    const nums = patternHasList[1]
+      .split(',')
+      .map((s) => Number(s.trim().replace(/,/g, '')))
+      .filter((n) => Number.isFinite(n));
+    const targetTerm = Number(patternHasList[2]);
+    if (nums.length >= 2 && Number.isFinite(targetTerm)) {
+      const d = nums[1] - nums[0];
+      if (d !== 0) {
+        const shown = Math.min(Math.max(nums.length, Math.min(targetTerm, 6)), 6);
+        const series = Array.from({ length: shown }, (_, i) => ({
+          label: `T${i + 1}`,
+          value: i < nums.length ? nums[i] : nums[nums.length - 1] + (i - (nums.length - 1)) * d,
+        }));
+        return {
+          type: 'chart',
+          chartType: 'bar',
+          series,
+          altText: `Bar chart of pattern totals (${nums.join(', ')}).`,
+          caption: 'Pattern totals by term.',
+        };
+      }
+    }
+  }
+
+  const totalsMatch = question.match(
+    /\b(?:totals?|sequence|diagram)\s+(?:is|has|of diagram totals is|of)\s+([\d,\s]+)\.\s*What is term (\d+)/i,
+  );
+  if (totalsMatch) {
+    const nums = totalsMatch[1]
+      .split(',')
+      .map((s) => Number(s.trim().replace(/,/g, '')))
+      .filter((n) => Number.isFinite(n));
+    const targetTerm = Number(totalsMatch[2]);
+    if (nums.length < 2 || !Number.isFinite(targetTerm)) return null;
+    const d = nums[1] - nums[0];
+    if (d === 0) return null;
+    const shown = Math.min(Math.max(nums.length, Math.min(targetTerm, 6)), 6);
+    const series = Array.from({ length: shown }, (_, i) => ({
+      label: `T${i + 1}`,
+      value: i < nums.length ? nums[i] : nums[nums.length - 1] + (i - (nums.length - 1)) * d,
+    }));
+    return {
+      type: 'chart',
+      chartType: 'bar',
+      series,
+      altText: `Bar chart of pattern totals (${nums.join(', ')}) extended to term ${shown}.`,
+      caption: 'Diagram totals by term.',
+    };
+  }
+
+  return null;
+}
+
 function inferShapeVisual(question: string, primarySkillCode?: string): ShapeVisual | null {
   const lower = question.toLowerCase();
   const labels = parseCentimetreValues(question);
+
+  if (isA1PatternSequenceSkill(primarySkillCode)) {
+    return null;
+  }
 
   if (primarySkillCode === 'N2.13' || lower.includes('compound shape')) {
     return createCompoundLShape(labels);
@@ -882,6 +1192,10 @@ function inferBarModel(question: string, primarySkillCode?: string): BarModelVis
 
 function inferGeneratedVisuals(question: string, primarySkillCode?: string): MathsVisual[] {
   const lower = question.toLowerCase();
+  const a1PatternChart = inferA1PatternSequenceChart(question, primarySkillCode);
+  const a1IrregularPerimeter = inferIrregularPerimeterDiagram(question, primarySkillCode);
+  const a1RectangleAreaMissing = inferAlgebraRectangleAreaMissing(question, primarySkillCode);
+  const a1RectangleSides = inferAlgebraRectangleSides(question, primarySkillCode);
   const barModel = inferBarModel(question, primarySkillCode);
   const numberLine = inferNumberLine(question, primarySkillCode);
   const arithmetic = inferArithmeticLayout(question, primarySkillCode);
@@ -889,15 +1203,42 @@ function inferGeneratedVisuals(question: string, primarySkillCode?: string): Mat
   const fractionBar = inferFractionBar(question);
 
   const visuals: Array<
-    BarModelVisual | ArithmeticLayoutVisual | ShapeVisual | NumberLineVisual | FractionBarVisual | null
+    | ChartVisual
+    | BarModelVisual
+    | ArithmeticLayoutVisual
+    | ShapeVisual
+    | NumberLineVisual
+    | FractionBarVisual
+    | null
   > = lower.includes('number line')
-    ? [numberLine, barModel, arithmetic, shape, fractionBar]
-    : [barModel, shape, arithmetic, numberLine, fractionBar];
+    ? [
+        numberLine,
+        a1PatternChart,
+        a1IrregularPerimeter,
+        a1RectangleAreaMissing,
+        a1RectangleSides,
+        barModel,
+        arithmetic,
+        shape,
+        fractionBar,
+      ]
+    : [
+        a1PatternChart,
+        a1IrregularPerimeter,
+        a1RectangleAreaMissing,
+        a1RectangleSides,
+        barModel,
+        shape,
+        arithmetic,
+        numberLine,
+        fractionBar,
+      ];
 
   return visuals.filter(
     (
       visual
     ): visual is
+      | ChartVisual
       | BarModelVisual
       | ArithmeticLayoutVisual
       | ShapeVisual
