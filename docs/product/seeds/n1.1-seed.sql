@@ -6,7 +6,7 @@ BEGIN;
 -- 1) Ensure subject exists
 WITH upsert_subject AS (
   INSERT INTO "Subject" ("id", "title", "slug", "description", "createdAt")
-  VALUES (gen_random_uuid()::text, 'KS3 Mathematics', 'ks3-maths', 'KS3 maths curriculum', NOW())
+  VALUES (gen_random_uuid()::text, 'Maths', 'ks3-maths', 'Maths curriculum', NOW())
   ON CONFLICT ("slug") DO UPDATE SET "title" = EXCLUDED."title"
   RETURNING "id"
 )

@@ -18,7 +18,7 @@ npm install
 # Run database migrations
 npx prisma migrate dev --name init
 
-# Seed the database (KS3 Maths Number + FDP graph)
+# Seed the database (Maths Number + FDP graph)
 npx prisma db seed
 # or: npm run db:seed
 
@@ -54,9 +54,9 @@ NEXTAUTH_SECRET=your-secret-here
 NEXTAUTH_URL=http://localhost:3000
 ```
 
-## KS3 Maths Skill Graph
+## Maths Skill Graph
 
-Stage 2 introduces a mastery-gated skill graph for KS3 Maths (Year 7 Entry).
+Stage 2 introduces a mastery-gated skill graph for Maths (Year 7 Entry).
 
 - **56 skills** across Number (N1–N3) and FDP (N4) strands
 - Prerequisite edges enforce unlock order: a skill is only available once all its prerequisites have `mastery ≥ 0.85` AND `confirmedCount ≥ 2`
