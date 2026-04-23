@@ -3,7 +3,21 @@ import { authOptions } from '@/features/auth/authOptions';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { prisma } from '@/db/prisma';
+import { AdminPageFrame } from '@/components/admin/AdminPageFrame';
 import { QuestionListClient } from './QuestionListClient';
+
+function StatTile({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="anx-card rounded-xl p-4">
+      <p className="anx-section-label m-0 text-[10px]" style={{ color: 'var(--anx-text-muted)' }}>
+        {label}
+      </p>
+      <p className="mt-1 text-2xl font-bold tabular-nums tracking-tight" style={{ color: 'var(--anx-text)' }}>
+        {value.toLocaleString('en-GB')}
+      </p>
+    </div>
+  );
+}
 
 export default async function AdminQuestionsPage() {
   const session = await getServerSession(authOptions);
@@ -26,56 +40,28 @@ export default async function AdminQuestionsPage() {
   ]);
 
   const typeBreakdown = byType.map((b) => ({ type: b.type, count: b._count.type }));
+  const statCount = Math.min(typeBreakdown.length + 1, 7);
+  const gridTemplate = { gridTemplateColumns: `repeat(${statCount}, minmax(0, 1fr))` } as const;
 
   return (
-    <main className="anx-shell" style={{ background: 'var(--anx-surface-bright)', minHeight: '100vh' }}>
-      <div className="max-w-6xl mx-auto space-y-8">
+    <AdminPageFrame
+      maxWidthClassName="max-w-6xl"
+      title="Question bank"
+      subtitle="Author, search, and manage all questions linked to subjects in the database."
+      actions={(
+        <Link href="/admin/questions/new" className="anx-btn-primary px-5 py-2.5 text-sm no-underline">
+          + New question
+        </Link>
+      )}
+    >
+      <section className="grid gap-3" style={gridTemplate}>
+        <StatTile label="Total" value={total} />
+        {typeBreakdown.map((b) => (
+          <StatTile key={b.type} label={b.type} value={b.count} />
+        ))}
+      </section>
 
-        {/* Header */}
-        <div className="flex items-center justify-between pt-2">
-          <div>
-            <Link
-              href="/admin"
-              className="text-xs"
-              style={{ color: 'var(--anx-text-muted)' }}
-            >
-              ← Admin
-            </Link>
-            <h1 className="text-2xl font-bold mt-1" style={{ color: 'var(--anx-text)' }}>
-              Question Bank
-            </h1>
-            <p className="text-sm mt-1" style={{ color: 'var(--anx-text-secondary)' }}>
-              Author, search and manage all questions in the database.
-            </p>
-          </div>
-          <Link
-            href="/admin/questions/new"
-            className="anx-btn-primary px-5 py-2.5 text-sm"
-          >
-            + New question
-          </Link>
-        </div>
-
-        {/* Stats bar */}
-        <div
-          className="grid gap-3"
-          style={{ gridTemplateColumns: `repeat(${Math.min(typeBreakdown.length + 1, 6)}, minmax(0, 1fr))` }}
-        >
-          <div className="rounded-xl p-4" style={{ background: 'var(--anx-surface-container-lowest)', border: '1px solid var(--anx-border)' }}>
-            <p className="text-xs font-medium uppercase tracking-wide" style={{ color: 'var(--anx-text-muted)' }}>Total</p>
-            <p className="text-3xl font-bold mt-1" style={{ color: 'var(--anx-text)' }}>{total.toLocaleString()}</p>
-          </div>
-          {typeBreakdown.map((b) => (
-            <div key={b.type} className="rounded-xl p-4" style={{ background: 'var(--anx-surface-container-lowest)', border: '1px solid var(--anx-border)' }}>
-              <p className="text-xs font-medium uppercase tracking-wide" style={{ color: 'var(--anx-text-muted)' }}>{b.type}</p>
-              <p className="text-3xl font-bold mt-1" style={{ color: 'var(--anx-text)' }}>{b.count.toLocaleString()}</p>
-            </div>
-          ))}
-        </div>
-
-        {/* Interactive list */}
-        <QuestionListClient skills={skills} />
-      </div>
-    </main>
+      <QuestionListClient skills={skills} />
+    </AdminPageFrame>
   );
 }

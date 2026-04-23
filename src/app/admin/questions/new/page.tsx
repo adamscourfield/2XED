@@ -1,8 +1,8 @@
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/features/auth/authOptions';
 import { redirect } from 'next/navigation';
-import Link from 'next/link';
 import { prisma } from '@/db/prisma';
+import { AdminPageFrame } from '@/components/admin/AdminPageFrame';
 import { QuestionFormClient } from '../QuestionFormClient';
 
 export default async function NewQuestionPage() {
@@ -17,30 +17,16 @@ export default async function NewQuestionPage() {
   });
 
   return (
-    <main className="anx-shell" style={{ background: 'var(--anx-surface-bright)', minHeight: '100vh' }}>
-      <div className="max-w-3xl mx-auto space-y-8">
-        <div>
-          <Link href="/admin/questions" className="text-xs" style={{ color: 'var(--anx-text-muted)' }}>
-            ← Question Bank
-          </Link>
-          <h1 className="text-2xl font-bold mt-1" style={{ color: 'var(--anx-text)' }}>
-            New question
-          </h1>
-          <p className="text-sm mt-1" style={{ color: 'var(--anx-text-secondary)' }}>
-            This question will be saved directly to the database.
-          </p>
-        </div>
-
-        <div
-          className="rounded-2xl p-8"
-          style={{ background: 'var(--anx-surface-container-lowest)', border: '1px solid var(--anx-border)' }}
-        >
-          <QuestionFormClient
-            mode="create"
-            allSkills={allSkills}
-          />
-        </div>
+    <AdminPageFrame
+      maxWidthClassName="max-w-3xl"
+      title="New question"
+      subtitle="This question will be saved directly to the database."
+      backHref="/admin/questions"
+      backLabel="← Question bank"
+    >
+      <div className="anx-card rounded-2xl p-6 sm:p-8">
+        <QuestionFormClient mode="create" allSkills={allSkills} />
       </div>
-    </main>
+    </AdminPageFrame>
   );
 }
