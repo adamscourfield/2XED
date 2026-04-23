@@ -51,6 +51,15 @@ export const DiagnosticCompletedPayloadSchema = z.object({
   itemsSeen: z.number(),
 });
 
+/** Admin reset so the student can retake onboarding diagnostic for a subject. */
+export const StudentRebaselinedPayloadSchema = z.object({
+  subjectSlug: z.string(),
+  studentEmail: z.string(),
+  reason: z.string().min(1),
+  abandonedDiagnosticSessions: z.number().int().nonnegative(),
+  clearedSkillMasteries: z.number().int().nonnegative(),
+});
+
 export const BaselineStartedPayloadSchema = z.object({
   sessionId: z.string(),
   subjectSlug: z.string(),
@@ -284,6 +293,7 @@ export const EventPayloadSchemas: Record<string, z.ZodSchema> = {
   live_support_recheck_started: LiveSupportRecheckStartedPayloadSchema,
   live_support_recheck_completed: LiveSupportRecheckCompletedPayloadSchema,
   diagnostic_completed: DiagnosticCompletedPayloadSchema,
+  student_rebaselined: StudentRebaselinedPayloadSchema,
   baseline_started: BaselineStartedPayloadSchema,
   baseline_item_answered: BaselineItemAnsweredPayloadSchema,
   baseline_completed: BaselineCompletedPayloadSchema,
