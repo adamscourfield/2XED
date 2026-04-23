@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { prisma } from '@/db/prisma';
 import { LearningPageShell } from '@/components/LearningPageShell';
 import { DashboardLessonCalendar } from '@/components/DashboardLessonCalendar';
+import { StaffDashboardShell } from '@/components/staff/StaffDashboardShell';
 
 type EventPayload = Record<string, unknown>;
 
@@ -185,95 +186,89 @@ export default async function TeacherDashboardPage({ searchParams }: Props) {
   const subjectMap = new Map((await prisma.subject.findMany({ select: { id: true, slug: true } })).map((s) => [s.slug, s.id]));
   const now = new Date();
 
+  const displayName = user.name?.trim() || user.email?.split('@')[0] || 'there';
+  const classCount = teacherProfile.classrooms.length;
+  const studentCount = allStudentIds.length;
+  const activitySignals = events.filter((e) => e.name === 'question_answered').length;
+  const reviewDueStudentIds = new Set<string>();
+  for (const tc of teacherProfile.classrooms) {
+    for (const en of tc.classroom.enrollments) {
+      if (en.student.skillMasteries.some((m) => !m.nextReviewAt || m.nextReviewAt <= now)) {
+        reviewDueStudentIds.add(en.studentUserId);
+      }
+    }
+  }
+  const reviewsDueStudents = reviewDueStudentIds.size;
+  const liveNowCount = recentSessions.filter((ls) => ls.status === 'ACTIVE' || ls.status === 'LOBBY').length;
+
   return (
     <LearningPageShell
-      title="Teacher Dashboard"
-      subtitle={`Observe-linked analytics for ${user.name ?? user.email}`}
+      title="Teacher dashboard"
+      subtitle="Class health, live teaching, and Observe-linked signals in one view."
       maxWidthClassName="max-w-6xl"
       appChrome="teacher"
       appChromeShowLeadershipNav={user.role === 'ADMIN' || user.role === 'LEADERSHIP'}
-      meta={
-        <>
-          <p><span className="font-semibold">Observe Teacher ID:</span> {teacherProfile.externalTeacherId}</p>
-          <p><span className="font-semibold">Observe School ID:</span> {teacherProfile.externalSchoolId ?? '—'}</p>
-          <p><span className="font-semibold">Time window:</span> last {days} days</p>
-          <p><span className="font-semibold">Subtopic filter:</span> {subtopicFilter || 'All'}</p>
-          <p className="mt-2 rounded-lg border px-3 py-1.5 text-xs" style={{ borderColor: 'var(--anx-border)', background: 'var(--anx-primary-soft)', color: 'var(--anx-primary)' }}>
-            <span className="font-semibold">DLE momentum note:</span> {MOMENTUM_HELP}
-          </p>
-        </>
-      }
     >
-      <DashboardLessonCalendar hint="Shows class timetables you maintain, your live sessions, and student reviews." />
-
-      {/* ── Live lesson launcher ─────────────────────────────────────────── */}
-      <div className="anx-lesson-launcher flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <p className="anx-section-label mb-1" style={{ color: 'var(--anx-text-muted)' }}>Live lesson</p>
-          <h2 className="text-xl font-semibold" style={{ color: 'var(--anx-text)' }}>Ready to teach?</h2>
-          <p className="mt-0.5 text-sm" style={{ color: 'var(--anx-text-muted)' }}>
-            Start a session, pick your topics, and deploy content live to student devices.
-          </p>
-        </div>
-        <Link href="/teacher/live/new" className="anx-btn-primary shrink-0 whitespace-nowrap">
-          Start a live lesson →
-        </Link>
-      </div>
-
-      {/* ── Recent live sessions ─────────────────────────────────────────── */}
-      {recentSessions.length > 0 && (
-        <div>
-          <p className="anx-section-label mb-3" style={{ color: 'var(--anx-text-muted)' }}>Recent sessions</p>
-          <div className="space-y-2">
-            {recentSessions.map((ls) => {
-              const isLive = ls.status === 'ACTIVE' || ls.status === 'LOBBY';
-              const statusColour =
-                ls.status === 'ACTIVE' ? 'anx-badge-green' :
-                ls.status === 'LOBBY' ? 'anx-badge-blue' :
-                ls.status === 'PAUSED' ? 'anx-badge-blue' :
-                'anx-badge-blue';
-              return (
-                <div key={ls.id} className="flex items-center justify-between gap-4 anx-card px-4 py-3">
-                  <div className="flex min-w-0 flex-1 items-center gap-3">
-                    {isLive && <span className="anx-live-dot" />}
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-medium" style={{ color: 'var(--anx-text)' }}>
-                        {ls.subject.title}{ls.skill ? ` — ${ls.skill.code}: ${ls.skill.name}` : ''}
-                      </p>
-                      <p className="text-xs" style={{ color: 'var(--anx-text-muted)' }}>
-                        Code: <span className="font-mono font-semibold">{ls.joinCode}</span> · {ls._count.participants} student{ls._count.participants !== 1 ? 's' : ''} · {ls.createdAt.toLocaleDateString('en-GB')}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex shrink-0 items-center gap-3">
-                    <span className={`anx-badge ${statusColour}`}>{ls.status}</span>
-                    {(isLive || ls.status === 'PAUSED') && (
-                      <Link href={`/teacher/live/${ls.id}`} className="anx-btn-secondary px-3 py-1.5 text-xs">
-                        Open conductor →
-                      </Link>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* ── Time window filter ───────────────────────────────────────────── */}
-      <div className="flex flex-wrap gap-2 text-xs">
-          {[7, 30, 90].map((d) => (
-            <Link
-              key={d}
-              href={`/teacher/dashboard?days=${d}${subtopicFilter ? `&subtopic=${encodeURIComponent(subtopicFilter)}` : ''}`}
-              className={`rounded-xl border px-3.5 py-1.5 font-medium transition-all ${days === d ? 'border-[var(--anx-primary)] bg-[var(--anx-primary-soft)] text-[var(--anx-primary)]' : 'border-[var(--anx-border)] bg-white text-[var(--anx-text-secondary)]'}`}
-            >
-              {d}d
+      <StaffDashboardShell
+        variant="teacher"
+        eyebrow="Teaching workspace"
+        displayName={displayName}
+        title="Your classes at a glance"
+        lead="Use the calendar for what is coming up, then dive into each group for mastery, checkpoints, and who needs you next."
+        stats={[
+          { label: 'Classes', value: String(classCount) },
+          { label: 'Students', value: String(studentCount) },
+          { label: 'Practice signals', value: String(activitySignals), hint: `Question events · last ${days}d` },
+          {
+            label: 'Attention',
+            value: String(reviewsDueStudents),
+            hint: `${liveNowCount} live session${liveNowCount === 1 ? '' : 's'} (lobby or active)`,
+          },
+        ]}
+        heroActions={
+          <>
+            <Link href="/teacher/live/new" className="anx-btn-primary">
+              Start a live lesson
             </Link>
-          ))}
-        </div>
+            <Link href="/teacher/timetable" className="anx-btn-secondary">
+              Timetable
+            </Link>
+            {(user.role === 'ADMIN' || user.role === 'LEADERSHIP') && (
+              <Link href="/teacher/leadership" className="anx-btn-secondary">
+                School overview
+              </Link>
+            )}
+          </>
+        }
+        footnote={
+          <p className="m-0">
+            <span className="font-semibold">DLE momentum:</span> {MOMENTUM_HELP}
+          </p>
+        }
+      >
+        <div className="staff-dash-bento">
+          <div className="staff-dash-bento-main">
+            <DashboardLessonCalendar
+              className="student-dash-calendar anx-card overflow-hidden"
+              hint="Class timetables you maintain, your live sessions, and student reviews."
+            />
 
-        <div className="mt-6 space-y-6">
+            <div className="staff-dash-filter-row">
+              <span className="text-xs font-semibold uppercase tracking-wide text-[color:var(--anx-text-muted)]">Window</span>
+              <div className="staff-dash-pill-group">
+                {[7, 30, 90].map((d) => (
+                  <Link
+                    key={d}
+                    href={`/teacher/dashboard?days=${d}${subtopicFilter ? `&subtopic=${encodeURIComponent(subtopicFilter)}` : ''}`}
+                    className={`staff-dash-pill${days === d ? ' staff-dash-pill--active' : ''}`}
+                  >
+                    Last {d} days
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            <div className="staff-dash-section-gap">
           {teacherProfile.classrooms.map((tc) => {
             const cls = tc.classroom;
             const classSubjectId = cls.subjectSlug ? subjectMap.get(cls.subjectSlug) : undefined;
@@ -393,70 +388,242 @@ export default async function TeacherDashboardPage({ searchParams }: Props) {
             const requiringAction = studentRows.filter((s) => s.needsAction);
 
             return (
-              <section key={cls.id} className="anx-card p-6">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <div>
-                    <h2 className="text-lg font-semibold" style={{ color: 'var(--anx-text)' }}>{cls.name}</h2>
-                    <p className="text-xs" style={{ color: 'var(--anx-text-muted)' }}>
-                      {cls.yearGroup ?? '—'} · {cls.subjectSlug ?? '—'} · Observe class id: {cls.externalClassId}
+              <section key={cls.id} className="staff-dash-class-panel">
+                <div className="staff-dash-class-head">
+                  <h2 className="staff-dash-class-title">{cls.name}</h2>
+                  <p className="staff-dash-class-meta">
+                    {cls.yearGroup ?? '—'} · {cls.subjectSlug ?? '—'} · Observe class id: {cls.externalClassId}
+                  </p>
+                </div>
+
+                <div className="staff-dash-metric-grid">
+                  <div className="staff-dash-metric-tile">
+                    <p className="staff-dash-metric-label">Students</p>
+                    <p className="staff-dash-metric-value">{classStudents.length}</p>
+                  </div>
+                  <div className="staff-dash-metric-tile">
+                    <p className="staff-dash-metric-label">Average mastery</p>
+                    <p className="staff-dash-metric-value">{avgMastery}%</p>
+                  </div>
+                  <div className="staff-dash-metric-tile">
+                    <p className="staff-dash-metric-label">Stable learners</p>
+                    <p className="staff-dash-metric-value">{stableCount}</p>
+                  </div>
+                  <div className="staff-dash-metric-tile">
+                    <p className="staff-dash-metric-label">Review due</p>
+                    <p className="staff-dash-metric-value">{reviewDueCount}</p>
+                  </div>
+                </div>
+
+                <div className="staff-dash-metric-grid staff-dash-metric-grid--5">
+                  <div className="staff-dash-metric-tile staff-dash-metric-tile--accent">
+                    <p className="staff-dash-metric-label">Question events</p>
+                    <p className="staff-dash-metric-value">{questionEvents.length}</p>
+                  </div>
+                  <div className="staff-dash-metric-tile staff-dash-metric-tile--accent">
+                    <p className="staff-dash-metric-label">Checkpoint accuracy</p>
+                    <p className="staff-dash-metric-value">{pct(checkpointCorrect, stepAttemptEvents.length)}</p>
+                  </div>
+                  <div className="staff-dash-metric-tile staff-dash-metric-tile--accent">
+                    <p className="staff-dash-metric-label">Interaction rule pass</p>
+                    <p className="staff-dash-metric-value">{pct(rulePassed, interactionEvalEvents.length)}</p>
+                  </div>
+                  <div className="staff-dash-metric-tile staff-dash-metric-tile--accent">
+                    <p className="staff-dash-metric-label">Strong routes (≥80%)</p>
+                    <p className="staff-dash-metric-value">{pct(routeStrong, routeEvents.length)}</p>
+                  </div>
+                  <div className="staff-dash-metric-tile staff-dash-metric-tile--warn">
+                    <p className="staff-dash-metric-label">Wrong first-difference</p>
+                    <p className="staff-dash-metric-value">{wrongFirstDiff}</p>
+                  </div>
+                </div>
+
+                <div className="staff-dash-metric-grid staff-dash-metric-grid--5">
+                  <div className="staff-dash-metric-tile staff-dash-metric-tile--teal">
+                    <p className="staff-dash-metric-label">Avg DLE (latest)</p>
+                    <p className="staff-dash-metric-value">{classAvgDle != null ? classAvgDle.toFixed(2) : '—'}</p>
+                  </div>
+                  <div className="staff-dash-metric-tile staff-dash-metric-tile--sky" title={MOMENTUM_HELP}>
+                    <p className="staff-dash-metric-label">DLE momentum</p>
+                    <p className="staff-dash-metric-value">{trendBadge(classTrend)}</p>
+                    <p className="mt-1 text-[11px] text-sky-800">Proxy metric</p>
+                  </div>
+                  <div className="staff-dash-metric-tile staff-dash-metric-tile--emerald">
+                    <p className="staff-dash-metric-label">Durable states</p>
+                    <p className="staff-dash-metric-value">{classDurableCount}</p>
+                  </div>
+                  <div className="staff-dash-metric-tile staff-dash-metric-tile--amber">
+                    <p className="staff-dash-metric-label">At-risk states</p>
+                    <p className="staff-dash-metric-value">{classAtRiskCount}</p>
+                  </div>
+                  <div className="staff-dash-metric-tile staff-dash-metric-tile--cyan">
+                    <p className="staff-dash-metric-label">Avg instructional time</p>
+                    <p className="staff-dash-metric-value">
+                      {classAvgInstructionalTimeMs != null ? `${Math.round(classAvgInstructionalTimeMs / 1000)}s` : '—'}
                     </p>
                   </div>
                 </div>
 
-                <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                  <div className="anx-stat"><p className="anx-stat-label">Students</p><p className="anx-stat-value">{classStudents.length}</p></div>
-                  <div className="anx-stat"><p className="anx-stat-label">Average mastery</p><p className="anx-stat-value">{avgMastery}%</p></div>
-                  <div className="anx-stat"><p className="anx-stat-label">Stable learners</p><p className="anx-stat-value">{stableCount}</p></div>
-                  <div className="anx-stat"><p className="anx-stat-label">Review due</p><p className="anx-stat-value">{reviewDueCount}</p></div>
-                </div>
-
-                <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-                  <div className="rounded-xl border border-[var(--anx-border)] bg-[var(--anx-primary-soft)] p-3"><p className="anx-stat-label text-[var(--anx-primary)]">Question events</p><p className="text-lg font-semibold text-[var(--anx-text)]">{questionEvents.length}</p></div>
-                  <div className="rounded-xl border border-[var(--anx-border)] bg-[var(--anx-primary-soft)] p-3"><p className="anx-stat-label text-[var(--anx-primary)]">Checkpoint accuracy</p><p className="text-lg font-semibold text-[var(--anx-text)]">{pct(checkpointCorrect, stepAttemptEvents.length)}</p></div>
-                  <div className="rounded-xl border border-[var(--anx-border)] bg-[var(--anx-primary-soft)] p-3"><p className="anx-stat-label text-[var(--anx-primary)]">Interaction rule pass</p><p className="text-lg font-semibold text-[var(--anx-text)]">{pct(rulePassed, interactionEvalEvents.length)}</p></div>
-                  <div className="rounded-xl border border-[var(--anx-border)] bg-[var(--anx-primary-soft)] p-3"><p className="anx-stat-label text-[var(--anx-primary)]">Strong routes (≥80%)</p><p className="text-lg font-semibold text-[var(--anx-text)]">{pct(routeStrong, routeEvents.length)}</p></div>
-                  <div className="rounded-lg border border-rose-200 bg-rose-50 p-3"><p className="text-xs text-rose-700">Wrong first-difference</p><p className="text-lg font-semibold text-rose-900">{wrongFirstDiff}</p></div>
-                </div>
-
-                <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-                  <div className="rounded-lg border border-teal-200 bg-teal-50 p-3"><p className="text-xs text-teal-700">Avg DLE (latest)</p><p className="text-lg font-semibold text-teal-900">{classAvgDle != null ? classAvgDle.toFixed(2) : '—'}</p></div>
-                  <div className="rounded-lg border border-sky-200 bg-sky-50 p-3" title={MOMENTUM_HELP}><p className="text-xs text-sky-700">DLE momentum</p><p className="text-lg font-semibold text-sky-900">{trendBadge(classTrend)}</p><p className="mt-1 text-[11px] text-sky-700">proxy metric</p></div>
-                  <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3"><p className="text-xs text-emerald-700">Durable states</p><p className="text-lg font-semibold text-emerald-900">{classDurableCount}</p></div>
-                  <div className="rounded-lg border border-amber-200 bg-amber-50 p-3"><p className="text-xs text-amber-700">At-risk states</p><p className="text-lg font-semibold text-amber-900">{classAtRiskCount}</p></div>
-                  <div className="rounded-lg border border-cyan-200 bg-cyan-50 p-3"><p className="text-xs text-cyan-700">Avg instructional time</p><p className="text-lg font-semibold text-cyan-900">{classAvgInstructionalTimeMs != null ? `${Math.round(classAvgInstructionalTimeMs / 1000)}s` : '—'}</p></div>
-                </div>
-
-                <div className="mt-4 rounded-xl border px-4 py-3" style={{ borderColor: '#fbbf24', background: 'var(--anx-warning-soft)' }}>
-                  <p className="anx-section-label" style={{ color: '#92400e' }}>Students requiring action</p>
-                  <p className="mt-1.5 text-sm" style={{ color: '#78350f' }}>
+                <div className="staff-dash-callout">
+                  <p className="staff-dash-callout-label">Students requiring action</p>
+                  <p className="staff-dash-callout-body">
                     {requiringAction.length === 0
                       ? 'No high-priority students in this filter window.'
                       : requiringAction.map((s) => `${s.name} (${s.riskLevel})`).join(', ')}
                   </p>
                 </div>
 
-                <div className="mt-4 overflow-hidden rounded-xl border" style={{ borderColor: 'var(--anx-border)' }}>
-                  <div className="border-b px-4 py-2.5 anx-section-label" style={{ borderColor: 'var(--anx-border-subtle)', background: 'var(--anx-surface-soft)' }}>Student drilldown (actionable)</div>
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
-                      <thead className="bg-white text-xs" style={{ color: 'var(--anx-text-muted)' }}>
-                        <tr><th className="px-3 py-2 text-left">Student</th><th className="px-3 py-2 text-left">Observe ID</th><th className="px-3 py-2 text-left">Risk</th><th className="px-3 py-2 text-left">DLE</th><th className="px-3 py-2 text-left">Durability</th><th className="px-3 py-2 text-left">Trend</th><th className="px-3 py-2 text-left">Mastery</th><th className="px-3 py-2 text-left">Questions</th><th className="px-3 py-2 text-left">Checkpoint</th><th className="px-3 py-2 text-left">Interaction pass</th><th className="px-3 py-2 text-left">Wrong first-diff</th><th className="px-3 py-2 text-left">Interventions</th></tr>
-                      </thead>
-                      <tbody className="divide-y" style={{ borderColor: 'var(--anx-border-subtle)' }}>
-                        {studentRows.map((row) => (
-                          <tr key={row.id} className={row.needsAction ? 'bg-amber-50/60' : ''}>
-                            <td className="px-3 py-2 text-slate-800">{row.name}</td><td className="px-3 py-2 font-mono text-xs text-slate-600">{row.observeStudentId}</td><td className="px-3 py-2"><span className={`rounded px-2 py-0.5 text-xs font-semibold ${row.riskLevel === 'RED' ? 'bg-rose-100 text-rose-800' : row.riskLevel === 'AMBER' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}`}>{row.riskLevel} ({row.riskScore})</span></td><td className="px-3 py-2 font-mono text-xs">{row.studentAvgDle != null ? row.studentAvgDle.toFixed(2) : '—'}</td><td className="px-3 py-2"><span className={`rounded px-2 py-0.5 text-xs font-semibold ${row.studentDurability === 'AT_RISK' ? 'bg-rose-100 text-rose-800' : row.studentDurability === 'DEVELOPING' ? 'bg-amber-100 text-amber-800' : row.studentDurability === 'DURABLE' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-600'}`}>{row.studentDurability ?? '—'}</span></td><td className="px-3 py-2 text-xs text-sky-800">{trendBadge(row.studentTrend)}</td><td className="px-3 py-2">{row.masteryAvg}%</td><td className="px-3 py-2">{row.questionCount}</td><td className="px-3 py-2">{row.checkpointRate}</td><td className="px-3 py-2">{row.interactionPassRate}</td><td className="px-3 py-2 text-rose-700">{row.wrongFirstDiff}</td><td className="px-3 py-2">{row.interventions}</td>
-                          </tr>
-                        ))}
-                        {studentRows.length === 0 && <tr><td colSpan={12} className="px-3 py-8 text-center text-slate-400">No students enrolled in this class yet.</td></tr>}
-                      </tbody>
-                    </table>
-                  </div>
+                <div className="staff-dash-table-wrap">
+                  <table className="staff-dash-table">
+                    <thead>
+                      <tr>
+                        <th>Student</th>
+                        <th>Observe ID</th>
+                        <th>Risk</th>
+                        <th>DLE</th>
+                        <th>Durability</th>
+                        <th>Trend</th>
+                        <th>Mastery</th>
+                        <th>Questions</th>
+                        <th>Checkpoint</th>
+                        <th>Interaction pass</th>
+                        <th>Wrong first-diff</th>
+                        <th>Interventions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {studentRows.map((row) => (
+                        <tr key={row.id} className={row.needsAction ? 'bg-amber-50/60' : ''}>
+                          <td>{row.name}</td>
+                          <td className="font-mono text-xs">{row.observeStudentId}</td>
+                          <td>
+                            <span
+                              className={`rounded px-2 py-0.5 text-xs font-semibold ${
+                                row.riskLevel === 'RED'
+                                  ? 'bg-rose-100 text-rose-800'
+                                  : row.riskLevel === 'AMBER'
+                                    ? 'bg-amber-100 text-amber-800'
+                                    : 'bg-emerald-100 text-emerald-800'
+                              }`}
+                            >
+                              {row.riskLevel} ({row.riskScore})
+                            </span>
+                          </td>
+                          <td className="font-mono text-xs">{row.studentAvgDle != null ? row.studentAvgDle.toFixed(2) : '—'}</td>
+                          <td>
+                            <span
+                              className={`rounded px-2 py-0.5 text-xs font-semibold ${
+                                row.studentDurability === 'AT_RISK'
+                                  ? 'bg-rose-100 text-rose-800'
+                                  : row.studentDurability === 'DEVELOPING'
+                                    ? 'bg-amber-100 text-amber-800'
+                                    : row.studentDurability === 'DURABLE'
+                                      ? 'bg-emerald-100 text-emerald-800'
+                                      : 'bg-slate-100 text-slate-600'
+                              }`}
+                            >
+                              {row.studentDurability ?? '—'}
+                            </span>
+                          </td>
+                          <td className="text-xs text-sky-800">{trendBadge(row.studentTrend)}</td>
+                          <td>{row.masteryAvg}%</td>
+                          <td>{row.questionCount}</td>
+                          <td>{row.checkpointRate}</td>
+                          <td>{row.interactionPassRate}</td>
+                          <td className="text-rose-700">{row.wrongFirstDiff}</td>
+                          <td>{row.interventions}</td>
+                        </tr>
+                      ))}
+                      {studentRows.length === 0 && (
+                        <tr>
+                          <td colSpan={12} className="py-8 text-center text-[color:var(--anx-text-muted)]">
+                            No students enrolled in this class yet.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
                 </div>
               </section>
             );
           })}
+            </div>
+          </div>
+
+          <aside className="staff-dash-bento-side">
+            <section className="staff-dash-side-card">
+              <p className="student-dash-eyebrow" style={{ color: 'var(--anx-text-muted)' }}>
+                Observe link
+              </p>
+              <h3 className="staff-dash-side-title">Your profile</h3>
+              <ul className="staff-dash-meta-list">
+                <li>
+                  <strong>Teacher ID</strong> {teacherProfile.externalTeacherId}
+                </li>
+                <li>
+                  <strong>School ID</strong> {teacherProfile.externalSchoolId ?? '—'}
+                </li>
+                <li>
+                  <strong>Analytics window</strong> Last {days} days
+                </li>
+                <li>
+                  <strong>Subtopic filter</strong> {subtopicFilter || 'All'}
+                </li>
+              </ul>
+            </section>
+
+            <section className="staff-dash-side-card">
+              <p className="student-dash-eyebrow" style={{ color: 'var(--anx-text-muted)' }}>
+                Live teaching
+              </p>
+              <h3 className="staff-dash-side-title">Recent sessions</h3>
+              <p className="staff-dash-side-text">Resume a lobby or active lesson, or start a new one from the hero.</p>
+              {recentSessions.length === 0 ? (
+                <p className="staff-dash-side-text mt-2">No sessions yet — start your first live lesson when you are ready.</p>
+              ) : (
+                <ul className="mt-3 flex list-none flex-col gap-2 p-0">
+                  {recentSessions.map((ls) => {
+                    const isLive = ls.status === 'ACTIVE' || ls.status === 'LOBBY';
+                    const statusColour =
+                      ls.status === 'ACTIVE'
+                        ? 'anx-badge-green'
+                        : ls.status === 'LOBBY'
+                          ? 'anx-badge-blue'
+                          : ls.status === 'PAUSED'
+                            ? 'anx-badge-blue'
+                            : 'anx-badge-blue';
+                    return (
+                      <li key={ls.id} className="staff-dash-live-row">
+                        <div className="staff-dash-live-row-main">
+                          {isLive ? <span className="anx-live-dot shrink-0" /> : <span className="w-2 shrink-0" aria-hidden />}
+                          <div className="min-w-0">
+                            <p className="truncate text-sm font-semibold text-[color:var(--anx-text)]">
+                              {ls.subject.title}
+                              {ls.skill ? ` — ${ls.skill.code}: ${ls.skill.name}` : ''}
+                            </p>
+                            <p className="text-xs text-[color:var(--anx-text-muted)]">
+                              <span className="font-mono font-semibold">{ls.joinCode}</span> · {ls._count.participants} student
+                              {ls._count.participants !== 1 ? 's' : ''} · {ls.createdAt.toLocaleDateString('en-GB')}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="staff-dash-live-actions">
+                          <span className={`anx-badge ${statusColour}`}>{ls.status}</span>
+                          {(isLive || ls.status === 'PAUSED') && (
+                            <Link href={`/teacher/live/${ls.id}`} className="anx-btn-secondary px-3 py-1.5 text-xs">
+                              Open
+                            </Link>
+                          )}
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </section>
+          </aside>
         </div>
+      </StaffDashboardShell>
     </LearningPageShell>
   );
 }
