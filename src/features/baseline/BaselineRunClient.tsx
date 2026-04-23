@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { parseAnswerType, parseItemOptions, stripStudentQuestionLabel } from '@/features/items/itemMeta';
+import { StudentQuestionCard } from '@/components/student/StudentQuestionCard';
 
 type BaselineItem = {
   id: string;
@@ -124,94 +125,104 @@ export function BaselineRunClient({ subjectSlug }: { subjectSlug: string }) {
   if (!item) return <div className="p-8 text-sm" style={{ color: 'var(--anx-text-secondary)' }}>Loading your next question…</div>;
 
   return (
-    <main className="anx-shell anx-scene flex items-center justify-center">
-      <div className="anx-panel w-full max-w-2xl space-y-6 p-7 sm:p-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-[color:var(--anx-text-secondary)]">Let&apos;s start with a few quick questions</p>
-            <p className="text-xs text-[color:var(--anx-text-muted)]">One question at a time. Just try each one.</p>
+    <main className="anx-shell anx-scene flex items-center justify-center py-8 sm:py-10">
+      <StudentQuestionCard
+        questionKey={item.id}
+        header={(
+          <>
+            <div>
+              <p className="text-sm font-medium text-[color:var(--anx-text-secondary)]">Let&apos;s start with a few quick questions</p>
+              <p className="mt-0.5 text-xs text-[color:var(--anx-text-muted)]">One question at a time. Just try each one.</p>
+            </div>
+            <span className="shrink-0 text-sm tabular-nums text-[color:var(--anx-text-muted)]">{Math.min(itemsSeen + 1, maxItems)} / {maxItems}</span>
+          </>
+        )}
+        progress={(
+          <div className="anx-progress-track">
+            <div className="anx-progress-bar" style={{ width: `${(Math.min(itemsSeen + 1, maxItems) / maxItems) * 100}%` }} />
           </div>
-          <span className="text-sm text-[color:var(--anx-text-muted)]">{Math.min(itemsSeen + 1, maxItems)} / {maxItems}</span>
-        </div>
-
-        <div className="anx-progress-track">
-          <div className="anx-progress-bar" style={{ width: `${(Math.min(itemsSeen + 1, maxItems) / maxItems) * 100}%` }} />
-        </div>
-
-        <div className="anx-callout-info px-5 py-4 sm:px-6">
-          <p className="font-semibold text-[color:var(--anx-text)]">What to do</p>
-          <p className="mt-1">
-            {answerType === 'MCQ'
-              ? 'Pick one answer.'
-              : answerType === 'TRUE_FALSE'
-                ? 'Pick true or false.'
-                : answerType === 'SHORT_NUMERIC'
-                  ? 'Type a number.'
-                  : 'Type your answer.'}
-          </p>
-        </div>
-
-        <div className="anx-surface-muted px-5 py-6 sm:px-6 sm:py-7">
-          <h2 className="text-2xl font-bold leading-tight text-[color:var(--anx-text)] sm:text-3xl">{questionText}</h2>
-        </div>
-
-        <div className="space-y-3">
-          {answerType === 'MCQ' ? (
-            parsedOptions.choices.length === 0 ? (
-              <div className="anx-callout-warning">
-                This question has no options yet.
+        )}
+        preface={(
+          <div className="anx-callout-info px-4 py-3 sm:px-5">
+            <p className="font-semibold text-[color:var(--anx-text)]">What to do</p>
+            <p className="mt-1 text-sm">
+              {answerType === 'MCQ'
+                ? 'Pick one answer.'
+                : answerType === 'TRUE_FALSE'
+                  ? 'Pick true or false.'
+                  : answerType === 'SHORT_NUMERIC'
+                    ? 'Type a number.'
+                    : 'Type your answer.'}
+            </p>
+          </div>
+        )}
+        questionLabel="Question"
+        question={<p className="m-0 whitespace-pre-wrap">{questionText}</p>}
+        answerArea={(
+          <div className="space-y-3">
+            {answerType === 'MCQ' ? (
+              parsedOptions.choices.length === 0 ? (
+                <div className="anx-callout-warning">
+                  This question has no options yet.
+                </div>
+              ) : (
+                parsedOptions.choices.map((option, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => setSelectedAnswer(option)}
+                    className={`anx-option w-full py-4 text-left text-base font-semibold ${selectedAnswer === option ? 'anx-option-selected' : ''}`}
+                  >
+                    {option}
+                  </button>
+                ))
+              )
+            ) : answerType === 'TRUE_FALSE' ? (
+              <div className="space-y-3">
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedAnswer('true')}
+                    className={`anx-option py-3.5 text-base font-semibold ${selectedAnswer === 'true' ? 'anx-option-selected' : ''}`}
+                  >
+                    True
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedAnswer('false')}
+                    className={`anx-option py-3.5 text-base font-semibold ${selectedAnswer === 'false' ? 'anx-option-selected' : ''}`}
+                  >
+                    False
+                  </button>
+                </div>
               </div>
             ) : (
-              parsedOptions.choices.map((option, i) => (
-                <button
-                  key={i}
-                  onClick={() => setSelectedAnswer(option)}
-                  className={`anx-option py-4 text-base font-semibold ${selectedAnswer === option ? 'anx-option-selected' : ''}`}
-                >
-                  {option}
-                </button>
-              ))
-            )
-          ) : answerType === 'TRUE_FALSE' ? (
-            <div className="space-y-2">
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  onClick={() => setSelectedAnswer('true')}
-                  className={`anx-option py-3 text-base font-semibold ${selectedAnswer === 'true' ? 'anx-option-selected' : ''}`}
-                >
-                  True
-                </button>
-                <button
-                  onClick={() => setSelectedAnswer('false')}
-                  className={`anx-option py-3 text-base font-semibold ${selectedAnswer === 'false' ? 'anx-option-selected' : ''}`}
-                >
-                  False
-                </button>
+              <div className="space-y-2">
+                <input
+                  type="text"
+                  value={selectedAnswer}
+                  onChange={(e) => setSelectedAnswer(e.target.value)}
+                  placeholder={answerType === 'SHORT_NUMERIC' ? 'Enter a number' : 'Type your answer'}
+                  className="anx-input w-full"
+                />
+                {answerType === 'SHORT_TEXT' && (
+                  <p className="text-xs text-[color:var(--anx-text-secondary)]">Use clear words. You can use commas or “and”.</p>
+                )}
               </div>
-              <p className="text-xs text-[color:var(--anx-text-secondary)]">Tap true or false.</p>
-            </div>
-          ) : (
-            <div className="space-y-2">
-              <input
-                type="text"
-                value={selectedAnswer}
-                onChange={(e) => setSelectedAnswer(e.target.value)}
-                placeholder={answerType === 'SHORT_NUMERIC' ? 'Enter a number' : 'Type your answer'}
-                className="anx-input"
-              />
-              {answerType === 'SHORT_TEXT' && <p className="text-xs text-[color:var(--anx-text-secondary)]">Use clear words. You can use commas or “and”.</p>}
-            </div>
-          )}
-        </div>
-
-        <button
-          onClick={submit}
-          disabled={!selectedAnswer.trim() || submitting || (answerType === 'MCQ' && parsedOptions.choices.length === 0)}
-          className="anx-btn-primary w-full"
-        >
-          {submitting ? 'Saving…' : 'Check and go on'}
-        </button>
-      </div>
+            )}
+          </div>
+        )}
+        actions={(
+          <button
+            type="button"
+            onClick={submit}
+            disabled={!selectedAnswer.trim() || submitting || (answerType === 'MCQ' && parsedOptions.choices.length === 0)}
+            className="anx-btn-primary w-full py-3.5"
+          >
+            {submitting ? 'Saving…' : 'Check and go on'}
+          </button>
+        )}
+      />
     </main>
   );
 }
