@@ -994,206 +994,261 @@ function inferFractionBar(question: string): FractionBarVisual | null {
   };
 }
 
-function buildEqualPartsBarModel(total: number, partCount: number, partValue: number): BarModelVisual | null {
-  if (
-    !Number.isInteger(total) ||
-    total <= 0 ||
-    !Number.isInteger(partCount) ||
-    partCount <= 0 ||
-    partCount > 36 ||
-    !Number.isInteger(partValue) ||
-    partValue <= 0 ||
-    partCount * partValue !== total
-  ) {
+/** Parse strings like "3/4" or " 2/5 " into a numeric value. */
+function parseSimpleFractionValue(text: string): number | null {
+  const m = text.trim().match(/^(\d+)\s*\/\s*(\d+)$/);
+  if (!m) return null;
+  const num = Number(m[1]);
+  const den = Number(m[2]);
+  if (!Number.isFinite(num) || !Number.isFinite(den) || den === 0) return null;
+  return num / den;
+}
+
+function extractMcqChoiceStrings(rawOptions: unknown): string[] {
+  if (Array.isArray(rawOptions)) {
+    return rawOptions.filter((v): v is string => typeof v === 'string');
+  }
+  if (isObject(rawOptions) && Array.isArray(rawOptions.choices)) {
+    return rawOptions.choices.filter((v): v is string => typeof v === 'string');
+  }
+  return [];
+}
+
+/**
+ * N4.1 (fractions as parts of a whole, 0–1 number lines): infer visuals from stems
+ * so question-bank items render without hand-authored `options.visuals`.
+ */
+function inferN41PartWholeBar(question: string): FractionBarVisual | null {
+  const q = question;
+
+  const totalMatch =
+    q.match(/\b(?:divided into|split into)\s+(\d+)\s+equal\s+(?:parts?|sections?|slices|triangles)\b/i) ??
+    q.match(/\bcut into\s+(\d+)\s+equal\s+slices?\b/i) ??
+    q.match(/\bhas\s+(\d+)\s+equal\s+parts?\b/i) ??
+    q.match(
+      /\b(?:strip|rectangle|bar|circle|square|shape)\s+(?:is\s+)?(?:divided|split)\s+into\s+(\d+)\s+equal\s+(?:parts?|sections?|slices|triangles)\b/i
+    );
+
+  if (!totalMatch) return null;
+  const total = Number(totalMatch[1]);
+  if (!Number.isInteger(total) || total < 2 || total > 36) return null;
+
+  let partsShaded: number | null = null;
+
+  const eatMatch = q.match(/\beats\s+(\d+)\s+slices?\b/i);
+  if (eatMatch) partsShaded = Number(eatMatch[1]);
+
+  if (partsShaded == null) {
+    const shadedMatch = q.match(/\b(\d+)\s+(?:parts?|sections?|slices|triangles)\s+are\s+shaded\b/i);
+    if (shadedMatch) partsShaded = Number(shadedMatch[1]);
+  }
+
+  if (partsShaded == null) {
+    const andShaded = q.match(/\band\s+(\d+)\s+are\s+shaded\b/i);
+    if (andShaded) partsShaded = Number(andShaded[1]);
+  }
+
+  if (partsShaded == null) {
+    const colourMatch = q.match(/\b(\d+)\s+sections?\s+are\s+colou?red\b/i);
+    if (colourMatch) partsShaded = Number(colourMatch[1]);
+  }
+
+  if (partsShaded == null || !Number.isInteger(partsShaded) || partsShaded < 0 || partsShaded > total) {
     return null;
   }
 
-  const segments = Array.from({ length: partCount }, () => ({
-    value: partValue,
-    label: String(partValue),
-  }));
-
   return {
-    type: 'bar-model',
-    total,
-    segments,
-    altText: `Bar model with total ${total} split into ${partCount} equal parts of ${partValue}.`,
-    caption: 'Equal-parts bar model for the question.',
+    type: 'fraction-bar',
+    altText: `One whole split into ${total} equal parts; ${partsShaded} of them match the question (shaded or chosen).`,
+    caption: 'Part–whole model: each block is one equal part of the same whole.',
+    bars: [
+      {
+        id: 'whole',
+        segments: Array.from({ length: total }, (_, index) => ({
+          size: 1,
+          shaded: index < partsShaded,
+        })),
+      },
+    ],
   };
 }
 
-/** N3.1 (and stems that name a bar model): equal-groups / equal-parts diagrams. */
-function inferBarModel(question: string, primarySkillCode?: string): BarModelVisual | null {
+function inferN41UnitNumberLine(question: string): NumberLineVisual | null {
   const lower = question.toLowerCase();
-  if (primarySkillCode !== 'N3.1' && !/\bbar model\b/.test(lower)) return null;
+  if (!lower.includes('number line') && !lower.includes('between 0 and 1')) return null;
+  if (!/from\s+0\s+to\s+1|between\s+0\s+and\s+1/.test(lower)) return null;
 
-  let m = question.match(/total of (\d+) split into (\d+) equal parts of (\d+)/i);
-  if (m) {
-    return buildEqualPartsBarModel(Number(m[1]), Number(m[2]), Number(m[3]));
+  const splitMatch =
+    question.match(/\b(?:split|divided)\s+into\s+(\d+)\s+equal\s+(?:parts?|sections?)\b/i) ??
+    question.match(/\bdivided\s+into\s+(\d+)\s+equal\s+parts?\b/i);
+
+  const n = splitMatch ? Number(splitMatch[1]) : null;
+  if (n != null && (!Number.isInteger(n) || n < 2 || n > 36)) return null;
+
+  if (
+    /\bhalfway\b/.test(lower) ||
+    (/\bmiddle\b/.test(lower) && lower.includes('number line')) ||
+    /\bmarks?\s+at\s+1\s*\/\s*2\b/i.test(question)
+  ) {
+    const step = n != null && n >= 2 ? 1 / n : 0.5;
+    return {
+      type: 'number-line',
+      min: 0,
+      max: 1,
+      step,
+      markers: [{ value: 0.5, label: '1/2', kind: 'target' }],
+      altText: 'Number line from 0 to 1 with the halfway point marked.',
+      caption: '0 to 1 number line; the marker shows the position described in the question.',
+    };
   }
 
-  m = question.match(/(\d+) split into (\d+) equal groups of (\d+)/i);
-  if (m) {
-    return buildEqualPartsBarModel(Number(m[1]), Number(m[2]), Number(m[3]));
-  }
+  if (n != null) {
+    let markIndex: number | null = null;
 
-  m = question.match(/(\d+) groups of (\d+) making (\d+)/i);
-  if (m) {
-    const groups = Number(m[1]);
-    const each = Number(m[2]);
-    const total = Number(m[3]);
-    return buildEqualPartsBarModel(total, groups, each);
-  }
-
-  m = question.match(/(\d+) made from (\d+) equal parts of (\d+)/i);
-  if (m) {
-    return buildEqualPartsBarModel(Number(m[1]), Number(m[2]), Number(m[3]));
-  }
-
-  m = question.match(/(?:if a )?bar model (?:shows )?(\d+) as (\d+) equal parts of (\d+)/i);
-  if (m) {
-    return buildEqualPartsBarModel(Number(m[1]), Number(m[2]), Number(m[3]));
-  }
-
-  m = question.match(/total of (\d+) is shared into (\d+) equal groups/i);
-  if (m) {
-    const total = Number(m[1]);
-    const groups = Number(m[2]);
-    if (total % groups === 0) {
-      return buildEqualPartsBarModel(total, groups, total / groups);
+    if (/\bfirst\s+mark\s+after\s+0\b/i.test(question)) markIndex = 1;
+    else if (/\bsecond\s+mark\s+after\s+0\b/i.test(question)) markIndex = 2;
+    else {
+      const ord = question.match(/\b(\d+)(?:st|nd|rd|th)\s+mark\s+after\s+0\b/i);
+      if (ord) markIndex = Number(ord[1]);
     }
-  }
 
-  m = question.match(/total of (\d+) is shared into groups of (\d+)/i);
-  if (m) {
-    const total = Number(m[1]);
-    const groupSize = Number(m[2]);
-    if (total % groupSize === 0) {
-      const groups = total / groupSize;
-      return buildEqualPartsBarModel(total, groups, groupSize);
-    }
-  }
-
-  m = question.match(/bar model for (\d+) groups of (\d+) making (\d+)/i);
-  if (m) {
-    return buildEqualPartsBarModel(Number(m[3]), Number(m[1]), Number(m[2]));
-  }
-
-  m = question.match(/bar model for (\d+) shared into (\d+) equal groups/i);
-  if (m) {
-    const total = Number(m[1]);
-    const groups = Number(m[2]);
-    if (total % groups === 0) {
-      return buildEqualPartsBarModel(total, groups, total / groups);
+    if (markIndex != null && markIndex >= 1 && markIndex <= n - 1) {
+      const value = markIndex / n;
+      const g = gcd(markIndex, n);
+      const label = `${markIndex / g}/${n / g}`;
+      return {
+        type: 'number-line',
+        min: 0,
+        max: 1,
+        step: 1 / n,
+        markers: [{ value, label, kind: 'target' }],
+        altText: `Number line from 0 to 1 in ${n} equal steps; mark at ${label}.`,
+        caption: '0 to 1 number line split into equal parts; the arrow shows the mark described.',
+      };
     }
   }
 
-  if (primarySkillCode === 'N3.1' && /\bnumber family\b/i.test(question) && /\bmissing\b/i.test(question)) {
-    const fact = question.match(/(\d+)\s*[×x]\s*(\d+)\s*=\s*(\d+)/i);
-    if (fact) {
-      const a = Number(fact[1]);
-      const b = Number(fact[2]);
-      const c = Number(fact[3]);
-      if (a * b === c) {
-        return buildEqualPartsBarModel(c, a, b);
-      }
-    }
-  }
-
-  if (primarySkillCode === 'N3.1') {
-    const triple = question.match(/number family (?:for|is correct for) (\d+),\s*(\d+) and (\d+)/i);
-    if (triple) {
-      const x = Number(triple[1]);
-      const y = Number(triple[2]);
-      const z = Number(triple[3]);
-      const ordered = [x, y, z].sort((a, b) => a - b);
-      const [s, m, l] = ordered;
-      if (s * m === l) {
-        return buildEqualPartsBarModel(l, s, m);
-      }
-    }
-
-    const ifMult = question.match(/^If\s+(\d+)\s*[×x]\s*(\d+)\s*=\s*(\d+)/i);
-    if (ifMult) {
-      const a = Number(ifMult[1]);
-      const b = Number(ifMult[2]);
-      const c = Number(ifMult[3]);
-      if (a * b === c) {
-        return buildEqualPartsBarModel(c, a, b);
-      }
-    }
-
-    const writeFamily = question.match(/Write the number family for (\d+),\s*(\d+) and (\d+)/i);
-    if (writeFamily) {
-      const x = Number(writeFamily[1]);
-      const y = Number(writeFamily[2]);
-      const z = Number(writeFamily[3]);
-      const ordered = [x, y, z].sort((a, b) => a - b);
-      const [s, m, l] = ordered;
-      if (s * m === l) {
-        return buildEqualPartsBarModel(l, s, m);
-      }
-    }
-
-    const commTf = question.match(/(\d+)\s*[×x]\s*(\d+)\s*=\s*(\d+)\s*[×x]\s*(\d+)/i);
-    if (commTf && /true or false/i.test(question)) {
-      const a = Number(commTf[1]);
-      const b = Number(commTf[2]);
-      const c = Number(commTf[3]);
-      const d = Number(commTf[4]);
-      if (a * b === c * d && c === b && d === a) {
-        return buildEqualPartsBarModel(a * b, a, b);
-      }
-    }
-
-    const divNonComm = question.match(/(\d+)\s*÷\s*(\d+)\s*=\s*(\d+)\s+but/i);
-    if (divNonComm) {
-      const total = Number(divNonComm[1]);
-      const groups = Number(divNonComm[2]);
-      if (total % groups === 0) {
-        return buildEqualPartsBarModel(total, groups, total / groups);
-      }
-    }
-
-    const bothDiv = question.match(/(\d+)\s*÷\s*(\d+)\s*=\s*(\d+)\s+and\s+(\d+)\s*÷\s*(\d+)\s*=\s*(\d+)/i);
-    if (bothDiv && /\bnumber family\b/i.test(question)) {
-      const total = Number(bothDiv[1]);
-      const g1 = Number(bothDiv[2]);
-      if (total % g1 === 0) {
-        return buildEqualPartsBarModel(total, g1, total / g1);
-      }
-    }
-
-    if (/when dividing one number by another, the order does not matter/i.test(question)) {
-      return buildEqualPartsBarModel(12, 4, 3);
-    }
-
-    if (/\bdivision is not commutative\b/i.test(question)) {
-      return buildEqualPartsBarModel(12, 4, 3);
-    }
-
-    if (/(\d+)\s*÷\s*(\d+)\s*=\s*(\d+)\s*÷\s*(\d+)/i.test(question)) {
-      const bad = question.match(/(\d+)\s*÷\s*(\d+)\s*=\s*(\d+)\s*÷\s*(\d+)/i)!;
-      const total = Number(bad[1]);
-      const groups = Number(bad[2]);
-      if (total % groups === 0) {
-        return buildEqualPartsBarModel(total, groups, total / groups);
-      }
-    }
-
-    if (/which statement is correct/i.test(question) && /\bcommutative\b/i.test(question)) {
-      return buildEqualPartsBarModel(20, 4, 5);
-    }
-
-    if (/^which statement is correct\?$/i.test(question.trim())) {
-      return buildEqualPartsBarModel(20, 4, 5);
-    }
+  if (/\b2\s*\/\s*6\b.*\b1\s*\/\s*3\b|\b1\s*\/\s*3\b.*\b2\s*\/\s*6\b/.test(question) && /same\s+point/.test(lower)) {
+    return {
+      type: 'number-line',
+      min: 0,
+      max: 1,
+      step: 1 / 6,
+      markers: [
+        { value: 1 / 3, label: '1/3', kind: 'point' },
+        { value: 2 / 6, label: '2/6', kind: 'point' },
+      ],
+      altText: 'Number line from 0 to 1 showing that 1/3 and 2/6 fall on the same position.',
+      caption: 'Equivalent fractions occupy the same point between 0 and 1.',
+    };
   }
 
   return null;
 }
 
-function inferGeneratedVisuals(question: string, primarySkillCode?: string): MathsVisual[] {
+function gcd(a: number, b: number): number {
+  let x = Math.abs(a);
+  let y = Math.abs(b);
+  while (y !== 0) {
+    const t = y;
+    y = x % y;
+    x = t;
+  }
+  return x || 1;
+}
+
+function inferN41BetweenBenchmarks(question: string): NumberLineVisual | null {
+  const lower = question.toLowerCase();
+  if (!lower.includes('between') || !lower.includes('number line')) return null;
+
+  const m = question.match(/\bbetween\s+(\d+)\s*\/\s*(\d+)\s+and\s+(\d+)\s*\/\s*(\d+)/i);
+  if (!m) return null;
+
+  const a = Number(m[1]) / Number(m[2]);
+  const b = Number(m[3]) / Number(m[4]);
+  if (!Number.isFinite(a) || !Number.isFinite(b)) return null;
+
+  const lo = Math.min(a, b);
+  const hi = Math.max(a, b);
+  const mid = (lo + hi) / 2;
+
+  return {
+    type: 'number-line',
+    min: 0,
+    max: 1,
+    step: 0.25,
+    markers: [
+      { value: lo, label: `${m[1]}/${m[2]}`, kind: 'point' },
+      { value: hi, label: `${m[3]}/${m[4]}`, kind: 'point' },
+      { value: mid, label: '1/2', kind: 'target' },
+    ],
+    altText: `Number line from 0 to 1 with ${m[1]}/${m[2]} and ${m[3]}/${m[4]} marked; a value between them is highlighted.`,
+    caption: 'Benchmark positions; one fraction between them is shown.',
+  };
+}
+
+function inferN41ClosestOnUnitInterval(question: string, rawOptions: unknown): NumberLineVisual | null {
+  const lower = question.toLowerCase();
+  if (!/closest\s+to\s+(0|1)\b/.test(lower)) return null;
+  if (!/number line/.test(lower) && !/between\s+0\s+and\s+1/.test(lower)) return null;
+
+  const choices = extractMcqChoiceStrings(rawOptions);
+  const parsed = choices
+    .map((label) => ({ label, value: parseSimpleFractionValue(label) }))
+    .filter((e): e is { label: string; value: number } => e.value != null && e.value >= 0 && e.value <= 1);
+
+  if (parsed.length < 2) return null;
+
+  const towardOne = /closest\s+to\s+1\b/.test(lower);
+  const target = towardOne ? 1 : 0;
+
+  let best = parsed[0]!;
+  let bestD = Math.abs(parsed[0]!.value - target);
+  for (const p of parsed.slice(1)) {
+    const d = Math.abs(p.value - target);
+    if (d < bestD) {
+      best = p;
+      bestD = d;
+    }
+  }
+
+  return {
+    type: 'number-line',
+    min: 0,
+    max: 1,
+    step: 0.1,
+    markers: parsed.map((p) => ({
+      value: p.value,
+      label: p.label,
+      kind: p.label === best.label ? 'target' : 'point',
+    })),
+    altText: `Number line from 0 to 1 with the answer choices plotted; closest to ${target} is highlighted.`,
+    caption: 'Each marker is one of the fractions in the question; the filled marker is closest to the target end.',
+  };
+}
+
+function inferN41Visuals(question: string, rawOptions: unknown): MathsVisual[] {
+  const bar = inferN41PartWholeBar(question);
+  if (bar) return [bar];
+
+  const unitLine =
+    inferN41UnitNumberLine(question) ??
+    inferN41BetweenBenchmarks(question) ??
+    inferN41ClosestOnUnitInterval(question, rawOptions);
+
+  if (unitLine) return [unitLine];
+
+  return [];
+}
+
+function inferGeneratedVisuals(question: string, primarySkillCode?: string, rawOptions?: unknown): MathsVisual[] {
+  if (primarySkillCode === 'N4.1') {
+    const n41 = inferN41Visuals(question, rawOptions ?? {});
+    if (n41.length > 0) return n41;
+    // Avoid generic `inferFractionBar`: stems like "Which fraction is greater than 1/2?" yield a bogus 1/2 bar.
+    return [];
+  }
+
   const lower = question.toLowerCase();
   const a1PatternChart = inferA1PatternSequenceChart(question, primarySkillCode);
   const a1IrregularPerimeter = inferIrregularPerimeterDiagram(question, primarySkillCode);
@@ -1264,5 +1319,9 @@ export function resolveItemVisuals(
   const explicit = parseStoredVisuals(item.options);
   if (explicit.length > 0) return explicit;
 
-  return inferGeneratedVisuals(cleanQuestionForVisualInference(item.question), primarySkillCode);
+  return inferGeneratedVisuals(
+    cleanQuestionForVisualInference(item.question),
+    primarySkillCode,
+    item.options
+  );
 }

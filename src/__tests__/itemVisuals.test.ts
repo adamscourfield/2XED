@@ -234,208 +234,73 @@ describe('resolveItemVisuals', () => {
     });
   });
 
-  it('builds an equal-parts bar model for N3.1 bar-model stems', () => {
-    const visuals = resolveItemVisuals(
-      {
-        question: 'A bar model shows a total of 20 split into 4 equal parts of 5. Write both multiplication facts.',
-        options: {},
-      },
-      'N3.1'
-    );
-
-    expect(visuals[0]).toMatchObject({
-      type: 'bar-model',
-      total: 20,
-      segments: [
-        { value: 5, label: '5' },
-        { value: 5, label: '5' },
-        { value: 5, label: '5' },
-        { value: 5, label: '5' },
-      ],
-    });
-    expect(validateMathsVisual(visuals[0])).toEqual([]);
-  });
-
-  it('builds a bar model for N3.1 “groups of … making …” stems', () => {
-    const visuals = resolveItemVisuals(
-      {
-        question: 'A bar model shows 2 groups of 3 making 6. Write one multiplication fact.',
-        options: {},
-      },
-      'N3.1'
-    );
-
-    expect(visuals[0]).toMatchObject({
-      type: 'bar-model',
-      total: 6,
-      segments: [{ value: 3 }, { value: 3 }],
-    });
-    expect(validateMathsVisual(visuals[0])).toEqual([]);
-  });
-
-  it('builds a bar model for equal-sharing division stems', () => {
-    const visuals = resolveItemVisuals(
-      {
-        question: 'A total of 12 is shared into 4 equal groups. Write one division fact.',
-        options: {},
-      },
-      'N3.1'
-    );
-
-    expect(visuals[0]).toMatchObject({
-      type: 'bar-model',
-      total: 12,
-      segments: [{ value: 3 }, { value: 3 }, { value: 3 }, { value: 3 }],
-    });
-  });
-
-  it('builds a bar model for “shared into groups of” stems', () => {
-    const visuals = resolveItemVisuals(
-      {
-        question: 'A total of 18 is shared into groups of 6. Write one division fact.',
-        options: {},
-      },
-      'N3.1'
-    );
-
-    expect(visuals[0]).toMatchObject({
-      type: 'bar-model',
-      total: 18,
-      segments: [{ value: 6 }, { value: 6 }, { value: 6 }],
-    });
-  });
-
-  it('matches “If a bar model shows …” wording', () => {
-    const visuals = resolveItemVisuals(
-      {
-        question: 'If a bar model shows 63 as 9 equal parts of 7, write one division fact.',
-        options: {},
-      },
-      'N3.1'
-    );
-
-    expect(visuals[0]).toMatchObject({
-      type: 'bar-model',
-      total: 63,
-      segments: expect.arrayContaining([{ value: 7, label: '7' }]),
-    });
-    expect((visuals[0] as { segments: unknown[] }).segments).toHaveLength(9);
-  });
-
-  it('builds a bar model for N3.1 number-family missing-calculation stems', () => {
-    const visuals = resolveItemVisuals(
-      {
-        question:
-          'Which calculation is missing from this number family? 5 × 6 = 30, 6 × 5 = 30, 30 ÷ 5 = 6, ?',
-        options: {},
-      },
-      'N3.1'
-    );
-
-    expect(visuals[0]).toMatchObject({
-      type: 'bar-model',
-      total: 30,
-      segments: expect.arrayContaining([{ value: 6, label: '6' }]),
-    });
-    expect((visuals[0] as { segments: unknown[] }).segments).toHaveLength(5);
-  });
-
-  it('A1.12: prefers a term-total bar chart over misleading “square” shape matches', () => {
-    const visuals = resolveItemVisuals(
-      {
-        question: 'A pattern has 1 square in term 1, 3 in term 2, and 5 in term 3. How many squares are in term 4?',
-        options: {},
-      },
-      'A1.12'
-    );
-
-    expect(visuals[0]).toMatchObject({
-      type: 'chart',
-      chartType: 'bar',
-      series: [
-        { label: 'T1', value: 1 },
-        { label: 'T2', value: 3 },
-        { label: 'T3', value: 5 },
-      ],
-    });
-    expect(validateMathsVisual(visuals[0])).toEqual([]);
-    expect(visuals.some((v) => v.type === 'shape')).toBe(false);
-  });
-
-  it('A1.12: builds a bar chart from term-1 start and constant add for a later term', () => {
-    const visuals = resolveItemVisuals(
-      {
-        question:
-          'A diagram grows by adding 4 counters each time. If term 1 has 6 counters, how many counters are in term 3?',
-        options: {},
-      },
-      'A1.12'
-    );
-
-    expect(visuals[0]).toMatchObject({
-      type: 'chart',
-      series: [
-        { label: 'T1', value: 6 },
-        { label: 'T2', value: 10 },
-        { label: 'T3', value: 14 },
-      ],
-    });
-    expect(validateMathsVisual(visuals[0])).toEqual([]);
-  });
-
-  it('A1.4: labels rectangle sides with algebraic expressions from the stem', () => {
-    const visuals = resolveItemVisuals(
-      {
-        question: 'A rectangle has side lengths 3x and 4x. What is its area?',
-        options: {},
-      },
-      'A1.4'
-    );
-
-    expect(visuals[0]).toMatchObject({
-      type: 'shape',
-      shape: 'rectangle',
-    });
-    if (visuals[0].type === 'shape') {
-      expect(visuals[0].edges?.map((e) => e.label)).toEqual(
-        expect.arrayContaining(['3x', '4x'])
+  describe('N4.1 fraction reading (question bank)', () => {
+    it('builds a part–whole fraction bar from equal-parts stems', () => {
+      const visuals = resolveItemVisuals(
+        {
+          question: 'A rectangle is divided into 10 equal parts. 7 parts are shaded. What fraction is shaded?',
+          options: ['7/3', '10/7', '3/10', '7/10'],
+        },
+        'N4.1'
       );
-    }
-    expect(validateMathsVisual(visuals[0])).toEqual([]);
-  });
 
-  it('A1.3: draws an irregular polygon for equal-sided perimeter word problems', () => {
-    const visuals = resolveItemVisuals(
-      {
-        question: 'A shape has sides x, x, x and 6. What is its perimeter?',
-        options: {},
-      },
-      'A1.3'
-    );
-
-    expect(visuals[0]).toMatchObject({
-      type: 'shape',
-      shape: 'irregular-polygon',
+      expect(visuals).toHaveLength(1);
+      expect(visuals[0]).toMatchObject({ type: 'fraction-bar' });
+      if (visuals[0].type === 'fraction-bar') {
+        expect(visuals[0].bars[0]?.segments).toHaveLength(10);
+        expect(visuals[0].bars[0]?.segments.filter((s) => s.shaded)).toHaveLength(7);
+      }
+      expect(validateMathsVisual(visuals[0])).toEqual([]);
     });
-    expect(validateMathsVisual(visuals[0])).toEqual([]);
-  });
 
-  it('A1.5: shows a rectangle with known side and unknown for area–missing-side stems', () => {
-    const visuals = resolveItemVisuals(
-      {
-        question: 'A rectangle has area 24x^2 and one side length 6x. What is the missing side length?',
-        options: {},
-      },
-      'A1.5'
-    );
+    it('builds a 0–1 number line with the nth mark after 0', () => {
+      const visuals = resolveItemVisuals(
+        {
+          question:
+            'A number line from 0 to 1 is split into 5 equal parts. A point is at the second mark after 0. What fraction does the point show?',
+          options: ['1/5', '3/5', '2/5', '4/5'],
+        },
+        'N4.1'
+      );
 
-    expect(visuals[0]).toMatchObject({
-      type: 'shape',
-      shape: 'rectangle',
+      expect(visuals).toHaveLength(1);
+      expect(visuals[0]).toMatchObject({
+        type: 'number-line',
+        min: 0,
+        max: 1,
+        markers: [{ value: 0.4, label: '2/5', kind: 'target' }],
+      });
+      expect(validateMathsVisual(visuals[0])).toEqual([]);
     });
-    if (visuals[0].type === 'shape') {
-      expect(visuals[0].edges?.map((e) => e.label)).toEqual(expect.arrayContaining(['6x', '?']));
-    }
-    expect(validateMathsVisual(visuals[0])).toEqual([]);
+
+    it('does not invent a bogus fraction bar for “greater than 1/2” stems', () => {
+      const visuals = resolveItemVisuals(
+        {
+          question: 'Which fraction is greater than 1/2?',
+          options: ['1/4', '1/3', '3/8', '5/8'],
+        },
+        'N4.1'
+      );
+
+      expect(visuals).toHaveLength(0);
+    });
+
+    it('plots MCQ fractions on a unit interval for closest-to prompts', () => {
+      const visuals = resolveItemVisuals(
+        {
+          question: 'Which of these fractions is closest to 0 on a number line between 0 and 1?',
+          options: ['3/4', '1/2', '1/10', '2/3'],
+        },
+        'N4.1'
+      );
+
+      expect(visuals).toHaveLength(1);
+      expect(visuals[0]).toMatchObject({ type: 'number-line', min: 0, max: 1 });
+      if (visuals[0].type === 'number-line') {
+        const target = visuals[0].markers.find((m) => m.kind === 'target');
+        expect(target?.label).toBe('1/10');
+      }
+      expect(validateMathsVisual(visuals[0])).toEqual([]);
+    });
   });
 });
