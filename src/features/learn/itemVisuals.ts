@@ -8,6 +8,7 @@ import type {
   ShapeVisual,
   VisualPoint,
 } from '../../lib/maths/visuals/types';
+import { inferDataVisualsForItem } from './inferDataVisuals';
 
 function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
@@ -527,20 +528,20 @@ function inferFractionBar(question: string): FractionBarVisual | null {
 
 function inferGeneratedVisuals(question: string, primarySkillCode?: string): MathsVisual[] {
   const lower = question.toLowerCase();
+  const dataVisuals = inferDataVisualsForItem(question, primarySkillCode);
   const numberLine = inferNumberLine(question, primarySkillCode);
   const arithmetic = inferArithmeticLayout(question, primarySkillCode);
   const shape = inferShapeVisual(question, primarySkillCode);
   const fractionBar = inferFractionBar(question);
 
-  const visuals: Array<ArithmeticLayoutVisual | ShapeVisual | NumberLineVisual | FractionBarVisual | null> = lower.includes('number line')
-    ? [numberLine, arithmetic, shape, fractionBar]
-    : [shape, arithmetic, numberLine, fractionBar];
+  const rest: Array<ArithmeticLayoutVisual | ShapeVisual | NumberLineVisual | FractionBarVisual | null> =
+    lower.includes('number line') ? [numberLine, arithmetic, shape, fractionBar] : [shape, arithmetic, numberLine, fractionBar];
 
-  return visuals.filter(
-    (
-      visual
-    ): visual is ArithmeticLayoutVisual | ShapeVisual | NumberLineVisual | FractionBarVisual => visual !== null
+  const generated = rest.filter(
+    (visual): visual is ArithmeticLayoutVisual | ShapeVisual | NumberLineVisual | FractionBarVisual => visual !== null
   );
+
+  return [...dataVisuals, ...generated];
 }
 
 export function resolveItemVisuals(

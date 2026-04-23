@@ -147,6 +147,42 @@ export interface ChartVisual extends VisualCaptioned {
   series: ChartBarSpec[];
 }
 
+/** Part–whole bar model (distinct from chart bar graphs). */
+export interface PartWholeBarModelVisual extends VisualCaptioned {
+  type: 'part-whole-bar-model';
+  total: number;
+  parts: Array<{ value: number | null; label?: string }>;
+}
+
+/** Generic text grid (distance tables, small data tables). */
+export interface DataTableVisual extends VisualCaptioned {
+  type: 'data-table';
+  title?: string;
+  unit?: string;
+  columnHeaders: string[];
+  rows: Array<{ cells: string[] }>;
+}
+
+/** Train-style timetable: each row is one journey with times per station column. */
+export interface TimetableVisual extends VisualCaptioned {
+  type: 'timetable';
+  title?: string;
+  columnHeaders: string[];
+  rows: Array<{ cells: string[] }>;
+}
+
+/** Nested frequency tree (2–3 levels). `value` null renders as blank / unknown. */
+export interface FrequencyTreeNode {
+  label: string;
+  value: number | null;
+  children?: FrequencyTreeNode[];
+}
+
+export interface FrequencyTreeVisual extends VisualCaptioned {
+  type: 'frequency-tree';
+  root: FrequencyTreeNode;
+}
+
 export type MathsVisual =
   | ArithmeticLayoutVisual
   | ShapeVisual
@@ -154,4 +190,8 @@ export type MathsVisual =
   | NumberLineVisual
   | FractionBarVisual
   | CoordinateGridVisual
-  | ChartVisual;
+  | ChartVisual
+  | PartWholeBarModelVisual
+  | DataTableVisual
+  | TimetableVisual
+  | FrequencyTreeVisual;

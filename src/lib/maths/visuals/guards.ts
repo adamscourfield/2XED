@@ -2,10 +2,15 @@ import type {
   ArithmeticLayoutVisual,
   ChartVisual,
   CoordinateGridVisual,
+  DataTableVisual,
   FractionBarVisual,
+  FrequencyTreeNode,
+  FrequencyTreeVisual,
   MathsVisual,
   NumberLineVisual,
+  PartWholeBarModelVisual,
   ShapeVisual,
+  TimetableVisual,
 } from './types';
 
 function isObject(value: unknown): value is Record<string, unknown> {
@@ -79,6 +84,71 @@ function validateChart(visual: ChartVisual): string[] {
   return issues;
 }
 
+function validatePartWholeBarModel(visual: PartWholeBarModelVisual): string[] {
+  const issues: string[] = [];
+  if (!hasText(visual.altText)) issues.push('missing alt text');
+  if (!(typeof visual.total === 'number' && visual.total > 0)) issues.push('bar model needs a positive total');
+  if (!Array.isArray(visual.parts) || visual.parts.length < 2) {
+    issues.push('bar model needs at least two parts');
+  }
+  return issues;
+}
+
+function validateDataTable(visual: DataTableVisual): string[] {
+  const issues: string[] = [];
+  if (!hasText(visual.altText)) issues.push('missing alt text');
+  if (!Array.isArray(visual.columnHeaders) || visual.columnHeaders.length < 2) {
+    issues.push('data table needs column headers');
+  }
+  if (!Array.isArray(visual.rows) || visual.rows.length === 0) {
+    issues.push('data table needs rows');
+  }
+  const n = visual.columnHeaders.length;
+  if (visual.rows.some((row) => !Array.isArray(row.cells) || row.cells.length !== n)) {
+    issues.push('data table row cell counts must match headers');
+  }
+  return issues;
+}
+
+function validateTimetable(visual: TimetableVisual): string[] {
+  const issues: string[] = [];
+  if (!hasText(visual.altText)) issues.push('missing alt text');
+  if (!Array.isArray(visual.columnHeaders) || visual.columnHeaders.length < 2) {
+    issues.push('timetable needs column headers');
+  }
+  if (!Array.isArray(visual.rows) || visual.rows.length === 0) {
+    issues.push('timetable needs rows');
+  }
+  const n = visual.columnHeaders.length;
+  if (visual.rows.some((row) => !Array.isArray(row.cells) || row.cells.length !== n)) {
+    issues.push('timetable row cell counts must match headers');
+  }
+  return issues;
+}
+
+function validateFrequencyTreeNode(node: FrequencyTreeNode, depth: number): string[] {
+  const issues: string[] = [];
+  if (depth > 6) return ['frequency tree too deep'];
+  if (!hasText(node.label)) issues.push('frequency tree node needs a label');
+  if (!(node.value === null || (typeof node.value === 'number' && Number.isFinite(node.value)))) {
+    issues.push('frequency tree node value must be a number or null');
+  }
+  if (node.children) {
+    for (const child of node.children) {
+      issues.push(...validateFrequencyTreeNode(child, depth + 1));
+    }
+  }
+  return issues;
+}
+
+function validateFrequencyTree(visual: FrequencyTreeVisual): string[] {
+  const issues: string[] = [];
+  if (!hasText(visual.altText)) issues.push('missing alt text');
+  if (!visual.root) issues.push('frequency tree needs a root');
+  else issues.push(...validateFrequencyTreeNode(visual.root, 0));
+  return issues;
+}
+
 export function validateMathsVisual(visual: MathsVisual): string[] {
   switch (visual.type) {
     case 'arithmetic-layout':
@@ -93,6 +163,14 @@ export function validateMathsVisual(visual: MathsVisual): string[] {
       return validateCoordinateGrid(visual);
     case 'chart':
       return validateChart(visual);
+    case 'part-whole-bar-model':
+      return validatePartWholeBarModel(visual);
+    case 'data-table':
+      return validateDataTable(visual);
+    case 'timetable':
+      return validateTimetable(visual);
+    case 'frequency-tree':
+      return validateFrequencyTree(visual);
     case 'angle-diagram':
       return hasText(visual.altText) ? [] : ['missing alt text'];
     default:
