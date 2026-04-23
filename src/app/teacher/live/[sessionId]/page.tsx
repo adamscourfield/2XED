@@ -2,6 +2,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/features/auth/authOptions';
 import { redirect } from 'next/navigation';
 import { prisma } from '@/db/prisma';
+import { AppChrome } from '@/components/AppChrome';
 import { TeacherLiveDashboard } from './TeacherLiveDashboard';
 
 interface Props {
@@ -24,5 +25,9 @@ export default async function TeacherLiveSessionPage({ params }: Props) {
 
   if (!liveSession || liveSession.teacherUserId !== user.id) redirect('/teacher/dashboard');
 
-  return <TeacherLiveDashboard sessionId={sessionId} />;
+  return (
+    <AppChrome variant="teacher">
+      <TeacherLiveDashboard sessionId={sessionId} />
+    </AppChrome>
+  );
 }
