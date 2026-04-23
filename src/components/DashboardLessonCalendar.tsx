@@ -74,9 +74,11 @@ function kindClass(kind: LessonEvent['kind']): string {
 type Props = {
   /** Shown under the title */
   hint?: string;
+  /** Merged onto the outer section for layout hooks (e.g. dashboard bento). */
+  className?: string;
 };
 
-export function DashboardLessonCalendar({ hint }: Props) {
+export function DashboardLessonCalendar({ hint, className }: Props) {
   const [viewMonth, setViewMonth] = useState(() => startOfMonth(new Date()));
   const [events, setEvents] = useState<LessonEvent[]>([]);
   const [loading, setLoading] = useState(true);
@@ -150,7 +152,7 @@ export function DashboardLessonCalendar({ hint }: Props) {
   const selectedEvents = byDay.get(selectedKey) ?? [];
 
   return (
-    <section className="anx-card overflow-hidden">
+    <section className={className ?? 'anx-card overflow-hidden'}>
       <div className="flex flex-col gap-3 border-b border-[color:var(--anx-border)] bg-[color:var(--anx-surface-soft)] px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[color:var(--anx-text-muted)]">Calendar</p>
