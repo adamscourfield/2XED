@@ -525,7 +525,261 @@ function inferFractionBar(question: string): FractionBarVisual | null {
   };
 }
 
-function inferGeneratedVisuals(question: string, primarySkillCode?: string): MathsVisual[] {
+/** Parse strings like "3/4" or " 2/5 " into a numeric value. */
+function parseSimpleFractionValue(text: string): number | null {
+  const m = text.trim().match(/^(\d+)\s*\/\s*(\d+)$/);
+  if (!m) return null;
+  const num = Number(m[1]);
+  const den = Number(m[2]);
+  if (!Number.isFinite(num) || !Number.isFinite(den) || den === 0) return null;
+  return num / den;
+}
+
+function extractMcqChoiceStrings(rawOptions: unknown): string[] {
+  if (Array.isArray(rawOptions)) {
+    return rawOptions.filter((v): v is string => typeof v === 'string');
+  }
+  if (isObject(rawOptions) && Array.isArray(rawOptions.choices)) {
+    return rawOptions.choices.filter((v): v is string => typeof v === 'string');
+  }
+  return [];
+}
+
+/**
+ * N4.1 (fractions as parts of a whole, 0–1 number lines): infer visuals from stems
+ * so question-bank items render without hand-authored `options.visuals`.
+ */
+function inferN41PartWholeBar(question: string): FractionBarVisual | null {
+  const q = question;
+
+  const totalMatch =
+    q.match(/\b(?:divided into|split into)\s+(\d+)\s+equal\s+(?:parts?|sections?|slices|triangles)\b/i) ??
+    q.match(/\bcut into\s+(\d+)\s+equal\s+slices?\b/i) ??
+    q.match(/\bhas\s+(\d+)\s+equal\s+parts?\b/i) ??
+    q.match(
+      /\b(?:strip|rectangle|bar|circle|square|shape)\s+(?:is\s+)?(?:divided|split)\s+into\s+(\d+)\s+equal\s+(?:parts?|sections?|slices|triangles)\b/i
+    );
+
+  if (!totalMatch) return null;
+  const total = Number(totalMatch[1]);
+  if (!Number.isInteger(total) || total < 2 || total > 36) return null;
+
+  let partsShaded: number | null = null;
+
+  const eatMatch = q.match(/\beats\s+(\d+)\s+slices?\b/i);
+  if (eatMatch) partsShaded = Number(eatMatch[1]);
+
+  if (partsShaded == null) {
+    const shadedMatch = q.match(/\b(\d+)\s+(?:parts?|sections?|slices|triangles)\s+are\s+shaded\b/i);
+    if (shadedMatch) partsShaded = Number(shadedMatch[1]);
+  }
+
+  if (partsShaded == null) {
+    const andShaded = q.match(/\band\s+(\d+)\s+are\s+shaded\b/i);
+    if (andShaded) partsShaded = Number(andShaded[1]);
+  }
+
+  if (partsShaded == null) {
+    const colourMatch = q.match(/\b(\d+)\s+sections?\s+are\s+colou?red\b/i);
+    if (colourMatch) partsShaded = Number(colourMatch[1]);
+  }
+
+  if (partsShaded == null || !Number.isInteger(partsShaded) || partsShaded < 0 || partsShaded > total) {
+    return null;
+  }
+
+  return {
+    type: 'fraction-bar',
+    altText: `One whole split into ${total} equal parts; ${partsShaded} of them match the question (shaded or chosen).`,
+    caption: 'Part–whole model: each block is one equal part of the same whole.',
+    bars: [
+      {
+        id: 'whole',
+        segments: Array.from({ length: total }, (_, index) => ({
+          size: 1,
+          shaded: index < partsShaded,
+        })),
+      },
+    ],
+  };
+}
+
+function inferN41UnitNumberLine(question: string): NumberLineVisual | null {
+  const lower = question.toLowerCase();
+  if (!lower.includes('number line') && !lower.includes('between 0 and 1')) return null;
+  if (!/from\s+0\s+to\s+1|between\s+0\s+and\s+1/.test(lower)) return null;
+
+  const splitMatch =
+    question.match(/\b(?:split|divided)\s+into\s+(\d+)\s+equal\s+(?:parts?|sections?)\b/i) ??
+    question.match(/\bdivided\s+into\s+(\d+)\s+equal\s+parts?\b/i);
+
+  const n = splitMatch ? Number(splitMatch[1]) : null;
+  if (n != null && (!Number.isInteger(n) || n < 2 || n > 36)) return null;
+
+  if (
+    /\bhalfway\b/.test(lower) ||
+    (/\bmiddle\b/.test(lower) && lower.includes('number line')) ||
+    /\bmarks?\s+at\s+1\s*\/\s*2\b/i.test(question)
+  ) {
+    const step = n != null && n >= 2 ? 1 / n : 0.5;
+    return {
+      type: 'number-line',
+      min: 0,
+      max: 1,
+      step,
+      markers: [{ value: 0.5, label: '1/2', kind: 'target' }],
+      altText: 'Number line from 0 to 1 with the halfway point marked.',
+      caption: '0 to 1 number line; the marker shows the position described in the question.',
+    };
+  }
+
+  if (n != null) {
+    let markIndex: number | null = null;
+
+    if (/\bfirst\s+mark\s+after\s+0\b/i.test(question)) markIndex = 1;
+    else if (/\bsecond\s+mark\s+after\s+0\b/i.test(question)) markIndex = 2;
+    else {
+      const ord = question.match(/\b(\d+)(?:st|nd|rd|th)\s+mark\s+after\s+0\b/i);
+      if (ord) markIndex = Number(ord[1]);
+    }
+
+    if (markIndex != null && markIndex >= 1 && markIndex <= n - 1) {
+      const value = markIndex / n;
+      const g = gcd(markIndex, n);
+      const label = `${markIndex / g}/${n / g}`;
+      return {
+        type: 'number-line',
+        min: 0,
+        max: 1,
+        step: 1 / n,
+        markers: [{ value, label, kind: 'target' }],
+        altText: `Number line from 0 to 1 in ${n} equal steps; mark at ${label}.`,
+        caption: '0 to 1 number line split into equal parts; the arrow shows the mark described.',
+      };
+    }
+  }
+
+  if (/\b2\s*\/\s*6\b.*\b1\s*\/\s*3\b|\b1\s*\/\s*3\b.*\b2\s*\/\s*6\b/.test(question) && /same\s+point/.test(lower)) {
+    return {
+      type: 'number-line',
+      min: 0,
+      max: 1,
+      step: 1 / 6,
+      markers: [
+        { value: 1 / 3, label: '1/3', kind: 'point' },
+        { value: 2 / 6, label: '2/6', kind: 'point' },
+      ],
+      altText: 'Number line from 0 to 1 showing that 1/3 and 2/6 fall on the same position.',
+      caption: 'Equivalent fractions occupy the same point between 0 and 1.',
+    };
+  }
+
+  return null;
+}
+
+function gcd(a: number, b: number): number {
+  let x = Math.abs(a);
+  let y = Math.abs(b);
+  while (y !== 0) {
+    const t = y;
+    y = x % y;
+    x = t;
+  }
+  return x || 1;
+}
+
+function inferN41BetweenBenchmarks(question: string): NumberLineVisual | null {
+  const lower = question.toLowerCase();
+  if (!lower.includes('between') || !lower.includes('number line')) return null;
+
+  const m = question.match(/\bbetween\s+(\d+)\s*\/\s*(\d+)\s+and\s+(\d+)\s*\/\s*(\d+)/i);
+  if (!m) return null;
+
+  const a = Number(m[1]) / Number(m[2]);
+  const b = Number(m[3]) / Number(m[4]);
+  if (!Number.isFinite(a) || !Number.isFinite(b)) return null;
+
+  const lo = Math.min(a, b);
+  const hi = Math.max(a, b);
+  const mid = (lo + hi) / 2;
+
+  return {
+    type: 'number-line',
+    min: 0,
+    max: 1,
+    step: 0.25,
+    markers: [
+      { value: lo, label: `${m[1]}/${m[2]}`, kind: 'point' },
+      { value: hi, label: `${m[3]}/${m[4]}`, kind: 'point' },
+      { value: mid, label: '1/2', kind: 'target' },
+    ],
+    altText: `Number line from 0 to 1 with ${m[1]}/${m[2]} and ${m[3]}/${m[4]} marked; a value between them is highlighted.`,
+    caption: 'Benchmark positions; one fraction between them is shown.',
+  };
+}
+
+function inferN41ClosestOnUnitInterval(question: string, rawOptions: unknown): NumberLineVisual | null {
+  const lower = question.toLowerCase();
+  if (!/closest\s+to\s+(0|1)\b/.test(lower)) return null;
+  if (!/number line/.test(lower) && !/between\s+0\s+and\s+1/.test(lower)) return null;
+
+  const choices = extractMcqChoiceStrings(rawOptions);
+  const parsed = choices
+    .map((label) => ({ label, value: parseSimpleFractionValue(label) }))
+    .filter((e): e is { label: string; value: number } => e.value != null && e.value >= 0 && e.value <= 1);
+
+  if (parsed.length < 2) return null;
+
+  const towardOne = /closest\s+to\s+1\b/.test(lower);
+  const target = towardOne ? 1 : 0;
+
+  let best = parsed[0]!;
+  let bestD = Math.abs(parsed[0]!.value - target);
+  for (const p of parsed.slice(1)) {
+    const d = Math.abs(p.value - target);
+    if (d < bestD) {
+      best = p;
+      bestD = d;
+    }
+  }
+
+  return {
+    type: 'number-line',
+    min: 0,
+    max: 1,
+    step: 0.1,
+    markers: parsed.map((p) => ({
+      value: p.value,
+      label: p.label,
+      kind: p.label === best.label ? 'target' : 'point',
+    })),
+    altText: `Number line from 0 to 1 with the answer choices plotted; closest to ${target} is highlighted.`,
+    caption: 'Each marker is one of the fractions in the question; the filled marker is closest to the target end.',
+  };
+}
+
+function inferN41Visuals(question: string, rawOptions: unknown): MathsVisual[] {
+  const bar = inferN41PartWholeBar(question);
+  if (bar) return [bar];
+
+  const unitLine =
+    inferN41UnitNumberLine(question) ??
+    inferN41BetweenBenchmarks(question) ??
+    inferN41ClosestOnUnitInterval(question, rawOptions);
+
+  if (unitLine) return [unitLine];
+
+  return [];
+}
+
+function inferGeneratedVisuals(question: string, primarySkillCode?: string, rawOptions?: unknown): MathsVisual[] {
+  if (primarySkillCode === 'N4.1') {
+    const n41 = inferN41Visuals(question, rawOptions ?? {});
+    if (n41.length > 0) return n41;
+    // Avoid generic `inferFractionBar`: stems like "Which fraction is greater than 1/2?" yield a bogus 1/2 bar.
+    return [];
+  }
+
   const lower = question.toLowerCase();
   const numberLine = inferNumberLine(question, primarySkillCode);
   const arithmetic = inferArithmeticLayout(question, primarySkillCode);
@@ -553,5 +807,9 @@ export function resolveItemVisuals(
   const explicit = parseStoredVisuals(item.options);
   if (explicit.length > 0) return explicit;
 
-  return inferGeneratedVisuals(cleanQuestionForVisualInference(item.question), primarySkillCode);
+  return inferGeneratedVisuals(
+    cleanQuestionForVisualInference(item.question),
+    primarySkillCode,
+    item.options
+  );
 }
