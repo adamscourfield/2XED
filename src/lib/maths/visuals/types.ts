@@ -161,6 +161,32 @@ export interface BarModelVisual extends VisualCaptioned {
   segments: BarModelSegmentSpec[];
 }
 
+/** Two-event sample space as a labelled grid (probability S1.4 / S1.5). */
+export interface SampleSpaceGridVisual extends VisualCaptioned {
+  type: 'sample-space-grid';
+  rowLabels: string[];
+  columnLabels: string[];
+  /** rows.length === cells.length; each row has columnLabels.length strings */
+  cells: string[][];
+}
+
+/** Two-set Venn inside a universal rectangle (probability S1.7–S1.12). */
+export interface VennTwoSetVisual extends VisualCaptioned {
+  type: 'venn-two-set';
+  /** Elements listed in each region (empty → show region count only). */
+  aOnly: string[];
+  intersection: string[];
+  bOnly: string[];
+  outside: string[];
+  /** Region sizes when element lists are empty or for quick totals */
+  counts?: {
+    aOnly: number;
+    intersection: number;
+    bOnly: number;
+    outside: number;
+  };
+}
+
 export type MathsVisual =
   | ArithmeticLayoutVisual
   | ShapeVisual
@@ -169,4 +195,6 @@ export type MathsVisual =
   | FractionBarVisual
   | CoordinateGridVisual
   | ChartVisual
-  | BarModelVisual;
+  | BarModelVisual
+  | SampleSpaceGridVisual
+  | VennTwoSetVisual;

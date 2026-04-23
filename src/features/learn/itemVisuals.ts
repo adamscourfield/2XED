@@ -6,10 +6,13 @@ import type {
   FractionBarVisual,
   MathsVisual,
   NumberLineVisual,
+  SampleSpaceGridVisual,
   ShapeEdgeLabel,
   ShapeVisual,
   VisualPoint,
+  VennTwoSetVisual,
 } from '../../lib/maths/visuals/types';
+import { inferS1ProbabilityVisuals } from './s1QuestionVisuals';
 
 function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
@@ -1201,14 +1204,16 @@ function inferGeneratedVisuals(question: string, primarySkillCode?: string): Mat
   const arithmetic = inferArithmeticLayout(question, primarySkillCode);
   const shape = inferShapeVisual(question, primarySkillCode);
   const fractionBar = inferFractionBar(question);
+  const s1Probability = inferS1ProbabilityVisuals(question, primarySkillCode);
 
-  const visuals: Array<
-    | ChartVisual
+  const ordered: Array<
     | BarModelVisual
     | ArithmeticLayoutVisual
     | ShapeVisual
     | NumberLineVisual
     | FractionBarVisual
+    | SampleSpaceGridVisual
+    | VennTwoSetVisual
     | null
   > = lower.includes('number line')
     ? [
@@ -1234,7 +1239,7 @@ function inferGeneratedVisuals(question: string, primarySkillCode?: string): Mat
         fractionBar,
       ];
 
-  return visuals.filter(
+  const base = ordered.filter(
     (
       visual
     ): visual is
@@ -1245,6 +1250,8 @@ function inferGeneratedVisuals(question: string, primarySkillCode?: string): Mat
       | NumberLineVisual
       | FractionBarVisual => visual !== null
   );
+
+  return [...s1Probability, ...base];
 }
 
 export function resolveItemVisuals(
