@@ -253,7 +253,7 @@ export default function StudentLivePage() {
     return (
       <AppChrome variant="student">
         <main className="anx-shell anx-scene flex flex-1 flex-col items-center justify-center px-4 py-12">
-          <div className="student-flow-loading-card">
+          <div className="anx-flow-loading-card">
             <div className="h-11 w-11 animate-spin rounded-full border-4 border-[var(--anx-surface-container-high)] border-t-[var(--anx-primary)]" />
             <div>
               <p className="m-0 text-base font-semibold" style={{ color: 'var(--anx-text)' }}>Opening live room…</p>

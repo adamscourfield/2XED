@@ -43,6 +43,46 @@ function nextPhaseId() {
   return `phase-${++phaseCounter}`;
 }
 
+function StepIndicator({ current }: { current: 1 | 2 }) {
+  const steps = [
+    { n: 1 as const, label: 'Class & skills' },
+    { n: 2 as const, label: 'Lesson plan' },
+  ];
+  return (
+    <div className="mb-6 flex items-center gap-2" aria-label="Progress">
+      {steps.map((s, i) => {
+        const active = s.n === current;
+        const done = s.n < current;
+        return (
+          <div key={s.n} className="flex min-w-0 flex-1 items-center gap-2">
+            {i > 0 ? <div className="h-px flex-1 bg-[var(--anx-surface-container-high)]" aria-hidden /> : null}
+            <div
+              className={`flex shrink-0 items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold ${
+                active
+                  ? 'bg-[var(--anx-primary-soft)] text-[var(--anx-primary)] ring-1 ring-[var(--anx-primary)]/25'
+                  : done
+                    ? 'bg-[var(--anx-success-soft)] text-[var(--anx-success)]'
+                    : 'bg-[var(--anx-surface-container-low)] text-[var(--anx-text-muted)]'
+              }`}
+            >
+              <span
+                className="flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold"
+                style={{
+                  background: active || done ? 'currentColor' : 'var(--anx-surface-container-high)',
+                  color: active || done ? '#fff' : 'var(--anx-text-muted)',
+                }}
+              >
+                {done ? '✓' : s.n}
+              </span>
+              <span className="hidden sm:inline">{s.label}</span>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export function NewLiveSessionForm({ classrooms, subjects, skillsBySubject }: Props) {
   const router = useRouter();
 
@@ -177,13 +217,26 @@ export function NewLiveSessionForm({ classrooms, subjects, skillsBySubject }: Pr
   // ── Step 1: Pick classroom, subject, skills ────────────────────────────────
   if (step === 1) {
     return (
-      <div className="anx-panel space-y-6 p-6">
+      <div className="anx-card space-y-6 p-6 sm:p-8">
+        <StepIndicator current={1} />
         <div>
-          <p className="anx-section-label mb-4" style={{ color: 'var(--anx-text-muted)' }}>Step 1 of 2 — Setup</p>
-          <h2 className="text-lg font-semibold" style={{ color: 'var(--anx-text)' }}>Choose class and skills</h2>
+          <p className="anx-section-label mb-2" style={{ color: 'var(--anx-text-muted)' }}>Setup</p>
+          <h2 className="text-xl font-bold tracking-tight" style={{ color: 'var(--anx-text)' }}>Choose class and skills</h2>
+          <p className="mt-1 text-sm leading-relaxed" style={{ color: 'var(--anx-text-muted)' }}>
+            Pick who this lesson is for, then tick the skills you want in this session.
+          </p>
         </div>
 
-        {error && <div className="anx-callout-danger text-sm">{error}</div>}
+        {error ? <div className="anx-callout-danger text-sm">{error}</div> : null}
+
+        {classrooms.length === 0 ? (
+          <div className="anx-callout-info text-sm">
+            <p className="m-0 font-semibold text-[color:var(--anx-text)]">No classrooms yet</p>
+            <p className="mt-1 m-0 leading-relaxed">
+              Ask your school admin to link classes to your profile, then refresh this page.
+            </p>
+          </div>
+        ) : null}
 
         <div className="space-y-4">
           <div>
@@ -196,6 +249,7 @@ export function NewLiveSessionForm({ classrooms, subjects, skillsBySubject }: Pr
               onChange={(e) => setClassroomId(e.target.value)}
               className="anx-input"
               required
+              disabled={classrooms.length === 0}
             >
               <option value="">Select classroom…</option>
               {classrooms.map((c) => (
@@ -267,8 +321,8 @@ export function NewLiveSessionForm({ classrooms, subjects, skillsBySubject }: Pr
         <button
           type="button"
           onClick={goToStep2}
-          disabled={!classroomId || !subjectId || selectedSkillIds.length === 0}
-          className="anx-btn-primary w-full disabled:opacity-40"
+          disabled={classrooms.length === 0 || !classroomId || !subjectId || selectedSkillIds.length === 0}
+          className="anx-btn-primary w-full py-3.5 disabled:opacity-40"
         >
           Build lesson plan →
         </button>
@@ -278,12 +332,13 @@ export function NewLiveSessionForm({ classrooms, subjects, skillsBySubject }: Pr
 
   // ── Step 2: Arrange phases ─────────────────────────────────────────────────
   return (
-    <div className="anx-panel space-y-6 p-6">
+    <div className="anx-card space-y-6 p-6 sm:p-8">
+      <StepIndicator current={2} />
       <div>
-        <p className="anx-section-label mb-1" style={{ color: 'var(--anx-text-muted)' }}>Step 2 of 2 — Lesson plan</p>
-        <h2 className="text-lg font-semibold" style={{ color: 'var(--anx-text)' }}>Order your phases</h2>
-        <p className="mt-0.5 text-sm" style={{ color: 'var(--anx-text-muted)' }}>
-          Reorder, add explanation phases, or remove steps. You can also add more from step 1.
+        <p className="anx-section-label mb-2" style={{ color: 'var(--anx-text-muted)' }}>Lesson plan</p>
+        <h2 className="text-xl font-bold tracking-tight" style={{ color: 'var(--anx-text)' }}>Order your phases</h2>
+        <p className="mt-1 text-sm leading-relaxed" style={{ color: 'var(--anx-text-muted)' }}>
+          Drag order with the arrows, slot in explanations after practice blocks, or go back to change skills.
         </p>
       </div>
 
@@ -293,10 +348,10 @@ export function NewLiveSessionForm({ classrooms, subjects, skillsBySubject }: Pr
         {phases.map((phase, i) => (
           <div
             key={phase.id}
-            className={`flex items-center gap-3 rounded-xl border px-3 py-2.5 ${
+            className={`flex items-center gap-3 rounded-xl px-3 py-2.5 ${
               phase.type === 'EXPLANATION'
-                ? 'border-[var(--anx-warning)] bg-[var(--anx-warning-soft)]'
-                : 'border-[var(--anx-border)] bg-white'
+                ? 'bg-[var(--anx-warning-soft)] ring-1 ring-[var(--anx-warning)]/35'
+                : 'bg-[var(--anx-surface-container-low)]'
             }`}
           >
             <span className="w-5 text-center text-xs font-bold" style={{ color: 'var(--anx-text-muted)' }}>
@@ -357,19 +412,19 @@ export function NewLiveSessionForm({ classrooms, subjects, skillsBySubject }: Pr
         )}
       </div>
 
-      <div className="flex gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row">
         <button
           type="button"
           onClick={() => setStep(1)}
-          className="anx-btn-ghost flex-1"
+          className="anx-btn-secondary order-2 flex-1 py-3 sm:order-1"
         >
-          ← Back
+          ← Back to setup
         </button>
         <button
           type="button"
           onClick={handleLaunch}
           disabled={loading || phases.length === 0}
-          className="anx-btn-primary flex-1 disabled:opacity-40"
+          className="anx-btn-primary order-1 flex-1 py-3.5 disabled:opacity-40 sm:order-2"
         >
           {loading ? 'Launching…' : 'Launch lesson →'}
         </button>

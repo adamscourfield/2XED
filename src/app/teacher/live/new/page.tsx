@@ -2,6 +2,8 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/features/auth/authOptions';
 import { redirect } from 'next/navigation';
 import { prisma } from '@/db/prisma';
+import { LearningPageShell } from '@/components/LearningPageShell';
+import { TeacherFlowHero } from '@/components/teacher/TeacherFlowHero';
 import { NewLiveSessionForm } from './NewLiveSessionForm';
 
 export default async function TeacherLiveNewPage() {
@@ -38,15 +40,27 @@ export default async function TeacherLiveNewPage() {
   });
 
   return (
-    <main className="anx-shell anx-scene min-h-screen py-10">
-      <div className="mx-auto w-full max-w-lg px-4">
-      <h1 className="mb-6 text-2xl font-bold text-white drop-shadow-sm">Launch Live Session</h1>
-      <NewLiveSessionForm
-        classrooms={classrooms}
-        subjects={subjects}
-        skillsBySubject={skillsBySubject}
-      />
+    <LearningPageShell
+      appChrome="teacher"
+      title="Live lesson"
+      subtitle="Set your class, subject, and skills — then arrange phases before students join."
+      maxWidthClassName="max-w-2xl"
+      hero={(
+        <TeacherFlowHero
+          titleId="teacher-live-new-hero-title"
+          eyebrow="Teaching workspace"
+          title="Launch a live session"
+          lead="Students join with a six-letter code. You control the flow from the conductor when you are ready."
+        />
+      )}
+    >
+      <div className="mx-auto w-full max-w-2xl">
+        <NewLiveSessionForm
+          classrooms={classrooms}
+          subjects={subjects}
+          skillsBySubject={skillsBySubject}
+        />
       </div>
-    </main>
+    </LearningPageShell>
   );
 }

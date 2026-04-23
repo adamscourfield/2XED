@@ -994,8 +994,8 @@
     margin: 0;
   }
 
-  /* ── Student flow pages (diagnostic intro, live join, etc.) ─ */
-  .student-flow-hero {
+  /* ── Flow hero (student diagnostic, live join, teacher live launcher, etc.) ─ */
+  .anx-flow-hero {
     position: relative;
     overflow: hidden;
     border-radius: var(--anx-radius-xl);
@@ -1009,7 +1009,7 @@
     box-shadow: var(--anx-shadow-md);
   }
 
-  .student-flow-hero::before {
+  .anx-flow-hero::before {
     content: '';
     position: absolute;
     inset: 0;
@@ -1019,7 +1019,7 @@
     pointer-events: none;
   }
 
-  .student-flow-hero-inner {
+  .anx-flow-hero-inner {
     position: relative;
     z-index: 1;
     padding: 1.5rem 1.35rem 1.65rem;
@@ -1027,17 +1027,17 @@
   }
 
   @media (min-width: 640px) {
-    .student-flow-hero-inner {
+    .anx-flow-hero-inner {
       padding: 1.75rem 1.75rem 1.85rem;
     }
   }
 
-  .student-flow-hero-inner--compact {
+  .anx-flow-hero-inner--compact {
     padding: 1.15rem 1.25rem 1.25rem;
     text-align: center;
   }
 
-  .student-flow-hero-eyebrow {
+  .anx-flow-hero-eyebrow {
     margin: 0;
     font-size: 0.6875rem;
     font-weight: 600;
@@ -1046,7 +1046,7 @@
     color: rgba(255, 255, 255, 0.78);
   }
 
-  .student-flow-hero-title {
+  .anx-flow-hero-title {
     margin: 0.4rem 0 0;
     font-size: clamp(1.35rem, 3.2vw, 1.85rem);
     font-weight: 800;
@@ -1055,11 +1055,11 @@
     color: #fff;
   }
 
-  .student-flow-hero-inner--compact .student-flow-hero-title {
+  .anx-flow-hero-inner--compact .anx-flow-hero-title {
     font-size: clamp(1.2rem, 3vw, 1.5rem);
   }
 
-  .student-flow-hero-lead {
+  .anx-flow-hero-lead {
     margin: 0.65rem 0 0;
     max-width: 36rem;
     font-size: 0.9375rem;
@@ -1067,12 +1067,12 @@
     color: rgba(255, 255, 255, 0.92);
   }
 
-  .student-flow-hero-inner--compact .student-flow-hero-lead {
+  .anx-flow-hero-inner--compact .anx-flow-hero-lead {
     margin-left: auto;
     margin-right: auto;
   }
 
-  .student-flow-loading-card {
+  .anx-flow-loading-card {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1728,7 +1728,10 @@
   .anx-conductor-shell {
     display: grid;
     grid-template-rows: auto 1fr auto;
-    height: 100dvh;
+    flex: 1 1 auto;
+    min-height: 0;
+    height: 100%;
+    max-height: 100%;
     overflow: hidden;
     background: var(--anx-surface-bright);
   }

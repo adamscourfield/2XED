@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
+import Link from 'next/link';
 import { TeacherLiveWhiteboard } from '@/components/teacher/TeacherLiveWhiteboard';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -144,6 +145,13 @@ function ConductorTopBar({
       </div>
 
       <span className={`anx-badge ${statusColour} ml-1`}>{snapshot.status}</span>
+
+      <Link
+        href={`/teacher/live/${snapshot.sessionId}/lanes`}
+        className="hidden shrink-0 rounded-full border border-[var(--anx-border)] bg-[var(--anx-surface)] px-3 py-1.5 text-xs font-semibold text-[color:var(--anx-text-secondary)] transition hover:bg-[var(--anx-surface-container-low)] sm:inline-flex"
+      >
+        Lane view
+      </Link>
 
       <div className="ml-auto flex flex-wrap items-center gap-2">
         {onOpenWhiteboard && (snapshot.status === 'ACTIVE' || snapshot.status === 'PAUSED') && (
@@ -685,13 +693,26 @@ export function TeacherLiveDashboard({ sessionId }: Props) {
   }
 
   if (error) {
-    return <div className="p-8 text-sm" style={{ color: 'var(--anx-danger-text)' }}>{error}</div>;
+    return (
+      <div className="flex flex-1 flex-col items-center justify-center px-4 py-16">
+        <div className="anx-callout-danger max-w-md text-center text-sm">{error}</div>
+        <Link href="/teacher/dashboard" className="anx-btn-secondary mt-6 px-5 py-2.5 text-sm no-underline">
+          Back to dashboard
+        </Link>
+      </div>
+    );
   }
 
   if (!snapshot) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <p className="text-sm" style={{ color: 'var(--anx-text-muted)' }}>Loading conductor…</p>
+      <div className="flex flex-1 flex-col items-center justify-center px-4 py-16">
+        <div className="anx-flow-loading-card max-w-sm">
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-[var(--anx-surface-container-high)] border-t-[var(--anx-primary)]" />
+          <p className="m-0 text-sm font-medium" style={{ color: 'var(--anx-text)' }}>Loading conductor…</p>
+          <p className="m-0 text-xs leading-relaxed" style={{ color: 'var(--anx-text-muted)' }}>
+            Connecting to your live session.
+          </p>
+        </div>
       </div>
     );
   }
