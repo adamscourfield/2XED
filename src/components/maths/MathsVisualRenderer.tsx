@@ -1,5 +1,9 @@
 import { ChartRenderer } from '@/components/maths/charts/ChartRenderer';
 import { ArithmeticLayoutRenderer } from '@/components/maths/arithmetic/ArithmeticLayoutRenderer';
+import { DataTableRenderer } from '@/components/maths/data/DataTableRenderer';
+import { FrequencyTreeRenderer } from '@/components/maths/data/FrequencyTreeRenderer';
+import { PartWholeBarModelRenderer } from '@/components/maths/data/PartWholeBarModelRenderer';
+import { TimetableRenderer } from '@/components/maths/data/TimetableRenderer';
 import { AngleRenderer } from '@/components/maths/geometry/AngleRenderer';
 import { CoordinateGridRenderer } from '@/components/maths/geometry/CoordinateGridRenderer';
 import { ShapeRenderer } from '@/components/maths/geometry/ShapeRenderer';
@@ -36,12 +40,14 @@ export function MathsVisualRenderer({ visual }: { visual: MathsVisual }) {
       return <CoordinateGridRenderer visual={visual} />;
     case 'chart':
       return <ChartRenderer visual={visual} />;
-    case 'bar-model':
-      return <BarModelRenderer visual={visual} />;
-    case 'sample-space-grid':
-      return <SampleSpaceGridRenderer visual={visual} />;
-    case 'venn-two-set':
-      return <VennTwoSetRenderer visual={visual} />;
+    case 'part-whole-bar-model':
+      return <PartWholeBarModelRenderer visual={visual} />;
+    case 'data-table':
+      return <DataTableRenderer visual={visual} />;
+    case 'timetable':
+      return <TimetableRenderer visual={visual} />;
+    case 'frequency-tree':
+      return <FrequencyTreeRenderer visual={visual} />;
     default:
       return null;
   }

@@ -3,7 +3,10 @@ import type {
   BarModelVisual,
   ChartVisual,
   CoordinateGridVisual,
+  DataTableVisual,
   FractionBarVisual,
+  FrequencyTreeNode,
+  FrequencyTreeVisual,
   MathsVisual,
   NumberLineVisual,
   SampleSpaceGridVisual,
@@ -105,42 +108,42 @@ function validateBarModel(visual: BarModelVisual): string[] {
   return issues;
 }
 
-function validateSampleSpaceGrid(visual: SampleSpaceGridVisual): string[] {
+function validateTimetable(visual: TimetableVisual): string[] {
   const issues: string[] = [];
   if (!hasText(visual.altText)) issues.push('missing alt text');
-  if (!Array.isArray(visual.rowLabels) || visual.rowLabels.length === 0) {
-    issues.push('sample space grid needs row labels');
+  if (!Array.isArray(visual.columnHeaders) || visual.columnHeaders.length < 2) {
+    issues.push('timetable needs column headers');
   }
-  if (!Array.isArray(visual.columnLabels) || visual.columnLabels.length === 0) {
-    issues.push('sample space grid needs column labels');
+  if (!Array.isArray(visual.rows) || visual.rows.length === 0) {
+    issues.push('timetable needs rows');
   }
-  if (!Array.isArray(visual.cells) || visual.cells.length !== visual.rowLabels.length) {
-    issues.push('sample space grid cells must match row count');
-  } else if (
-    visual.cells.some(
-      (row) => !Array.isArray(row) || row.length !== visual.columnLabels.length
-    )
-  ) {
-    issues.push('sample space grid row widths must match column count');
+  const n = visual.columnHeaders.length;
+  if (visual.rows.some((row) => !Array.isArray(row.cells) || row.cells.length !== n)) {
+    issues.push('timetable row cell counts must match headers');
   }
   return issues;
 }
 
-function validateVennTwoSet(visual: VennTwoSetVisual): string[] {
+function validateFrequencyTreeNode(node: FrequencyTreeNode, depth: number): string[] {
   const issues: string[] = [];
-  if (!hasText(visual.altText)) issues.push('missing alt text');
-  const lists = [visual.aOnly, visual.intersection, visual.bOnly, visual.outside];
-  if (!lists.every((list) => Array.isArray(list))) {
-    issues.push('venn regions must be arrays');
-    return issues;
+  if (depth > 6) return ['frequency tree too deep'];
+  if (!hasText(node.label)) issues.push('frequency tree node needs a label');
+  if (!(node.value === null || (typeof node.value === 'number' && Number.isFinite(node.value)))) {
+    issues.push('frequency tree node value must be a number or null');
   }
-  if (visual.counts) {
-    const { aOnly, intersection, bOnly, outside } = visual.counts;
-    const nums = [aOnly, intersection, bOnly, outside];
-    if (nums.some((n) => !(typeof n === 'number' && Number.isFinite(n) && n >= 0))) {
-      issues.push('venn counts must be non-negative numbers');
+  if (node.children) {
+    for (const child of node.children) {
+      issues.push(...validateFrequencyTreeNode(child, depth + 1));
     }
   }
+  return issues;
+}
+
+function validateFrequencyTree(visual: FrequencyTreeVisual): string[] {
+  const issues: string[] = [];
+  if (!hasText(visual.altText)) issues.push('missing alt text');
+  if (!visual.root) issues.push('frequency tree needs a root');
+  else issues.push(...validateFrequencyTreeNode(visual.root, 0));
   return issues;
 }
 
@@ -158,8 +161,14 @@ export function validateMathsVisual(visual: MathsVisual): string[] {
       return validateCoordinateGrid(visual);
     case 'chart':
       return validateChart(visual);
-    case 'bar-model':
-      return validateBarModel(visual);
+    case 'part-whole-bar-model':
+      return validatePartWholeBarModel(visual);
+    case 'data-table':
+      return validateDataTable(visual);
+    case 'timetable':
+      return validateTimetable(visual);
+    case 'frequency-tree':
+      return validateFrequencyTree(visual);
     case 'angle-diagram':
       return hasText(visual.altText) ? [] : ['missing alt text'];
     case 'sample-space-grid':

@@ -147,44 +147,40 @@ export interface ChartVisual extends VisualCaptioned {
   series: ChartBarSpec[];
 }
 
-/** Equal-parts bar model for multiplication / division (e.g. N3.1). */
-export interface BarModelSegmentSpec {
-  /** Numeric size of the segment (used for width proportion). */
-  value: number;
-  /** Label inside the part (defaults to string of value). */
-  label?: string;
-}
-
-export interface BarModelVisual extends VisualCaptioned {
-  type: 'bar-model';
+/** Part–whole bar model (distinct from chart bar graphs). */
+export interface PartWholeBarModelVisual extends VisualCaptioned {
+  type: 'part-whole-bar-model';
   total: number;
-  segments: BarModelSegmentSpec[];
+  parts: Array<{ value: number | null; label?: string }>;
 }
 
-/** Two-event sample space as a labelled grid (probability S1.4 / S1.5). */
-export interface SampleSpaceGridVisual extends VisualCaptioned {
-  type: 'sample-space-grid';
-  rowLabels: string[];
-  columnLabels: string[];
-  /** rows.length === cells.length; each row has columnLabels.length strings */
-  cells: string[][];
+/** Generic text grid (distance tables, small data tables). */
+export interface DataTableVisual extends VisualCaptioned {
+  type: 'data-table';
+  title?: string;
+  unit?: string;
+  columnHeaders: string[];
+  rows: Array<{ cells: string[] }>;
 }
 
-/** Two-set Venn inside a universal rectangle (probability S1.7–S1.12). */
-export interface VennTwoSetVisual extends VisualCaptioned {
-  type: 'venn-two-set';
-  /** Elements listed in each region (empty → show region count only). */
-  aOnly: string[];
-  intersection: string[];
-  bOnly: string[];
-  outside: string[];
-  /** Region sizes when element lists are empty or for quick totals */
-  counts?: {
-    aOnly: number;
-    intersection: number;
-    bOnly: number;
-    outside: number;
-  };
+/** Train-style timetable: each row is one journey with times per station column. */
+export interface TimetableVisual extends VisualCaptioned {
+  type: 'timetable';
+  title?: string;
+  columnHeaders: string[];
+  rows: Array<{ cells: string[] }>;
+}
+
+/** Nested frequency tree (2–3 levels). `value` null renders as blank / unknown. */
+export interface FrequencyTreeNode {
+  label: string;
+  value: number | null;
+  children?: FrequencyTreeNode[];
+}
+
+export interface FrequencyTreeVisual extends VisualCaptioned {
+  type: 'frequency-tree';
+  root: FrequencyTreeNode;
 }
 
 export type MathsVisual =
@@ -195,6 +191,7 @@ export type MathsVisual =
   | FractionBarVisual
   | CoordinateGridVisual
   | ChartVisual
-  | BarModelVisual
-  | SampleSpaceGridVisual
-  | VennTwoSetVisual;
+  | PartWholeBarModelVisual
+  | DataTableVisual
+  | TimetableVisual
+  | FrequencyTreeVisual;
