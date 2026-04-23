@@ -335,6 +335,7 @@ export default async function AdminHomePage() {
                 { label: 'Content audit', href: '/admin/content-audit', sub: 'Coverage & gaps by strand' },
                 { label: 'Content ingestion', href: '/admin/content-ingestion', sub: 'Review & publish batches' },
                 { label: 'Knowledge state', href: '/admin/knowledge-state', sub: 'Debug learner state traces' },
+                { label: 'Re-baseline onboarding', href: '/admin/students/rebaseline', sub: 'Reset diagnostic placement for a student' },
               ].map((item) => (
                 <Link
                   key={item.href}
