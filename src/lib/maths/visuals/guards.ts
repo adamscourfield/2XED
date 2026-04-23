@@ -1,5 +1,6 @@
 import type {
   ArithmeticLayoutVisual,
+  BarModelVisual,
   ChartVisual,
   CoordinateGridVisual,
   FractionBarVisual,
@@ -79,6 +80,29 @@ function validateChart(visual: ChartVisual): string[] {
   return issues;
 }
 
+function validateBarModel(visual: BarModelVisual): string[] {
+  const issues: string[] = [];
+  if (!hasText(visual.altText)) issues.push('missing alt text');
+  if (!(Number.isInteger(visual.total) && visual.total > 0)) {
+    issues.push('bar model requires a positive integer total');
+  }
+  if (!Array.isArray(visual.segments) || visual.segments.length === 0) {
+    issues.push('bar model requires at least one segment');
+  }
+  if (
+    visual.segments.some(
+      (seg) => !(typeof seg.value === 'number' && Number.isFinite(seg.value) && seg.value > 0)
+    )
+  ) {
+    issues.push('bar model segments must have positive numeric values');
+  }
+  const sum = visual.segments.reduce((acc, seg) => acc + seg.value, 0);
+  if (Math.abs(sum - visual.total) > 1e-6) {
+    issues.push('bar model segment values must sum to the total');
+  }
+  return issues;
+}
+
 export function validateMathsVisual(visual: MathsVisual): string[] {
   switch (visual.type) {
     case 'arithmetic-layout':
@@ -93,6 +117,8 @@ export function validateMathsVisual(visual: MathsVisual): string[] {
       return validateCoordinateGrid(visual);
     case 'chart':
       return validateChart(visual);
+    case 'bar-model':
+      return validateBarModel(visual);
     case 'angle-diagram':
       return hasText(visual.altText) ? [] : ['missing alt text'];
     default:

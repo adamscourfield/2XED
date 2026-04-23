@@ -1,6 +1,7 @@
 import { isMathsVisual } from '../../lib/maths/visuals/guards';
 import type {
   ArithmeticLayoutVisual,
+  BarModelVisual,
   FractionBarVisual,
   MathsVisual,
   NumberLineVisual,
@@ -525,21 +526,228 @@ function inferFractionBar(question: string): FractionBarVisual | null {
   };
 }
 
+function buildEqualPartsBarModel(total: number, partCount: number, partValue: number): BarModelVisual | null {
+  if (
+    !Number.isInteger(total) ||
+    total <= 0 ||
+    !Number.isInteger(partCount) ||
+    partCount <= 0 ||
+    partCount > 36 ||
+    !Number.isInteger(partValue) ||
+    partValue <= 0 ||
+    partCount * partValue !== total
+  ) {
+    return null;
+  }
+
+  const segments = Array.from({ length: partCount }, () => ({
+    value: partValue,
+    label: String(partValue),
+  }));
+
+  return {
+    type: 'bar-model',
+    total,
+    segments,
+    altText: `Bar model with total ${total} split into ${partCount} equal parts of ${partValue}.`,
+    caption: 'Equal-parts bar model for the question.',
+  };
+}
+
+/** N3.1 (and stems that name a bar model): equal-groups / equal-parts diagrams. */
+function inferBarModel(question: string, primarySkillCode?: string): BarModelVisual | null {
+  const lower = question.toLowerCase();
+  if (primarySkillCode !== 'N3.1' && !/\bbar model\b/.test(lower)) return null;
+
+  let m = question.match(/total of (\d+) split into (\d+) equal parts of (\d+)/i);
+  if (m) {
+    return buildEqualPartsBarModel(Number(m[1]), Number(m[2]), Number(m[3]));
+  }
+
+  m = question.match(/(\d+) split into (\d+) equal groups of (\d+)/i);
+  if (m) {
+    return buildEqualPartsBarModel(Number(m[1]), Number(m[2]), Number(m[3]));
+  }
+
+  m = question.match(/(\d+) groups of (\d+) making (\d+)/i);
+  if (m) {
+    const groups = Number(m[1]);
+    const each = Number(m[2]);
+    const total = Number(m[3]);
+    return buildEqualPartsBarModel(total, groups, each);
+  }
+
+  m = question.match(/(\d+) made from (\d+) equal parts of (\d+)/i);
+  if (m) {
+    return buildEqualPartsBarModel(Number(m[1]), Number(m[2]), Number(m[3]));
+  }
+
+  m = question.match(/(?:if a )?bar model (?:shows )?(\d+) as (\d+) equal parts of (\d+)/i);
+  if (m) {
+    return buildEqualPartsBarModel(Number(m[1]), Number(m[2]), Number(m[3]));
+  }
+
+  m = question.match(/total of (\d+) is shared into (\d+) equal groups/i);
+  if (m) {
+    const total = Number(m[1]);
+    const groups = Number(m[2]);
+    if (total % groups === 0) {
+      return buildEqualPartsBarModel(total, groups, total / groups);
+    }
+  }
+
+  m = question.match(/total of (\d+) is shared into groups of (\d+)/i);
+  if (m) {
+    const total = Number(m[1]);
+    const groupSize = Number(m[2]);
+    if (total % groupSize === 0) {
+      const groups = total / groupSize;
+      return buildEqualPartsBarModel(total, groups, groupSize);
+    }
+  }
+
+  m = question.match(/bar model for (\d+) groups of (\d+) making (\d+)/i);
+  if (m) {
+    return buildEqualPartsBarModel(Number(m[3]), Number(m[1]), Number(m[2]));
+  }
+
+  m = question.match(/bar model for (\d+) shared into (\d+) equal groups/i);
+  if (m) {
+    const total = Number(m[1]);
+    const groups = Number(m[2]);
+    if (total % groups === 0) {
+      return buildEqualPartsBarModel(total, groups, total / groups);
+    }
+  }
+
+  if (primarySkillCode === 'N3.1' && /\bnumber family\b/i.test(question) && /\bmissing\b/i.test(question)) {
+    const fact = question.match(/(\d+)\s*[×x]\s*(\d+)\s*=\s*(\d+)/i);
+    if (fact) {
+      const a = Number(fact[1]);
+      const b = Number(fact[2]);
+      const c = Number(fact[3]);
+      if (a * b === c) {
+        return buildEqualPartsBarModel(c, a, b);
+      }
+    }
+  }
+
+  if (primarySkillCode === 'N3.1') {
+    const triple = question.match(/number family (?:for|is correct for) (\d+),\s*(\d+) and (\d+)/i);
+    if (triple) {
+      const x = Number(triple[1]);
+      const y = Number(triple[2]);
+      const z = Number(triple[3]);
+      const ordered = [x, y, z].sort((a, b) => a - b);
+      const [s, m, l] = ordered;
+      if (s * m === l) {
+        return buildEqualPartsBarModel(l, s, m);
+      }
+    }
+
+    const ifMult = question.match(/^If\s+(\d+)\s*[×x]\s*(\d+)\s*=\s*(\d+)/i);
+    if (ifMult) {
+      const a = Number(ifMult[1]);
+      const b = Number(ifMult[2]);
+      const c = Number(ifMult[3]);
+      if (a * b === c) {
+        return buildEqualPartsBarModel(c, a, b);
+      }
+    }
+
+    const writeFamily = question.match(/Write the number family for (\d+),\s*(\d+) and (\d+)/i);
+    if (writeFamily) {
+      const x = Number(writeFamily[1]);
+      const y = Number(writeFamily[2]);
+      const z = Number(writeFamily[3]);
+      const ordered = [x, y, z].sort((a, b) => a - b);
+      const [s, m, l] = ordered;
+      if (s * m === l) {
+        return buildEqualPartsBarModel(l, s, m);
+      }
+    }
+
+    const commTf = question.match(/(\d+)\s*[×x]\s*(\d+)\s*=\s*(\d+)\s*[×x]\s*(\d+)/i);
+    if (commTf && /true or false/i.test(question)) {
+      const a = Number(commTf[1]);
+      const b = Number(commTf[2]);
+      const c = Number(commTf[3]);
+      const d = Number(commTf[4]);
+      if (a * b === c * d && c === b && d === a) {
+        return buildEqualPartsBarModel(a * b, a, b);
+      }
+    }
+
+    const divNonComm = question.match(/(\d+)\s*÷\s*(\d+)\s*=\s*(\d+)\s+but/i);
+    if (divNonComm) {
+      const total = Number(divNonComm[1]);
+      const groups = Number(divNonComm[2]);
+      if (total % groups === 0) {
+        return buildEqualPartsBarModel(total, groups, total / groups);
+      }
+    }
+
+    const bothDiv = question.match(/(\d+)\s*÷\s*(\d+)\s*=\s*(\d+)\s+and\s+(\d+)\s*÷\s*(\d+)\s*=\s*(\d+)/i);
+    if (bothDiv && /\bnumber family\b/i.test(question)) {
+      const total = Number(bothDiv[1]);
+      const g1 = Number(bothDiv[2]);
+      if (total % g1 === 0) {
+        return buildEqualPartsBarModel(total, g1, total / g1);
+      }
+    }
+
+    if (/when dividing one number by another, the order does not matter/i.test(question)) {
+      return buildEqualPartsBarModel(12, 4, 3);
+    }
+
+    if (/\bdivision is not commutative\b/i.test(question)) {
+      return buildEqualPartsBarModel(12, 4, 3);
+    }
+
+    if (/(\d+)\s*÷\s*(\d+)\s*=\s*(\d+)\s*÷\s*(\d+)/i.test(question)) {
+      const bad = question.match(/(\d+)\s*÷\s*(\d+)\s*=\s*(\d+)\s*÷\s*(\d+)/i)!;
+      const total = Number(bad[1]);
+      const groups = Number(bad[2]);
+      if (total % groups === 0) {
+        return buildEqualPartsBarModel(total, groups, total / groups);
+      }
+    }
+
+    if (/which statement is correct/i.test(question) && /\bcommutative\b/i.test(question)) {
+      return buildEqualPartsBarModel(20, 4, 5);
+    }
+
+    if (/^which statement is correct\?$/i.test(question.trim())) {
+      return buildEqualPartsBarModel(20, 4, 5);
+    }
+  }
+
+  return null;
+}
+
 function inferGeneratedVisuals(question: string, primarySkillCode?: string): MathsVisual[] {
   const lower = question.toLowerCase();
+  const barModel = inferBarModel(question, primarySkillCode);
   const numberLine = inferNumberLine(question, primarySkillCode);
   const arithmetic = inferArithmeticLayout(question, primarySkillCode);
   const shape = inferShapeVisual(question, primarySkillCode);
   const fractionBar = inferFractionBar(question);
 
-  const visuals: Array<ArithmeticLayoutVisual | ShapeVisual | NumberLineVisual | FractionBarVisual | null> = lower.includes('number line')
-    ? [numberLine, arithmetic, shape, fractionBar]
-    : [shape, arithmetic, numberLine, fractionBar];
+  const visuals: Array<
+    BarModelVisual | ArithmeticLayoutVisual | ShapeVisual | NumberLineVisual | FractionBarVisual | null
+  > = lower.includes('number line')
+    ? [numberLine, barModel, arithmetic, shape, fractionBar]
+    : [barModel, shape, arithmetic, numberLine, fractionBar];
 
   return visuals.filter(
     (
       visual
-    ): visual is ArithmeticLayoutVisual | ShapeVisual | NumberLineVisual | FractionBarVisual => visual !== null
+    ): visual is
+      | BarModelVisual
+      | ArithmeticLayoutVisual
+      | ShapeVisual
+      | NumberLineVisual
+      | FractionBarVisual => visual !== null
   );
 }
 

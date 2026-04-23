@@ -3,6 +3,7 @@ import { ArithmeticLayoutRenderer } from '@/components/maths/arithmetic/Arithmet
 import { AngleRenderer } from '@/components/maths/geometry/AngleRenderer';
 import { CoordinateGridRenderer } from '@/components/maths/geometry/CoordinateGridRenderer';
 import { ShapeRenderer } from '@/components/maths/geometry/ShapeRenderer';
+import { BarModelRenderer } from '@/components/maths/number/BarModelRenderer';
 import { FractionBarRenderer } from '@/components/maths/number/FractionBarRenderer';
 import { NumberLineRenderer } from '@/components/maths/number/NumberLineRenderer';
 import { validateMathsVisual } from '@/lib/maths/visuals/guards';
@@ -33,6 +34,8 @@ export function MathsVisualRenderer({ visual }: { visual: MathsVisual }) {
       return <CoordinateGridRenderer visual={visual} />;
     case 'chart':
       return <ChartRenderer visual={visual} />;
+    case 'bar-model':
+      return <BarModelRenderer visual={visual} />;
     default:
       return null;
   }

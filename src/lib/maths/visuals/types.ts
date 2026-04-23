@@ -147,6 +147,20 @@ export interface ChartVisual extends VisualCaptioned {
   series: ChartBarSpec[];
 }
 
+/** Equal-parts bar model for multiplication / division (e.g. N3.1). */
+export interface BarModelSegmentSpec {
+  /** Numeric size of the segment (used for width proportion). */
+  value: number;
+  /** Label inside the part (defaults to string of value). */
+  label?: string;
+}
+
+export interface BarModelVisual extends VisualCaptioned {
+  type: 'bar-model';
+  total: number;
+  segments: BarModelSegmentSpec[];
+}
+
 export type MathsVisual =
   | ArithmeticLayoutVisual
   | ShapeVisual
@@ -154,4 +168,5 @@ export type MathsVisual =
   | NumberLineVisual
   | FractionBarVisual
   | CoordinateGridVisual
-  | ChartVisual;
+  | ChartVisual
+  | BarModelVisual;
