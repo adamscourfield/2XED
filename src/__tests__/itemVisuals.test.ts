@@ -68,6 +68,79 @@ describe('resolveItemVisuals', () => {
     });
   });
 
+  it('builds a midpoint segment for N1.9 midpoint prompts', () => {
+    const visuals = resolveItemVisuals(
+      {
+        question: 'Calculate the midpoint of 20 and 30.',
+        options: {},
+      },
+      'N1.9'
+    );
+
+    expect(visuals).toHaveLength(1);
+    expect(visuals[0]).toMatchObject({
+      type: 'number-line',
+      markers: expect.arrayContaining([
+        { value: 20, label: '20', kind: 'point' },
+        { value: 30, label: '30', kind: 'point' },
+        { value: 25, label: 'mid', kind: 'target' },
+      ]),
+    });
+  });
+
+  it('builds tick marks for missing-value-on-the-number-line sequences', () => {
+    const visuals = resolveItemVisuals(
+      {
+        question: 'What is the missing value on the number line? 10, 20, ___, 40, 50',
+        options: {},
+      },
+      'N1.9'
+    );
+
+    expect(visuals).toHaveLength(1);
+    expect(visuals[0]).toMatchObject({
+      type: 'number-line',
+      markers: expect.arrayContaining([
+        expect.objectContaining({ value: 10 }),
+        expect.objectContaining({ value: 20 }),
+        expect.objectContaining({ value: 40 }),
+        expect.objectContaining({ value: 50 }),
+      ]),
+    });
+  });
+
+  it('places P and Q for negative interval word problems', () => {
+    const visuals = resolveItemVisuals(
+      {
+        question:
+          'The difference between P and Q is 24 on a negative number line. If Q is at -12 and P is to the left of Q, what is P?',
+        options: {},
+      },
+      'N1.13'
+    );
+
+    expect(visuals).toHaveLength(1);
+    expect(visuals[0]).toMatchObject({
+      type: 'number-line',
+      markers: expect.arrayContaining([
+        { value: -36, label: 'P', kind: 'point' },
+        { value: -12, label: 'Q', kind: 'point' },
+      ]),
+    });
+  });
+
+  it('does not invent a number line for N1.10 rounding-only stems', () => {
+    const visuals = resolveItemVisuals(
+      {
+        question: 'Round 73 to the nearest 10.',
+        options: {},
+      },
+      'N1.10'
+    );
+
+    expect(visuals).toHaveLength(0);
+  });
+
   it('builds a jump number line for starts-at-and-jumps prompts', () => {
     const visuals = resolveItemVisuals(
       {
@@ -158,6 +231,76 @@ describe('resolveItemVisuals', () => {
     expect(visuals[0]).toMatchObject({
       type: 'shape',
       shape: 'square',
+    });
+  });
+
+  describe('N4.1 fraction reading (question bank)', () => {
+    it('builds a part–whole fraction bar from equal-parts stems', () => {
+      const visuals = resolveItemVisuals(
+        {
+          question: 'A rectangle is divided into 10 equal parts. 7 parts are shaded. What fraction is shaded?',
+          options: ['7/3', '10/7', '3/10', '7/10'],
+        },
+        'N4.1'
+      );
+
+      expect(visuals).toHaveLength(1);
+      expect(visuals[0]).toMatchObject({ type: 'fraction-bar' });
+      if (visuals[0].type === 'fraction-bar') {
+        expect(visuals[0].bars[0]?.segments).toHaveLength(10);
+        expect(visuals[0].bars[0]?.segments.filter((s) => s.shaded)).toHaveLength(7);
+      }
+      expect(validateMathsVisual(visuals[0])).toEqual([]);
+    });
+
+    it('builds a 0–1 number line with the nth mark after 0', () => {
+      const visuals = resolveItemVisuals(
+        {
+          question:
+            'A number line from 0 to 1 is split into 5 equal parts. A point is at the second mark after 0. What fraction does the point show?',
+          options: ['1/5', '3/5', '2/5', '4/5'],
+        },
+        'N4.1'
+      );
+
+      expect(visuals).toHaveLength(1);
+      expect(visuals[0]).toMatchObject({
+        type: 'number-line',
+        min: 0,
+        max: 1,
+        markers: [{ value: 0.4, label: '2/5', kind: 'target' }],
+      });
+      expect(validateMathsVisual(visuals[0])).toEqual([]);
+    });
+
+    it('does not invent a bogus fraction bar for “greater than 1/2” stems', () => {
+      const visuals = resolveItemVisuals(
+        {
+          question: 'Which fraction is greater than 1/2?',
+          options: ['1/4', '1/3', '3/8', '5/8'],
+        },
+        'N4.1'
+      );
+
+      expect(visuals).toHaveLength(0);
+    });
+
+    it('plots MCQ fractions on a unit interval for closest-to prompts', () => {
+      const visuals = resolveItemVisuals(
+        {
+          question: 'Which of these fractions is closest to 0 on a number line between 0 and 1?',
+          options: ['3/4', '1/2', '1/10', '2/3'],
+        },
+        'N4.1'
+      );
+
+      expect(visuals).toHaveLength(1);
+      expect(visuals[0]).toMatchObject({ type: 'number-line', min: 0, max: 1 });
+      if (visuals[0].type === 'number-line') {
+        const target = visuals[0].markers.find((m) => m.kind === 'target');
+        expect(target?.label).toBe('1/10');
+      }
+      expect(validateMathsVisual(visuals[0])).toEqual([]);
     });
   });
 });

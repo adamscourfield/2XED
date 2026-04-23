@@ -1,5 +1,6 @@
 import type {
   ArithmeticLayoutVisual,
+  BarModelVisual,
   ChartVisual,
   CoordinateGridVisual,
   DataTableVisual,
@@ -8,9 +9,9 @@ import type {
   FrequencyTreeVisual,
   MathsVisual,
   NumberLineVisual,
-  PartWholeBarModelVisual,
+  SampleSpaceGridVisual,
   ShapeVisual,
-  TimetableVisual,
+  VennTwoSetVisual,
 } from './types';
 
 function isObject(value: unknown): value is Record<string, unknown> {
@@ -84,28 +85,25 @@ function validateChart(visual: ChartVisual): string[] {
   return issues;
 }
 
-function validatePartWholeBarModel(visual: PartWholeBarModelVisual): string[] {
+function validateBarModel(visual: BarModelVisual): string[] {
   const issues: string[] = [];
   if (!hasText(visual.altText)) issues.push('missing alt text');
-  if (!(typeof visual.total === 'number' && visual.total > 0)) issues.push('bar model needs a positive total');
-  if (!Array.isArray(visual.parts) || visual.parts.length < 2) {
-    issues.push('bar model needs at least two parts');
+  if (!(Number.isInteger(visual.total) && visual.total > 0)) {
+    issues.push('bar model requires a positive integer total');
   }
-  return issues;
-}
-
-function validateDataTable(visual: DataTableVisual): string[] {
-  const issues: string[] = [];
-  if (!hasText(visual.altText)) issues.push('missing alt text');
-  if (!Array.isArray(visual.columnHeaders) || visual.columnHeaders.length < 2) {
-    issues.push('data table needs column headers');
+  if (!Array.isArray(visual.segments) || visual.segments.length === 0) {
+    issues.push('bar model requires at least one segment');
   }
-  if (!Array.isArray(visual.rows) || visual.rows.length === 0) {
-    issues.push('data table needs rows');
+  if (
+    visual.segments.some(
+      (seg) => !(typeof seg.value === 'number' && Number.isFinite(seg.value) && seg.value > 0)
+    )
+  ) {
+    issues.push('bar model segments must have positive numeric values');
   }
-  const n = visual.columnHeaders.length;
-  if (visual.rows.some((row) => !Array.isArray(row.cells) || row.cells.length !== n)) {
-    issues.push('data table row cell counts must match headers');
+  const sum = visual.segments.reduce((acc, seg) => acc + seg.value, 0);
+  if (Math.abs(sum - visual.total) > 1e-6) {
+    issues.push('bar model segment values must sum to the total');
   }
   return issues;
 }
@@ -173,6 +171,10 @@ export function validateMathsVisual(visual: MathsVisual): string[] {
       return validateFrequencyTree(visual);
     case 'angle-diagram':
       return hasText(visual.altText) ? [] : ['missing alt text'];
+    case 'sample-space-grid':
+      return validateSampleSpaceGrid(visual);
+    case 'venn-two-set':
+      return validateVennTwoSet(visual);
     default:
       return ['unknown visual type'];
   }

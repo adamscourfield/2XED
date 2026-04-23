@@ -1,12 +1,16 @@
 import { isMathsVisual } from '../../lib/maths/visuals/guards';
 import type {
   ArithmeticLayoutVisual,
+  BarModelVisual,
+  ChartVisual,
   FractionBarVisual,
   MathsVisual,
   NumberLineVisual,
+  SampleSpaceGridVisual,
   ShapeEdgeLabel,
   ShapeVisual,
   VisualPoint,
+  VennTwoSetVisual,
 } from '../../lib/maths/visuals/types';
 import { inferDataVisualsForItem } from './inferDataVisuals';
 
@@ -402,9 +406,318 @@ function createCompoundLShape(labels: string[]): ShapeVisual {
   };
 }
 
+/** A1.12 stems describe growing patterns (counts per term), not geometric "find the square" tasks. */
+function isA1PatternSequenceSkill(primarySkillCode?: string): boolean {
+  return primarySkillCode === 'A1.12';
+}
+
+/**
+ * Rectangle with algebraic or unit side labels, e.g. "side lengths 3x and 4x" or "5m and 2m".
+ * Plain numeric cm stems still use parseCentimetreValues via createRectangle(labels).
+ */
+function parseRectangleAlgebraSideLabels(question: string): [string, string] | null {
+  const m = question.match(
+    /\brectangle has (?:side lengths?|sides)\s+([^.\n]+?)\s+and\s+([^.\n]+?)(?:\.|\s+what\b|\s+find\b)/i,
+  );
+  if (!m) return null;
+  const a = m[1].replace(/\s+/g, ' ').trim();
+  const b = m[2].replace(/\s+/g, ' ').trim();
+  if (!a || !b) return null;
+  if (!/[a-z]/i.test(a + b) && !/\d\s*(?:m|cm)\b/i.test(a + b)) return null;
+  return [a, b];
+}
+
+/** "A rectangle has area … and one side …" — label known side and "? " for missing (shown on diagram). */
+function parseRectangleAreaMissingSide(question: string): [string, string] | null {
+  const m = question.match(
+    /\brectangle has area\s+([^\s]+)\s+and one side(?:\s+length)?\s+([^\s.]+)/i,
+  );
+  if (!m) return null;
+  return [m[1].trim(), m[2].trim()];
+}
+
+/** "A shape has sides x, x, x and 6" style irregular perimeter prompts. */
+function parseIrregularSideLabels(question: string): string[] | null {
+  const m = question.match(/\bshape has sides\s+(.+?)\.\s*(?:What|Find)/i);
+  if (!m) return null;
+  const inner = m[1].trim();
+  const parts = inner.split(/\s*,\s*|\s+and\s+/i).map((s) => s.trim()).filter(Boolean);
+  if (parts.length < 3 || parts.length > 8) return null;
+  return parts;
+}
+
+function inferAlgebraRectangleSides(question: string, primarySkillCode?: string): ShapeVisual | null {
+  if (primarySkillCode !== 'A1.3' && primarySkillCode !== 'A1.4') return null;
+  const pair = parseRectangleAlgebraSideLabels(question);
+  if (!pair) return null;
+  return createRectangle(pair);
+}
+
+function inferAlgebraRectangleAreaMissing(question: string, primarySkillCode?: string): ShapeVisual | null {
+  if (primarySkillCode !== 'A1.5') return null;
+  const parsed = parseRectangleAreaMissingSide(question);
+  if (!parsed) return null;
+  const [areaExpr, knownSide] = parsed;
+  return {
+    ...createRectangle([knownSide, '?']),
+    altText: `Rectangle with area ${areaExpr} and one side ${knownSide}.`,
+    caption: 'Rectangle diagram: known side labelled; missing side is unknown.',
+  };
+}
+
+function inferIrregularPerimeterDiagram(question: string, primarySkillCode?: string): ShapeVisual | null {
+  if (primarySkillCode !== 'A1.3') return null;
+  const sides = parseIrregularSideLabels(question);
+  if (!sides) return null;
+  return createIrregularPolygon(sides);
+}
+
+/** Bar heights for the first few terms of an A1.12 linear pattern (from the stem). */
+function inferA1PatternSequenceChart(question: string, primarySkillCode?: string): ChartVisual | null {
+  if (!isA1PatternSequenceSkill(primarySkillCode)) return null;
+
+  const termMap = new Map<number, number>();
+  const inTermRe = /(\d+)(?:\s+[a-z]+)?\s+in term (\d+)/gi;
+  let im: RegExpExecArray | null;
+  while ((im = inTermRe.exec(question)) !== null) {
+    termMap.set(Number(im[2]), Number(im[1]));
+  }
+  if (termMap.has(1) && termMap.has(2) && termMap.has(3)) {
+    const series = [1, 2, 3].map((t) => ({
+      label: `T${t}`,
+      value: termMap.get(t)!,
+    }));
+    return {
+      type: 'chart',
+      chartType: 'bar',
+      series,
+      altText: `Bar chart of pattern totals for terms 1 to 3 (${series.map((s) => s.value).join(', ')}).`,
+      caption: 'Diagram totals for the first three terms.',
+    };
+  }
+
+  const addEach =
+    question.match(/\badd(?:s|ing)?\s+(\d+)\b[^.\n]*?(?:each time|each term)\b/i) ||
+    question.match(/\bincreases?\s+by\s+(\d+)\s+(?:each time|each term)?\b/i) ||
+    question.match(/\bgo(?:es)?\s+up\s+by\s+(\d+)\b/i) ||
+    question.match(/\bgrows?\s+by\s+(\d+)\s+each time\b/i);
+  const startMatch =
+    question.match(/\b(?:If\s+)?term\s+1\s+has\s+(\d+)\b/i) ||
+    question.match(/\bterm\s+1\s+is\s+(\d+)\b/i) ||
+    question.match(/\bstarts?\s+(?:at|with)\s+(\d+)\b/i);
+  const targetTermMatch =
+    question.match(/\bin term (\d+)\s*\?/i) ||
+    question.match(/\bhow many[^?]*\bterm (\d+)\b/i) ||
+    question.match(/\bterm (\d+)\s*\?/i);
+  if (addEach && startMatch && targetTermMatch) {
+    const a = Number(startMatch[1]);
+    const d = Number(addEach[1]);
+    const target = Number(targetTermMatch[1]);
+    if (!Number.isFinite(a) || !Number.isFinite(d) || !Number.isFinite(target) || target < 1) return null;
+    const count = Math.min(target, 6);
+    const series = Array.from({ length: count }, (_, i) => ({
+      label: `T${i + 1}`,
+      value: a + i * d,
+    }));
+    return {
+      type: 'chart',
+      chartType: 'bar',
+      series,
+      altText: `Bar chart: term 1 starts at ${a}, adding ${d} each time, up to term ${count}.`,
+      caption: 'Linear pattern totals by term.',
+    };
+  }
+
+  const growBy = question.match(/\bgrows?\s+by\s+(\d+)\s+each time\b/i);
+  const term1Is = question.match(/\bterm\s+1\s+is\s+(\d+)\b/i);
+  const growTarget =
+    question.match(/\bin term (\d+)\s*\?/i) ||
+    question.match(/\bhow many[^?]*\bterm (\d+)\b/i) ||
+    question.match(/\bterm (\d+)\s*\?/i);
+  if (growBy && term1Is && growTarget) {
+    const a = Number(term1Is[1]);
+    const d = Number(growBy[1]);
+    const target = Number(growTarget[1]);
+    if (!Number.isFinite(a) || !Number.isFinite(d) || !Number.isFinite(target) || target < 1) return null;
+    const count = Math.min(target, 6);
+    const series = Array.from({ length: count }, (_, i) => ({
+      label: `T${i + 1}`,
+      value: a + i * d,
+    }));
+    return {
+      type: 'chart',
+      chartType: 'bar',
+      series,
+      altText: `Bar chart: term 1 is ${a}, growing by ${d} each time, up to term ${count}.`,
+      caption: 'Linear pattern totals by term.',
+    };
+  }
+
+  const listMatch =
+    question.match(/\b(?:diagram sequence|pattern)\s+(?:is|has)\s+([\d,\s]+)\.\s*What is term (\d+)/i) ||
+    question.match(/\bsequence has totals\s+([\d,\s]+)\.\s*What is term (\d+)/i);
+  if (listMatch) {
+    const nums = listMatch[1]
+      .split(',')
+      .map((s) => Number(s.trim().replace(/,/g, '')))
+      .filter((n) => Number.isFinite(n));
+    const targetTerm = Number(listMatch[2]);
+    if (nums.length < 2 || !Number.isFinite(targetTerm) || targetTerm < 1) return null;
+    const d = nums[1] - nums[0];
+    if (d === 0) return null;
+    const shown = Math.min(Math.max(nums.length, Math.min(targetTerm, 6)), 6);
+    const series = Array.from({ length: shown }, (_, i) => ({
+      label: `T${i + 1}`,
+      value: i < nums.length ? nums[i] : nums[nums.length - 1] + (i - (nums.length - 1)) * d,
+    }));
+    return {
+      type: 'chart',
+      chartType: 'bar',
+      series,
+      altText: `Bar chart of listed pattern totals for terms 1 to ${shown}.`,
+      caption: 'Diagram totals by term number.',
+    };
+  }
+
+  const objectsConsec = question.match(/\b([\d,\s]+)\s+objects in consecutive terms\b/i);
+  if (objectsConsec) {
+    const nums = objectsConsec[1]
+      .split(',')
+      .map((s) => Number(s.trim().replace(/,/g, '')))
+      .filter((n) => Number.isFinite(n));
+    const termAsk = question.match(/\bterm\s+(\d+)\b/i);
+    const targetTerm = termAsk ? Number(termAsk[1]) : nums.length + 1;
+    if (nums.length < 2 || !Number.isFinite(targetTerm)) return null;
+    const d = nums[1] - nums[0];
+    if (d === 0) return null;
+    const shown = Math.min(Math.max(nums.length, Math.min(targetTerm, 6)), 6);
+    const series = Array.from({ length: shown }, (_, i) => ({
+      label: `T${i + 1}`,
+      value: i < nums.length ? nums[i] : nums[nums.length - 1] + (i - (nums.length - 1)) * d,
+    }));
+    return {
+      type: 'chart',
+      chartType: 'bar',
+      series,
+      altText: `Bar chart of consecutive-term object counts (${nums.join(', ')}).`,
+      caption: 'Pattern totals by term.',
+    };
+  }
+
+  const showsTotals = question.match(/\bshows totals\s+([\d,\s]+)\.\s*What is term (\d+)/i);
+  if (showsTotals) {
+    const nums = showsTotals[1]
+      .split(',')
+      .map((s) => Number(s.trim().replace(/,/g, '')))
+      .filter((n) => Number.isFinite(n));
+    const targetTerm = Number(showsTotals[2]);
+    if (nums.length < 2 || !Number.isFinite(targetTerm)) return null;
+    const d = nums[1] - nums[0];
+    if (d === 0) return null;
+    const shown = Math.min(Math.max(nums.length, Math.min(targetTerm, 6)), 6);
+    const series = Array.from({ length: shown }, (_, i) => ({
+      label: `T${i + 1}`,
+      value: i < nums.length ? nums[i] : nums[nums.length - 1] + (i - (nums.length - 1)) * d,
+    }));
+    return {
+      type: 'chart',
+      chartType: 'bar',
+      series,
+      altText: `Bar chart of listed totals (${nums.join(', ')}).`,
+      caption: 'Diagram totals by term.',
+    };
+  }
+
+  const diagramTotals = question.match(/\bdiagram totals\s+([\d,\s]+)\.\s*What is term (\d+)/i);
+  if (diagramTotals) {
+    const nums = diagramTotals[1]
+      .split(',')
+      .map((s) => Number(s.trim().replace(/,/g, '')))
+      .filter((n) => Number.isFinite(n));
+    const targetTerm = Number(diagramTotals[2]);
+    if (nums.length >= 2 && Number.isFinite(targetTerm)) {
+      const d = nums[1] - nums[0];
+      if (d !== 0) {
+        const shown = Math.min(Math.max(nums.length, Math.min(targetTerm, 6)), 6);
+        const series = Array.from({ length: shown }, (_, i) => ({
+          label: `T${i + 1}`,
+          value: i < nums.length ? nums[i] : nums[nums.length - 1] + (i - (nums.length - 1)) * d,
+        }));
+        return {
+          type: 'chart',
+          chartType: 'bar',
+          series,
+          altText: `Bar chart of diagram totals (${nums.join(', ')}).`,
+          caption: 'Diagram totals by term.',
+        };
+      }
+    }
+  }
+
+  const patternHasList = question.match(
+    /\bpattern has\s+([\d,\s]+)\.\s*What is term (\d+)/i,
+  );
+  if (patternHasList) {
+    const nums = patternHasList[1]
+      .split(',')
+      .map((s) => Number(s.trim().replace(/,/g, '')))
+      .filter((n) => Number.isFinite(n));
+    const targetTerm = Number(patternHasList[2]);
+    if (nums.length >= 2 && Number.isFinite(targetTerm)) {
+      const d = nums[1] - nums[0];
+      if (d !== 0) {
+        const shown = Math.min(Math.max(nums.length, Math.min(targetTerm, 6)), 6);
+        const series = Array.from({ length: shown }, (_, i) => ({
+          label: `T${i + 1}`,
+          value: i < nums.length ? nums[i] : nums[nums.length - 1] + (i - (nums.length - 1)) * d,
+        }));
+        return {
+          type: 'chart',
+          chartType: 'bar',
+          series,
+          altText: `Bar chart of pattern totals (${nums.join(', ')}).`,
+          caption: 'Pattern totals by term.',
+        };
+      }
+    }
+  }
+
+  const totalsMatch = question.match(
+    /\b(?:totals?|sequence|diagram)\s+(?:is|has|of diagram totals is|of)\s+([\d,\s]+)\.\s*What is term (\d+)/i,
+  );
+  if (totalsMatch) {
+    const nums = totalsMatch[1]
+      .split(',')
+      .map((s) => Number(s.trim().replace(/,/g, '')))
+      .filter((n) => Number.isFinite(n));
+    const targetTerm = Number(totalsMatch[2]);
+    if (nums.length < 2 || !Number.isFinite(targetTerm)) return null;
+    const d = nums[1] - nums[0];
+    if (d === 0) return null;
+    const shown = Math.min(Math.max(nums.length, Math.min(targetTerm, 6)), 6);
+    const series = Array.from({ length: shown }, (_, i) => ({
+      label: `T${i + 1}`,
+      value: i < nums.length ? nums[i] : nums[nums.length - 1] + (i - (nums.length - 1)) * d,
+    }));
+    return {
+      type: 'chart',
+      chartType: 'bar',
+      series,
+      altText: `Bar chart of pattern totals (${nums.join(', ')}) extended to term ${shown}.`,
+      caption: 'Diagram totals by term.',
+    };
+  }
+
+  return null;
+}
+
 function inferShapeVisual(question: string, primarySkillCode?: string): ShapeVisual | null {
   const lower = question.toLowerCase();
   const labels = parseCentimetreValues(question);
+
+  if (isA1PatternSequenceSkill(primarySkillCode)) {
+    return null;
+  }
 
   if (primarySkillCode === 'N2.13' || lower.includes('compound shape')) {
     return createCompoundLShape(labels);
@@ -426,18 +739,161 @@ function inferShapeVisual(question: string, primarySkillCode?: string): ShapeVis
   return null;
 }
 
-function inferNumberLine(question: string, primarySkillCode?: string): NumberLineVisual | null {
-  const lower = question.toLowerCase();
+/** Smallest positive difference between sorted distinct values (for tick spacing). */
+function minPositiveGap(values: number[]): number | null {
+  const sorted = [...new Set(values)].sort((a, b) => a - b);
+  let best: number | null = null;
+  for (let i = 1; i < sorted.length; i++) {
+    const d = sorted[i] - sorted[i - 1];
+    if (d > 0 && (best === null || d < best)) best = d;
+  }
+  return best;
+}
+
+function niceStepForRange(range: number, isDecimal: boolean): number {
+  if (!Number.isFinite(range) || range <= 0) return isDecimal ? 0.1 : 1;
+  if (isDecimal && range <= 2) {
+    const candidates = [0.01, 0.02, 0.05, 0.1, 0.2, 0.25, 0.5, 1];
+    for (const c of candidates) {
+      if (range / c <= 12) return c;
+    }
+    return 0.5;
+  }
+  const raw = range / 8;
+  const pow10 = 10 ** Math.floor(Math.log10(raw));
+  const frac = raw / pow10;
+  const niceFrac = frac <= 1 ? 1 : frac <= 2 ? 2 : frac <= 5 ? 5 : 10;
+  return niceFrac * pow10;
+}
+
+function isN1ExtendedLineSkill(code?: string): boolean {
+  return code === 'N1.21' || code === 'N1.22' || code === 'N1.23' || code === 'N1.24';
+}
+
+function inferMidpointSegment(question: string, primarySkillCode?: string): NumberLineVisual | null {
   if (
+    primarySkillCode !== 'N1.5' &&
     primarySkillCode !== 'N1.9' &&
-    primarySkillCode !== 'N1.10' &&
     primarySkillCode !== 'N1.11' &&
-    primarySkillCode !== 'N1.12' &&
-    primarySkillCode !== 'N1.13' &&
-    !lower.includes('number line')
+    !isN1ExtendedLineSkill(primarySkillCode)
   ) {
     return null;
   }
+
+  const midMatch = question.match(
+    /\b(?:find|calculate)\s+the\s+midpoint\s+of\s+(-?\d+(?:\.\d+)?)\s+and\s+(-?\d+(?:\.\d+)?)\b/i
+  );
+  if (!midMatch) return null;
+
+  const a = Number(midMatch[1]);
+  const b = Number(midMatch[2]);
+  if (!Number.isFinite(a) || !Number.isFinite(b)) return null;
+
+  const lo = Math.min(a, b);
+  const hi = Math.max(a, b);
+  const mid = (a + b) / 2;
+  const span = hi - lo || 1;
+  const pad = span * 0.12;
+  const isDecimal =
+    primarySkillCode === 'N1.11' || isN1ExtendedLineSkill(primarySkillCode) || !Number.isInteger(a) || !Number.isInteger(b);
+  const step = niceStepForRange(hi - lo + 2 * pad, isDecimal);
+
+  return {
+    type: 'number-line',
+    min: lo - pad,
+    max: hi + pad,
+    step,
+    markers: [
+      { value: a, label: String(a), kind: 'point' },
+      { value: b, label: String(b), kind: 'point' },
+      { value: mid, label: 'mid', kind: 'target' },
+    ],
+    altText: `Number line from ${a} to ${b} showing the midpoint.`,
+    caption: 'Midpoint shown between the two values on a number line.',
+  };
+}
+
+function inferMissingTickNumberLine(question: string, primarySkillCode?: string): NumberLineVisual | null {
+  if (primarySkillCode !== 'N1.9' && primarySkillCode !== 'N1.11' && !isN1ExtendedLineSkill(primarySkillCode)) return null;
+  if (!/\bmissing value on the number line\b/i.test(question)) return null;
+
+  const parts = question.split(/\bmissing value on the number line\b/i);
+  const tail = parts[1] ?? '';
+  const seq = [...tail.matchAll(/-?\d+(?:\.\d+)?/g)].map((m) => Number(m[0]));
+  if (seq.length < 2) return null;
+
+  const gap = minPositiveGap(seq);
+  const isDecimal = seq.some((n) => !Number.isInteger(n));
+  const step = gap && gap > 0 ? gap : niceStepForRange(Math.max(...seq) - Math.min(...seq), isDecimal);
+
+  const lo = Math.min(...seq);
+  const hi = Math.max(...seq);
+  const pad = Math.max(step, (hi - lo) * 0.08, 0.5);
+
+  return {
+    type: 'number-line',
+    min: lo - pad,
+    max: hi + pad,
+    step,
+    markers: seq.map((value) => ({ value, label: String(value), kind: 'point' })),
+    altText: 'Number line tick marks from the question sequence.',
+    caption: 'Tick marks for the sequence; one value is missing in the question.',
+  };
+}
+
+function inferNegativePQNumberLine(question: string, primarySkillCode?: string): NumberLineVisual | null {
+  if (primarySkillCode !== 'N1.13') return null;
+  const diffMatch = question.match(/\bdifference between P and Q is (\d+(?:\.\d+)?)\b/i);
+  const qMatch = question.match(/\bQ\s+is\s+at\s+(-?\d+(?:\.\d+)?)\b/i);
+  if (!diffMatch || !qMatch) return null;
+
+  const interval = Number(diffMatch[1]);
+  const qVal = Number(qMatch[1]);
+  if (!Number.isFinite(interval) || !Number.isFinite(qVal)) return null;
+
+  const leftOfQ = /\bP\s+is\s+to\s+the\s+left\b/i.test(question);
+  const pVal = leftOfQ ? qVal - interval : qVal + interval;
+
+  const lo = Math.min(pVal, qVal);
+  const hi = Math.max(pVal, qVal);
+  const pad = Math.max(1, interval * 0.25);
+  const step = niceStepForRange(hi - lo + 2 * pad, !Number.isInteger(qVal));
+
+  return {
+    type: 'number-line',
+    min: lo - pad,
+    max: hi + pad,
+    step,
+    markers: [
+      { value: pVal, label: 'P', kind: 'point' },
+      { value: qVal, label: 'Q', kind: 'point' },
+    ],
+    altText: `Number line with P at ${pVal} and Q at ${qVal}.`,
+    caption: 'Points P and Q from the interval description on a number line.',
+  };
+}
+
+function numberLineSkillAllowed(question: string, primarySkillCode?: string): boolean {
+  const lower = question.toLowerCase();
+  if (lower.includes('number line') || primarySkillCode === 'N2.1') return true;
+  if (
+    primarySkillCode === 'N1.5' ||
+    primarySkillCode === 'N1.9' ||
+    primarySkillCode === 'N1.11' ||
+    primarySkillCode === 'N1.13' ||
+    isN1ExtendedLineSkill(primarySkillCode)
+  ) {
+    return true;
+  }
+  if (primarySkillCode === 'N1.14' || primarySkillCode === 'N1.15') {
+    return lower.includes('number line');
+  }
+  return false;
+}
+
+function inferNumberLine(question: string, primarySkillCode?: string): NumberLineVisual | null {
+  const lower = question.toLowerCase();
+  if (!numberLineSkillAllowed(question, primarySkillCode)) return null;
 
   const jumpMatch = question.match(/starts?\s+at\s+(-?\d+(?:\.\d+)?)\s+and\s+jumps?\s+(?:on|by)\s+(-?\d+(?:\.\d+)?)/i);
   if (jumpMatch) {
@@ -460,6 +916,15 @@ function inferNumberLine(question: string, primarySkillCode?: string): NumberLin
       caption: 'Structured number line jump generated from the question.',
     };
   }
+
+  const midpointSeg = inferMidpointSegment(question, primarySkillCode);
+  if (midpointSeg) return midpointSeg;
+
+  const missingTicks = inferMissingTickNumberLine(question, primarySkillCode);
+  if (missingTicks) return missingTicks;
+
+  const pq = inferNegativePQNumberLine(question, primarySkillCode);
+  if (pq) return pq;
 
   if (lower.includes('number line') || primarySkillCode === 'N2.1') {
     const operation = parseOperationTokens(question);
@@ -488,13 +953,16 @@ function inferNumberLine(question: string, primarySkillCode?: string): NumberLin
   const min = Math.min(...tokens);
   const max = Math.max(...tokens);
   const padding = max === min ? 1 : Math.max(1, Math.ceil((max - min) * 0.15));
+  const isDecimal = tokens.some((n) => !Number.isInteger(n));
+  const range = max - min + 2 * padding;
+  const step = niceStepForRange(range, isDecimal);
 
   return {
     type: 'number-line',
-    min: Math.floor(min - padding),
-    max: Math.ceil(max + padding),
-    step: max - min > 10 ? Math.max(1, Math.round((max - min) / 8)) : 1,
-    markers: tokens.map((value) => ({ value })),
+    min: min - padding,
+    max: max + padding,
+    step,
+    markers: unique(tokens).map((value) => ({ value })),
     altText: 'Number line model generated from the numbers in the question.',
     caption: 'Structured number line generated from the values mentioned in the question.',
   };
@@ -526,22 +994,140 @@ function inferFractionBar(question: string): FractionBarVisual | null {
   };
 }
 
-function inferGeneratedVisuals(question: string, primarySkillCode?: string): MathsVisual[] {
+/** Parse strings like "3/4" or " 2/5 " into a numeric value. */
+function parseSimpleFractionValue(text: string): number | null {
+  const m = text.trim().match(/^(\d+)\s*\/\s*(\d+)$/);
+  if (!m) return null;
+  const num = Number(m[1]);
+  const den = Number(m[2]);
+  if (!Number.isFinite(num) || !Number.isFinite(den) || den === 0) return null;
+  return num / den;
+}
+
+function extractMcqChoiceStrings(rawOptions: unknown): string[] {
+  if (Array.isArray(rawOptions)) {
+    return rawOptions.filter((v): v is string => typeof v === 'string');
+  }
+  if (isObject(rawOptions) && Array.isArray(rawOptions.choices)) {
+    return rawOptions.choices.filter((v): v is string => typeof v === 'string');
+  }
+  return [];
+}
+
+/**
+ * N4.1 (fractions as parts of a whole, 0–1 number lines): infer visuals from stems
+ * so question-bank items render without hand-authored `options.visuals`.
+ */
+function inferN41PartWholeBar(question: string): FractionBarVisual | null {
+  const q = question;
+
+  const totalMatch =
+    q.match(/\b(?:divided into|split into)\s+(\d+)\s+equal\s+(?:parts?|sections?|slices|triangles)\b/i) ??
+    q.match(/\bcut into\s+(\d+)\s+equal\s+slices?\b/i) ??
+    q.match(/\bhas\s+(\d+)\s+equal\s+parts?\b/i) ??
+    q.match(
+      /\b(?:strip|rectangle|bar|circle|square|shape)\s+(?:is\s+)?(?:divided|split)\s+into\s+(\d+)\s+equal\s+(?:parts?|sections?|slices|triangles)\b/i
+    );
+
+  if (!totalMatch) return null;
+  const total = Number(totalMatch[1]);
+  if (!Number.isInteger(total) || total < 2 || total > 36) return null;
+
+  let partsShaded: number | null = null;
+
+  const eatMatch = q.match(/\beats\s+(\d+)\s+slices?\b/i);
+  if (eatMatch) partsShaded = Number(eatMatch[1]);
+
+  if (partsShaded == null) {
+    const shadedMatch = q.match(/\b(\d+)\s+(?:parts?|sections?|slices|triangles)\s+are\s+shaded\b/i);
+    if (shadedMatch) partsShaded = Number(shadedMatch[1]);
+  }
+
+  if (partsShaded == null) {
+    const andShaded = q.match(/\band\s+(\d+)\s+are\s+shaded\b/i);
+    if (andShaded) partsShaded = Number(andShaded[1]);
+  }
+
+  if (partsShaded == null) {
+    const colourMatch = q.match(/\b(\d+)\s+sections?\s+are\s+colou?red\b/i);
+    if (colourMatch) partsShaded = Number(colourMatch[1]);
+  }
+
+  if (partsShaded == null || !Number.isInteger(partsShaded) || partsShaded < 0 || partsShaded > total) {
+    return null;
+  }
+
+  return {
+    type: 'fraction-bar',
+    altText: `One whole split into ${total} equal parts; ${partsShaded} of them match the question (shaded or chosen).`,
+    caption: 'Part–whole model: each block is one equal part of the same whole.',
+    bars: [
+      {
+        id: 'whole',
+        segments: Array.from({ length: total }, (_, index) => ({
+          size: 1,
+          shaded: index < partsShaded,
+        })),
+      },
+    ],
+  };
+}
+
+function inferN41UnitNumberLine(question: string): NumberLineVisual | null {
   const lower = question.toLowerCase();
   const dataVisuals = inferDataVisualsForItem(question, primarySkillCode);
   const numberLine = inferNumberLine(question, primarySkillCode);
   const arithmetic = inferArithmeticLayout(question, primarySkillCode);
   const shape = inferShapeVisual(question, primarySkillCode);
   const fractionBar = inferFractionBar(question);
+  const s1Probability = inferS1ProbabilityVisuals(question, primarySkillCode);
 
-  const rest: Array<ArithmeticLayoutVisual | ShapeVisual | NumberLineVisual | FractionBarVisual | null> =
-    lower.includes('number line') ? [numberLine, arithmetic, shape, fractionBar] : [shape, arithmetic, numberLine, fractionBar];
+  const ordered: Array<
+    | BarModelVisual
+    | ArithmeticLayoutVisual
+    | ShapeVisual
+    | NumberLineVisual
+    | FractionBarVisual
+    | SampleSpaceGridVisual
+    | VennTwoSetVisual
+    | null
+  > = lower.includes('number line')
+    ? [
+        numberLine,
+        a1PatternChart,
+        a1IrregularPerimeter,
+        a1RectangleAreaMissing,
+        a1RectangleSides,
+        barModel,
+        arithmetic,
+        shape,
+        fractionBar,
+      ]
+    : [
+        a1PatternChart,
+        a1IrregularPerimeter,
+        a1RectangleAreaMissing,
+        a1RectangleSides,
+        barModel,
+        shape,
+        arithmetic,
+        numberLine,
+        fractionBar,
+      ];
 
-  const generated = rest.filter(
-    (visual): visual is ArithmeticLayoutVisual | ShapeVisual | NumberLineVisual | FractionBarVisual => visual !== null
+  const base = ordered.filter(
+    (
+      visual
+    ): visual is
+      | ChartVisual
+      | BarModelVisual
+      | ArithmeticLayoutVisual
+      | ShapeVisual
+      | NumberLineVisual
+      | FractionBarVisual => visual !== null
   );
 
-  return [...dataVisuals, ...generated];
+  return [...s1Probability, ...base];
 }
 
 export function resolveItemVisuals(
@@ -554,5 +1140,9 @@ export function resolveItemVisuals(
   const explicit = parseStoredVisuals(item.options);
   if (explicit.length > 0) return explicit;
 
-  return inferGeneratedVisuals(cleanQuestionForVisualInference(item.question), primarySkillCode);
+  return inferGeneratedVisuals(
+    cleanQuestionForVisualInference(item.question),
+    primarySkillCode,
+    item.options
+  );
 }
