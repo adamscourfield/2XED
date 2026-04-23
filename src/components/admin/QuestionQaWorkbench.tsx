@@ -13,7 +13,7 @@ type ReviewCategory =
   | 'SKILL_MAPPING'
   | 'OTHER';
 
-interface QaItem {
+export interface QaItem {
   id: string;
   question: string;
   displayQuestion: string;

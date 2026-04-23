@@ -2,7 +2,8 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/features/auth/authOptions';
 import { redirect } from 'next/navigation';
 import { prisma } from '@/db/prisma';
-import { QuestionQaWorkbench } from '@/components/admin/QuestionQaWorkbench';
+import { AdminContentQaView } from '@/components/admin/AdminContentQaView';
+import { AdminPageFrame } from '@/components/admin/AdminPageFrame';
 import { buildQaItemView } from '@/features/items/questionQa.server';
 
 export default async function AdminContentKSMathsPage() {
@@ -12,7 +13,13 @@ export default async function AdminContentKSMathsPage() {
   if (role !== 'ADMIN') redirect('/dashboard');
 
   const subject = await prisma.subject.findUnique({ where: { slug: 'ks3-maths' } });
-  if (!subject) return <div>Subject not found</div>;
+  if (!subject) {
+    return (
+      <AdminPageFrame title="Subject not found" subtitle="KS3 Maths is not in the database. Run db:seed first.">
+        <p className="text-sm" style={{ color: 'var(--anx-text-muted)' }}>Return to admin home and check your seed.</p>
+      </AdminPageFrame>
+    );
+  }
 
   const importedItems = await prisma.item.findMany({
     where: {
@@ -65,75 +72,6 @@ export default async function AdminContentKSMathsPage() {
         a.displayQuestion.localeCompare(b.displayQuestion)
       );
     });
-  const skillSet = Array.from(new Set(qaItems.flatMap((item) => item.skills))).sort();
-  const typeSet = Array.from(new Set(qaItems.map((item) => item.type))).sort();
-  const realQuestionCount = qaItems.filter((item) => !item.isPlaceholder).length;
-  const placeholderCount = qaItems.filter((item) => item.isPlaceholder).length;
-  const issueCount = qaItems.reduce((sum, item) => sum + item.issues.length, 0);
-  const flaggedCount = qaItems.filter((item) => item.issues.length > 0).length;
-  const repairOpenCount = qaItems.reduce(
-    (sum, item) => sum + item.reviewNotes.filter((note) => note.status === 'OPEN').length,
-    0
-  );
 
-  return (
-    <main className="anx-shell">
-      <div className="mx-auto w-full max-w-7xl space-y-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Question QA Lab</h1>
-            <p className="mt-1 text-sm text-gray-500">
-              Review answer mode, stored answers, accepted answers, and grading behaviour before students see items.
-            </p>
-          </div>
-          <a href="/admin/insight/ks3-maths" className="text-sm text-blue-600 hover:underline">
-            ← Back to Insight Dashboard
-          </a>
-        </div>
-
-        <section className="grid gap-4 md:grid-cols-6">
-          <div className="rounded-xl border border-gray-200 bg-white p-4">
-            <div className="text-xs text-gray-500">Total rows</div>
-            <div className="mt-1 text-2xl font-bold text-gray-900">{qaItems.length}</div>
-          </div>
-          <div className="rounded-xl border border-gray-200 bg-white p-4">
-            <div className="text-xs text-gray-500">Real questions</div>
-            <div className="mt-1 text-2xl font-bold text-emerald-700">{realQuestionCount}</div>
-          </div>
-          <div className="rounded-xl border border-gray-200 bg-white p-4">
-            <div className="text-xs text-gray-500">Placeholder rows</div>
-            <div className="mt-1 text-2xl font-bold text-slate-600">{placeholderCount}</div>
-            {placeholderCount > 0 && (
-              <div className="mt-1 text-xs text-gray-500">Hidden by default in the list</div>
-            )}
-          </div>
-          <div className="rounded-xl border border-gray-200 bg-white p-4">
-            <div className="text-xs text-gray-500">Flagged items</div>
-            <div className="mt-1 text-2xl font-bold text-red-600">{flaggedCount}</div>
-          </div>
-          <div className="rounded-xl border border-gray-200 bg-white p-4">
-            <div className="text-xs text-gray-500">Contract issues</div>
-            <div className="mt-1 text-2xl font-bold text-amber-600">{issueCount}</div>
-          </div>
-          <div className="rounded-xl border border-gray-200 bg-white p-4">
-            <div className="text-xs text-gray-500">Skills covered</div>
-            <div className="mt-1 text-2xl font-bold text-gray-900">{skillSet.length}</div>
-          </div>
-          <div className="rounded-xl border border-gray-200 bg-white p-4">
-            <div className="text-xs text-gray-500">Open repair notes</div>
-            <div className="mt-1 text-2xl font-bold text-indigo-600">{repairOpenCount}</div>
-          </div>
-        </section>
-
-        <section className="rounded-xl border border-blue-200 bg-blue-50 p-5 text-sm text-blue-900">
-          <p className="font-semibold">Future encoding rules now have to satisfy the same contract checks shown here.</p>
-          <p className="mt-1">
-            Use this page to test whether the student-facing input mode matches the question, whether the correct answer can actually be entered, and whether grading matches the stored accepted answers.
-          </p>
-        </section>
-
-        <QuestionQaWorkbench items={qaItems} availableSkills={skillSet} availableTypes={typeSet} />
-      </div>
-    </main>
-  );
+  return <AdminContentQaView subjectTitle={subject.title} subjectSlug={subject.slug} qaItems={qaItems} />;
 }

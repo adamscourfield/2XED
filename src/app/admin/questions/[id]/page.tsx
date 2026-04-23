@@ -1,8 +1,8 @@
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/features/auth/authOptions';
 import { redirect, notFound } from 'next/navigation';
-import Link from 'next/link';
 import { prisma } from '@/db/prisma';
+import { AdminPageFrame } from '@/components/admin/AdminPageFrame';
 import { QuestionFormClient, QuestionType, Misconception, NumberLineConfig } from '../QuestionFormClient';
 
 function extractStem(question: string): string {
@@ -52,61 +52,51 @@ export default async function EditQuestionPage({ params }: { params: { id: strin
   const stem = extractStem(item.question);
 
   const attemptCount = await prisma.attempt.count({ where: { itemId: item.id } });
+  const refLabel = item.question.match(/^\[([^\]]+)\]/)?.[1] ?? item.id;
 
   return (
-    <main className="anx-shell" style={{ background: 'var(--anx-surface-bright)', minHeight: '100vh' }}>
-      <div className="max-w-3xl mx-auto space-y-8">
-
-        {/* Header */}
-        <div>
-          <Link href="/admin/questions" className="text-xs" style={{ color: 'var(--anx-text-muted)' }}>
-            ← Question Bank
-          </Link>
-          <h1 className="text-2xl font-bold mt-1" style={{ color: 'var(--anx-text)' }}>
-            Edit question
-          </h1>
-          <p className="text-xs font-mono mt-1" style={{ color: 'var(--anx-text-faint)' }}>
-            {item.question.match(/^\[([^\]]+)\]/)?.[1] ?? item.id}
-          </p>
+    <AdminPageFrame
+      maxWidthClassName="max-w-3xl"
+      title="Edit question"
+      subtitle={(
+        <>
+          <span className="font-mono text-xs" style={{ color: 'var(--anx-text-faint)' }}>{refLabel}</span>
+          <span className="mx-2 text-[var(--anx-text-muted)]">·</span>
+          <span>Type <strong style={{ color: 'var(--anx-text)' }}>{item.type}</strong></span>
+          <span className="mx-2 text-[var(--anx-text-muted)]">·</span>
+          <span>Created <strong style={{ color: 'var(--anx-text)' }}>{new Date(item.createdAt).toLocaleDateString('en-GB')}</strong></span>
+          <span className="mx-2 text-[var(--anx-text-muted)]">·</span>
+          <span><strong style={{ color: 'var(--anx-text)' }}>{attemptCount.toLocaleString('en-GB')}</strong> attempts</span>
+        </>
+      )}
+      backHref="/admin/questions"
+      backLabel="← Question bank"
+    >
+      {attemptCount > 0 ? (
+        <div className="anx-callout-info text-sm leading-relaxed">
+          This question has {attemptCount.toLocaleString('en-GB')} student attempt{attemptCount !== 1 ? 's' : ''}.
+          Edits to the stem or answer may affect historical accuracy data.
         </div>
+      ) : null}
 
-        {/* Meta bar */}
-        <div className="flex gap-4 text-sm" style={{ color: 'var(--anx-text-muted)' }}>
-          <span>Type: <strong style={{ color: 'var(--anx-text)' }}>{item.type}</strong></span>
-          <span>Created: <strong style={{ color: 'var(--anx-text)' }}>{new Date(item.createdAt).toLocaleDateString('en-GB')}</strong></span>
-          <span>Attempts: <strong style={{ color: 'var(--anx-text)' }}>{attemptCount.toLocaleString()}</strong></span>
-        </div>
-
-        {attemptCount > 0 && (
-          <div className="anx-callout-info text-sm">
-            This question has {attemptCount.toLocaleString()} student attempt{attemptCount !== 1 ? 's' : ''}.
-            Edits to the stem or answer may affect historical accuracy data.
-          </div>
-        )}
-
-        {/* Form */}
-        <div
-          className="rounded-2xl p-8"
-          style={{ background: 'var(--anx-surface-container-lowest)', border: '1px solid var(--anx-border)' }}
-        >
-          <QuestionFormClient
-            mode="edit"
-            itemId={item.id}
-            allSkills={allSkills}
-            initialData={{
-              stem,
-              type: item.type as QuestionType,
-              answer: item.answer,
-              choices,
-              acceptedAnswers,
-              tolerance,
-              numberLine,
-              skillIds,
-              misconceptions,
-            }}
-          />
-        </div>
+      <div className="anx-card rounded-2xl p-6 sm:p-8">
+        <QuestionFormClient
+          mode="edit"
+          itemId={item.id}
+          allSkills={allSkills}
+          initialData={{
+            stem,
+            type: item.type as QuestionType,
+            answer: item.answer,
+            choices,
+            acceptedAnswers,
+            tolerance,
+            numberLine,
+            skillIds,
+            misconceptions,
+          }}
+        />
       </div>
-    </main>
+    </AdminPageFrame>
   );
 }
