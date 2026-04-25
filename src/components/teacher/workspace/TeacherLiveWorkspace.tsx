@@ -377,7 +377,7 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
           className="flex items-center gap-2 rounded-xl px-1.5 py-1 transition hover:bg-[var(--anx-surface-hover)]"
           aria-label="Ember home"
         >
-          <Image src="/Ember_logo.png" alt="Ember" width={1774} height={887} className="h-7 w-auto" priority />
+          <Image src="/Ember_logo_icon.png" alt="Ember" width={512} height={512} className="h-7 w-7" priority />
         </Link>
 
         <span className="anx-live-pill">

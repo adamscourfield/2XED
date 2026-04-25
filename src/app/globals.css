@@ -244,6 +244,19 @@
     z-index: 1;
   }
 
+  /* Marketing home — calm off-white backdrop, single floating card */
+  .anx-landing-scene {
+    background: #f2f3f5;
+  }
+
+  .anx-landing-card {
+    border-radius: 2.25rem;
+    background: #ffffff;
+    box-shadow:
+      0 28px 90px rgba(15, 23, 42, 0.07),
+      0 10px 32px rgba(15, 23, 42, 0.04);
+  }
+
   /* Regular cards — lifted via background color, no border, no shadow */
   .anx-card {
     @apply transition-colors duration-200;

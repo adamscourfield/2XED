@@ -28,11 +28,11 @@ interface StudentSubjectNav {
 function LogoImage({ className }: { className?: string }) {
   return (
     <Image
-      src="/Ember_logo.png"
+      src="/Ember_logo_icon.png"
       alt="Ember"
-      width={1774}
-      height={887}
-      className={className ?? "h-8 w-auto"}
+      width={512}
+      height={512}
+      className={className ?? "h-8 w-8"}
       priority
     />
   );

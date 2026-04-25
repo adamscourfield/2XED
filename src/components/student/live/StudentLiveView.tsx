@@ -46,7 +46,7 @@ function TopBar({
       className="flex flex-wrap items-center gap-3 border-b px-4 py-3 sm:px-6"
       style={{ borderColor: 'var(--anx-outline-variant)', background: 'var(--anx-surface-container-lowest)' }}
     >
-      <Image src="/Ember_logo.png" alt="Ember" width={1774} height={887} className="h-7 w-auto" priority />
+      <Image src="/Ember_logo_icon.png" alt="Ember" width={512} height={512} className="h-7 w-7" priority />
       <span className="anx-live-pill">
         <span className="anx-live-pill-dot" />
         Live

@@ -362,7 +362,7 @@ export default function StudentLivePage() {
           className="flex items-center gap-3 border-b px-4 py-3 sm:px-6"
           style={{ borderColor: 'var(--anx-outline-variant)', background: 'var(--anx-surface-container-lowest)' }}
         >
-          <Image src="/Ember_logo.png" alt="Ember" width={1774} height={887} className="h-7 w-auto" priority />
+          <Image src="/Ember_logo_icon.png" alt="Ember" width={512} height={512} className="h-7 w-7" priority />
           <span className="anx-live-pill" style={{ background: 'var(--anx-success-soft)', color: 'var(--anx-success)' }}>Ended</span>
         </header>
         <main className="flex flex-1 items-center justify-center px-4 py-10">
@@ -396,7 +396,7 @@ export default function StudentLivePage() {
           className="flex items-center gap-3 border-b px-4 py-3 sm:px-6"
           style={{ borderColor: 'var(--anx-outline-variant)', background: 'var(--anx-surface-container-lowest)' }}
         >
-          <Image src="/Ember_logo.png" alt="Ember" width={1774} height={887} className="h-7 w-auto" priority />
+          <Image src="/Ember_logo_icon.png" alt="Ember" width={512} height={512} className="h-7 w-7" priority />
           <span className="anx-live-pill"><span className="anx-live-pill-dot" />Live</span>
           <p className="ml-2 truncate text-sm font-semibold" style={{ color: 'var(--anx-text)' }}>{lessonTitle}</p>
         </header>
