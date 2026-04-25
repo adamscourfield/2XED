@@ -8,11 +8,27 @@ import { ReactNode, useEffect, useState } from "react";
 
 export type AppChromeVariant = "student" | "teacher";
 
+type NavIconKind =
+  | "home"
+  | "school"
+  | "book"
+  | "bolt"
+  | "dashboard"
+  | "radio"
+  | "calendar"
+  | "file"
+  | "users"
+  | "chart"
+  | "folder"
+  | "clock"
+  | "help"
+  | "gear";
+
 interface NavItem {
   href: string;
   label: string;
-  description: string;
-  icon: "home" | "school" | "book" | "bolt" | "dashboard" | "radio" | "calendar" | "file" | "users";
+  description?: string;
+  icon: NavIconKind;
 }
 
 interface StudentSubjectNav {
@@ -42,7 +58,7 @@ function NavIconBox({
   kind,
   active,
 }: {
-  kind: NavItem["icon"];
+  kind: NavIconKind;
   active: boolean;
 }) {
   const box = active
@@ -157,6 +173,54 @@ function NavIconBox({
             <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" stroke={stroke} strokeWidth="1.75" strokeLinecap="round" />
           </svg>
         );
+      case "chart":
+        return (
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
+            <path d="M4 20V4M4 20h16M8 16V11M12 16V7M16 16v-4" stroke={stroke} strokeWidth="1.75" strokeLinecap="round" />
+          </svg>
+        );
+      case "folder":
+        return (
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
+            <path
+              d="M3 8a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8Z"
+              stroke={stroke}
+              strokeWidth="1.75"
+              strokeLinejoin="round"
+            />
+          </svg>
+        );
+      case "clock":
+        return (
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
+            <circle cx="12" cy="12" r="9" stroke={stroke} strokeWidth="1.75" />
+            <path d="M12 7v5l3 2" stroke={stroke} strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        );
+      case "help":
+        return (
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
+            <circle cx="12" cy="12" r="9" stroke={stroke} strokeWidth="1.75" />
+            <path d="M9.5 9.5a2.5 2.5 0 0 1 4.86 1c0 1.5-1.36 1.5-1.36 3" stroke={stroke} strokeWidth="1.75" strokeLinecap="round" />
+            <path d="M12 17h.01" stroke={stroke} strokeWidth="2.5" strokeLinecap="round" />
+          </svg>
+        );
+      case "gear":
+        return (
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
+            <path
+              d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"
+              stroke={stroke}
+              strokeWidth="1.75"
+            />
+            <path
+              d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82 1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"
+              stroke={stroke}
+              strokeWidth="1.25"
+              strokeLinejoin="round"
+            />
+          </svg>
+        );
       default:
         return null;
     }
@@ -173,8 +237,14 @@ function NavIconBox({
 
 function isNavActive(pathname: string | null, href: string) {
   if (!pathname) return false;
-  if (href === "/dashboard" || href === "/teacher/dashboard") {
+  if (href === "/dashboard") {
     return pathname === href;
+  }
+  if (href === "/teacher/dashboard") {
+    return pathname === "/teacher/dashboard";
+  }
+  if (href === "/teacher/live/new") {
+    return pathname.startsWith("/teacher/live");
   }
   return pathname === href || pathname.startsWith(`${href}/`);
 }
@@ -244,41 +314,22 @@ export function AppChrome({
   const tagline =
     variant === "teacher" ? "Teaching workspace" : "Your learning hub";
 
-  const teacherNav: NavItem[] = [
-    {
-      href: "/teacher/dashboard",
-      label: "Dashboard",
-      description: "Classes and analytics",
-      icon: "dashboard",
-    },
-    {
-      href: "/teacher/live/new",
-      label: "Live lesson",
-      description: "Start a session",
-      icon: "radio",
-    },
-    {
-      href: "/teacher/timetable",
-      label: "Timetables",
-      description: "Recurring class slots",
-      icon: "calendar",
-    },
-    {
-      href: "/teacher/content/review",
-      label: "Content review",
-      description: "English booklet gate",
-      icon: "file",
-    },
+  const teacherNavPrimary: NavItem[] = [
+    { href: "/teacher/dashboard", label: "Home", icon: "home" },
+    { href: "/teacher/live/new", label: "Lessons", icon: "book" },
+    { href: "/teacher/content/review", label: "Question bank", icon: "file" },
+    { href: "/teacher/dashboard/classes", label: "Classes", icon: "users" },
+    { href: "/teacher/reports", label: "Reports", icon: "chart" },
+    { href: "/teacher/resources", label: "Resources", icon: "folder" },
+    { href: "/teacher/recent-sessions", label: "Recent sessions", icon: "clock" },
     ...(showLeadershipNav
-      ? ([
-          {
-            href: "/teacher/leadership",
-            label: "Leadership",
-            description: "School-wide overview",
-            icon: "users",
-          },
-        ] satisfies NavItem[])
+      ? ([{ href: "/teacher/leadership", label: "Leadership", icon: "dashboard" }] satisfies NavItem[])
       : []),
+  ];
+
+  const teacherNavSecondary: NavItem[] = [
+    { href: "/teacher/help", label: "Help centre", icon: "help" },
+    { href: "/teacher/settings", label: "Settings", icon: "gear" },
   ];
 
   const liveStudentItem: NavItem = {
@@ -324,8 +375,8 @@ export function AppChrome({
   }: {
     href: string;
     label: string;
-    description: string;
-    iconKind: NavItem["icon"];
+    description?: string;
+    iconKind: NavIconKind;
     active: boolean;
     badge?: number;
     onNavigate?: () => void;
@@ -355,13 +406,15 @@ export function AppChrome({
           >
             {label}
           </span>
-          <span
-            className={`mt-0.5 block text-xs leading-relaxed ${
-              active ? "text-[#4f46e5]/90" : "text-[color:var(--anx-text-muted)]"
-            }`}
-          >
-            {description}
-          </span>
+          {description ? (
+            <span
+              className={`mt-0.5 block text-xs leading-relaxed ${
+                active ? "text-[#4f46e5]/90" : "text-[color:var(--anx-text-muted)]"
+              }`}
+            >
+              {description}
+            </span>
+          ) : null}
         </span>
         {badge !== undefined && badge > 0 ? (
           <span className="flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-[#ef4444] px-1.5 text-[10px] font-bold text-white">
@@ -445,12 +498,26 @@ export function AppChrome({
 
   function TeacherNav({ onNavigate }: { onNavigate?: () => void }) {
     return (
-      <div className="px-2 py-2">
-        <p className="mb-2 px-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-[color:var(--anx-text-muted)]">
-          Main
-        </p>
-        <nav className="flex flex-col gap-1" aria-label="Main">
-          {teacherNav.map((item) => {
+      <div className="flex flex-col gap-6 px-2 py-3">
+        <nav className="flex flex-col gap-1" aria-label="Primary">
+          {teacherNavPrimary.map((item) => {
+            const active = isNavActive(pathname, item.href);
+            return (
+              <NavRow
+                key={item.href}
+                href={item.href}
+                label={item.label}
+                description={item.description}
+                iconKind={item.icon}
+                active={active}
+                onNavigate={onNavigate}
+              />
+            );
+          })}
+        </nav>
+        <div className="mx-3 border-t border-[var(--anx-outline-variant)]" />
+        <nav className="flex flex-col gap-1" aria-label="Secondary">
+          {teacherNavSecondary.map((item) => {
             const active = isNavActive(pathname, item.href);
             return (
               <NavRow
@@ -551,7 +618,7 @@ export function AppChrome({
         </div>
 
         <div className="border-t border-[var(--anx-outline-variant)] p-4">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 rounded-xl border border-[var(--anx-outline-variant)] bg-[color:var(--anx-surface-bright)] px-3 py-2.5 shadow-[var(--anx-shadow-sm)]">
             <div
               className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white"
               style={{
@@ -570,14 +637,14 @@ export function AppChrome({
                 {roleFooterLabel()}
               </p>
             </div>
-            <button
-              type="button"
-              onClick={() => signOut({ callbackUrl: "/login" })}
-              className="shrink-0 text-xs font-medium text-[color:var(--anx-text-muted)] transition hover:text-[color:var(--anx-text)]"
-            >
-              Sign out
-            </button>
           </div>
+          <button
+            type="button"
+            onClick={() => signOut({ callbackUrl: "/login" })}
+            className="mt-3 w-full text-center text-xs font-medium text-[color:var(--anx-text-muted)] transition hover:text-[color:var(--anx-text)]"
+          >
+            Sign out
+          </button>
         </div>
       </aside>
 
