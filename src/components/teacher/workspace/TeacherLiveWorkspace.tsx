@@ -67,6 +67,16 @@ interface SupportSummary {
   }>;
 }
 
+interface RecommendedExplanation {
+  explanationId: string;
+  skillId: string;
+  dle: number;
+  routeType: string;
+  misconceptionSummary: string;
+  workedExample: string;
+  animationSchema?: unknown | null;
+}
+
 interface SessionSnapshot {
   sessionId: string;
   status: 'LOBBY' | 'ACTIVE' | 'PAUSED' | 'COMPLETED';
@@ -82,6 +92,7 @@ interface SessionSnapshot {
   supportSummary?: SupportSummary;
   skillId?: string | null;
   skill?: { id: string; code: string; name: string } | null;
+  recommendedExplanation?: RecommendedExplanation | null;
 }
 
 interface Props {
@@ -336,6 +347,22 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
   function handleNewCheckQuestion() {
     canvasRef.current?.insertText('New check question — type the prompt');
   }
+  async function broadcastExplanationToStudents(explanationRouteId: string) {
+    try {
+      await fetch(`/api/live-sessions/${sessionId}/broadcast`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          lanes: ['LANE_1', 'LANE_2', 'LANE_3'],
+          contentType: 'EXPLANATION',
+          explanationRouteId,
+        }),
+      });
+    } catch {
+      /* students still see canvas */
+    }
+  }
+
   async function handleExplainOption(option: 'easier' | 'wrong-vs-right' | 'misconception' | 'comparison') {
     const labels: Record<typeof option, string> = {
       easier: 'Easier model',
@@ -356,17 +383,27 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
         }),
       });
       const data = (await res.json()) as
-        | { ok: true; headline: string; body: string }
+        | { ok: true; headline: string; body: string; explanationId?: string }
         | { ok: false; reason?: string };
       if (data.ok && data.body.trim()) {
         const block = `${data.headline}\n\n${data.body}\n\n— annotate alongside`;
         canvasRef.current?.insertText(block);
+        if (data.explanationId) {
+          void broadcastExplanationToStudents(data.explanationId);
+        }
         return;
       }
     } catch {
       // use fallback below
     }
     canvasRef.current?.insertText(fallback);
+  }
+
+  async function pushRecommendedModelExample() {
+    const id = snapshot?.recommendedExplanation?.explanationId;
+    if (!id) return;
+    setMode('EXPLAIN');
+    await broadcastExplanationToStudents(id);
   }
   async function handleAssignPractice(
     kind: 'easier' | 'similar' | 'challenge' | 'misconception',
@@ -554,7 +591,9 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
               studentSignals.suggestedMove
                 ? {
                     ...studentSignals.suggestedMove,
-                    onAct: () => setMode('EXPLAIN'),
+                    onAct: () => {
+                      void pushRecommendedModelExample();
+                    },
                   }
                 : null
             }

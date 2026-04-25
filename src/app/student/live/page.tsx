@@ -7,7 +7,11 @@ import { useSession } from 'next-auth/react';
 import { redirect } from 'next/navigation';
 import { AppChrome } from '@/components/AppChrome';
 import { StudentFlowHero } from '@/components/student/StudentFlowHero';
-import { StudentLiveView, type StudentLiveScreen } from '@/components/student/live/StudentLiveView';
+import {
+  StudentLiveView,
+  type LiveExplanationPayload,
+  type StudentLiveScreen,
+} from '@/components/student/live/StudentLiveView';
 import {
   StudentPracticeView,
   type Confidence,
@@ -51,6 +55,8 @@ interface CurrentContent {
   phaseIndex?: number;
   broadcastAt?: string;
   whiteboard?: LiveWhiteboardPayload;
+  explanationRouteId?: string;
+  explanation?: LiveExplanationPayload;
 }
 
 interface SessionPoll {
@@ -66,6 +72,7 @@ type AppState =
   | { phase: 'waiting'; session: JoinedSession }
   | { phase: 'between-phases'; session: JoinedSession; message: string }
   | { phase: 'whiteboard'; session: JoinedSession; whiteboard: LiveWhiteboardPayload }
+  | { phase: 'explanation'; session: JoinedSession; explanation: LiveExplanationPayload }
   | { phase: 'question'; session: JoinedSession; item: Item }
   | { phase: 'practice'; session: JoinedSession; item: Item; index: number; total: number }
   | { phase: 'feedback'; session: JoinedSession; correct: boolean; nextItem: (Item & { skillId?: string }) | null; index: number; total: number }
@@ -99,6 +106,7 @@ export default function StudentLivePage() {
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const sessionRef = useRef<JoinedSession | null>(null);
   const liveWhiteboardRef = useRef<LiveWhiteboardPayload | null>(null);
+  const lastExplanationTelemetryIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (appState.phase !== 'join') {
@@ -106,6 +114,25 @@ export default function StudentLivePage() {
     }
     if (appState.phase === 'whiteboard') {
       liveWhiteboardRef.current = appState.whiteboard;
+    }
+    if (appState.phase === 'explanation') {
+      const ex = appState.explanation;
+      const sid = appState.session.sessionId;
+      if (lastExplanationTelemetryIdRef.current !== ex.id) {
+        lastExplanationTelemetryIdRef.current = ex.id;
+        void fetch(`/api/live-sessions/${sid}/explanation-event`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            eventType: 'shown',
+            explanationRouteId: ex.id,
+            skillId: ex.skillId,
+            routeType: ex.routeType,
+          }),
+        }).catch(() => {});
+      }
+    } else {
+      lastExplanationTelemetryIdRef.current = null;
     }
   }, [appState]);
 
@@ -142,7 +169,9 @@ export default function StudentLivePage() {
 
         if (data.pendingRecheckItem) {
           const sess = sessionRef.current;
-          if (sess && appState.phase !== 'question') {
+          const skipRecheckPull =
+            appState.phase === 'question' || appState.phase === 'explanation' || appState.phase === 'feedback';
+          if (sess && !skipRecheckPull) {
             setAppState({ phase: 'question', session: sess, item: data.pendingRecheckItem });
             return;
           }
@@ -152,7 +181,16 @@ export default function StudentLivePage() {
           lastBroadcastAtRef.current = data.currentContent.broadcastAt ?? null;
           const cc = data.currentContent;
           const laneOk = broadcastTargetsStudentLane(cc, data.studentLane);
-          if (cc.contentType === 'WHITEBOARD' && laneOk && cc.whiteboard) {
+          if (cc.contentType === 'EXPLANATION' && laneOk && cc.explanation) {
+            const sess = sessionRef.current;
+            if (sess) {
+              setAppState({
+                phase: 'explanation',
+                session: sess,
+                explanation: cc.explanation,
+              });
+            }
+          } else if (cc.contentType === 'WHITEBOARD' && laneOk && cc.whiteboard) {
             const wb = cc.whiteboard;
             const sess = sessionRef.current;
             if (!sess) return;
@@ -184,7 +222,8 @@ export default function StudentLivePage() {
       }
     }
 
-    const pollMs = appState.phase === 'whiteboard' ? 1500 : 3000;
+    const pollMs =
+      appState.phase === 'whiteboard' || appState.phase === 'explanation' ? 1500 : 3000;
     pollRef.current = setInterval(pollSession, pollMs);
     return () => { if (pollRef.current) clearInterval(pollRef.current); };
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -235,6 +274,7 @@ export default function StudentLivePage() {
       lastPhaseIndexRef.current = -1;
       lastBroadcastAtRef.current = null;
       lastWhiteboardVersionRef.current = -1;
+      lastExplanationTelemetryIdRef.current = null;
       setAppState({ phase: 'waiting', session });
     } catch {
       setError('Network error. Please try again.');
@@ -518,6 +558,26 @@ export default function StudentLivePage() {
     screen = { kind: 'message', message: appState.message };
   } else if (appState.phase === 'whiteboard') {
     screen = { kind: 'watch', whiteboard: appState.whiteboard };
+  } else if (appState.phase === 'explanation') {
+    const ex = appState.explanation;
+    screen = {
+      kind: 'explanation',
+      explanation: ex,
+      whiteboard: liveWhiteboardRef.current,
+      onDismiss: () => {
+        void fetch(`/api/live-sessions/${appState.session.sessionId}/explanation-event`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            eventType: 'acknowledged',
+            explanationRouteId: ex.id,
+            skillId: ex.skillId,
+            routeType: ex.routeType,
+          }),
+        }).catch(() => {});
+        setAppState({ phase: 'waiting', session: appState.session });
+      },
+    };
   } else if (appState.phase === 'question') {
     const opts = Array.isArray(appState.item.options) ? (appState.item.options as string[]) : [];
     const stem = stripStudentQuestionLabel(appState.item.question) || appState.item.question;
