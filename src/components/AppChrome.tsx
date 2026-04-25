@@ -5,6 +5,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 import { ReactNode, useEffect, useState } from "react";
+import { StudentTopBarSubjectSelector, type StudentTopBarSubjectOption } from "@/components/student/StudentTopBarSubjectSelector";
+import { StudentTopBarUserMenu } from "@/components/student/StudentTopBarUserMenu";
 
 export type AppChromeVariant = "student" | "teacher";
 
@@ -262,12 +264,31 @@ interface AppChromeProps {
   variant: AppChromeVariant;
   showLeadershipNav?: boolean;
   children: ReactNode;
+  /** Student dashboard-style layout: top bar only (no side nav). */
+  studentLayout?: "sidebar" | "topbar";
+  /** Subject options for the student top bar (Year 7 Maths style switcher). */
+  studentTopBarSubjects?: StudentTopBarSubjectOption[];
+}
+
+function studentInitials(displayName: string, email: string): string {
+  const name = displayName.trim();
+  const parts = name.split(/\s+/).filter(Boolean);
+  if (parts.length >= 2) {
+    return `${parts[0].charAt(0)}${parts[1].charAt(0)}`.toUpperCase();
+  }
+  if (parts.length === 1 && parts[0].length >= 2) {
+    return parts[0].slice(0, 2).toUpperCase();
+  }
+  const c = name.charAt(0) || email.charAt(0) || "?";
+  return c.toUpperCase();
 }
 
 export function AppChrome({
   variant,
   showLeadershipNav = false,
   children,
+  studentLayout = "sidebar",
+  studentTopBarSubjects = [],
 }: AppChromeProps) {
   const pathname = usePathname();
   const { data: authSession, status: sessionStatus } = useSession();
@@ -293,7 +314,8 @@ export function AppChrome({
   }, [menuOpen]);
 
   useEffect(() => {
-    if (variant !== "student" || role !== "STUDENT" || sessionStatus !== "authenticated") return;
+    if (variant !== "student" || studentLayout === "topbar") return;
+    if (role !== "STUDENT" || sessionStatus !== "authenticated") return;
     let cancelled = false;
     (async () => {
       try {
@@ -308,7 +330,7 @@ export function AppChrome({
     return () => {
       cancelled = true;
     };
-  }, [variant, role, sessionStatus]);
+  }, [variant, role, sessionStatus, studentLayout]);
 
   const homeHref = variant === "teacher" ? "/teacher/dashboard" : "/dashboard";
   const tagline =
@@ -550,6 +572,58 @@ export function AppChrome({
       </div>
     </Link>
   );
+
+  const logoOnly = (
+    <Link
+      href={homeHref}
+      className="flex shrink-0 items-center rounded-xl p-1 outline-none transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-[var(--anx-primary-glow)]"
+      aria-label="Home"
+    >
+      <LogoImage className="h-7 w-auto sm:h-8" />
+    </Link>
+  );
+
+  const studentTopBar =
+    variant === "student" &&
+    studentLayout === "topbar" &&
+    (role === "STUDENT" || sessionStatus === "loading") ? (
+      <header
+        className="sticky top-0 z-40 border-b border-[var(--anx-outline-variant)] bg-[color:var(--anx-surface-raised)]/95 px-4 py-2.5 backdrop-blur-md sm:px-6"
+        style={{ WebkitBackdropFilter: "blur(12px)" }}
+      >
+        <div className="mx-auto flex max-w-6xl items-center gap-3 sm:gap-4">
+          {logoOnly}
+          <div className="min-w-0 flex-1 flex justify-center sm:justify-start sm:pl-2">
+            <StudentTopBarSubjectSelector subjects={studentTopBarSubjects} />
+          </div>
+          <span
+            className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[var(--anx-outline-variant)] bg-[color:var(--anx-surface-bright)] text-[color:var(--anx-text-secondary)]"
+            title="Notifications"
+            aria-hidden
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M12 22a2 2 0 0 0 2-2H10a2 2 0 0 0 2 2Zm6-6V11a6 6 0 1 0-12 0v5l-2 2V20h16v-2l-2-2Z"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinejoin="round"
+              />
+            </svg>
+            <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-[var(--anx-primary)] ring-2 ring-[color:var(--anx-surface-bright)]" />
+          </span>
+          <StudentTopBarUserMenu userName={userName} initial={studentInitials(userName, userEmail)} />
+        </div>
+      </header>
+    ) : null;
+
+  if (studentTopBar) {
+    return (
+      <div className="flex min-h-screen flex-col bg-[color:var(--anx-surface-bright)]">
+        {studentTopBar}
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col">{children}</div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen flex-col bg-[color:var(--anx-surface-bright)] lg:flex-row">

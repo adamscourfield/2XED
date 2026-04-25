@@ -1,5 +1,6 @@
 import { ReactNode } from 'react';
 import { AppChrome, type AppChromeVariant } from '@/components/AppChrome';
+import type { StudentTopBarSubjectOption } from '@/components/student/StudentTopBarSubjectSelector';
 
 interface LearningPageShellProps {
   title: string;
@@ -16,6 +17,10 @@ interface LearningPageShellProps {
   appChromeShowLeadershipNav?: boolean;
   /** Omit the default title block (for custom in-page headers). */
   hideHeader?: boolean;
+  /** Student chrome: `topbar` removes the side menu (dashboard-style). */
+  appChromeStudentLayout?: 'sidebar' | 'topbar';
+  /** Options for the student top-bar subject switcher. */
+  appChromeStudentSubjects?: StudentTopBarSubjectOption[];
 }
 
 export function LearningPageShell({
@@ -29,6 +34,8 @@ export function LearningPageShell({
   appChrome,
   appChromeShowLeadershipNav = false,
   hideHeader = false,
+  appChromeStudentLayout = 'sidebar',
+  appChromeStudentSubjects,
 }: LearningPageShellProps) {
   const main = (
     <main className="anx-shell flex-1">
@@ -58,7 +65,12 @@ export function LearningPageShell({
 
   if (appChrome) {
     return (
-      <AppChrome variant={appChrome} showLeadershipNav={appChromeShowLeadershipNav}>
+      <AppChrome
+        variant={appChrome}
+        showLeadershipNav={appChromeShowLeadershipNav}
+        studentLayout={appChrome === 'student' ? appChromeStudentLayout : 'sidebar'}
+        studentTopBarSubjects={appChrome === 'student' ? appChromeStudentSubjects : undefined}
+      >
         {main}
       </AppChrome>
     );
