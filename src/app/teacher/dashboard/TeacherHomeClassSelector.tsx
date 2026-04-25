@@ -14,9 +14,33 @@ export type TeacherHomeClassOption = {
 
 type Props = {
   classes: TeacherHomeClassOption[];
+  /** Calendar icon (default) or people icon (e.g. classes page). */
+  variant?: 'calendar' | 'people';
 };
 
-export function TeacherHomeClassSelector({ classes }: Props) {
+function LeadingIcon({ variant }: { variant: 'calendar' | 'people' }) {
+  const stroke = 'currentColor';
+  if (variant === 'people') {
+    return (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
+        <path
+          d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm12 1v6M21 16h-6"
+          stroke={stroke}
+          strokeWidth="1.75"
+          strokeLinecap="round"
+        />
+      </svg>
+    );
+  }
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <rect x="3" y="5" width="18" height="16" rx="2" stroke={stroke} strokeWidth="1.75" />
+      <path d="M16 3v4M8 3v4M3 11h18" stroke={stroke} strokeWidth="1.75" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+export function TeacherHomeClassSelector({ classes, variant = 'calendar' }: Props) {
   const [open, setOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
@@ -54,10 +78,7 @@ export function TeacherHomeClassSelector({ classes }: Props) {
     return (
       <div className="td-class-select td-class-select--static" title="No classes linked">
         <span className="td-class-select-cal" aria-hidden>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-            <rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" strokeWidth="1.75" />
-            <path d="M16 3v4M8 3v4M3 11h18" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
-          </svg>
+          <LeadingIcon variant={variant} />
         </span>
         <span className="td-class-select-label">No classes</span>
       </div>
@@ -74,10 +95,7 @@ export function TeacherHomeClassSelector({ classes }: Props) {
         onClick={() => setOpen((o) => !o)}
       >
         <span className="td-class-select-cal" aria-hidden>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-            <rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" strokeWidth="1.75" />
-            <path d="M16 3v4M8 3v4M3 11h18" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
-          </svg>
+          <LeadingIcon variant={variant} />
         </span>
         <span className="td-class-select-label">{label}</span>
         <span className="td-class-select-chev" aria-hidden>
