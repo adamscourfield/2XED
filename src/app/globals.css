@@ -273,6 +273,36 @@
     background: var(--anx-surface-container-lowest);
   }
 
+  /* Teacher reports — reference palette + canvas (scoped via wrapper class) */
+  .anx-reports-page {
+    --report-purple: #5e35b1;
+    --report-purple-dark: #4527a0;
+    --report-purple-soft: rgba(94, 53, 177, 0.1);
+    --report-purple-tint: rgba(94, 53, 177, 0.14);
+    --report-purple-line: rgba(94, 53, 177, 0.35);
+    --report-canvas: #eceef1;
+    --report-green: #22c55e;
+    --report-green-dark: #15803d;
+    --report-green-soft: #dcfce7;
+    --report-orange: #ea580c;
+    --report-red: #ef4444;
+    --report-red-soft: #fee2e2;
+    --report-amber-bar: #f97316;
+  }
+
+  .anx-reports-card {
+    border-radius: 1rem;
+    background: #ffffff;
+    box-shadow:
+      0 1px 2px rgba(15, 23, 42, 0.04),
+      0 6px 20px rgba(15, 23, 42, 0.06);
+    border: 1px solid rgba(15, 23, 42, 0.05);
+  }
+
+  .anx-reports-card:hover {
+    background: #ffffff;
+  }
+
   /* Student dashboard — gradient hero (not a tonal .anx-card surface) */
   .anx-dashboard-hero {
     border-radius: var(--anx-radius-xl);
