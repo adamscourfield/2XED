@@ -16,7 +16,7 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-  title: '2XED',
+  title: 'Ember',
   description: 'Adaptive mastery learning platform',
 };
 
