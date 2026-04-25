@@ -27,6 +27,18 @@ interface LessonPhase {
   label: string;
 }
 
+function currentPhaseSkill(snapshot: SessionSnapshot | null): { id: string; code: string; name: string } | null {
+  if (!snapshot?.phases?.length) return snapshot?.skill ?? null;
+  const idx = Math.min(Math.max(0, snapshot.currentPhaseIndex), snapshot.phases.length - 1);
+  const phase = snapshot.phases[idx];
+  if (!phase?.skillId) return snapshot.skill ?? null;
+  return {
+    id: phase.skillId,
+    code: phase.skillCode,
+    name: phase.skillName,
+  };
+}
+
 interface ResponseSummary {
   skillId: string;
   totalParticipants: number;
@@ -68,6 +80,7 @@ interface SessionSnapshot {
   laneStudents: { LANE_1: LaneStudent[]; LANE_2: LaneStudent[]; LANE_3: LaneStudent[] };
   responseSummary: ResponseSummary[];
   supportSummary?: SupportSummary;
+  skillId?: string | null;
   skill?: { id: string; code: string; name: string } | null;
 }
 
@@ -92,7 +105,11 @@ function deriveSignals(snapshot: SessionSnapshot | null): {
     };
   }
   const total = snapshot.participantCount;
-  const summary = snapshot.responseSummary[0];
+  const focus = currentPhaseSkill(snapshot);
+  const summary =
+    focus && snapshot.responseSummary.length > 0
+      ? snapshot.responseSummary.find((r) => r.skillId === focus.id) ?? snapshot.responseSummary[0]
+      : snapshot.responseSummary[0];
   const responded = summary?.answeredCount ?? 0;
   const correct = summary?.correctCount ?? 0;
   const incorrect = Math.max(0, responded - correct);
@@ -105,7 +122,7 @@ function deriveSignals(snapshot: SessionSnapshot | null): {
     incorrect,
   };
 
-  const skillName = snapshot.skill?.name ?? 'this concept';
+  const skillName = focus?.name ?? snapshot.skill?.name ?? 'this concept';
   const correctRate = responded > 0 ? correct / responded : 0;
 
   const signals: InterpretedSignal[] = [];
@@ -149,12 +166,13 @@ function deriveSignals(snapshot: SessionSnapshot | null): {
 }
 
 function classLabel(snapshot: SessionSnapshot | null): string {
-  if (!snapshot?.skill) return 'Live class';
-  return snapshot.skill.code ?? 'Live class';
+  const s = currentPhaseSkill(snapshot);
+  if (!s) return 'Live class';
+  return s.code ?? 'Live class';
 }
 
 function lessonTitle(snapshot: SessionSnapshot | null): string {
-  return snapshot?.skill?.name ?? 'Live lesson';
+  return currentPhaseSkill(snapshot)?.name ?? snapshot?.skill?.name ?? 'Live lesson';
 }
 
 export function TeacherLiveWorkspace({ sessionId }: Props) {
@@ -318,14 +336,37 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
   function handleNewCheckQuestion() {
     canvasRef.current?.insertText('New check question — type the prompt');
   }
-  function handleExplainOption(option: 'easier' | 'wrong-vs-right' | 'misconception' | 'comparison') {
+  async function handleExplainOption(option: 'easier' | 'wrong-vs-right' | 'misconception' | 'comparison') {
     const labels: Record<typeof option, string> = {
       easier: 'Easier model',
       'wrong-vs-right': 'Wrong vs right',
       misconception: 'Misconception repair',
       comparison: 'Comparison example',
     };
-    canvasRef.current?.insertText(`${labels[option]} — annotate alongside`);
+    const fallback = `${labels[option]} — annotate alongside`;
+    const focusSkill = currentPhaseSkill(snapshot);
+    try {
+      const res = await fetch(`/api/live-sessions/${sessionId}/resolve-explain-bridge`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          option,
+          skillId: focusSkill?.id,
+          responseSummary: snapshot?.responseSummary ?? [],
+        }),
+      });
+      const data = (await res.json()) as
+        | { ok: true; headline: string; body: string }
+        | { ok: false; reason?: string };
+      if (data.ok && data.body.trim()) {
+        const block = `${data.headline}\n\n${data.body}\n\n— annotate alongside`;
+        canvasRef.current?.insertText(block);
+        return;
+      }
+    } catch {
+      // use fallback below
+    }
+    canvasRef.current?.insertText(fallback);
   }
   async function handleAssignPractice(
     kind: 'easier' | 'similar' | 'challenge' | 'misconception',

@@ -44,8 +44,8 @@ export default function LoginPage() {
             <Image
               src="/Ember_logo_icon.png"
               alt=""
-              width={512}
-              height={512}
+              width={1024}
+              height={1024}
               className="h-12 w-12 sm:h-14 sm:w-14"
               aria-hidden
               priority
@@ -54,8 +54,8 @@ export default function LoginPage() {
               src="/Ember_logo_text.png"
               alt="Ember"
               width={1024}
-              height={256}
-              className="h-9 w-auto sm:h-10"
+              height={1024}
+              className="mx-auto w-[min(11.5rem,calc(100vw-3rem))] max-w-full sm:w-[min(12.5rem,calc(100vw-3rem))] h-auto"
               priority
             />
           </div>

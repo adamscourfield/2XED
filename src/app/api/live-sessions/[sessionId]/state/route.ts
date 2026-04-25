@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/features/auth/authOptions';
 import { prisma } from '@/db/prisma';
+import { getRecommendedExplanationForLiveSession } from '@/lib/live/live-session-explanation-bridge';
 
 interface LiveSupportEventSummary {
   shownCount: number;
@@ -102,39 +103,11 @@ export async function GET(_req: NextRequest, { params }: Props) {
     correctCount: s.correct,
   }));
 
-  // Identify skills where students are struggling (for explanation recommendation)
-  const skillIds = liveSession.skillId ? [liveSession.skillId] : [];
-  let recommendedExplanation = null;
-
-  if (skillIds.length > 0) {
-    const explanationPerf = await prisma.explanationPerformance.findMany({
-      where: { skillId: { in: skillIds } },
-      include: {
-        explanation: {
-          select: {
-            id: true,
-            routeType: true,
-            misconceptionSummary: true,
-            workedExample: true,
-          },
-        },
-      },
-      orderBy: { dle: 'desc' },
-      take: 1,
-    });
-
-    if (explanationPerf.length > 0) {
-      const top = explanationPerf[0];
-      recommendedExplanation = {
-        explanationId: top.explanationId,
-        skillId: top.skillId,
-        dle: top.dle,
-        routeType: top.explanation.routeType,
-        misconceptionSummary: top.explanation.misconceptionSummary,
-        workedExample: top.explanation.workedExample,
-      };
-    }
-  }
+  const recommendedExplanation = await getRecommendedExplanationForLiveSession(prisma, {
+    phases: liveSession.phases,
+    primarySkillId: liveSession.skillId,
+    responseSummary,
+  });
 
   const supportEvents = await prisma.event.findMany({
     where: {
@@ -210,6 +183,8 @@ export async function GET(_req: NextRequest, { params }: Props) {
     };
   });
 
+  const participantCount = liveSession.participants.filter((p) => p.isActive).length;
+
   return NextResponse.json({
     sessionId: liveSession.id,
     status: liveSession.status,
@@ -220,6 +195,7 @@ export async function GET(_req: NextRequest, { params }: Props) {
     phases: liveSession.phases,
     currentPhaseIndex: liveSession.currentPhaseIndex,
     currentContent: liveSession.currentContent,
+    participantCount,
     participants,
     laneCounts,
     laneStudents,

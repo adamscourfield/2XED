@@ -14,6 +14,8 @@ type NavIconKind =
   | "home"
   | "school"
   | "book"
+  | "bookOpen"
+  | "clipboardList"
   | "bolt"
   | "dashboard"
   | "radio"
@@ -56,16 +58,25 @@ function LogoImage({ className }: { className?: string }) {
   );
 }
 
+type NavIconChrome = "default" | "teacher";
+
 function NavIconBox({
   kind,
   active,
+  chrome = "default",
 }: {
   kind: NavIconKind;
   active: boolean;
+  chrome?: NavIconChrome;
 }) {
+  const isTeacher = chrome === "teacher";
   const box = active
-    ? "bg-[rgba(99,102,241,0.18)] text-[#4338ca]"
-    : "bg-[#f0f1f4] text-[#374151]";
+    ? isTeacher
+      ? "bg-[#ede9fe] text-[#5b21b6] ring-1 ring-inset ring-[#c4b5fd]/90"
+      : "bg-[rgba(99,102,241,0.18)] text-[#4338ca]"
+    : isTeacher
+      ? "bg-[#f4f4f5] text-[#52525b]"
+      : "bg-[#f0f1f4] text-[#374151]";
   const stroke = "currentColor";
   const icon = (() => {
     switch (kind) {
@@ -110,6 +121,31 @@ function NavIconBox({
               strokeLinejoin="round"
             />
             <path d="M8 7h8M8 11h6" stroke={stroke} strokeWidth="1.75" strokeLinecap="round" />
+          </svg>
+        );
+      case "bookOpen":
+        return (
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
+            <path
+              d="M12 6.5v11M12 6.5c-1.2-.67-2.75-1-4.5-1-1.4 0-2.6.22-3.5.6V18c.9-.38 2.1-.6 3.5-.6 1.75 0 3.3.33 4.5 1M12 6.5c1.2-.67 2.75-1 4.5-1 1.4 0 2.6.22 3.5.6V18c-.9-.38-2.1-.6-3.5-.6-1.75 0-3.3.33-4.5 1"
+              stroke={stroke}
+              strokeWidth="1.75"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        );
+      case "clipboardList":
+        return (
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
+            <path
+              d="M9 5h-.5a1.5 1.5 0 0 0-3 0H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-.5a1.5 1.5 0 0 0-3 0H9"
+              stroke={stroke}
+              strokeWidth="1.75"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path d="M9 12h6M9 16h6M9 8h2" stroke={stroke} strokeWidth="1.75" strokeLinecap="round" />
           </svg>
         );
       case "bolt":
@@ -229,7 +265,7 @@ function NavIconBox({
   })();
   return (
     <span
-      className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${box}`}
+      className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] ${box}`}
       aria-hidden
     >
       {icon}
@@ -248,6 +284,11 @@ function isNavActive(pathname: string | null, href: string) {
   if (href === "/teacher/lessons") {
     if (pathname === "/teacher/lessons" || pathname.startsWith("/teacher/lessons/")) return true;
     if (pathname.startsWith("/teacher/live")) return true;
+    return false;
+  }
+  if (href === "/teacher/question-bank") {
+    if (pathname === "/teacher/question-bank" || pathname.startsWith("/teacher/question-bank/")) return true;
+    if (pathname.startsWith("/teacher/content/review")) return true;
     return false;
   }
   return pathname === href || pathname.startsWith(`${href}/`);
@@ -301,6 +342,8 @@ export function AppChrome({
   const userName = authSession?.user?.name ?? authSession?.user?.email ?? "Account";
   const userEmail = authSession?.user?.email ?? "";
   const initial = (userName.trim().charAt(0) || userEmail.charAt(0) || "?").toUpperCase();
+  const teacherInitials =
+    variant === "teacher" ? studentInitials(userName, userEmail) : initial;
 
   useEffect(() => {
     setMenuOpen(false);
@@ -340,8 +383,8 @@ export function AppChrome({
 
   const teacherNavPrimary: NavItem[] = [
     { href: "/teacher/dashboard", label: "Home", icon: "home" },
-    { href: "/teacher/lessons", label: "Lessons", icon: "book" },
-    { href: "/teacher/question-bank", label: "Question bank", icon: "file" },
+    { href: "/teacher/lessons", label: "Lessons", icon: "bookOpen" },
+    { href: "/teacher/question-bank", label: "Question bank", icon: "clipboardList" },
     { href: "/teacher/dashboard/classes", label: "Classes", icon: "users" },
     { href: "/teacher/reports", label: "Reports", icon: "chart" },
     { href: "/teacher/resources", label: "Resources", icon: "folder" },
@@ -396,6 +439,7 @@ export function AppChrome({
     active,
     badge,
     onNavigate,
+    variant = "default",
   }: {
     href: string;
     label: string;
@@ -404,28 +448,44 @@ export function AppChrome({
     active: boolean;
     badge?: number;
     onNavigate?: () => void;
+    variant?: "default" | "teacher";
   }) {
+    const teacher = variant === "teacher";
     return (
       <Link
         href={href}
         onClick={onNavigate}
-        className={`group relative flex items-center gap-3 rounded-2xl px-3 py-2.5 pl-3 transition-colors duration-150 ${
-          active
-            ? "bg-[rgba(99,102,241,0.12)] shadow-[inset_0_0_0_1px_rgba(99,102,241,0.35)]"
-            : "text-[color:var(--anx-text)] hover:bg-[var(--anx-surface-hover)]"
-        }`}
+        className={
+          teacher
+            ? `group relative flex items-center gap-3 rounded-xl py-2.5 pl-3 pr-2.5 transition-colors duration-150 ${
+                active
+                  ? "bg-[#f5f3ff] before:absolute before:left-0 before:top-1/2 before:h-[2.125rem] before:w-[4px] before:-translate-y-1/2 before:rounded-full before:bg-[#6366f1] before:content-['']"
+                  : "text-[#3f3f46] hover:bg-[#fafafa]"
+              }`
+            : `group relative flex items-center gap-3 rounded-2xl px-3 py-2.5 pl-3 transition-colors duration-150 ${
+                active
+                  ? "bg-[rgba(99,102,241,0.12)] shadow-[inset_0_0_0_1px_rgba(99,102,241,0.35)]"
+                  : "text-[color:var(--anx-text)] hover:bg-[var(--anx-surface-hover)]"
+              }`
+        }
       >
-        {active ? (
+        {!teacher && active ? (
           <span
             className="absolute left-0 top-1/2 h-8 w-1 -translate-y-1/2 rounded-full bg-[#6366f1]"
             aria-hidden
           />
         ) : null}
-        <NavIconBox kind={iconKind} active={active} />
+        <NavIconBox kind={iconKind} active={active} chrome={teacher ? "teacher" : "default"} />
         <span className="min-w-0 flex-1">
           <span
             className={`block text-[0.9375rem] font-semibold leading-snug tracking-tight ${
-              active ? "text-[#312e81]" : "text-[color:var(--anx-text)]"
+              teacher
+                ? active
+                  ? "text-[#312e81]"
+                  : "text-[#27272a]"
+                : active
+                  ? "text-[#312e81]"
+                  : "text-[color:var(--anx-text)]"
             }`}
           >
             {label}
@@ -433,7 +493,13 @@ export function AppChrome({
           {description ? (
             <span
               className={`mt-0.5 block text-xs leading-relaxed ${
-                active ? "text-[#4f46e5]/90" : "text-[color:var(--anx-text-muted)]"
+                teacher
+                  ? active
+                    ? "text-[#5b21b6]/85"
+                    : "text-[#71717a]"
+                  : active
+                    ? "text-[#4f46e5]/90"
+                    : "text-[color:var(--anx-text-muted)]"
               }`}
             >
               {description}
@@ -522,8 +588,8 @@ export function AppChrome({
 
   function TeacherNav({ onNavigate }: { onNavigate?: () => void }) {
     return (
-      <div className="flex flex-col gap-6 px-2 py-3">
-        <nav className="flex flex-col gap-1" aria-label="Primary">
+      <div className="flex flex-col gap-5 px-2 py-3">
+        <nav className="flex flex-col gap-0.5" aria-label="Primary">
           {teacherNavPrimary.map((item) => {
             const active = isNavActive(pathname, item.href);
             return (
@@ -535,12 +601,13 @@ export function AppChrome({
                 iconKind={item.icon}
                 active={active}
                 onNavigate={onNavigate}
+                variant="teacher"
               />
             );
           })}
         </nav>
-        <div className="mx-3 border-t border-[var(--anx-outline-variant)]" />
-        <nav className="flex flex-col gap-1" aria-label="Secondary">
+        <div className="mx-2 border-t border-[#e4e4e7]" />
+        <nav className="flex flex-col gap-0.5" aria-label="Secondary">
           {teacherNavSecondary.map((item) => {
             const active = isNavActive(pathname, item.href);
             return (
@@ -552,6 +619,7 @@ export function AppChrome({
                 iconKind={item.icon}
                 active={active}
                 onNavigate={onNavigate}
+                variant="teacher"
               />
             );
           })}
@@ -563,12 +631,20 @@ export function AppChrome({
   const brandBlock = (
     <Link
       href={homeHref}
-      className="flex items-center gap-3 rounded-2xl p-2 outline-none transition-colors hover:bg-[var(--anx-surface-hover)] focus-visible:ring-2 focus-visible:ring-[var(--anx-primary-glow)]"
+      className={`flex items-center gap-3 rounded-2xl p-2 outline-none focus-visible:ring-2 focus-visible:ring-[var(--anx-primary-glow)] ${
+        variant === "teacher"
+          ? "transition-colors hover:bg-[#f4f4f5]"
+          : "transition-colors hover:bg-[var(--anx-surface-hover)]"
+      }`}
       onClick={() => setMenuOpen(false)}
     >
       <LogoImage className="h-7 w-auto shrink-0 sm:h-8" />
       <div className="min-w-0 text-left">
-        <p className="truncate text-xs font-medium text-[color:var(--anx-text-muted)]">
+        <p
+          className={`truncate text-xs font-medium ${
+            variant === "teacher" ? "text-[#71717a]" : "text-[color:var(--anx-text-muted)]"
+          }`}
+        >
           {tagline}
         </p>
       </div>
@@ -673,14 +749,24 @@ export function AppChrome({
 
       <aside
         id="app-chrome-drawer"
-        className={`fixed inset-y-0 left-0 z-50 flex w-[min(18rem,88vw)] flex-col border-r border-[var(--anx-outline-variant)] bg-[color:var(--anx-surface-raised)] shadow-[var(--anx-shadow-lg)] transition-transform duration-200 ease-out lg:static lg:z-0 lg:w-[min(17.5rem,19vw)] lg:translate-x-0 lg:shadow-none ${
-          menuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
-        }`}
+        className={`fixed inset-y-0 left-0 z-50 flex w-[min(18rem,88vw)] flex-col border-r shadow-[var(--anx-shadow-lg)] transition-transform duration-200 ease-out lg:static lg:z-0 lg:w-[min(17.5rem,19vw)] lg:translate-x-0 lg:shadow-none ${
+          variant === "teacher"
+            ? "border-[#e4e4e7] bg-white lg:border-[#e4e4e7] lg:shadow-[1px_0_0_rgba(0,0,0,0.04)]"
+            : "border-[var(--anx-outline-variant)] bg-[color:var(--anx-surface-raised)] lg:shadow-none"
+        } ${menuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
       >
-        <div className="hidden border-b border-[var(--anx-outline-variant)] p-4 lg:block">
+        <div
+          className={`hidden p-4 lg:block ${
+            variant === "teacher" ? "border-b border-[#f4f4f5]" : "border-b border-[var(--anx-outline-variant)]"
+          }`}
+        >
           {brandBlock}
         </div>
-        <div className="border-b border-[var(--anx-outline-variant)] p-3 lg:hidden">
+        <div
+          className={`p-3 lg:hidden ${
+            variant === "teacher" ? "border-b border-[#f4f4f5]" : "border-b border-[var(--anx-outline-variant)]"
+          }`}
+        >
           {brandBlock}
         </div>
 
@@ -693,8 +779,18 @@ export function AppChrome({
           )}
         </div>
 
-        <div className="border-t border-[var(--anx-outline-variant)] p-4">
-          <div className="flex items-center gap-3 rounded-xl border border-[var(--anx-outline-variant)] bg-[color:var(--anx-surface-bright)] px-3 py-2.5 shadow-[var(--anx-shadow-sm)]">
+        <div
+          className={`p-4 ${
+            variant === "teacher" ? "border-t border-[#f4f4f5] bg-[#fafafa]" : "border-t border-[var(--anx-outline-variant)]"
+          }`}
+        >
+          <div
+            className={`flex items-center gap-3 rounded-xl border px-3 py-2.5 shadow-[var(--anx-shadow-sm)] ${
+              variant === "teacher"
+                ? "border-[#e4e4e7] bg-white"
+                : "border-[var(--anx-outline-variant)] bg-[color:var(--anx-surface-bright)]"
+            }`}
+          >
             <div
               className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white"
               style={{
@@ -703,13 +799,21 @@ export function AppChrome({
               }}
               aria-hidden
             >
-              {initial}
+              {variant === "teacher" ? teacherInitials : initial}
             </div>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-semibold text-[color:var(--anx-text)]">
+              <p
+                className={`truncate text-sm font-semibold ${
+                  variant === "teacher" ? "text-[#18181b]" : "text-[color:var(--anx-text)]"
+                }`}
+              >
                 {userName}
               </p>
-              <p className="truncate text-xs text-[color:var(--anx-text-muted)]">
+              <p
+                className={`truncate text-xs ${
+                  variant === "teacher" ? "text-[#71717a]" : "text-[color:var(--anx-text-muted)]"
+                }`}
+              >
                 {roleFooterLabel()}
               </p>
             </div>
@@ -717,7 +821,11 @@ export function AppChrome({
           <button
             type="button"
             onClick={() => signOut({ callbackUrl: "/login" })}
-            className="mt-3 w-full text-center text-xs font-medium text-[color:var(--anx-text-muted)] transition hover:text-[color:var(--anx-text)]"
+            className={`mt-3 w-full text-center text-xs font-medium transition ${
+              variant === "teacher"
+                ? "text-[#71717a] hover:text-[#6366f1]"
+                : "text-[color:var(--anx-text-muted)] hover:text-[color:var(--anx-text)]"
+            }`}
           >
             Sign out
           </button>
