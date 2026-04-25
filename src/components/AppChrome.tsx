@@ -245,8 +245,10 @@ function isNavActive(pathname: string | null, href: string) {
   if (href === "/teacher/dashboard") {
     return pathname === "/teacher/dashboard";
   }
-  if (href === "/teacher/live/new") {
-    return pathname.startsWith("/teacher/live");
+  if (href === "/teacher/lessons") {
+    if (pathname === "/teacher/lessons" || pathname.startsWith("/teacher/lessons/")) return true;
+    if (pathname.startsWith("/teacher/live")) return true;
+    return false;
   }
   return pathname === href || pathname.startsWith(`${href}/`);
 }
@@ -338,7 +340,7 @@ export function AppChrome({
 
   const teacherNavPrimary: NavItem[] = [
     { href: "/teacher/dashboard", label: "Home", icon: "home" },
-    { href: "/teacher/live/new", label: "Lessons", icon: "book" },
+    { href: "/teacher/lessons", label: "Lessons", icon: "book" },
     { href: "/teacher/content/review", label: "Question bank", icon: "file" },
     { href: "/teacher/dashboard/classes", label: "Classes", icon: "users" },
     { href: "/teacher/reports", label: "Reports", icon: "chart" },
