@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 interface Classroom {
@@ -29,6 +29,22 @@ interface LessonPhase {
   skillCode: string;
   skillName: string;
   type: 'PRACTICE' | 'EXPLANATION';
+  label: string;
+}
+
+interface CheckSlotDraft {
+  skillId: string;
+  itemId: string;
+  stemPreview: string;
+}
+
+interface BankItem {
+  id: string;
+  question: string;
+}
+
+interface RecentSessionRow {
+  id: string;
   label: string;
 }
 
@@ -98,6 +114,15 @@ export function NewLiveSessionForm({ classrooms, subjects, skillsBySubject }: Pr
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const [openingShared, setOpeningShared] = useState<CheckSlotDraft[]>([]);
+  const [openingDifferentiated, setOpeningDifferentiated] = useState(false);
+  const [openingPerStudent, setOpeningPerStudent] = useState<Record<string, CheckSlotDraft[]>>({});
+  const [lastSessionId, setLastSessionId] = useState('');
+  const [recentSessions, setRecentSessions] = useState<RecentSessionRow[]>([]);
+  const [bankBySkill, setBankBySkill] = useState<Array<{ skillId: string; items: BankItem[] }>>([]);
+  const [bankLoading, setBankLoading] = useState(false);
+  const [perStudentSuggestLoading, setPerStudentSuggestLoading] = useState(false);
+
   const skillsForSubject = skillsBySubject.filter((s) => s.subjectId === subjectId);
 
   // Group skills by strand for step 1 display
@@ -107,6 +132,32 @@ export function NewLiveSessionForm({ classrooms, subjects, skillsBySubject }: Pr
     acc[strand].push(skill);
     return acc;
   }, {});
+
+  const practiceSkillIdsInPlan = useMemo(
+    () => [...new Set(phases.filter((p) => p.type === 'PRACTICE').map((p) => p.skillId))],
+    [phases],
+  );
+
+  useEffect(() => {
+    if (!classroomId) {
+      setRecentSessions([]);
+      return;
+    }
+    let cancelled = false;
+    void (async () => {
+      try {
+        const res = await fetch(`/api/teacher/classrooms/${classroomId}/recent-live-sessions`);
+        if (!res.ok) return;
+        const data = (await res.json()) as { sessions?: RecentSessionRow[] };
+        if (!cancelled) setRecentSessions(data.sessions ?? []);
+      } catch {
+        /* ignore */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [classroomId]);
 
   function toggleSkill(skillId: string) {
     setSelectedSkillIds((prev) =>
@@ -167,6 +218,107 @@ export function NewLiveSessionForm({ classrooms, subjects, skillsBySubject }: Pr
     });
   }
 
+  function addSharedSlot(slot: CheckSlotDraft) {
+    setOpeningShared((prev) => {
+      if (prev.some((p) => p.itemId === slot.itemId)) return prev;
+      if (prev.length >= 12) return prev;
+      return [...prev, slot];
+    });
+  }
+
+  function removeSharedSlot(itemId: string) {
+    setOpeningShared((prev) => prev.filter((p) => p.itemId !== itemId));
+  }
+
+  async function loadQuestionBank() {
+    if (!subjectId || practiceSkillIdsInPlan.length === 0) return;
+    setBankLoading(true);
+    setError(null);
+    try {
+      const qs = new URLSearchParams({
+        subjectId,
+        skillIds: practiceSkillIdsInPlan.join(','),
+      });
+      if (classroomId && lastSessionId) {
+        qs.set('classroomId', classroomId);
+        qs.set('lastSessionId', lastSessionId);
+      }
+      const res = await fetch(`/api/teacher/live-items-suggest?${qs.toString()}`);
+      if (!res.ok) {
+        setError('Could not load sample questions.');
+        return;
+      }
+      const data = (await res.json()) as {
+        itemsBySkill: Array<{ skillId: string; items: BankItem[] }>;
+        recapItemsBySkill?: Array<{ skillId: string; items: BankItem[] }>;
+      };
+      const merged = new Map<string, BankItem[]>();
+      for (const row of data.itemsBySkill ?? []) {
+        merged.set(row.skillId, [...(merged.get(row.skillId) ?? []), ...row.items]);
+      }
+      for (const row of data.recapItemsBySkill ?? []) {
+        const cur = merged.get(row.skillId) ?? [];
+        const seen = new Set(cur.map((i) => i.id));
+        for (const it of row.items) {
+          if (!seen.has(it.id)) {
+            cur.push(it);
+            seen.add(it.id);
+          }
+        }
+        merged.set(row.skillId, cur);
+      }
+      setBankBySkill(
+        [...merged.entries()].map(([skillId, items]) => ({
+          skillId,
+          items: items.slice(0, 24),
+        })),
+      );
+    } catch {
+      setError('Could not load sample questions.');
+    } finally {
+      setBankLoading(false);
+    }
+  }
+
+  async function suggestPerStudentRecap() {
+    if (!classroomId || !subjectId || practiceSkillIdsInPlan.length === 0) return;
+    setPerStudentSuggestLoading(true);
+    setError(null);
+    try {
+      const qs = new URLSearchParams({
+        subjectId,
+        skillIds: practiceSkillIdsInPlan.join(','),
+      });
+      const res = await fetch(
+        `/api/teacher/classrooms/${classroomId}/opening-check-suggestions?${qs.toString()}`,
+      );
+      if (!res.ok) {
+        setError('Could not build per-student suggestions.');
+        return;
+      }
+      const data = (await res.json()) as {
+        students: Array<{
+          studentUserId: string;
+          suggested: Array<{ skillId: string; itemId: string; questionPreview: string }>;
+        }>;
+      };
+      const next: Record<string, CheckSlotDraft[]> = {};
+      for (const row of data.students ?? []) {
+        next[row.studentUserId] = row.suggested.map((s) => ({
+          skillId: s.skillId,
+          itemId: s.itemId,
+          stemPreview: s.questionPreview,
+        }));
+      }
+      setOpeningPerStudent(next);
+      setOpeningDifferentiated(true);
+    } catch {
+      setError('Could not build per-student suggestions.');
+    } finally {
+      setPerStudentSuggestLoading(false);
+    }
+  }
+
   async function handleLaunch() {
     if (phases.length === 0) {
       setError('Add at least one phase before launching.');
@@ -187,6 +339,25 @@ export function NewLiveSessionForm({ classrooms, subjects, skillsBySubject }: Pr
       label: p.label,
     }));
 
+    const checkPlanPayload =
+      openingShared.length > 0 || (openingDifferentiated && Object.keys(openingPerStudent).length > 0)
+        ? {
+            shared:
+              openingShared.length > 0
+                ? openingShared.map((s) => ({ skillId: s.skillId, itemId: s.itemId }))
+                : undefined,
+            perStudent:
+              openingDifferentiated && Object.keys(openingPerStudent).length > 0
+                ? Object.fromEntries(
+                    Object.entries(openingPerStudent).map(([uid, slots]) => [
+                      uid,
+                      slots.map((s) => ({ skillId: s.skillId, itemId: s.itemId })),
+                    ]),
+                  )
+                : undefined,
+          }
+        : undefined;
+
     try {
       const res = await fetch('/api/live-sessions', {
         method: 'POST',
@@ -196,6 +367,7 @@ export function NewLiveSessionForm({ classrooms, subjects, skillsBySubject }: Pr
           subjectId,
           skillId: primarySkill?.skillId,
           phases: phasesPayload,
+          checkPlan: checkPlanPayload,
         }),
       });
 
@@ -343,6 +515,126 @@ export function NewLiveSessionForm({ classrooms, subjects, skillsBySubject }: Pr
       </div>
 
       {error && <div className="anx-callout-danger text-sm">{error}</div>}
+
+      <div className="rounded-xl border p-4" style={{ borderColor: 'var(--anx-outline-variant)' }}>
+        <p className="anx-section-label mb-1" style={{ color: 'var(--anx-text-muted)' }}>Opening checks</p>
+        <h3 className="text-base font-bold" style={{ color: 'var(--anx-text)' }}>Quick checks when you start</h3>
+        <p className="mt-1 text-sm leading-relaxed" style={{ color: 'var(--anx-text-muted)' }}>
+          Pick questions now so students see them automatically in check mode when the lesson goes live. You can use one
+          set for everyone, or different first questions per student (for example recap based on prior lesson or mastery).
+        </p>
+
+        {recentSessions.length > 0 && (
+          <div className="mt-4">
+            <label className="mb-1 block text-xs font-medium" style={{ color: 'var(--anx-text-secondary)' }} htmlFor="lastSess">
+              Last lesson in this class (optional — adds recap topic samples)
+            </label>
+            <select
+              id="lastSess"
+              value={lastSessionId}
+              onChange={(e) => setLastSessionId(e.target.value)}
+              className="anx-input text-sm"
+            >
+              <option value="">None</option>
+              {recentSessions.map((s) => (
+                <option key={s.id} value={s.id}>{s.label}</option>
+              ))}
+            </select>
+          </div>
+        )}
+
+        <div className="mt-4 flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => void loadQuestionBank()}
+            disabled={bankLoading || !subjectId || practiceSkillIdsInPlan.length === 0}
+            className="anx-btn-secondary px-3 py-2 text-xs disabled:opacity-40"
+          >
+            {bankLoading ? 'Loading bank…' : 'Load sample questions'}
+          </button>
+          <button
+            type="button"
+            onClick={() => void suggestPerStudentRecap()}
+            disabled={perStudentSuggestLoading || !classroomId || !subjectId || practiceSkillIdsInPlan.length === 0}
+            className="anx-btn-secondary px-3 py-2 text-xs disabled:opacity-40"
+          >
+            {perStudentSuggestLoading ? 'Suggesting…' : 'Suggest per-student recap'}
+          </button>
+        </div>
+
+        {bankBySkill.length > 0 && (
+          <div className="mt-4 max-h-48 space-y-3 overflow-y-auto pr-1">
+            {bankBySkill.map((row) => {
+              const sk = skillsForSubject.find((s) => s.id === row.skillId);
+              return (
+                <div key={row.skillId}>
+                  <p className="mb-1 text-xs font-semibold" style={{ color: 'var(--anx-text-secondary)' }}>
+                    {sk ? `${sk.code} · ${sk.name}` : row.skillId}
+                  </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {row.items.map((it) => (
+                      <button
+                        key={it.id}
+                        type="button"
+                        onClick={() =>
+                          addSharedSlot({
+                            skillId: row.skillId,
+                            itemId: it.id,
+                            stemPreview: it.question.slice(0, 80) + (it.question.length > 80 ? '…' : ''),
+                          })
+                        }
+                        className="max-w-full rounded-lg border px-2 py-1 text-left text-[11px] leading-snug transition hover:bg-[var(--anx-primary-soft)]"
+                        style={{ borderColor: 'var(--anx-outline-variant)', color: 'var(--anx-text-secondary)' }}
+                        title={it.question}
+                      >
+                        {it.question.slice(0, 56)}{it.question.length > 56 ? '…' : ''}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {openingShared.length > 0 && (
+          <div className="mt-4">
+            <p className="mb-2 text-xs font-semibold" style={{ color: 'var(--anx-text-secondary)' }}>Whole class order</p>
+            <ol className="m-0 list-decimal space-y-1 pl-5 text-sm" style={{ color: 'var(--anx-text)' }}>
+              {openingShared.map((s) => (
+                <li key={s.itemId} className="flex items-start gap-2">
+                  <span className="min-w-0 flex-1">{s.stemPreview}</span>
+                  <button
+                    type="button"
+                    onClick={() => removeSharedSlot(s.itemId)}
+                    className="shrink-0 text-xs font-medium"
+                    style={{ color: 'var(--anx-danger-text)' }}
+                  >
+                    Remove
+                  </button>
+                </li>
+              ))}
+            </ol>
+          </div>
+        )}
+
+        <label className="mt-4 flex cursor-pointer items-center gap-2 text-sm" style={{ color: 'var(--anx-text-secondary)' }}>
+          <input
+            type="checkbox"
+            checked={openingDifferentiated}
+            onChange={(e) => setOpeningDifferentiated(e.target.checked)}
+            className="accent-[var(--anx-primary)]"
+          />
+          Use per-student lists when set (overrides whole-class list for those students)
+        </label>
+
+        {openingDifferentiated && Object.keys(openingPerStudent).length > 0 && (
+          <p className="mt-2 text-xs leading-relaxed" style={{ color: 'var(--anx-text-muted)' }}>
+            {Object.keys(openingPerStudent).length} students have a personalised first check. Others use the whole-class
+            list if you added one.
+          </p>
+        )}
+      </div>
 
       <div className="space-y-2">
         {phases.map((phase, i) => (

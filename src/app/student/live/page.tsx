@@ -40,6 +40,8 @@ interface Item {
   question: string;
   type: string;
   options: unknown;
+  /** Present for opening checks / differentiated queue */
+  skillId?: string;
 }
 
 interface CurrentContent {
@@ -66,7 +68,7 @@ type AppState =
   | { phase: 'whiteboard'; session: JoinedSession; whiteboard: LiveWhiteboardPayload }
   | { phase: 'question'; session: JoinedSession; item: Item }
   | { phase: 'practice'; session: JoinedSession; item: Item; index: number; total: number }
-  | { phase: 'feedback'; session: JoinedSession; correct: boolean; nextItem: Item | null; index: number; total: number }
+  | { phase: 'feedback'; session: JoinedSession; correct: boolean; nextItem: (Item & { skillId?: string }) | null; index: number; total: number }
   | { phase: 'done'; session: JoinedSession };
 
 function broadcastTargetsStudentLane(content: CurrentContent, studentLane: string | null | undefined): boolean {
@@ -245,7 +247,7 @@ export default function StudentLivePage() {
     if (appState.phase !== 'question') return;
     setSubmitError(null);
     const { session, item } = appState;
-    const skillId = session.skill?.id;
+    const skillId = item.skillId ?? session.skill?.id;
     if (!skillId) { setSubmitError('No skill associated with this session.'); return; }
 
     setLoading(true);
@@ -266,8 +268,15 @@ export default function StudentLivePage() {
         setSubmitError(data.error ?? 'Failed to submit answer.');
         return;
       }
-      const result: { correct: boolean; nextItem: Item | null } = await res.json();
-      setAppState({ phase: 'feedback', session, correct: result.correct, nextItem: result.nextItem, index: 1, total: 1 });
+      const result: { correct: boolean; nextItem: (Item & { skillId?: string }) | null } = await res.json();
+      setAppState({
+        phase: 'feedback',
+        session,
+        correct: result.correct,
+        nextItem: result.nextItem,
+        index: 1,
+        total: 1,
+      });
     } catch {
       setSubmitError('Network error. Please try again.');
     } finally {
@@ -280,7 +289,7 @@ export default function StudentLivePage() {
     void _confidence; // confidence is captured client-side; backend integration is left for a follow-up
     setSubmitError(null);
     const { session, item, index, total } = appState;
-    const skillId = session.skill?.id;
+    const skillId = item.skillId ?? session.skill?.id;
     if (!skillId) { setSubmitError('No skill associated with this session.'); return; }
 
     setLoading(true);
@@ -419,7 +428,23 @@ export default function StudentLivePage() {
               onClick={() => {
                 const sess = appState.session;
                 if (appState.nextItem) {
-                  setAppState({ phase: 'practice', session: sess, item: appState.nextItem, index: appState.index + 1, total: appState.total });
+                  const ni = appState.nextItem;
+                  const mergedSession =
+                    ni.skillId && sess.skill?.id !== ni.skillId
+                      ? { ...sess, skill: { id: ni.skillId, code: sess.skill?.code ?? '', name: sess.skill?.name ?? '' } }
+                      : sess;
+                  const resumePractice = appState.total > 1;
+                  if (resumePractice) {
+                    setAppState({
+                      phase: 'practice',
+                      session: mergedSession,
+                      item: ni,
+                      index: appState.index + 1,
+                      total: appState.total,
+                    });
+                  } else {
+                    setAppState({ phase: 'question', session: mergedSession, item: ni });
+                  }
                 } else {
                   setAppState({ phase: 'waiting', session: sess });
                 }

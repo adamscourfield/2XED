@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { z } from 'zod';
 import { authOptions } from '@/features/auth/authOptions';
 import { prisma } from '@/db/prisma';
+import { resolveOpeningCheckQueueForParticipant, type LiveCheckPlan } from '@/lib/live/live-check-plan';
 
 const schema = z.object({
   joinCode: z.string().length(6),
@@ -53,7 +54,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Upsert participant record (handles rejoins)
-  await prisma.liveParticipant.upsert({
+  const participant = await prisma.liveParticipant.upsert({
     where: {
       liveSessionId_studentUserId: {
         liveSessionId: liveSession.id,
@@ -65,7 +66,28 @@ export async function POST(req: NextRequest) {
       liveSessionId: liveSession.id,
       studentUserId: userId,
     },
+    select: { id: true, openingCheckQueue: true },
   });
+
+  if (liveSession.status === 'ACTIVE') {
+    const plan = liveSession.checkPlan as LiveCheckPlan | null | undefined;
+    if (plan && (plan.shared?.length || Object.keys(plan.perStudent ?? {}).length)) {
+      const queue = await resolveOpeningCheckQueueForParticipant({
+        studentUserId: userId,
+        checkPlan: plan,
+        subjectId: liveSession.subjectId,
+      });
+      const hasQueue =
+        Array.isArray(participant.openingCheckQueue) &&
+        (participant.openingCheckQueue as unknown[]).length > 0;
+      if (queue.length > 0 && !hasQueue) {
+        await prisma.liveParticipant.update({
+          where: { id: participant.id },
+          data: { openingCheckQueue: queue, openingCheckIndex: 0 },
+        });
+      }
+    }
+  }
 
   return NextResponse.json({
     sessionId: liveSession.id,

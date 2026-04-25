@@ -699,6 +699,8 @@ model LiveSession {
   currentPhaseIndex Int               @default(0)
   // What's currently deployed to student devices
   currentContent    Json?
+  // Teacher-authored opening checks: { shared?: { skillId, itemId }[], perStudent?: Record<userId, { skillId, itemId }[]> }
+  checkPlan         Json?
 
   classroom     Classroom         @relation(fields: [classroomId], references: [id])
   teacher       User              @relation("TeacherLiveSessions", fields: [teacherUserId], references: [id])
@@ -723,6 +725,9 @@ model LiveParticipant {
   isActive              Boolean           @default(true)
   lastActiveAt          DateTime          @default(now())
   laneAssignedAt        DateTime?
+  // Resolved opening checks: [{ itemId, skillId }, …]; index is the current prompt (session ACTIVE).
+  openingCheckQueue     Json?
+  openingCheckIndex     Int               @default(0)
 
   session               LiveSession       @relation(fields: [liveSessionId], references: [id], onDelete: Cascade)
   student               User              @relation(fields: [studentUserId], references: [id], onDelete: Cascade)
