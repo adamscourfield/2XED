@@ -15,8 +15,8 @@ export default async function TeacherResourcesPage() {
       <div className="anx-card max-w-xl space-y-4 p-6 text-sm text-[color:var(--anx-text-secondary)]">
         <p className="m-0">Curated resource packs will be listed here. You can still open the English booklet review flow or your class timetable from the links below.</p>
         <div className="flex flex-wrap gap-2">
-          <Link href="/teacher/content/review" className="anx-btn-secondary text-sm no-underline">
-            Content review
+          <Link href="/teacher/content/booklet-review" className="anx-btn-secondary text-sm no-underline">
+            English booklet review
           </Link>
           <Link href="/teacher/timetable" className="anx-btn-secondary text-sm no-underline">
             Timetable

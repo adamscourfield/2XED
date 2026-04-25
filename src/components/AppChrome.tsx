@@ -341,7 +341,7 @@ export function AppChrome({
   const teacherNavPrimary: NavItem[] = [
     { href: "/teacher/dashboard", label: "Home", icon: "home" },
     { href: "/teacher/lessons", label: "Lessons", icon: "book" },
-    { href: "/teacher/content/review", label: "Question bank", icon: "file" },
+    { href: "/teacher/question-bank", label: "Question bank", icon: "file" },
     { href: "/teacher/dashboard/classes", label: "Classes", icon: "users" },
     { href: "/teacher/reports", label: "Reports", icon: "chart" },
     { href: "/teacher/resources", label: "Resources", icon: "folder" },
