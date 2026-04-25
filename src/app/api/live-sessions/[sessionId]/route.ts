@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { z } from 'zod';
 import { authOptions } from '@/features/auth/authOptions';
 import { prisma } from '@/db/prisma';
+import { resolveOpeningCheckQueueForParticipant, type LiveCheckPlan } from '@/lib/live/live-check-plan';
 
 const schema = z.object({
   status: z.enum(['ACTIVE', 'PAUSED', 'COMPLETED']),
@@ -27,7 +28,15 @@ export async function PATCH(req: NextRequest, { params }: Props) {
 
   const { status } = parsed.data;
 
-  const liveSession = await prisma.liveSession.findUnique({ where: { id: sessionId } });
+  const liveSession = await prisma.liveSession.findUnique({
+    where: { id: sessionId },
+    select: {
+      teacherUserId: true,
+      startedAt: true,
+      subjectId: true,
+      checkPlan: true,
+    },
+  });
   if (!liveSession) return NextResponse.json({ error: 'Session not found' }, { status: 404 });
   if (liveSession.teacherUserId !== userId) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
@@ -50,6 +59,30 @@ export async function PATCH(req: NextRequest, { params }: Props) {
     where: { id: sessionId },
     data: updateData,
   });
+
+  if (status === 'ACTIVE' && !liveSession.startedAt) {
+    const plan = liveSession.checkPlan as LiveCheckPlan | null | undefined;
+    if (plan && (plan.shared?.length || Object.keys(plan.perStudent ?? {}).length)) {
+      const participants = await prisma.liveParticipant.findMany({
+        where: { liveSessionId: sessionId },
+        select: { id: true, studentUserId: true },
+      });
+      for (const p of participants) {
+        const queue = await resolveOpeningCheckQueueForParticipant({
+          studentUserId: p.studentUserId,
+          checkPlan: plan,
+          subjectId: liveSession.subjectId,
+        });
+        await prisma.liveParticipant.update({
+          where: { id: p.id },
+          data: {
+            openingCheckQueue: queue.length ? queue : undefined,
+            openingCheckIndex: 0,
+          },
+        });
+      }
+    }
+  }
 
   return NextResponse.json(updated);
 }
