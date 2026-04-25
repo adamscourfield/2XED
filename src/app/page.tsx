@@ -9,14 +9,14 @@ export default function HomePage() {
         <div className="w-full max-w-xl space-y-6 sm:max-w-2xl">
           <StudentFlowHero
             titleId="marketing-home-title"
-            eyebrow="2XED"
+            eyebrow="Ember"
             title="Adaptive learning that keeps pace with every learner"
             lead="Mastery paths, diagnostics, and live lessons — with progress your students can actually read."
             variant="compact"
           >
             <div className="mt-6 flex justify-center">
               <div className="rounded-2xl bg-white/12 p-3 shadow-lg backdrop-blur-sm ring-1 ring-white/25">
-                <Image src="/2xed-logo.png" alt="2XED" width={44} height={44} />
+                <Image src="/ember-icon.svg" alt="Ember" width={44} height={55} />
               </div>
             </div>
           </StudentFlowHero>

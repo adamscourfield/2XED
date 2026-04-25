@@ -138,7 +138,7 @@ export default async function AdminHomePage() {
       <header className="border-b px-8 py-5" style={{ borderColor: 'var(--anx-border)', background: 'var(--anx-surface-container-lowest)' }}>
         <div className="mx-auto flex max-w-6xl items-center justify-between">
           <div>
-            <p className="anx-section-label mb-0.5" style={{ color: 'var(--anx-text-muted)' }}>2XED</p>
+            <p className="anx-section-label mb-0.5" style={{ color: 'var(--anx-text-muted)' }}>Ember</p>
             <h1 className="text-xl font-semibold" style={{ color: 'var(--anx-text)' }}>Platform Overview</h1>
           </div>
           <div className="flex items-center gap-3 text-sm" style={{ color: 'var(--anx-text-muted)' }}>

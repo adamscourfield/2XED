@@ -28,8 +28,8 @@ interface StudentSubjectNav {
 function LogoImage({ className }: { className?: string }) {
   return (
     <Image
-      src="/2xed-logo.png"
-      alt="2XED"
+      src="/ember-logo.svg"
+      alt="Ember"
       width={160}
       height={40}
       className={className ?? "h-8 w-auto"}

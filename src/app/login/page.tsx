@@ -40,10 +40,10 @@ export default function LoginPage() {
     <main className="anx-scene flex min-h-screen flex-col items-center justify-center px-4 py-12">
       <div className="w-full max-w-md space-y-6">
         <div className="text-center">
-          <Image src="/2xed-logo.png" alt="2XED" width={48} height={48} className="mx-auto" />
+          <Image src="/ember-icon.svg" alt="Ember" width={48} height={60} className="mx-auto" />
           <p className="anx-section-label mt-4">Welcome back</p>
           <h1 className="mt-2 text-2xl font-bold tracking-tight sm:text-[1.65rem]" style={{ color: 'var(--anx-text)' }}>
-            Sign in to 2XED
+            Sign in to Ember
           </h1>
           <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed" style={{ color: 'var(--anx-text-muted)' }}>
             Use the email and password from your school. You will land on your dashboard after signing in.
@@ -105,7 +105,7 @@ export default function LoginPage() {
             ← Back to home
           </Link>
           <span className="mx-2 text-[var(--anx-text-faint)]">·</span>
-          &copy; 2026 2XED
+          &copy; 2026 Ember
         </p>
       </div>
     </main>
