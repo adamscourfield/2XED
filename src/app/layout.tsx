@@ -25,13 +25,13 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Ember',
     description: 'Adaptive mastery learning platform',
-    images: ['/Ember_logo.png'],
+    images: ['/Ember_logo_icon.png'],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Ember',
     description: 'Adaptive mastery learning platform',
-    images: ['/Ember_logo.png'],
+    images: ['/Ember_logo_icon.png'],
   },
 };
 
