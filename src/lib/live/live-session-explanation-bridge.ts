@@ -141,6 +141,8 @@ export type RecommendedExplanationSnapshot = {
   routeType: string;
   misconceptionSummary: string;
   workedExample: string;
+  /** Present when the route has a generated animation (teacher preview / metadata). */
+  animationSchema: unknown | null;
 };
 
 /** Top DLE explanation route for the focus skill (weakest by attempt data when available). */
@@ -164,6 +166,7 @@ export async function getRecommendedExplanationForLiveSession(
           routeType: true,
           misconceptionSummary: true,
           workedExample: true,
+          animationSchema: true,
         },
       },
     },
@@ -179,5 +182,6 @@ export async function getRecommendedExplanationForLiveSession(
     routeType: top.explanation.routeType,
     misconceptionSummary: top.explanation.misconceptionSummary,
     workedExample: top.explanation.workedExample,
+    animationSchema: top.explanation.animationSchema,
   };
 }
