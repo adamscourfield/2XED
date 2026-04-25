@@ -5,19 +5,9 @@ import { prisma } from '@/db/prisma';
 import { hasCompletedOnboardingDiagnostic } from '@/features/learn/onboarding';
 import { selectNextSkill } from '@/features/learn/nextSkill';
 import { LearningPageShell } from '@/components/LearningPageShell';
-import {
-  StudentDashboardView,
-  type DashboardRecentSession,
-  type DashboardRewardRow,
-  type DashboardSubjectSummary,
-  type JourneyMonthBar,
-} from '@/components/student/StudentDashboardView';
+import { StudentDashboardView, type DashboardSubjectSummary, type StudentLivePromo } from '@/components/student/StudentDashboardView';
 import { getUserGamificationSummary } from '@/features/gamification/gamificationService';
-
-const MAX_RECENT_ATTEMPTS = 20;
-const MAX_RECENT_SESSIONS = 5;
-const JOURNEY_MONTHS = 6;
-const REWARD_LEDGER_LIMIT = 12;
+import type { StudentTopBarSubjectOption } from '@/components/student/StudentTopBarSubjectSelector';
 
 function startOfDay(date: Date): Date {
   const d = new Date(date);
@@ -31,17 +21,6 @@ function startOfWeekMonday(date: Date): Date {
   const diffToMonday = day === 0 ? 6 : day - 1;
   d.setDate(d.getDate() - diffToMonday);
   return d;
-}
-
-function monthKeysDescending(now: Date, count: number): { key: string; label: string; date: Date }[] {
-  const out: { key: string; label: string; date: Date }[] = [];
-  for (let i = count - 1; i >= 0; i -= 1) {
-    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-    const label = new Intl.DateTimeFormat('en-GB', { month: 'short' }).format(d);
-    out.push({ key, label, date: d });
-  }
-  return out;
 }
 
 function subjectEmoji(slug: string): string {
@@ -62,22 +41,8 @@ export default async function DashboardPage() {
 
   const now = new Date();
   const weekStart = startOfWeekMonday(now);
-  const prevWeekStart = new Date(weekStart);
-  prevWeekStart.setDate(prevWeekStart.getDate() - 7);
 
-  const journeyMonthDefs = monthKeysDescending(now, JOURNEY_MONTHS);
-  const journeyFrom = journeyMonthDefs[0]?.date ?? new Date(now.getFullYear(), now.getMonth() - (JOURNEY_MONTHS - 1), 1);
-
-  const [
-    subjects,
-    gamification,
-    recentAttempts,
-    journeyEvents,
-    weekQuestionEvents,
-    prevWeekQuestionEvents,
-    weekAttempts,
-    rewardTransactions,
-  ] = await Promise.all([
+  const [subjects, gamification, weekQuestionEvents, liveParticipant] = await Promise.all([
     prisma.subject.findMany({
       include: {
         skills: {
@@ -91,122 +56,37 @@ export default async function DashboardPage() {
       },
     }),
     getUserGamificationSummary(userId),
-    prisma.attempt.findMany({
-      where: { userId },
-      orderBy: { createdAt: 'desc' },
-      take: MAX_RECENT_ATTEMPTS,
+    prisma.event.findMany({
+      where: {
+        name: 'question_answered',
+        studentUserId: userId,
+        createdAt: { gte: weekStart },
+      },
+      select: { id: true },
+    }),
+    prisma.liveParticipant.findFirst({
+      where: {
+        studentUserId: userId,
+        isActive: true,
+        session: {
+          status: { in: ['LOBBY', 'ACTIVE'] },
+        },
+      },
+      orderBy: { joinedAt: 'desc' },
       include: {
-        item: {
+        session: {
           include: {
-            skills: {
-              include: { skill: { include: { subject: true } } },
-            },
+            subject: { select: { title: true } },
+            skill: { select: { name: true, code: true } },
+            teacher: { select: { name: true, email: true } },
+            classroom: { select: { name: true, externalClassId: true } },
           },
         },
       },
     }),
-    prisma.event.findMany({
-      where: {
-        name: 'question_answered',
-        studentUserId: userId,
-        createdAt: { gte: journeyFrom },
-      },
-      select: { createdAt: true },
-    }),
-    prisma.event.findMany({
-      where: {
-        name: 'question_answered',
-        studentUserId: userId,
-        createdAt: { gte: weekStart },
-      },
-      select: { id: true },
-    }),
-    prisma.event.findMany({
-      where: {
-        name: 'question_answered',
-        studentUserId: userId,
-        createdAt: { gte: prevWeekStart, lt: weekStart },
-      },
-      select: { id: true },
-    }),
-    prisma.attempt.findMany({
-      where: {
-        userId,
-        createdAt: { gte: weekStart },
-      },
-      select: { correct: true },
-    }),
-    prisma.rewardTransaction.findMany({
-      where: { userId },
-      orderBy: { createdAt: 'desc' },
-      take: REWARD_LEDGER_LIMIT,
-      select: {
-        id: true,
-        createdAt: true,
-        reason: true,
-        xpDelta: true,
-        tokenDelta: true,
-      },
-    }),
   ]);
 
-  const monthCounts = new Map<string, number>();
-  for (const def of journeyMonthDefs) {
-    monthCounts.set(def.key, 0);
-  }
-  for (const ev of journeyEvents) {
-    const d = ev.createdAt;
-    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-    if (monthCounts.has(key)) {
-      monthCounts.set(key, (monthCounts.get(key) ?? 0) + 1);
-    }
-  }
-  const journeyMonths: JourneyMonthBar[] = journeyMonthDefs.map((def) => ({
-    key: def.key,
-    label: def.label,
-    count: monthCounts.get(def.key) ?? 0,
-  }));
-
-  const weekQuestions = weekQuestionEvents.length;
-  const prevWeekQuestions = prevWeekQuestionEvents.length;
-  const weekCorrect = weekAttempts.filter((a) => a.correct).length;
-  const weekAccuracyPct =
-    weekAttempts.length === 0 ? null : Math.round((weekCorrect / weekAttempts.length) * 100);
-
-  const recentBySubject = new Map<string, { subjectTitle: string; subjectSlug: string; total: number; correct: number; date: Date }>();
-  for (const attempt of recentAttempts) {
-    const firstSkill = attempt.item.skills[0]?.skill;
-    if (!firstSkill?.subject) continue;
-    const subId = firstSkill.subject.id;
-    if (!recentBySubject.has(subId)) {
-      recentBySubject.set(subId, {
-        subjectTitle: firstSkill.subject.title,
-        subjectSlug: firstSkill.subject.slug,
-        total: 0,
-        correct: 0,
-        date: attempt.createdAt,
-      });
-    }
-    const entry = recentBySubject.get(subId)!;
-    entry.total += 1;
-    if (attempt.correct) entry.correct += 1;
-  }
-  const recentSessions: DashboardRecentSession[] = Array.from(recentBySubject.values())
-    .slice(0, MAX_RECENT_SESSIONS)
-    .map((r) => ({
-      subjectTitle: r.subjectTitle,
-      subjectSlug: r.subjectSlug,
-      total: r.total,
-      correct: r.correct,
-    }));
-
-  const rewardRows: DashboardRewardRow[] = rewardTransactions.map((t) => ({
-    id: t.id,
-    at: t.createdAt.toISOString(),
-    reason: t.reason,
-    xpDelta: t.xpDelta,
-    tokenDelta: t.tokenDelta,
-  }));
+  const weekActivityCount = weekQuestionEvents.length;
 
   const onboardingResults = await Promise.all(
     subjects.map((subject) => hasCompletedOnboardingDiagnostic(userId, subject.id))
@@ -272,12 +152,25 @@ export default async function DashboardPage() {
     };
   });
 
-  const first = subjectSummaries[0];
-  let primaryCtaHref = '/dashboard';
-  let primaryCtaLabel = 'Your dashboard';
-  if (first) {
-    primaryCtaHref = first.onboardingComplete ? `/learn/${first.slug}` : `/diagnostic/${first.slug}`;
-    primaryCtaLabel = first.onboardingComplete ? 'Continue learning' : 'Start your diagnostic';
+  const topBarSubjects: StudentTopBarSubjectOption[] = subjectSummaries.map((s) => ({
+    id: s.id,
+    title: s.title,
+    slug: s.slug,
+    href: s.nextHref,
+  }));
+
+  let livePromo: StudentLivePromo | null = null;
+  if (liveParticipant?.session) {
+    const ls = liveParticipant.session;
+    const topicTitle = ls.skill?.name ?? ls.subject.title;
+    const teacherName = ls.teacher.name?.trim() || ls.teacher.email?.split('@')[0] || 'Your teacher';
+    const className = ls.classroom.name;
+    const classCode = ls.classroom.externalClassId?.slice(-4).toUpperCase() ?? '';
+    livePromo = {
+      topicTitle,
+      teacherLine: `with ${teacherName}`,
+      classLine: classCode ? `${className} · ${classCode}` : className,
+    };
   }
 
   const displayName =
@@ -285,29 +178,29 @@ export default async function DashboardPage() {
     (typeof session.user.email === 'string' ? session.user.email.split('@')[0] : null) ||
     'there';
 
+  const primarySubjectSlug = subjectSummaries[0]?.slug ?? null;
+
   return (
     <LearningPageShell
       title="Dashboard"
       subtitle="Your calendar, progress, and shortcuts in one place."
       maxWidthClassName="max-w-6xl"
       appChrome="student"
+      appChromeStudentLayout="topbar"
+      appChromeStudentSubjects={topBarSubjects}
+      hideHeader
     >
       <StudentDashboardView
         displayName={displayName}
         gamification={gamification}
-        weekQuestions={weekQuestions}
-        weekAccuracyPct={weekAccuracyPct}
-        prevWeekQuestions={prevWeekQuestions}
-        journeyMonths={journeyMonths}
-        recentSessions={recentSessions}
-        rewardRows={rewardRows}
         subjects={subjectSummaries}
-        primaryCtaHref={primaryCtaHref}
-        primaryCtaLabel={primaryCtaLabel}
+        livePromo={livePromo}
+        weekActivityCount={weekActivityCount}
+        primarySubjectSlug={primarySubjectSlug}
       />
 
       {subjects.length === 0 && (
-        <div className="anx-card px-6 py-16 text-center text-[color:var(--anx-text-muted)]">
+        <div className="anx-card mt-6 px-6 py-16 text-center text-[color:var(--anx-text-muted)]">
           <p>No subjects available yet. Check back when your school has set them up.</p>
         </div>
       )}
