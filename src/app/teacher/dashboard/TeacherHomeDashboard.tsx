@@ -54,7 +54,7 @@ function classCodeLabel(externalClassId: string, subjectSlug: string | null): st
 }
 
 const QUICK_LINKS = [
-  { href: '/teacher/content/review', label: 'Question bank', icon: 'bank' as const },
+  { href: '/teacher/question-bank', label: 'Question bank', icon: 'bank' as const },
   { href: '/teacher/reports', label: 'Reports', icon: 'chart' as const },
   { href: '/teacher/resources', label: 'Resources', icon: 'folder' as const },
 ];
