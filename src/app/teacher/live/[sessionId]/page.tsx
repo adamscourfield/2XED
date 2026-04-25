@@ -2,8 +2,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/features/auth/authOptions';
 import { redirect } from 'next/navigation';
 import { prisma } from '@/db/prisma';
-import { AppChrome } from '@/components/AppChrome';
-import { TeacherLiveDashboard } from './TeacherLiveDashboard';
+import { TeacherLiveWorkspace } from '@/components/teacher/workspace/TeacherLiveWorkspace';
 
 interface Props {
   params: Promise<{ sessionId: string }>;
@@ -25,9 +24,11 @@ export default async function TeacherLiveSessionPage({ params }: Props) {
 
   if (!liveSession || liveSession.teacherUserId !== user.id) redirect('/teacher/dashboard');
 
+  // Live workspace runs full-bleed (no AppChrome) so the teacher sees a calm,
+  // canvas-first teaching surface instead of an admin dashboard shell.
   return (
-    <AppChrome variant="teacher">
-      <TeacherLiveDashboard sessionId={sessionId} />
-    </AppChrome>
+    <main className="flex min-h-screen flex-col bg-[color:var(--anx-surface-bright)]">
+      <TeacherLiveWorkspace sessionId={sessionId} />
+    </main>
   );
 }

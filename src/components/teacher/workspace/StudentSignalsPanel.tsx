@@ -1,0 +1,216 @@
+'use client';
+
+import { useState } from 'react';
+import { ChevronRightIcon, PeopleIcon, SparkleIcon } from './icons';
+
+export interface ClassOverview {
+  total: number;
+  responded: number;
+  correct: number;
+  partiallyCorrect: number;
+  incorrect: number;
+}
+
+export interface InterpretedSignal {
+  tone: 'ok' | 'warn' | 'issue';
+  text: string;
+}
+
+interface Props {
+  overview: ClassOverview;
+  signals: InterpretedSignal[];
+  topMisconception?: { text: string; studentCount: number } | null;
+  suggestedMove?: { text: string; cta?: string; onAct?: () => void } | null;
+  onViewDetailedResponses?: () => void;
+}
+
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: 'var(--anx-text-muted)' }}>
+      {children}
+    </p>
+  );
+}
+
+function toneIcon(tone: InterpretedSignal['tone']) {
+  if (tone === 'ok') {
+    return (
+      <span className="anx-signal-dot anx-signal-dot-ok" aria-hidden>
+        ✓
+      </span>
+    );
+  }
+  if (tone === 'warn') {
+    return (
+      <span className="anx-signal-dot anx-signal-dot-warn" aria-hidden>
+        !
+      </span>
+    );
+  }
+  return (
+    <span className="anx-signal-dot anx-signal-dot-issue" aria-hidden>
+      !
+    </span>
+  );
+}
+
+export function StudentSignalsPanel({
+  overview,
+  signals,
+  topMisconception,
+  suggestedMove,
+  onViewDetailedResponses,
+}: Props) {
+  const [showDetail, setShowDetail] = useState(false);
+  const noResponses = overview.total - overview.responded;
+  const total = Math.max(1, overview.responded);
+  const correctPct = (overview.correct / total) * 100;
+  const partialPct = (overview.partiallyCorrect / total) * 100;
+  const incorrectPct = (overview.incorrect / total) * 100;
+
+  return (
+    <section className="anx-signals-card">
+      <div className="flex items-center justify-between">
+        <SectionLabel>Student signals</SectionLabel>
+        <span className="inline-flex items-center gap-1.5 text-xs" style={{ color: 'var(--anx-success)' }}>
+          <span className="anx-live-dot" />
+          Live
+        </span>
+      </div>
+
+      {signals.length > 0 ? (
+        <div className="mt-3 rounded-2xl bg-[var(--anx-surface-container-low)] px-3 py-3">
+          <p className="text-xs font-semibold" style={{ color: 'var(--anx-text-secondary)' }}>What we’re seeing</p>
+          <div className="mt-2">
+            {signals.map((s, i) => (
+              <div key={i} className="anx-signal-row">
+                {toneIcon(s.tone)}
+                <span>{s.text}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div className="mt-3 rounded-2xl bg-[var(--anx-surface-container-low)] px-3 py-3">
+          <p className="text-xs" style={{ color: 'var(--anx-text-muted)' }}>
+            Waiting for student responses…
+          </p>
+        </div>
+      )}
+
+      <div className="mt-4">
+        <div className="flex items-center justify-between">
+          <p className="text-xs font-semibold" style={{ color: 'var(--anx-text-secondary)' }}>Class overview</p>
+          <p className="text-xs" style={{ color: 'var(--anx-text-muted)' }}>
+            {overview.responded} / {overview.total} responded
+          </p>
+        </div>
+        <div className="anx-class-overview-bar mt-2">
+          {overview.responded > 0 && (
+            <>
+              <span style={{ width: `${correctPct}%`, background: 'var(--anx-success)' }} />
+              <span style={{ width: `${partialPct}%`, background: 'var(--anx-warning-text)' }} />
+              <span style={{ width: `${incorrectPct}%`, background: 'var(--anx-danger-text)' }} />
+            </>
+          )}
+        </div>
+        <div className="anx-class-overview-grid">
+          <div className="anx-class-overview-cell">
+            <div className="anx-class-overview-cell-num" style={{ color: 'var(--anx-success)' }}>
+              {overview.correct}
+            </div>
+            <div className="anx-class-overview-cell-label">Correct</div>
+          </div>
+          <div className="anx-class-overview-cell">
+            <div className="anx-class-overview-cell-num" style={{ color: 'var(--anx-danger-text)' }}>
+              {overview.incorrect}
+            </div>
+            <div className="anx-class-overview-cell-label">Incorrect</div>
+          </div>
+          <div className="anx-class-overview-cell">
+            <div className="anx-class-overview-cell-num" style={{ color: 'var(--anx-warning-text)' }}>
+              {overview.partiallyCorrect}
+            </div>
+            <div className="anx-class-overview-cell-label">Partial</div>
+          </div>
+          <div className="anx-class-overview-cell">
+            <div className="anx-class-overview-cell-num" style={{ color: 'var(--anx-text-muted)' }}>
+              {Math.max(0, noResponses)}
+            </div>
+            <div className="anx-class-overview-cell-label">No reply</div>
+          </div>
+        </div>
+      </div>
+
+      {topMisconception && (
+        <div className="mt-4 rounded-2xl bg-[var(--anx-warning-soft)] px-3 py-3">
+          <div className="flex items-start gap-2">
+            <span className="anx-signal-dot anx-signal-dot-warn" aria-hidden>!</span>
+            <div className="min-w-0">
+              <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--anx-warning-text)' }}>
+                Top misconception · {topMisconception.studentCount} students
+              </p>
+              <p className="mt-0.5 text-sm" style={{ color: 'var(--anx-text)' }}>
+                {topMisconception.text}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {suggestedMove && (
+        <div className="mt-4 rounded-2xl bg-[var(--anx-primary-soft)] px-3 py-3">
+          <div className="flex items-start gap-2">
+            <span
+              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full"
+              style={{ background: 'var(--anx-primary)', color: '#fff' }}
+              aria-hidden
+            >
+              <SparkleIcon size={16} />
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--anx-primary)' }}>
+                Suggested next move
+              </p>
+              <p className="mt-0.5 text-sm" style={{ color: 'var(--anx-text)' }}>
+                {suggestedMove.text}
+              </p>
+              {suggestedMove.cta && (
+                <button
+                  type="button"
+                  onClick={suggestedMove.onAct}
+                  className="mt-2 inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold"
+                  style={{ borderColor: 'var(--anx-primary)', color: 'var(--anx-primary)' }}
+                >
+                  <SparkleIcon size={14} />
+                  {suggestedMove.cta}
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      <button
+        type="button"
+        onClick={() => {
+          setShowDetail((v) => !v);
+          onViewDetailedResponses?.();
+        }}
+        className="mt-4 flex w-full items-center justify-between rounded-xl px-2 py-2 text-sm transition hover:bg-[var(--anx-surface-container-low)]"
+        style={{ color: 'var(--anx-text-secondary)' }}
+      >
+        <span className="inline-flex items-center gap-2">
+          <PeopleIcon size={16} />
+          View detailed responses
+        </span>
+        <ChevronRightIcon size={16} />
+      </button>
+      {showDetail && (
+        <div className="mt-2 rounded-xl border px-3 py-2 text-xs" style={{ borderColor: 'var(--anx-outline-variant)', color: 'var(--anx-text-muted)' }}>
+          Detailed per-student response breakdown opens in the side panel. Stay focused on the class first — drill in only when needed.
+        </div>
+      )}
+    </section>
+  );
+}

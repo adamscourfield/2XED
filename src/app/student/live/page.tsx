@@ -2,13 +2,17 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useSession } from 'next-auth/react';
 import { redirect } from 'next/navigation';
 import { AppChrome } from '@/components/AppChrome';
-import { AnimationRenderer } from '@/components/explanation/AnimationRenderer';
-import { LiveWhiteboardViewer } from '@/components/student/LiveWhiteboardViewer';
-import { StudentQuestionCard } from '@/components/student/StudentQuestionCard';
 import { StudentFlowHero } from '@/components/student/StudentFlowHero';
+import { StudentLiveView, type StudentLiveScreen } from '@/components/student/live/StudentLiveView';
+import {
+  StudentPracticeView,
+  type Confidence,
+  type PracticeQuestion,
+} from '@/components/student/live/StudentPracticeView';
 import { stripStudentQuestionLabel } from '@/features/items/itemMeta';
 import type { LiveWhiteboardPayload } from '@/lib/live/whiteboard-strokes';
 
@@ -38,38 +42,6 @@ interface Item {
   options: unknown;
 }
 
-interface ExplanationAnimationSchema {
-  schemaVersion: string;
-  skillCode: string;
-  skillName: string;
-  routeType: string;
-  routeLabel: string;
-  misconceptionSummary: string;
-  generatedAt: string;
-  steps: Array<{
-    stepIndex: number;
-    id: string;
-    visuals: unknown[];
-    narration: string;
-    audioFile: string | null;
-  }>;
-  misconceptionStrip: {
-    text: string;
-    audioNarration: string;
-  };
-  loopable: boolean;
-  pauseAtEndMs: number;
-}
-
-interface LiveExplanationPayload {
-  id: string;
-  skillId: string;
-  routeType: string;
-  misconceptionSummary: string;
-  workedExample?: string;
-  animationSchema?: ExplanationAnimationSchema | null;
-}
-
 interface CurrentContent {
   contentType: 'EXPLANATION' | 'MESSAGE' | 'PHASE' | 'WHITEBOARD';
   targetLanes?: string[];
@@ -77,7 +49,6 @@ interface CurrentContent {
   phaseIndex?: number;
   broadcastAt?: string;
   whiteboard?: LiveWhiteboardPayload;
-  explanation?: LiveExplanationPayload;
 }
 
 interface SessionPoll {
@@ -93,9 +64,9 @@ type AppState =
   | { phase: 'waiting'; session: JoinedSession }
   | { phase: 'between-phases'; session: JoinedSession; message: string }
   | { phase: 'whiteboard'; session: JoinedSession; whiteboard: LiveWhiteboardPayload }
-  | { phase: 'explanation'; session: JoinedSession; explanation: LiveExplanationPayload }
   | { phase: 'question'; session: JoinedSession; item: Item }
-  | { phase: 'feedback'; session: JoinedSession; correct: boolean; nextItem: Item | null }
+  | { phase: 'practice'; session: JoinedSession; item: Item; index: number; total: number }
+  | { phase: 'feedback'; session: JoinedSession; correct: boolean; nextItem: Item | null; index: number; total: number }
   | { phase: 'done'; session: JoinedSession };
 
 function broadcastTargetsStudentLane(content: CurrentContent, studentLane: string | null | undefined): boolean {
@@ -107,8 +78,8 @@ function broadcastTargetsStudentLane(content: CurrentContent, studentLane: strin
 
 export default function StudentLivePage() {
   const { data: authSession, status } = useSession();
+  const isPracticeMode = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('mode') === 'practice';
 
-  // Pre-fill from ?code= query param (e.g. when redirected from dashboard)
   const initialCode =
     typeof window !== 'undefined'
       ? new URLSearchParams(window.location.search).get('code')?.toUpperCase().slice(0, 6) ?? ''
@@ -116,34 +87,28 @@ export default function StudentLivePage() {
 
   const [joinCode, setJoinCode] = useState(initialCode);
   const [appState, setAppState] = useState<AppState>({ phase: 'join' });
-  const [answer, setAnswer] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
-  // Track last seen content to detect teacher pushes
   const lastPhaseIndexRef = useRef<number>(-1);
   const lastBroadcastAtRef = useRef<string | null>(null);
   const lastWhiteboardVersionRef = useRef<number>(-1);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const sessionRef = useRef<JoinedSession | null>(null);
-  const lastLiveExplanationIdRef = useRef<string | null>(null);
+  const liveWhiteboardRef = useRef<LiveWhiteboardPayload | null>(null);
 
-  // Update sessionRef when appState changes
   useEffect(() => {
     if (appState.phase !== 'join') {
       sessionRef.current = (appState as { session: JoinedSession }).session ?? null;
     }
+    if (appState.phase === 'whiteboard') {
+      liveWhiteboardRef.current = appState.whiteboard;
+    }
   }, [appState]);
 
-  // Poll for session state changes when in an active session
   useEffect(() => {
-    const isInSession =
-      appState.phase === 'waiting' ||
-      appState.phase === 'between-phases' ||
-      appState.phase === 'whiteboard' ||
-      appState.phase === 'explanation' ||
-      appState.phase === 'question' ||
-      appState.phase === 'feedback';
+    const isInSession = appState.phase !== 'join' && appState.phase !== 'done';
     if (!isInSession) {
       if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; }
       return;
@@ -160,21 +125,17 @@ export default function StudentLivePage() {
         if (!res.ok) return;
         const data: SessionPoll = await res.json();
 
-        // Session ended
         if (data.status === 'COMPLETED') {
           const sess = sessionRef.current;
           if (sess) setAppState({ phase: 'done', session: sess });
           return;
         }
 
-        // Teacher pushed new content / advanced phase
         const phaseChanged = data.currentPhaseIndex !== lastPhaseIndexRef.current && lastPhaseIndexRef.current !== -1;
         const newBroadcast = data.currentContent?.broadcastAt && data.currentContent.broadcastAt !== lastBroadcastAtRef.current;
 
         if (phaseChanged) {
           lastPhaseIndexRef.current = data.currentPhaseIndex;
-          const sess = sessionRef.current;
-          if (sess) setAppState({ phase: 'between-phases', session: sess, message: 'Your teacher has moved to the next phase. Get ready!' });
         }
 
         if (data.pendingRecheckItem) {
@@ -189,23 +150,21 @@ export default function StudentLivePage() {
           lastBroadcastAtRef.current = data.currentContent.broadcastAt ?? null;
           const cc = data.currentContent;
           const laneOk = broadcastTargetsStudentLane(cc, data.studentLane);
-
           if (cc.contentType === 'WHITEBOARD' && laneOk && cc.whiteboard) {
             const wb = cc.whiteboard;
             const sess = sessionRef.current;
             if (!sess) return;
             if (wb.action === 'hide') {
               lastWhiteboardVersionRef.current = wb.version;
+              liveWhiteboardRef.current = null;
               setAppState({ phase: 'waiting', session: sess });
             } else if (wb.action === 'show' || wb.action === 'clear') {
               if (wb.version >= lastWhiteboardVersionRef.current) {
                 lastWhiteboardVersionRef.current = wb.version;
+                liveWhiteboardRef.current = wb;
                 setAppState({ phase: 'whiteboard', session: sess, whiteboard: wb });
               }
             }
-          } else if (cc.contentType === 'EXPLANATION' && laneOk && cc.explanation) {
-            const sess = sessionRef.current;
-            if (sess) setAppState({ phase: 'explanation', session: sess, explanation: cc.explanation });
           } else if (cc.contentType === 'MESSAGE' && laneOk && cc.message) {
             const sess = sessionRef.current;
             if (sess) setAppState({ phase: 'between-phases', session: sess, message: cc.message });
@@ -219,7 +178,7 @@ export default function StudentLivePage() {
           lastBroadcastAtRef.current = data.currentContent.broadcastAt;
         }
       } catch {
-        // silently ignore poll errors
+        // silent
       }
     }
 
@@ -228,26 +187,6 @@ export default function StudentLivePage() {
     return () => { if (pollRef.current) clearInterval(pollRef.current); };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appState.phase]);
-
-  useEffect(() => {
-    if (appState.phase !== 'explanation') return;
-    const explanationId = appState.explanation.id;
-    if (!explanationId || lastLiveExplanationIdRef.current === explanationId) return;
-
-    lastLiveExplanationIdRef.current = explanationId;
-    void fetch(`/api/live-sessions/${appState.session.sessionId}/explanation-event`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        eventType: 'shown',
-        explanationRouteId: explanationId,
-        skillId: appState.explanation.skillId,
-        routeType: appState.explanation.routeType,
-      }),
-    }).catch(() => {
-      // ignore telemetry failures
-    });
-  }, [appState]);
 
   if (status === 'loading') {
     return (
@@ -294,12 +233,7 @@ export default function StudentLivePage() {
       lastPhaseIndexRef.current = -1;
       lastBroadcastAtRef.current = null;
       lastWhiteboardVersionRef.current = -1;
-
-      if (session.status === 'LOBBY') {
-        setAppState({ phase: 'waiting', session });
-      } else {
-        setAppState({ phase: 'waiting', session });
-      }
+      setAppState({ phase: 'waiting', session });
     } catch {
       setError('Network error. Please try again.');
     } finally {
@@ -307,20 +241,14 @@ export default function StudentLivePage() {
     }
   }
 
-  async function handleAnswer(e: React.FormEvent) {
-    e.preventDefault();
+  async function submitCheckAnswer(answer: string) {
     if (appState.phase !== 'question') return;
-    setError(null);
-    setLoading(true);
-
+    setSubmitError(null);
     const { session, item } = appState;
     const skillId = session.skill?.id;
-    if (!skillId) {
-      setError('No skill associated with this session.');
-      setLoading(false);
-      return;
-    }
+    if (!skillId) { setSubmitError('No skill associated with this session.'); return; }
 
+    setLoading(true);
     try {
       const start = Date.now();
       const res = await fetch(`/api/live-sessions/${session.sessionId}/attempts`, {
@@ -333,44 +261,56 @@ export default function StudentLivePage() {
           responseTimeMs: Date.now() - start,
         }),
       });
-
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        setError(data.error ?? 'Failed to submit answer.');
+        setSubmitError(data.error ?? 'Failed to submit answer.');
         return;
       }
-
-      const result: {
-        correct: boolean;
-        nextItem: Item | null;
-        recheckOutcome?: 'rejoined_lane_1' | 'stayed_lane_2' | 'escalated_lane_3' | null;
-        laneAfterAttempt?: 'LANE_1' | 'LANE_2' | 'LANE_3' | null;
-      } = await res.json();
-      setAnswer('');
-      setAppState({
-        phase: 'feedback',
-        session,
-        correct: result.correct,
-        nextItem: result.nextItem,
-      });
+      const result: { correct: boolean; nextItem: Item | null } = await res.json();
+      setAppState({ phase: 'feedback', session, correct: result.correct, nextItem: result.nextItem, index: 1, total: 1 });
     } catch {
-      setError('Network error. Please try again.');
+      setSubmitError('Network error. Please try again.');
     } finally {
       setLoading(false);
     }
   }
 
-  function handleNext() {
-    if (appState.phase !== 'feedback') return;
-    const { session, nextItem } = appState;
-    if (!nextItem) {
-      setAppState({ phase: 'waiting', session });
-    } else {
-      setAppState({ phase: 'question', session, item: nextItem });
+  async function submitPracticeAnswer(answer: string, _confidence: Confidence | null) {
+    if (appState.phase !== 'practice') return;
+    void _confidence; // confidence is captured client-side; backend integration is left for a follow-up
+    setSubmitError(null);
+    const { session, item, index, total } = appState;
+    const skillId = session.skill?.id;
+    if (!skillId) { setSubmitError('No skill associated with this session.'); return; }
+
+    setLoading(true);
+    try {
+      const start = Date.now();
+      const res = await fetch(`/api/live-sessions/${session.sessionId}/attempts`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          itemId: item.id,
+          skillId,
+          answer,
+          responseTimeMs: Date.now() - start,
+        }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setSubmitError(data.error ?? 'Failed to submit answer.');
+        return;
+      }
+      const result: { correct: boolean; nextItem: Item | null } = await res.json();
+      setAppState({ phase: 'feedback', session, correct: result.correct, nextItem: result.nextItem, index, total });
+    } catch {
+      setSubmitError('Network error. Please try again.');
+    } finally {
+      setLoading(false);
     }
   }
 
-  // ── Join screen ─────────────────────────────────────────────────────────────
+  // ── Join screen ─────────────────────────────────────────────────────────
   if (appState.phase === 'join') {
     return (
       <AppChrome variant="student">
@@ -403,11 +343,7 @@ export default function StudentLivePage() {
                     Codes are not case-sensitive. You need all six characters before joining.
                   </p>
                 </div>
-                <button
-                  type="submit"
-                  disabled={loading || joinCode.length !== 6}
-                  className="anx-btn-primary w-full py-3.5"
-                >
+                <button type="submit" disabled={loading || joinCode.length !== 6} className="anx-btn-primary w-full py-3.5">
                   {loading ? 'Joining…' : 'Join lesson'}
                 </button>
               </form>
@@ -418,224 +354,55 @@ export default function StudentLivePage() {
     );
   }
 
-  // ── Teacher whiteboard (read-only for students) ─────────────────────────────
-  if (appState.phase === 'whiteboard') {
-    const wb = appState.whiteboard;
+  // ── Done ────────────────────────────────────────────────────────────────
+  if (appState.phase === 'done') {
     return (
-      <AppChrome variant="student">
-        <main className="anx-shell flex min-h-0 flex-1 flex-col bg-[color:var(--anx-surface-bright)] px-4 py-6 sm:px-6">
-          <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-5">
-            <div className="text-center sm:text-left">
-              <p className="student-dash-eyebrow">Live lesson</p>
-              <h2 className="mt-1 text-xl font-bold tracking-tight" style={{ color: 'var(--anx-text)' }}>
-                Teacher whiteboard
-              </h2>
-              <p className="mt-1 text-sm leading-relaxed" style={{ color: 'var(--anx-text-muted)' }}>
-                Follow along — this view updates as your teacher draws.
-              </p>
-            </div>
-            <div className="anx-card min-h-0 flex-1 overflow-hidden p-3 sm:p-4">
-              <LiveWhiteboardViewer logicalWidth={wb.width} logicalHeight={wb.height} strokes={wb.strokes} className="min-h-[260px] w-full rounded-xl" />
-            </div>
-          </div>
-        </main>
-      </AppChrome>
-    );
-  }
-
-  // ── Compact live explanation ───────────────────────────────────────────────
-  if (appState.phase === 'explanation') {
-    const { explanation } = appState;
-    return (
-      <AppChrome variant="student">
-        <main className="anx-shell anx-scene flex flex-1 flex-col items-center px-4 py-8 sm:py-10">
-          <div className="w-full max-w-4xl space-y-6">
-            <StudentFlowHero
-              variant="compact"
-              eyebrow="Live lesson"
-              title="Quick support"
-              lead="Stay with this walkthrough. A short recheck question may follow."
-            />
-            <div className="anx-card space-y-6 p-6 sm:p-8">
-            {explanation.animationSchema ? (
-              <AnimationRenderer schema={explanation.animationSchema} />
-            ) : (
-              <div className="space-y-4 rounded-2xl border p-6" style={{ borderColor: 'var(--anx-border)', background: 'var(--anx-surface)' }}>
-                <div className="anx-callout-warning">
-                  <p className="font-medium">Watch out for this</p>
-                  <p className="mt-1">{explanation.misconceptionSummary}</p>
-                </div>
-                {explanation.workedExample && (
-                  <div className="anx-callout-info">
-                    <p className="font-medium">Worked example</p>
-                    <p className="mt-1 whitespace-pre-wrap">{explanation.workedExample}</p>
-                  </div>
-                )}
-              </div>
-            )}
-
-            <div className="flex justify-center pt-2">
-              <button
-                onClick={() => {
-                  void fetch(`/api/live-sessions/${appState.session.sessionId}/explanation-event`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                      eventType: 'acknowledged',
-                      explanationRouteId: explanation.id,
-                      skillId: explanation.skillId,
-                      routeType: explanation.routeType,
-                    }),
-                  }).catch(() => {
-                    // ignore telemetry failures
-                  });
-                  setAppState({ phase: 'waiting', session: appState.session });
-                }}
-                className="anx-btn-primary px-8 py-3.5"
-              >
-                I’m ready
-              </button>
-            </div>
-            </div>
-          </div>
-        </main>
-      </AppChrome>
-    );
-  }
-
-  // ── Waiting for session to start ────────────────────────────────────────────
-  if (appState.phase === 'waiting') {
-    return (
-      <AppChrome variant="student">
-        <main className="anx-shell anx-scene flex flex-1 items-center justify-center px-4 py-10">
+      <div className="flex min-h-screen flex-col bg-[color:var(--anx-surface-bright)]">
+        <header
+          className="flex items-center gap-3 border-b px-4 py-3 sm:px-6"
+          style={{ borderColor: 'var(--anx-outline-variant)', background: 'var(--anx-surface-container-lowest)' }}
+        >
+          <Image src="/Ember_logo.png" alt="Ember" width={1774} height={887} className="h-7 w-auto" priority />
+          <span className="anx-live-pill" style={{ background: 'var(--anx-success-soft)', color: 'var(--anx-success)' }}>Ended</span>
+        </header>
+        <main className="flex flex-1 items-center justify-center px-4 py-10">
           <div className="anx-card w-full max-w-md space-y-5 p-8 text-center">
-            <div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-[var(--anx-surface-container-high)] border-t-[var(--anx-primary)]" />
+            <div className="text-5xl" aria-hidden>🎉</div>
             <div>
               <p className="student-dash-eyebrow">Live lesson</p>
-              <h2 className="mt-2 text-xl font-bold tracking-tight" style={{ color: 'var(--anx-text)' }}>Waiting for your teacher</h2>
+              <h2 className="mt-2 text-2xl font-bold tracking-tight" style={{ color: 'var(--anx-text)' }}>All done</h2>
               <p className="mt-2 text-sm leading-relaxed" style={{ color: 'var(--anx-text-muted)' }}>
-                You&apos;re in <strong style={{ color: 'var(--anx-text-secondary)' }}>{appState.session.subject.title}</strong>.
-                Sit tight — the next activity will appear here.
+                You&apos;ve completed the questions for this session. Head home when your teacher dismisses you.
               </p>
             </div>
+            <Link href="/dashboard" className="anx-btn-primary inline-flex w-full justify-center py-3.5 no-underline sm:w-auto sm:min-w-[12rem]">
+              Back to dashboard
+            </Link>
           </div>
         </main>
-      </AppChrome>
+      </div>
     );
   }
 
-  // ── Between phases — teacher message ────────────────────────────────────────
-  if (appState.phase === 'between-phases') {
-    return (
-      <AppChrome variant="student">
-        <main className="anx-shell anx-scene flex flex-1 items-center justify-center px-4 py-10">
-          <div className="anx-card w-full max-w-md space-y-6 p-8 text-center">
-            <div className="text-4xl" aria-hidden>💬</div>
-            <div>
-              <p className="student-dash-eyebrow">Message</p>
-              <h2 className="mt-2 text-xl font-bold tracking-tight" style={{ color: 'var(--anx-text)' }}>
-                From your teacher
-              </h2>
-              <p className="mt-3 text-base leading-relaxed" style={{ color: 'var(--anx-text-secondary)' }}>
-                {appState.message}
-              </p>
-            </div>
-            <button
-              onClick={() => setAppState({ phase: 'waiting', session: appState.session })}
-              className="anx-btn-primary w-full py-3.5 sm:w-auto sm:px-10"
-            >
-              Got it
-            </button>
-          </div>
-        </main>
-      </AppChrome>
-    );
-  }
+  const session = (appState as { session: JoinedSession }).session;
+  const lessonTitle = session.skill?.name ?? session.subject.title;
+  const classLabel = session.skill?.code ?? session.subject.title;
 
-  // ── Question screen ─────────────────────────────────────────────────────────
-  if (appState.phase === 'question') {
-    const { item } = appState;
-    const opts = Array.isArray(item.options) ? (item.options as string[]) : [];
-    const questionStem = stripStudentQuestionLabel(item.question) || item.question;
-    return (
-      <AppChrome variant="student">
-        <main className="anx-shell anx-scene flex flex-1 items-center justify-center px-4 py-8 sm:py-10">
-          <StudentQuestionCard
-            questionKey={item.id}
-            header={(
-              <>
-                <div>
-                  <p className="text-sm font-medium" style={{ color: 'var(--anx-text-secondary)' }}>Live lesson</p>
-                  <p className="mt-0.5 text-xs" style={{ color: 'var(--anx-text-muted)' }}>Quick recheck from your teacher.</p>
-                </div>
-                <span className="shrink-0 text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--anx-text-muted)' }}>
-                  Recheck
-                </span>
-              </>
-            )}
-            questionLabel="Question"
-            question={<p className="m-0 whitespace-pre-wrap">{questionStem}</p>}
-            instruction={<p className="m-0">{opts.length > 0 ? 'Pick one answer.' : 'Type your answer.'}</p>}
-            answerArea={(
-              <form id="live-recheck-form" onSubmit={handleAnswer} className="flex min-h-0 flex-1 flex-col space-y-3">
-                {error ? <div className="anx-callout-danger text-sm">{error}</div> : null}
-                {opts.length > 0 ? (
-                  opts.map((opt) => (
-                    <label
-                      key={opt}
-                      className={`anx-option flex cursor-pointer items-center gap-3 py-3.5 ${
-                        answer === opt ? 'anx-option-selected' : ''
-                      }`}
-                    >
-                      <input
-                        type="radio"
-                        name="answer"
-                        value={opt}
-                        checked={answer === opt}
-                        onChange={() => setAnswer(opt)}
-                        className="accent-[var(--anx-primary)]"
-                      />
-                      <span className="text-base font-medium">{opt}</span>
-                    </label>
-                  ))
-                ) : (
-                  <input
-                    type="text"
-                    value={answer}
-                    onChange={(e) => setAnswer(e.target.value)}
-                    placeholder="Your answer…"
-                    className="anx-input w-full"
-                    required
-                  />
-                )}
-              </form>
-            )}
-            actions={(
-              <button
-                type="submit"
-                form="live-recheck-form"
-                disabled={loading || !answer}
-                className="anx-btn-primary w-full py-3.5"
-              >
-                {loading ? 'Submitting…' : 'Submit'}
-              </button>
-            )}
-          />
-        </main>
-      </AppChrome>
-    );
-  }
-
-  // ── Feedback screen ─────────────────────────────────────────────────────────
+  // ── Feedback after a check ─────────────────────────────────────────────
   if (appState.phase === 'feedback') {
     return (
-      <AppChrome variant="student">
-        <main className="anx-shell anx-scene flex flex-1 items-center justify-center px-4 py-10">
+      <div className="flex min-h-screen flex-col bg-[color:var(--anx-surface-bright)]">
+        <header
+          className="flex items-center gap-3 border-b px-4 py-3 sm:px-6"
+          style={{ borderColor: 'var(--anx-outline-variant)', background: 'var(--anx-surface-container-lowest)' }}
+        >
+          <Image src="/Ember_logo.png" alt="Ember" width={1774} height={887} className="h-7 w-auto" priority />
+          <span className="anx-live-pill"><span className="anx-live-pill-dot" />Live</span>
+          <p className="ml-2 truncate text-sm font-semibold" style={{ color: 'var(--anx-text)' }}>{lessonTitle}</p>
+        </header>
+        <main className="flex flex-1 items-center justify-center px-4 py-10">
           <div className="anx-card w-full max-w-md space-y-5 p-8 text-center">
-            <div
-              className={`text-5xl ${appState.correct ? 'animate-[anxPulseCorrect_220ms_ease-out]' : 'animate-[anxShakeIncorrect_260ms_ease-out]'}`}
-              aria-hidden
-            >
+            <div className={`text-5xl ${appState.correct ? 'animate-[anxPulseCorrect_220ms_ease-out]' : 'animate-[anxShakeIncorrect_260ms_ease-out]'}`} aria-hidden>
               {appState.correct ? '✅' : '❌'}
             </div>
             <div>
@@ -643,43 +410,126 @@ export default function StudentLivePage() {
               <h2 className="mt-2 text-2xl font-bold tracking-tight" style={{ color: appState.correct ? 'var(--anx-success)' : 'var(--anx-danger)' }}>
                 {appState.correct ? 'Nice one!' : 'Not quite…'}
               </h2>
-              {appState.nextItem ? null : (
-                <p className="mt-2 text-sm leading-relaxed" style={{ color: 'var(--anx-text-muted)' }}>
-                  Your teacher will guide what happens next.
-                </p>
-              )}
+              <p className="mt-2 text-sm leading-relaxed" style={{ color: 'var(--anx-text-muted)' }}>
+                Your teacher will guide what happens next.
+              </p>
             </div>
             <button
               type="button"
-              onClick={handleNext}
+              onClick={() => {
+                const sess = appState.session;
+                if (appState.nextItem) {
+                  setAppState({ phase: 'practice', session: sess, item: appState.nextItem, index: appState.index + 1, total: appState.total });
+                } else {
+                  setAppState({ phase: 'waiting', session: sess });
+                }
+              }}
               className="anx-btn-primary w-full py-3.5 sm:w-auto sm:min-w-[12rem]"
             >
               {appState.nextItem ? 'Next question' : 'Keep going'}
             </button>
           </div>
         </main>
-      </AppChrome>
+      </div>
     );
   }
 
-  // ── Done screen ─────────────────────────────────────────────────────────────
-  return (
-    <AppChrome variant="student">
-      <main className="anx-shell anx-scene flex flex-1 items-center justify-center px-4 py-10">
-        <div className="anx-card w-full max-w-md space-y-5 p-8 text-center">
-          <div className="text-5xl" aria-hidden>🎉</div>
-          <div>
-            <p className="student-dash-eyebrow">Live lesson</p>
-            <h2 className="mt-2 text-2xl font-bold tracking-tight" style={{ color: 'var(--anx-text)' }}>All done</h2>
-            <p className="mt-2 text-sm leading-relaxed" style={{ color: 'var(--anx-text-muted)' }}>
-              You&apos;ve completed the questions for this session. Head home when your teacher dismisses you.
+  // ── Practice mode ──────────────────────────────────────────────────────
+  if (appState.phase === 'practice' || isPracticeMode) {
+    if (appState.phase !== 'practice') {
+      return (
+        <div className="flex min-h-screen items-center justify-center bg-[color:var(--anx-surface-bright)] px-4">
+          <div className="anx-card w-full max-w-md space-y-3 p-8 text-center">
+            <h2 className="text-base font-bold" style={{ color: 'var(--anx-text)' }}>No practice available</h2>
+            <p className="text-sm" style={{ color: 'var(--anx-text-muted)' }}>
+              Your teacher hasn’t pushed practice work yet.
             </p>
           </div>
-          <Link href="/dashboard" className="anx-btn-primary inline-flex w-full justify-center py-3.5 no-underline sm:w-auto sm:min-w-[12rem]">
-            Back to dashboard
-          </Link>
         </div>
-      </main>
-    </AppChrome>
+      );
+    }
+    const item = appState.item;
+    const stem = stripStudentQuestionLabel(item.question) || item.question;
+    const question: PracticeQuestion = {
+      id: item.id,
+      stem: <p className="m-0 whitespace-pre-wrap">{stem}</p>,
+      answerPrefix: 'x =',
+      placeholder: 'Type your answer…',
+      tip: 'Take your time — read the question carefully first.',
+    };
+    return (
+      <StudentPracticeView
+        lessonTitle={lessonTitle}
+        classLabel={classLabel}
+        question={question}
+        questionNumber={appState.index}
+        totalQuestions={appState.total}
+        busy={loading}
+        error={submitError}
+        onSubmit={submitPracticeAnswer}
+        onLeave={() => setAppState({ phase: 'waiting', session: appState.session })}
+        onMessageTeacher={(msg) => {
+          // For now: surface as a flag/intervention via a generic message endpoint stub.
+          void fetch(`/api/live-sessions/${appState.session.sessionId}/escalate`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ reason: 'student_message', message: msg }),
+          }).catch(() => {});
+        }}
+        onNeedHelp={() => {
+          void fetch(`/api/live-sessions/${appState.session.sessionId}/escalate`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ reason: 'student_help_request' }),
+          }).catch(() => {});
+        }}
+      />
+    );
+  }
+
+  // ── Live model / check / waiting ───────────────────────────────────────
+  let screen: StudentLiveScreen;
+  if (appState.phase === 'between-phases') {
+    screen = { kind: 'message', message: appState.message };
+  } else if (appState.phase === 'whiteboard') {
+    screen = { kind: 'watch', whiteboard: appState.whiteboard };
+  } else if (appState.phase === 'question') {
+    const opts = Array.isArray(appState.item.options) ? (appState.item.options as string[]) : [];
+    const stem = stripStudentQuestionLabel(appState.item.question) || appState.item.question;
+    screen = {
+      kind: 'check',
+      whiteboard: liveWhiteboardRef.current,
+      questionStem: stem,
+      options: opts.length > 0 ? opts : undefined,
+      busy: loading,
+      error: submitError,
+      onSubmit: submitCheckAnswer,
+    };
+  } else {
+    // waiting
+    screen = { kind: 'waiting' };
+  }
+
+  return (
+    <StudentLiveView
+      lessonTitle={lessonTitle}
+      classLabel={classLabel}
+      screen={screen}
+      onLeave={() => setAppState({ phase: 'done', session })}
+      onNeedHelp={() => {
+        void fetch(`/api/live-sessions/${session.sessionId}/escalate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ reason: 'student_help_request' }),
+        }).catch(() => {});
+      }}
+      onMessageTeacher={(msg) => {
+        void fetch(`/api/live-sessions/${session.sessionId}/escalate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ reason: 'student_message', message: msg }),
+        }).catch(() => {});
+      }}
+    />
   );
 }
