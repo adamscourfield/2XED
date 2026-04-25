@@ -1,4 +1,4 @@
-# 2XED
+# Ember
 
 ## Getting Started
 
