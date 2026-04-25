@@ -1,8 +1,8 @@
 import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
-import Link from 'next/link';
 import { authOptions } from '@/features/auth/authOptions';
 import { LearningPageShell } from '@/components/LearningPageShell';
+import { TeacherReportsDashboard, TeacherReportsHeaderActions } from './TeacherReportsClient';
 
 export default async function TeacherReportsPage() {
   const session = await getServerSession(authOptions);
@@ -15,23 +15,13 @@ export default async function TeacherReportsPage() {
   return (
     <LearningPageShell
       title="Reports"
-      subtitle="Analytics and school-wide views"
+      subtitle="Understand the impact of your teaching and drive durable learning."
       appChrome="teacher"
       appChromeShowLeadershipNav={showLeadership}
+      maxWidthClassName="max-w-7xl"
+      actions={<TeacherReportsHeaderActions />}
     >
-      <div className="anx-card max-w-xl space-y-4 p-6 text-sm text-[color:var(--anx-text-secondary)]">
-        <p className="m-0">Open detailed class analytics with mastery, checkpoints, and student risk signals.</p>
-        <div className="flex flex-wrap gap-2">
-          <Link href="/teacher/dashboard/classes" className="anx-btn-primary text-sm no-underline">
-            Class analytics
-          </Link>
-          {showLeadership ? (
-            <Link href="/teacher/leadership" className="anx-btn-secondary text-sm no-underline">
-              School overview
-            </Link>
-          ) : null}
-        </div>
-      </div>
+      <TeacherReportsDashboard />
     </LearningPageShell>
   );
 }
