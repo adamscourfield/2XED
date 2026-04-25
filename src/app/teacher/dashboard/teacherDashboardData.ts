@@ -43,6 +43,110 @@ export type TeacherProfileWithClassrooms = Prisma.TeacherProfileGetPayload<{
   include: typeof teacherDashboardProfileInclude;
 }>;
 
+/** Minimal profile load for the teacher Classes hub (no event or attempt queries). */
+export const teacherClassesPageProfileInclude = {
+  classrooms: {
+    include: {
+      classroom: {
+        include: {
+          enrollments: {
+            include: {
+              student: {
+                include: {
+                  skillMasteries: {
+                    select: { mastery: true },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+} as const;
+
+export type TeacherProfileForClassesPage = Prisma.TeacherProfileGetPayload<{
+  include: typeof teacherClassesPageProfileInclude;
+}>;
+
+export async function loadTeacherClassesPageData(userId: string) {
+  const teacherProfile = await prisma.teacherProfile.findUnique({
+    where: { userId },
+    include: teacherClassesPageProfileInclude,
+  });
+
+  if (!teacherProfile) {
+    return { teacherProfile: null };
+  }
+
+  const now = new Date();
+  const classroomIds = teacherProfile.classrooms.map((tc) => tc.classroomId);
+
+  const recentSessionsForClasses =
+    classroomIds.length > 0
+      ? await prisma.liveSession.findMany({
+          where: { teacherUserId: userId, classroomId: { in: classroomIds } },
+          orderBy: { createdAt: 'desc' },
+          take: 400,
+          select: {
+            classroomId: true,
+            createdAt: true,
+            startedAt: true,
+            endedAt: true,
+            status: true,
+            subject: { select: { title: true } },
+            skill: { select: { name: true, code: true } },
+          },
+        })
+      : [];
+
+  const lastLiveSessionByClassroomId = new Map<string, (typeof recentSessionsForClasses)[number]>();
+  for (const row of recentSessionsForClasses) {
+    if (!lastLiveSessionByClassroomId.has(row.classroomId)) {
+      lastLiveSessionByClassroomId.set(row.classroomId, row);
+    }
+  }
+
+  const termStart = new Date(now.getFullYear(), Math.floor(now.getMonth() / 3) * 3, 1);
+  const liveSessionsThisTerm =
+    classroomIds.length > 0
+      ? await prisma.liveSession.count({
+          where: {
+            teacherUserId: userId,
+            classroomId: { in: classroomIds },
+            createdAt: { gte: termStart },
+            status: { in: ['COMPLETED', 'ACTIVE', 'LOBBY', 'PAUSED'] },
+          },
+        })
+      : 0;
+
+  const subjectRows = await prisma.subject.findMany({ select: { slug: true, title: true } });
+  const subjectTitleBySlug = new Map(subjectRows.map((s) => [s.slug, s.title]));
+
+  return {
+    teacherProfile,
+    lastLiveSessionByClassroomId,
+    liveSessionsThisTerm,
+    subjectTitleBySlug,
+  };
+}
+
+/** Live sessions this calendar quarter for the given classrooms (same definition as the classes hub stat). */
+export async function countLiveSessionsThisTermForClassrooms(teacherUserId: string, classroomIds: string[]) {
+  if (classroomIds.length === 0) return 0;
+  const now = new Date();
+  const termStart = new Date(now.getFullYear(), Math.floor(now.getMonth() / 3) * 3, 1);
+  return prisma.liveSession.count({
+    where: {
+      teacherUserId,
+      classroomId: { in: classroomIds },
+      createdAt: { gte: termStart },
+      status: { in: ['COMPLETED', 'ACTIVE', 'LOBBY', 'PAUSED'] },
+    },
+  });
+}
+
 export async function loadTeacherDashboardData(userId: string, days: number) {
   const teacherProfile = await prisma.teacherProfile.findUnique({
     where: { userId },

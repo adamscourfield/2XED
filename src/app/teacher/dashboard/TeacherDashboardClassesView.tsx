@@ -21,8 +21,6 @@ type Props = {
   teacherProfile: TeacherProfileWithClassrooms;
   externalTeacherId: string;
   externalSchoolId: string | null;
-  /** Omit calendar and side column; stack analytics for the classes hub layout. */
-  compactLayout?: boolean;
 };
 
 export function TeacherDashboardClassesView({
@@ -32,20 +30,17 @@ export function TeacherDashboardClassesView({
   teacherProfile,
   externalTeacherId,
   externalSchoolId,
-  compactLayout = false,
 }: Props) {
   const { events, questionAttempts, subjectMap, since, recentSessions } = data;
   const now = new Date();
 
   return (
-    <div className={compactLayout ? 'staff-dash-bento staff-dash-bento--stack' : 'staff-dash-bento'}>
+    <div className="staff-dash-bento">
       <div className="staff-dash-bento-main">
-        {!compactLayout && (
-          <DashboardLessonCalendar
-            className="student-dash-calendar anx-card overflow-hidden"
-            hint="Class timetables you maintain, your live sessions, and student reviews."
-          />
-        )}
+        <DashboardLessonCalendar
+          className="student-dash-calendar anx-card overflow-hidden"
+          hint="Class timetables you maintain, your live sessions, and student reviews."
+        />
 
         <div className="staff-dash-filter-row">
           <span className="text-xs font-semibold uppercase tracking-wide text-[color:var(--anx-text-muted)]">Window</span>
@@ -184,7 +179,7 @@ export function TeacherDashboardClassesView({
             const requiringAction = studentRows.filter((s) => s.needsAction);
 
             return (
-              <section key={cls.id} id={`class-analytics-${cls.id}`} className="staff-dash-class-panel scroll-mt-24">
+              <section key={cls.id} className="staff-dash-class-panel">
                 <div className="staff-dash-class-head">
                   <h2 className="staff-dash-class-title">{cls.name}</h2>
                   <p className="staff-dash-class-meta">
@@ -346,7 +341,6 @@ export function TeacherDashboardClassesView({
         </div>
       </div>
 
-      {!compactLayout ? (
       <aside className="staff-dash-bento-side">
         <section className="staff-dash-side-card">
           <p className="student-dash-eyebrow" style={{ color: 'var(--anx-text-muted)' }}>
@@ -419,7 +413,6 @@ export function TeacherDashboardClassesView({
           )}
         </section>
       </aside>
-      ) : null}
     </div>
   );
 }

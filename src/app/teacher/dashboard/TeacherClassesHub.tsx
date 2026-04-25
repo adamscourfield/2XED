@@ -1,8 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
-import { iconHue } from '@/app/teacher/dashboard/TeacherHomeDashboard';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 export type TeacherClassesHubRow = {
   id: string;
@@ -24,10 +23,11 @@ type SortKey = 'name' | 'students' | 'understanding';
 type Props = {
   rows: TeacherClassesHubRow[];
   teacherDisplayName: string;
-  classCount: number;
-  studentCount: number;
-  avgUnderstandingAcrossClasses: number | null;
-  liveLessonsThisTerm: number;
+  /** Summary counts respect the current year/subject scope from the server. */
+  statClassCount: number;
+  statStudentCount: number;
+  statAvgUnderstandingPct: number | null;
+  statLiveLessonsThisTerm: number;
 };
 
 function understandingStatus(pct: number): { label: string; variant: 'on-track' | 'developing' } {
@@ -35,13 +35,63 @@ function understandingStatus(pct: number): { label: string; variant: 'on-track' 
   return { label: 'Developing', variant: 'developing' };
 }
 
+function RowActionsMenu({ classroomId }: { classroomId: string }) {
+  const [open, setOpen] = useState(false);
+  const wrapRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    function onDoc(e: MouseEvent) {
+      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener('mousedown', onDoc);
+    return () => document.removeEventListener('mousedown', onDoc);
+  }, [open]);
+
+  return (
+    <div className="tc-row-menu-wrap" ref={wrapRef}>
+      <button
+        type="button"
+        className="tc-row-menu-btn"
+        aria-expanded={open}
+        aria-haspopup="menu"
+        onClick={() => setOpen((o) => !o)}
+      >
+        <span className="sr-only">More actions</span>
+        <span className="tc-row-menu-dots" aria-hidden>
+          ···
+        </span>
+      </button>
+      {open ? (
+        <ul className="tc-row-menu" role="menu">
+          <li role="none">
+            <Link
+              role="menuitem"
+              className="tc-row-menu-item"
+              href={`/teacher/live/new?classroomId=${encodeURIComponent(classroomId)}`}
+              onClick={() => setOpen(false)}
+            >
+              Start live lesson
+            </Link>
+          </li>
+          <li role="none">
+            <Link role="menuitem" className="tc-row-menu-item" href="/teacher/timetable" onClick={() => setOpen(false)}>
+              Timetable
+            </Link>
+          </li>
+        </ul>
+      ) : null}
+    </div>
+  );
+}
+
 export function TeacherClassesHub({
   rows,
   teacherDisplayName,
-  classCount,
-  studentCount,
-  avgUnderstandingAcrossClasses,
-  liveLessonsThisTerm,
+  statClassCount,
+  statStudentCount,
+  statAvgUnderstandingPct,
+  statLiveLessonsThisTerm,
 }: Props) {
   const [query, setQuery] = useState('');
   const [sort, setSort] = useState<SortKey>('name');
@@ -66,8 +116,8 @@ export function TeacherClassesHub({
     return list;
   }, [rows, query, sort]);
 
-  const avgLabel =
-    avgUnderstandingAcrossClasses != null ? `${avgUnderstandingAcrossClasses}%` : '—';
+  const avgMain =
+    statAvgUnderstandingPct != null ? `${statAvgUnderstandingPct}%` : '—';
 
   return (
     <div className="tc-hub">
@@ -83,9 +133,11 @@ export function TeacherClassesHub({
               />
             </svg>
           </div>
-          <div>
-            <p className="tc-hub-stat-value">{classCount}</p>
-            <p className="tc-hub-stat-title">Classes</p>
+          <div className="tc-hub-stat-text">
+            <p className="tc-hub-stat-eyebrow">Classes</p>
+            <p className="tc-hub-stat-line">
+              <span className="tc-hub-stat-line-value">{statClassCount}</span> Classes
+            </p>
             <p className="tc-hub-stat-hint">Across all year groups</p>
           </div>
         </article>
@@ -100,9 +152,11 @@ export function TeacherClassesHub({
               />
             </svg>
           </div>
-          <div>
-            <p className="tc-hub-stat-value">{studentCount}</p>
-            <p className="tc-hub-stat-title">Students</p>
+          <div className="tc-hub-stat-text">
+            <p className="tc-hub-stat-eyebrow">Students</p>
+            <p className="tc-hub-stat-line">
+              <span className="tc-hub-stat-line-value">{statStudentCount}</span> Students
+            </p>
             <p className="tc-hub-stat-hint">Across all classes</p>
           </div>
         </article>
@@ -113,9 +167,11 @@ export function TeacherClassesHub({
               <path d="m7 15 4-4 4 4 6-8" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </div>
-          <div>
-            <p className="tc-hub-stat-value">{avgLabel}</p>
-            <p className="tc-hub-stat-title">Average understanding</p>
+          <div className="tc-hub-stat-text">
+            <p className="tc-hub-stat-eyebrow">Average understanding</p>
+            <p className="tc-hub-stat-line">
+              <span className="tc-hub-stat-line-value">{avgMain}</span> Average understanding
+            </p>
             <p className="tc-hub-stat-hint">Across all classes</p>
           </div>
         </article>
@@ -126,9 +182,11 @@ export function TeacherClassesHub({
               <path d="M12 7v5l3 2" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
             </svg>
           </div>
-          <div>
-            <p className="tc-hub-stat-value">{liveLessonsThisTerm}</p>
-            <p className="tc-hub-stat-title">Live lessons</p>
+          <div className="tc-hub-stat-text">
+            <p className="tc-hub-stat-eyebrow">Live lessons</p>
+            <p className="tc-hub-stat-line">
+              <span className="tc-hub-stat-line-value">{statLiveLessonsThisTerm}</span> Live lessons
+            </p>
             <p className="tc-hub-stat-hint">This term</p>
           </div>
         </article>
@@ -145,21 +203,21 @@ export function TeacherClassesHub({
           <input
             type="search"
             className="tc-hub-search"
-            placeholder="Search classes…"
+            placeholder="Search classes..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             aria-label="Search classes"
           />
         </div>
         <div className="tc-hub-toolbar-right">
-          <label className="tc-hub-sort">
-            <span className="tc-hub-sort-label">Sort by</span>
-            <select className="tc-hub-select" value={sort} onChange={(e) => setSort(e.target.value as SortKey)}>
+          <div className="tc-hub-sort-row">
+            <span className="tc-hub-sort-prefix">Sort by:</span>
+            <select className="tc-hub-select tc-hub-select--sort" value={sort} onChange={(e) => setSort(e.target.value as SortKey)}>
               <option value="name">Class name</option>
               <option value="students">Students</option>
               <option value="understanding">Understanding</option>
             </select>
-          </label>
+          </div>
           <div className="tc-hub-view-toggle" role="group" aria-label="View mode">
             <button
               type="button"
@@ -191,7 +249,7 @@ export function TeacherClassesHub({
       </div>
 
       {view === 'list' ? (
-        <div className="tc-hub-table-wrap anx-card overflow-hidden">
+        <div className="tc-hub-table-shell">
           <table className="tc-hub-table">
             <thead>
               <tr>
@@ -210,11 +268,7 @@ export function TeacherClassesHub({
                   <tr key={row.id}>
                     <td>
                       <div className="tc-hub-class-cell">
-                        <span
-                          className="tc-hub-class-orb"
-                          style={{ background: row.hue || iconHue(row.id) }}
-                          aria-hidden
-                        >
+                        <span className="tc-hub-class-orb" style={{ background: row.hue }} aria-hidden>
                           {row.code.slice(0, 3)}
                         </span>
                         <div>
@@ -228,21 +282,22 @@ export function TeacherClassesHub({
                       {row.studentCount} student{row.studentCount !== 1 ? 's' : ''}
                     </td>
                     <td>
-                      <div className="tc-hub-understanding">
-                        <div className="tc-hub-understanding-top">
-                          <span className="tc-hub-understanding-pct">{row.avgUnderstandingPct}%</span>
-                          <div
-                            className="tc-hub-progress"
-                            role="progressbar"
-                            aria-valuenow={row.avgUnderstandingPct}
-                            aria-valuemin={0}
-                            aria-valuemax={100}
-                          >
-                            <span
-                              className={`tc-hub-progress-fill${st.variant === 'on-track' ? ' tc-hub-progress-fill--ok' : ' tc-hub-progress-fill--warn'}`}
-                              style={{ width: `${Math.min(100, Math.max(0, row.avgUnderstandingPct))}%` }}
-                            />
-                          </div>
+                      <div className="tc-hub-avg-col">
+                        <div className="tc-hub-avg-head">
+                          <span className="tc-hub-avg-pct">{row.avgUnderstandingPct}%</span>
+                          <span className="tc-hub-avg-sublabel">Average understanding</span>
+                        </div>
+                        <div
+                          className="tc-hub-progress"
+                          role="progressbar"
+                          aria-valuenow={row.avgUnderstandingPct}
+                          aria-valuemin={0}
+                          aria-valuemax={100}
+                        >
+                          <span
+                            className={`tc-hub-progress-fill${st.variant === 'on-track' ? ' tc-hub-progress-fill--ok' : ' tc-hub-progress-fill--warn'}`}
+                            style={{ width: `${Math.min(100, Math.max(0, row.avgUnderstandingPct))}%` }}
+                          />
                         </div>
                         <span className={`tc-hub-status tc-hub-status--${st.variant}`}>{st.label}</span>
                       </div>
@@ -252,9 +307,7 @@ export function TeacherClassesHub({
                         <div>
                           <p className="tc-hub-live-time">
                             {row.lastLive.at}
-                            {row.lastLive.isLive ? (
-                              <span className="tc-hub-live-pill">Live</span>
-                            ) : null}
+                            {row.lastLive.isLive ? <span className="tc-hub-live-pill">Live</span> : null}
                           </p>
                           <p className="tc-hub-live-topic">{row.lastLive.topic}</p>
                         </div>
@@ -263,10 +316,7 @@ export function TeacherClassesHub({
                       )}
                     </td>
                     <td className="tc-hub-actions">
-                      <Link href={`#class-analytics-${row.id}`} className="tc-hub-more" title="View class analytics">
-                        <span aria-hidden>…</span>
-                        <span className="sr-only">View class analytics</span>
-                      </Link>
+                      <RowActionsMenu classroomId={row.id} />
                     </td>
                   </tr>
                 );
@@ -286,43 +336,44 @@ export function TeacherClassesHub({
           {filtered.map((row) => {
             const st = understandingStatus(row.avgUnderstandingPct);
             return (
-              <article key={row.id} className="tc-hub-grid-card anx-card">
-                <div className="tc-hub-grid-head">
-                  <span className="tc-hub-class-orb" style={{ background: row.hue || iconHue(row.id) }} aria-hidden>
-                    {row.code.slice(0, 3)}
-                  </span>
-                  <div className="min-w-0">
-                    <p className="tc-hub-class-name truncate">{row.name}</p>
-                    <p className="tc-hub-class-teacher truncate">{teacherDisplayName}</p>
+              <article key={row.id} className="tc-hub-grid-card">
+                <div className="tc-hub-grid-card-top">
+                  <div className="tc-hub-grid-head">
+                    <span className="tc-hub-class-orb" style={{ background: row.hue }} aria-hidden>
+                      {row.code.slice(0, 3)}
+                    </span>
+                    <div className="min-w-0">
+                      <p className="tc-hub-class-name truncate">{row.name}</p>
+                      <p className="tc-hub-class-teacher truncate">{teacherDisplayName}</p>
+                    </div>
                   </div>
+                  <RowActionsMenu classroomId={row.id} />
                 </div>
                 <p className="tc-hub-grid-meta">
                   {row.yearGroup ?? '—'} · {row.studentCount} student{row.studentCount !== 1 ? 's' : ''}
                 </p>
-                <div className="tc-hub-understanding mt-2">
-                  <div className="tc-hub-understanding-top">
-                    <span className="tc-hub-understanding-pct">{row.avgUnderstandingPct}%</span>
-                    <div className="tc-hub-progress" role="presentation">
-                      <span
-                        className={`tc-hub-progress-fill${st.variant === 'on-track' ? ' tc-hub-progress-fill--ok' : ' tc-hub-progress-fill--warn'}`}
-                        style={{ width: `${Math.min(100, Math.max(0, row.avgUnderstandingPct))}%` }}
-                      />
-                    </div>
+                <div className="tc-hub-avg-col mt-2">
+                  <div className="tc-hub-avg-head">
+                    <span className="tc-hub-avg-pct">{row.avgUnderstandingPct}%</span>
+                    <span className="tc-hub-avg-sublabel">Average understanding</span>
+                  </div>
+                  <div className="tc-hub-progress" role="presentation">
+                    <span
+                      className={`tc-hub-progress-fill${st.variant === 'on-track' ? ' tc-hub-progress-fill--ok' : ' tc-hub-progress-fill--warn'}`}
+                      style={{ width: `${Math.min(100, Math.max(0, row.avgUnderstandingPct))}%` }}
+                    />
                   </div>
                   <span className={`tc-hub-status tc-hub-status--${st.variant}`}>{st.label}</span>
                 </div>
                 {row.lastLive ? (
                   <p className="tc-hub-grid-live mt-3 text-sm">
-                    <span className="font-medium text-[color:var(--anx-text)]">{row.lastLive.at}</span>
+                    <span className="font-semibold text-[color:var(--anx-text)]">{row.lastLive.at}</span>
                     <br />
                     <span className="text-[color:var(--anx-text-muted)]">{row.lastLive.topic}</span>
                   </p>
                 ) : (
                   <p className="tc-hub-grid-live mt-3 text-sm text-[color:var(--anx-text-muted)]">No sessions yet</p>
                 )}
-                <Link href={`#class-analytics-${row.id}`} className="tc-hub-grid-link mt-3 inline-block text-sm font-semibold text-[#4338ca]">
-                  View analytics
-                </Link>
               </article>
             );
           })}
@@ -343,7 +394,7 @@ export function TeacherClassesHub({
         </div>
         <div className="tc-hub-cta-copy">
           <p className="tc-hub-cta-title">Create a new class</p>
-          <p className="tc-hub-cta-sub">Classes are linked from your school roster (Observe). Ask your admin to add a class if you need one.</p>
+          <p className="tc-hub-cta-sub">Add a new class and invite your students to join.</p>
         </div>
         <button type="button" className="tc-hub-cta-btn" disabled title="Contact your school admin to link a new class">
           + Add class
