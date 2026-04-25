@@ -3,6 +3,22 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/features/auth/authOptions';
 import { prisma } from '@/db/prisma';
 import { fetchSampleItemsBySkillIds } from '@/lib/live/live-check-plan';
+import {
+  fetchItemsForDisplay,
+  getClassWrongHotspots,
+  getLastLiveSessionItemStats,
+} from '@/lib/live/opening-check-recommendations';
+
+function dedupeItems<T extends { id: string }>(items: T[]): T[] {
+  const seen = new Set<string>();
+  const out: T[] = [];
+  for (const it of items) {
+    if (seen.has(it.id)) continue;
+    seen.add(it.id);
+    out.push(it);
+  }
+  return out;
+}
 
 /**
  * GET /api/teacher/live-items-suggest?subjectId=&skillIds=a,b&classroomId=&lastSessionId=
@@ -10,6 +26,10 @@ import { fetchSampleItemsBySkillIds } from '@/lib/live/live-check-plan';
  * Returns sample bank items per skill for building a live opening check plan.
  * When lastSessionId is provided (same teacher + classroom), also returns recap
  * skills derived from prerequisites of the last session's phase skills.
+ *
+ * Richer signals (when classroomId is set):
+ * - Wrong-answer hotspots from recent QuestionAttempts in this class.
+ * - When lastSessionId is set: class-level wrong rate on items from that live session.
  */
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -65,15 +85,104 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  const itemsBySkill = await fetchSampleItemsBySkillIds(skillIds, subjectId, 12);
+  const baseItemsBySkill = await fetchSampleItemsBySkillIds(skillIds, subjectId, 12);
+
+  let lastSessionItemStats: Awaited<ReturnType<typeof getLastLiveSessionItemStats>> = [];
+  if (lastSessionId && classroomId) {
+    lastSessionItemStats = await getLastLiveSessionItemStats({
+      liveSessionId: lastSessionId,
+      classroomId,
+      teacherUserId: userId,
+    });
+  }
+
+  const wrongHotspots =
+    classroomId && skillIds.length > 0
+      ? await getClassWrongHotspots({
+          classroomId,
+          subjectId,
+          skillIds,
+          take: 24,
+        })
+      : [];
+
+  const struggleItemIds = lastSessionItemStats
+    .filter((s) => skillIds.includes(s.skillId) && (s.wrongCount > 0 || s.classWrongRate >= 0.35))
+    .slice(0, 20)
+    .map((s) => s.itemId);
+
+  const hotspotItemIds = wrongHotspots.map((h) => h.itemId);
+  const displayMap = await fetchItemsForDisplay([...new Set([...struggleItemIds, ...hotspotItemIds])], subjectId);
+
+  const priorityBySkill = new Map<string, Array<{ id: string; question: string; type: string }>>();
+  for (const sid of skillIds) priorityBySkill.set(sid, []);
+
+  for (const st of lastSessionItemStats) {
+    if (!skillIds.includes(st.skillId)) continue;
+    const row = displayMap.get(st.itemId);
+    if (!row || !row.skillIds.includes(st.skillId)) continue;
+    priorityBySkill.get(st.skillId)?.push({
+      id: row.id,
+      question: row.question,
+      type: row.type,
+    });
+  }
+  for (const h of wrongHotspots) {
+    if (!skillIds.includes(h.skillId)) continue;
+    const row = displayMap.get(h.itemId);
+    if (!row || !row.skillIds.includes(h.skillId)) continue;
+    priorityBySkill.get(h.skillId)?.push({
+      id: row.id,
+      question: row.question,
+      type: row.type,
+    });
+  }
+
+  const itemsBySkill = skillIds.map((skillId) => {
+    const base = baseItemsBySkill.find((b) => b.skillId === skillId)?.items ?? [];
+    const pri = priorityBySkill.get(skillId) ?? [];
+    return {
+      skillId,
+      items: dedupeItems([...pri, ...base]).slice(0, 24),
+    };
+  });
+
   let recapItemsBySkill: Awaited<ReturnType<typeof fetchSampleItemsBySkillIds>> = [];
   if (recapSkillIds.length > 0) {
     recapItemsBySkill = await fetchSampleItemsBySkillIds(recapSkillIds, subjectId, 8);
+    if (lastSessionId && classroomId && lastSessionItemStats.length > 0) {
+      const recapSet = new Set(recapSkillIds);
+      const recapStruggleIds = lastSessionItemStats
+        .filter((s) => recapSet.has(s.skillId) && (s.wrongCount > 0 || s.classWrongRate >= 0.25))
+        .slice(0, 16)
+        .map((s) => s.itemId);
+      const recapDisplay = await fetchItemsForDisplay(recapStruggleIds, subjectId);
+      const recapPriority = new Map<string, Array<{ id: string; question: string; type: string }>>();
+      for (const sid of recapSkillIds) recapPriority.set(sid, []);
+      for (const st of lastSessionItemStats) {
+        if (!recapSet.has(st.skillId)) continue;
+        const row = recapDisplay.get(st.itemId);
+        if (!row || !row.skillIds.includes(st.skillId)) continue;
+        recapPriority.get(st.skillId)?.push({
+          id: row.id,
+          question: row.question,
+          type: row.type,
+        });
+      }
+      recapItemsBySkill = recapItemsBySkill.map((row) => ({
+        skillId: row.skillId,
+        items: dedupeItems([...(recapPriority.get(row.skillId) ?? []), ...row.items]).slice(0, 16),
+      }));
+    }
   }
 
   return NextResponse.json({
     itemsBySkill,
     recapSkillIds,
     recapItemsBySkill,
+    recommendationMeta: {
+      lastSessionItemStats: lastSessionItemStats.slice(0, 30),
+      wrongHotspotCount: wrongHotspots.length,
+    },
   });
 }
