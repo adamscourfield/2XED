@@ -53,6 +53,8 @@ export async function loadTeacherDashboardData(userId: string, days: number) {
     return { teacherProfile: null };
   }
 
+  const now = new Date();
+
   const recentSessions = await prisma.liveSession.findMany({
     where: { teacherUserId: userId },
     include: {
@@ -113,6 +115,45 @@ export async function loadTeacherDashboardData(userId: string, days: number) {
 
   const subjectMap = new Map((await prisma.subject.findMany({ select: { id: true, slug: true } })).map((s) => [s.slug, s.id]));
 
+  const classroomIds = teacherProfile.classrooms.map((tc) => tc.classroomId);
+  const recentSessionsForClasses =
+    classroomIds.length > 0
+      ? await prisma.liveSession.findMany({
+          where: { teacherUserId: userId, classroomId: { in: classroomIds } },
+          orderBy: { createdAt: 'desc' },
+          take: 400,
+          select: {
+            classroomId: true,
+            createdAt: true,
+            startedAt: true,
+            endedAt: true,
+            status: true,
+            subject: { select: { title: true } },
+            skill: { select: { name: true, code: true } },
+          },
+        })
+      : [];
+
+  const lastLiveSessionByClassroomId = new Map<string, (typeof recentSessionsForClasses)[number]>();
+  for (const row of recentSessionsForClasses) {
+    if (!lastLiveSessionByClassroomId.has(row.classroomId)) {
+      lastLiveSessionByClassroomId.set(row.classroomId, row);
+    }
+  }
+
+  const termStart = new Date(now.getFullYear(), Math.floor(now.getMonth() / 3) * 3, 1);
+  const liveSessionsThisTerm =
+    classroomIds.length > 0
+      ? await prisma.liveSession.count({
+          where: {
+            teacherUserId: userId,
+            classroomId: { in: classroomIds },
+            createdAt: { gte: termStart },
+            status: { in: ['COMPLETED', 'ACTIVE', 'LOBBY', 'PAUSED'] },
+          },
+        })
+      : 0;
+
   return {
     teacherProfile,
     recentSessions,
@@ -121,5 +162,7 @@ export async function loadTeacherDashboardData(userId: string, days: number) {
     subjectMap,
     since,
     allStudentIds,
+    lastLiveSessionByClassroomId,
+    liveSessionsThisTerm,
   };
 }

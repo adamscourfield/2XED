@@ -11,7 +11,7 @@ type Props = {
   userRole: string;
 };
 
-function formatSessionTime(d: Date): string {
+export function formatSessionTime(d: Date): string {
   const now = new Date();
   const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const startOfYesterday = new Date(startOfToday);
@@ -41,13 +41,13 @@ function lessonIconSymbol(skillCode: string | null | undefined, subjectTitle: st
   return subjectTitle.trim().charAt(0).toUpperCase() || '?';
 }
 
-function iconHue(seed: string): string {
+export function iconHue(seed: string): string {
   let h = 0;
   for (let i = 0; i < seed.length; i += 1) h = (h + seed.charCodeAt(i) * (i + 1)) % 360;
   return `hsl(${h} 62% 46%)`;
 }
 
-function classCodeLabel(externalClassId: string, subjectSlug: string | null): string {
+export function classCodeLabel(externalClassId: string, subjectSlug: string | null): string {
   if (subjectSlug && subjectSlug.length <= 5) return subjectSlug.toUpperCase();
   if (externalClassId.length <= 6) return externalClassId.toUpperCase();
   return externalClassId.slice(-4).toUpperCase();
