@@ -40,7 +40,14 @@ export default function LoginPage() {
     <main className="anx-scene flex min-h-screen flex-col items-center justify-center px-4 py-12">
       <div className="w-full max-w-md space-y-6">
         <div className="text-center">
-          <Image src="/ember-icon.svg" alt="Ember" width={48} height={60} className="mx-auto" />
+          <Image
+            src="/Ember_logo.png"
+            alt="Ember"
+            width={1774}
+            height={887}
+            className="mx-auto h-14 w-auto sm:h-16"
+            priority
+          />
           <p className="anx-section-label mt-4">Welcome back</p>
           <h1 className="mt-2 text-2xl font-bold tracking-tight sm:text-[1.65rem]" style={{ color: 'var(--anx-text)' }}>
             Sign in to Ember

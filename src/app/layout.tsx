@@ -18,6 +18,21 @@ const manrope = Manrope({
 export const metadata: Metadata = {
   title: 'Ember',
   description: 'Adaptive mastery learning platform',
+  icons: {
+    icon: '/Ember_logo_icon.png',
+    apple: '/Ember_logo_icon.png',
+  },
+  openGraph: {
+    title: 'Ember',
+    description: 'Adaptive mastery learning platform',
+    images: ['/Ember_logo.png'],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Ember',
+    description: 'Adaptive mastery learning platform',
+    images: ['/Ember_logo.png'],
+  },
 };
 
 export default function RootLayout({
