@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/features/auth/authOptions';
 import { prisma } from '@/db/prisma';
+import { getRecommendedExplanationForLiveSession } from '@/lib/live/live-session-explanation-bridge';
 
 interface Props {
   params: Promise<{ sessionId: string }>;
@@ -51,6 +52,7 @@ export async function GET(req: NextRequest, { params }: Props) {
     const ls = await prisma.liveSession.findUnique({
       where: { id: sessionId },
       include: {
+        skill: { select: { id: true, code: true, name: true } },
         participants: {
           include: {
             student: {
@@ -82,7 +84,8 @@ export async function GET(req: NextRequest, { params }: Props) {
 
     if (!ls) return null;
 
-    const participantCount = ls.participants.length;
+    const participantIds = new Set(ls.participants.map((p) => p.studentUserId));
+    const participantCount = ls.participants.filter((p) => p.isActive).length;
     const skillSummary = new Map<string, { answered: Set<string>; correct: number }>();
 
     for (const attempt of ls.liveAttempts) {
@@ -109,6 +112,19 @@ export async function GET(req: NextRequest, { params }: Props) {
         });
       }
     }
+
+    const responseSummary = Array.from(skillSummary.entries()).map(([skillId, s]) => ({
+      skillId,
+      totalParticipants: participantIds.size,
+      answeredCount: s.answered.size,
+      correctCount: s.correct,
+    }));
+
+    const recommendedExplanation = await getRecommendedExplanationForLiveSession(prisma, {
+      phases: ls.phases,
+      primarySkillId: ls.skillId,
+      responseSummary,
+    });
 
     const supportEvents = await prisma.event.findMany({
       where: {
@@ -140,18 +156,16 @@ export async function GET(req: NextRequest, { params }: Props) {
       status: ls.status,
       joinCode: ls.joinCode,
       startedAt: ls.startedAt,
+      skillId: ls.skillId,
+      skill: ls.skill,
       phases: ls.phases,
       currentPhaseIndex: ls.currentPhaseIndex,
       currentContent: ls.currentContent,
       participantCount,
       laneCounts,
       laneStudents,
-      responseSummary: Array.from(skillSummary.entries()).map(([skillId, s]) => ({
-        skillId,
-        totalParticipants: participantCount,
-        answeredCount: s.answered.size,
-        correctCount: s.correct,
-      })),
+      responseSummary,
+      recommendedExplanation,
       supportSummary: {
         shownCount: supportEvents.filter((event) => event.name === 'live_explanation_shown').length,
         acknowledgedCount: supportEvents.filter((event) => event.name === 'live_explanation_acknowledged').length,

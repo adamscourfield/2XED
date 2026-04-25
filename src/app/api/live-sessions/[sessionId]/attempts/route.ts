@@ -41,6 +41,14 @@ export async function POST(req: NextRequest, { params }: Props) {
         studentUserId: userId,
       },
     },
+    select: {
+      id: true,
+      currentLane: true,
+      currentExplanationId: true,
+      pendingRecheckItemId: true,
+      openingCheckQueue: true,
+      openingCheckIndex: true,
+    },
   });
 
   if (!participant) return NextResponse.json({ error: 'Not a participant in this session' }, { status: 403 });
@@ -138,6 +146,16 @@ export async function POST(req: NextRequest, { params }: Props) {
         outcome: recheckOutcome,
       },
     });
+  } else {
+    const queue = (participant.openingCheckQueue as Array<{ itemId: string; skillId: string }> | null) ?? [];
+    const idx = participant.openingCheckIndex ?? 0;
+    const cur = queue[idx];
+    if (cur?.itemId === itemId) {
+      await prisma.liveParticipant.update({
+        where: { id: participant.id },
+        data: { openingCheckIndex: idx + 1 },
+      });
+    }
   }
 
   const answeredItemIds = await prisma.liveAttempt.findMany({
@@ -146,21 +164,52 @@ export async function POST(req: NextRequest, { params }: Props) {
   });
   const answeredSet = new Set(answeredItemIds.map((a) => a.itemId));
 
-  const sessionSkillId = liveSession.skillId ?? skillId;
-  const nextItem = await prisma.item.findFirst({
-    where: {
-      id: { notIn: Array.from(answeredSet) },
-      skills: {
-        some: { skillId: sessionSkillId },
-      },
-    },
-    select: {
-      id: true,
-      question: true,
-      type: true,
-      options: true,
-    },
+  const participantAfter = await prisma.liveParticipant.findUnique({
+    where: { id: participant.id },
+    select: { openingCheckQueue: true, openingCheckIndex: true },
   });
+  const queueAfter = (participantAfter?.openingCheckQueue as Array<{ itemId: string; skillId: string }> | null) ?? [];
+  const idxAfter = participantAfter?.openingCheckIndex ?? 0;
+  const nextOpening = queueAfter[idxAfter];
+
+  let nextItem: {
+    id: string;
+    question: string;
+    type: string;
+    options: unknown;
+    skillId: string;
+  } | null = null;
+
+  if (nextOpening) {
+    const openingItem = await prisma.item.findUnique({
+      where: { id: nextOpening.itemId },
+      select: { id: true, question: true, type: true, options: true },
+    });
+    if (openingItem) {
+      nextItem = { ...openingItem, skillId: nextOpening.skillId };
+    }
+  }
+
+  if (!nextItem) {
+    const sessionSkillId = liveSession.skillId ?? skillId;
+    const poolItem = await prisma.item.findFirst({
+      where: {
+        id: { notIn: Array.from(answeredSet) },
+        skills: {
+          some: { skillId: sessionSkillId },
+        },
+      },
+      select: {
+        id: true,
+        question: true,
+        type: true,
+        options: true,
+      },
+    });
+    if (poolItem) {
+      nextItem = { ...poolItem, skillId: sessionSkillId };
+    }
+  }
 
   return NextResponse.json({
     correct,
@@ -170,6 +219,7 @@ export async function POST(req: NextRequest, { params }: Props) {
           question: nextItem.question,
           type: nextItem.type,
           options: nextItem.options,
+          skillId: nextItem.skillId,
         }
       : null,
     recheckOutcome,

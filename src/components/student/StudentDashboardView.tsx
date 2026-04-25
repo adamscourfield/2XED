@@ -1,13 +1,7 @@
+import type { CSSProperties } from 'react';
 import Link from 'next/link';
-import { JoinSessionInput } from '@/components/JoinSessionInput';
-import { DashboardLessonCalendar } from '@/components/DashboardLessonCalendar';
 import type { UserGamificationSummary } from '@/features/gamification/gamificationService';
-
-export type JourneyMonthBar = {
-  key: string;
-  label: string;
-  count: number;
-};
+import { StudentComingUpWidget } from '@/components/student/StudentComingUpWidget';
 
 export type DashboardSubjectSummary = {
   id: string;
@@ -25,301 +19,192 @@ export type DashboardSubjectSummary = {
   nextSkillIsDue: boolean;
 };
 
-export type DashboardRecentSession = {
-  subjectTitle: string;
-  subjectSlug: string;
-  total: number;
-  correct: number;
+export type StudentLivePromo = {
+  topicTitle: string;
+  teacherLine: string;
+  classLine: string;
 };
 
-export type DashboardRewardRow = {
-  id: string;
-  at: string;
-  reason: string;
-  xpDelta: number;
-  tokenDelta: number;
-};
+const CONTINUE_TYPES = ['Worksheet', 'Check', 'Model', 'Practice'] as const;
+
+function tileAccent(i: number): { bg: string; icon: string } {
+  const accents = [
+    { bg: 'rgba(99, 102, 241, 0.18)', icon: '#4f46e5' },
+    { bg: 'rgba(249, 115, 22, 0.15)', icon: '#ea580c' },
+    { bg: 'rgba(34, 197, 94, 0.15)', icon: '#16a34a' },
+    { bg: 'rgba(59, 130, 246, 0.15)', icon: '#2563eb' },
+  ];
+  return accents[i % accents.length];
+}
 
 type Props = {
   displayName: string;
   gamification: UserGamificationSummary;
-  weekQuestions: number;
-  weekAccuracyPct: number | null;
-  prevWeekQuestions: number;
-  journeyMonths: JourneyMonthBar[];
-  recentSessions: DashboardRecentSession[];
-  rewardRows: DashboardRewardRow[];
   subjects: DashboardSubjectSummary[];
-  primaryCtaHref: string;
-  primaryCtaLabel: string;
+  /** Active live session the student has joined (lobby or active). */
+  livePromo: StudentLivePromo | null;
+  /** Question-answered events this week (for achievement copy). */
+  weekActivityCount: number;
+  /** First subject slug for timetable link */
+  primarySubjectSlug: string | null;
 };
-
-function subjectEmoji(slug: string): string {
-  if (slug.includes('maths')) return '📐';
-  if (slug.includes('english')) return '📖';
-  return '📘';
-}
-
-function maxBarValue(months: JourneyMonthBar[]): number {
-  const m = Math.max(1, ...months.map((x) => x.count));
-  return m;
-}
 
 export function StudentDashboardView({
   displayName,
   gamification,
-  weekQuestions,
-  weekAccuracyPct,
-  prevWeekQuestions,
-  journeyMonths,
-  recentSessions,
-  rewardRows,
   subjects,
-  primaryCtaHref,
-  primaryCtaLabel,
+  livePromo,
+  weekActivityCount,
+  primarySubjectSlug,
 }: Props) {
-  const barMax = maxBarValue(journeyMonths);
-  const weekTrend =
-    prevWeekQuestions === 0
-      ? weekQuestions > 0
-        ? 'First practice this week — nice start.'
-        : 'Your practice picks up when you are ready.'
-      : weekQuestions >= prevWeekQuestions
-        ? 'You are matching or beating last week’s pace.'
-        : 'A lighter week — jump back in when you can.';
+  const firstName = displayName.split(/\s+/)[0] || displayName;
+  const continueSubjects = subjects.filter((s) => s.onboardingComplete && s.nextSkillName).slice(0, 4);
+  const xpRingDeg = Math.min(360, Math.max(36, Math.round((gamification.streakDays / 14) * 360)));
+  const donutStyle: CSSProperties = {
+    background: `conic-gradient(var(--anx-primary) ${xpRingDeg}deg, var(--anx-surface-container-high) 0)`,
+  };
+
+  const timetableHref = primarySubjectSlug ? `/learn/${primarySubjectSlug}` : '/dashboard';
 
   return (
-    <div className="student-dash">
-      <section className="student-dash-hero">
-        <div className="student-dash-hero-grid">
-          <div className="student-dash-hero-copy">
-            <p className="student-dash-eyebrow">Your space</p>
-            <h2 className="student-dash-hero-title">Hi, {displayName}</h2>
-            <p className="student-dash-hero-lead">
-              Everything you need for class, practice, and progress — in one calm view.
-            </p>
-            <div className="student-dash-hero-actions">
-              <Link href={primaryCtaHref} className="anx-btn-primary">
-                {primaryCtaLabel}
-              </Link>
-              <Link href="/student/live" className="anx-btn-secondary">
-                Open live room
-              </Link>
-            </div>
-          </div>
+    <div className="stu-dash">
+      <header className="stu-dash-welcome">
+        <h1 className="stu-dash-welcome-title">
+          Hi {firstName}{' '}
+          <span aria-hidden>👋</span>
+        </h1>
+        <p className="stu-dash-welcome-sub">Let&apos;s keep learning and growing.</p>
+      </header>
 
-          <div className="student-dash-stats-rail">
-            <div className="student-dash-stat-card">
-              <p className="student-dash-stat-label">Total XP</p>
-              <p className="student-dash-stat-value">{gamification.xp.toLocaleString('en-GB')}</p>
-              <p className="student-dash-stat-hint">Earned from quizzes, routes, and streaks</p>
-            </div>
-            <div className="student-dash-stat-card">
-              <p className="student-dash-stat-label">Learning tokens</p>
-              <p className="student-dash-stat-value">{gamification.tokens}</p>
-              <p className="student-dash-stat-hint">From milestones and recoveries</p>
-            </div>
-            <div className="student-dash-stat-card">
-              <p className="student-dash-stat-label">Day streak</p>
-              <p className="student-dash-stat-value">{gamification.streakDays} days</p>
-              <p className="student-dash-stat-hint">
-                {gamification.activeDaysThisWeek} active day{gamification.activeDaysThisWeek === 1 ? '' : 's'} this week
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <div className="student-dash-bento">
-        <div className="student-dash-bento-main">
-          <DashboardLessonCalendar
-            className="student-dash-calendar anx-card overflow-hidden"
-            hint="Class timetable, scheduled reviews, and practice due dates."
-          />
-
-          <section className="student-dash-panel">
-            <div className="student-dash-panel-head">
-              <div>
-                <p className="student-dash-eyebrow">This week</p>
-                <h3 className="student-dash-panel-title">Your momentum</h3>
-              </div>
-            </div>
-            <div className="student-dash-momentum">
-              <div>
-                <p className="student-dash-metric">{weekQuestions}</p>
-                <p className="student-dash-metric-label">Questions practised</p>
-              </div>
-              <div>
-                <p className="student-dash-metric">
-                  {weekAccuracyPct === null ? '—' : `${weekAccuracyPct}%`}
-                </p>
-                <p className="student-dash-metric-label">Accuracy (this week)</p>
-              </div>
-            </div>
-            <p className="student-dash-momentum-note">{weekTrend}</p>
-          </section>
-
-          <section className="student-dash-panel">
-            <div className="student-dash-panel-head">
-              <div>
-                <p className="student-dash-eyebrow">Learning journey</p>
-                <h3 className="student-dash-panel-title">Practice rhythm</h3>
-                <p className="student-dash-panel-sub">Questions you attempted each month</p>
-              </div>
-            </div>
-            <div className="student-dash-chart" role="img" aria-label="Practice count by month">
-              {journeyMonths.map((m) => (
-                <div key={m.key} className="student-dash-chart-col">
-                  <div className="student-dash-chart-track" title={`${m.count} in ${m.label}`}>
-                    <div
-                      className="student-dash-chart-bar"
-                      style={{ height: `${Math.max(8, (m.count / barMax) * 100)}%` }}
-                    />
+      <div className="stu-dash-grid">
+        <div className="stu-dash-main">
+          <section className="stu-dash-live-card" aria-label="Live lesson">
+            <div className="stu-dash-live-inner">
+              <div className="stu-dash-live-copy">
+                <div className="stu-dash-live-icon-wrap" aria-hidden>
+                  <div className="stu-dash-live-icon">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+                      <rect x="2" y="4" width="20" height="14" rx="2" stroke="currentColor" strokeWidth="1.75" />
+                      <path d="M8 22h8" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
+                    </svg>
                   </div>
-                  <p className="student-dash-chart-label">{m.label}</p>
-                  <p className="student-dash-chart-count">{m.count}</p>
+                  <span className="stu-dash-live-badge">LIVE</span>
                 </div>
-              ))}
-            </div>
-          </section>
-
-          {recentSessions.length > 0 && (
-            <section className="student-dash-panel">
-              <div className="student-dash-panel-head">
-                <div>
-                  <p className="student-dash-eyebrow">Recent</p>
-                  <h3 className="student-dash-panel-title">Latest sessions</h3>
+                {livePromo ? (
+                  <>
+                    <p className="stu-dash-live-eyebrow">You have a live lesson</p>
+                    <h2 className="stu-dash-live-topic">{livePromo.topicTitle}</h2>
+                    <p className="stu-dash-live-meta">
+                      {livePromo.teacherLine} · {livePromo.classLine}
+                    </p>
+                    <Link href="/student/live" className="stu-dash-btn-primary">
+                      Join lesson
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    <p className="stu-dash-live-eyebrow">No live class right now</p>
+                    <h2 className="stu-dash-live-topic">Join when your teacher shares a code</h2>
+                    <p className="stu-dash-live-meta">Have a join code ready from your teacher.</p>
+                    <Link href="/student/live" className="stu-dash-btn-primary">
+                      Open live room
+                    </Link>
+                  </>
+                )}
+              </div>
+              <div className="stu-dash-live-art" aria-hidden>
+                <div className="stu-dash-tablet">
+                  <span className="stu-dash-tablet-eq">2x + 3 = 11</span>
                 </div>
               </div>
-              <ul className="student-dash-list">
-                {recentSessions.map((rs) => {
-                  const pct = rs.total > 0 ? Math.round((rs.correct / rs.total) * 100) : 0;
-                  const strong = pct >= 80;
-                  return (
-                    <li key={rs.subjectSlug}>
-                      <Link href={`/learn/${rs.subjectSlug}`} className="student-dash-list-row">
-                        <span className="student-dash-list-icon" aria-hidden>
-                          {subjectEmoji(rs.subjectSlug)}
-                        </span>
-                        <div className="student-dash-list-body">
-                          <p className="student-dash-list-title">{rs.subjectTitle}</p>
-                          <p className="student-dash-list-meta">
-                            {rs.total} question{rs.total === 1 ? '' : 's'} · {pct}% correct
-                          </p>
-                        </div>
-                        <span className={strong ? 'student-dash-pill student-dash-pill-success' : 'student-dash-pill'}>
-                          {strong ? 'Strong' : 'Building'}
-                        </span>
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
-            </section>
-          )}
-        </div>
-
-        <aside className="student-dash-bento-side">
-          <section className="student-dash-side-card student-dash-live">
-            <p className="student-dash-eyebrow">Live lesson</p>
-            <h3 className="student-dash-side-title">Join your class</h3>
-            <p className="student-dash-side-text">Enter the six-character code from your teacher.</p>
-            <JoinSessionInput />
-            <Link href="/student/live" className="student-dash-text-link">
-              Go to live room without a code →
-            </Link>
-          </section>
-
-          <section className="student-dash-side-card">
-            <p className="student-dash-eyebrow">Self study</p>
-            <h3 className="student-dash-side-title">Learn at your pace</h3>
-            <p className="student-dash-side-text">Pick up where adaptive practice left off for any subject.</p>
-            <div className="student-dash-chip-stack">
-              {subjects.length === 0 ? (
-                <p className="student-dash-side-text">Subjects will appear here when your school adds them.</p>
-              ) : (
-                subjects.map((s) => (
-                  <Link key={s.id} href={s.nextHref} className="student-dash-subject-chip">
-                    <span className="text-lg" aria-hidden>
-                      {s.emoji}
-                    </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="block truncate font-semibold text-[color:var(--anx-text)]">{s.title}</span>
-                      <span className="block truncate text-xs text-[color:var(--anx-text-muted)]">
-                        {s.onboardingComplete ? `${s.averageMastery}% path progress` : 'Start with diagnostic'}
-                      </span>
-                    </span>
-                    <span className="shrink-0 text-[color:var(--anx-primary)]">→</span>
-                  </Link>
-                ))
-              )}
             </div>
           </section>
 
-          <section className="student-dash-side-card student-dash-rewards">
-            <div className="student-dash-panel-head student-dash-panel-head-tight">
-              <div>
-                <p className="student-dash-eyebrow">Rewards</p>
-                <h3 className="student-dash-side-title">What you have collected</h3>
-              </div>
+          <section className="stu-dash-section">
+            <div className="stu-dash-section-head">
+              <h2 className="stu-dash-section-title">Continue learning</h2>
+              <Link href={timetableHref} className="stu-dash-link-all">
+                View all
+              </Link>
             </div>
-            {rewardRows.length === 0 ? (
-              <p className="student-dash-side-text">
-                Complete practice and streaks to fill this ledger — your first rewards will show up here.
+            {continueSubjects.length === 0 ? (
+              <p className="stu-dash-muted m-0 text-sm">
+                {subjects.length === 0
+                  ? 'Subjects will appear when your school adds them.'
+                  : 'Complete your diagnostic on a subject to unlock practice cards here.'}
               </p>
             ) : (
-              <ul className="student-dash-reward-list">
-                {rewardRows.map((r) => {
-                  const when = new Intl.DateTimeFormat('en-GB', {
-                    day: 'numeric',
-                    month: 'short',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  }).format(new Date(r.at));
+              <div className="stu-dash-continue-row">
+                {continueSubjects.map((s, i) => {
+                  const accent = tileAccent(i);
+                  const pct = Math.min(100, Math.max(8, s.averageMastery));
                   return (
-                    <li key={r.id} className="student-dash-reward-row">
-                      <div className="min-w-0 flex-1">
-                        <p className="student-dash-reward-reason">{r.reason}</p>
-                        <p className="student-dash-reward-when">{when}</p>
-                      </div>
-                      <div className="student-dash-reward-deltas">
-                        {r.xpDelta !== 0 ? <span className="student-dash-reward-xp">+{r.xpDelta} XP</span> : null}
-                        {r.tokenDelta !== 0 ? <span className="student-dash-reward-tok">+{r.tokenDelta} tokens</span> : null}
-                      </div>
-                    </li>
+                    <Link key={s.id} href={s.nextHref} className="stu-dash-tile">
+                      <span className="stu-dash-tile-icon" style={{ background: accent.bg, color: accent.icon }}>
+                        {s.emoji}
+                      </span>
+                      <span className="stu-dash-tile-type">{CONTINUE_TYPES[i % CONTINUE_TYPES.length]}</span>
+                      <span className="stu-dash-tile-title">{s.nextSkillName}</span>
+                      <span className="stu-dash-tile-bar-track">
+                        <span className="stu-dash-tile-bar-fill" style={{ width: `${pct}%` }} />
+                      </span>
+                    </Link>
                   );
                 })}
-              </ul>
+              </div>
             )}
+          </section>
+
+          <section className="stu-dash-achievement">
+            <div className="stu-dash-achievement-icon" aria-hidden>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M12 2l2.4 7.4h7.6l-6 4.6 2.3 7-6.3-4.6-6.3 4.6 2.3-7-6-4.6h7.6L12 2Z"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinejoin="round"
+                  fill="rgba(99,102,241,0.12)"
+                />
+              </svg>
+            </div>
+            <div className="stu-dash-achievement-copy">
+              <p className="stu-dash-achievement-title">Great work!</p>
+              <p className="stu-dash-achievement-sub">
+                You completed {weekActivityCount} activit{weekActivityCount === 1 ? 'y' : 'ies'} this week.
+              </p>
+            </div>
+            <div className="stu-dash-achievement-xp">
+              +
+              {Math.min(999, weekActivityCount * 30) || 50} XP
+            </div>
+          </section>
+        </div>
+
+        <aside className="stu-dash-aside">
+          <StudentComingUpWidget />
+          <section className="stu-dash-card stu-dash-xp-card">
+            <h2 className="stu-dash-card-title">Your XP</h2>
+            <div className="stu-dash-xp-row">
+              <div className="stu-dash-donut" style={donutStyle}>
+                <div className="stu-dash-donut-inner">
+                  <span className="stu-dash-donut-value">{gamification.xp.toLocaleString('en-GB')}</span>
+                  <span className="stu-dash-donut-label">XP</span>
+                </div>
+              </div>
+              <div className="stu-dash-xp-copy">
+                <p className="stu-dash-xp-lead">Keep it up!</p>
+                <p className="stu-dash-muted m-0 text-sm">
+                  You&apos;re on a {gamification.streakDays} day streak.
+                </p>
+              </div>
+            </div>
           </section>
         </aside>
       </div>
 
-      {subjects.some((s) => s.onboardingComplete && s.nextSkillName) && (
-        <section className="student-dash-panel student-dash-next-strip">
-          <p className="student-dash-eyebrow">Next up</p>
-          <h3 className="student-dash-panel-title">Continue your path</h3>
-          <div className="student-dash-next-grid">
-            {subjects
-              .filter((s) => s.onboardingComplete && s.nextSkillName)
-              .map((s) => (
-                <Link key={s.id} href={s.nextHref} className="student-dash-next-card">
-                  <span className="student-dash-next-emoji" aria-hidden>
-                    {s.emoji}
-                  </span>
-                  <div className="min-w-0">
-                    <p className="student-dash-next-subject">{s.title}</p>
-                    <p className="student-dash-next-skill">{s.nextSkillName}</p>
-                    <div className="student-dash-next-tags">
-                      <span className="student-dash-mini-pill">{s.nextSkillStarted ? 'In progress' : 'New'}</span>
-                      <span className="student-dash-mini-pill">{s.nextSkillIsDue ? 'Due now' : 'Scheduled'}</span>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-          </div>
-        </section>
-      )}
+      <p className="stu-dash-footer-msg">
+        You&apos;re doing great, {firstName}. Keep it up! 💪
+      </p>
     </div>
   );
 }

@@ -5,14 +5,34 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 import { ReactNode, useEffect, useState } from "react";
+import { StudentTopBarSubjectSelector, type StudentTopBarSubjectOption } from "@/components/student/StudentTopBarSubjectSelector";
+import { StudentTopBarUserMenu } from "@/components/student/StudentTopBarUserMenu";
 
 export type AppChromeVariant = "student" | "teacher";
+
+type NavIconKind =
+  | "home"
+  | "school"
+  | "book"
+  | "bookOpen"
+  | "clipboardList"
+  | "bolt"
+  | "dashboard"
+  | "radio"
+  | "calendar"
+  | "file"
+  | "users"
+  | "chart"
+  | "folder"
+  | "clock"
+  | "help"
+  | "gear";
 
 interface NavItem {
   href: string;
   label: string;
-  description: string;
-  icon: "home" | "school" | "book" | "bolt" | "dashboard" | "radio" | "calendar" | "file" | "users";
+  description?: string;
+  icon: NavIconKind;
 }
 
 interface StudentSubjectNav {
@@ -38,16 +58,25 @@ function LogoImage({ className }: { className?: string }) {
   );
 }
 
+type NavIconChrome = "default" | "teacher";
+
 function NavIconBox({
   kind,
   active,
+  chrome = "default",
 }: {
-  kind: NavItem["icon"];
+  kind: NavIconKind;
   active: boolean;
+  chrome?: NavIconChrome;
 }) {
+  const isTeacher = chrome === "teacher";
   const box = active
-    ? "bg-[rgba(99,102,241,0.18)] text-[#4338ca]"
-    : "bg-[#f0f1f4] text-[#374151]";
+    ? isTeacher
+      ? "bg-[#ede9fe] text-[#5b21b6] ring-1 ring-inset ring-[#c4b5fd]/90"
+      : "bg-[rgba(99,102,241,0.18)] text-[#4338ca]"
+    : isTeacher
+      ? "bg-[#f4f4f5] text-[#52525b]"
+      : "bg-[#f0f1f4] text-[#374151]";
   const stroke = "currentColor";
   const icon = (() => {
     switch (kind) {
@@ -92,6 +121,31 @@ function NavIconBox({
               strokeLinejoin="round"
             />
             <path d="M8 7h8M8 11h6" stroke={stroke} strokeWidth="1.75" strokeLinecap="round" />
+          </svg>
+        );
+      case "bookOpen":
+        return (
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
+            <path
+              d="M12 6.5v11M12 6.5c-1.2-.67-2.75-1-4.5-1-1.4 0-2.6.22-3.5.6V18c.9-.38 2.1-.6 3.5-.6 1.75 0 3.3.33 4.5 1M12 6.5c1.2-.67 2.75-1 4.5-1 1.4 0 2.6.22 3.5.6V18c-.9-.38-2.1-.6-3.5-.6-1.75 0-3.3.33-4.5 1"
+              stroke={stroke}
+              strokeWidth="1.75"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        );
+      case "clipboardList":
+        return (
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
+            <path
+              d="M9 5h-.5a1.5 1.5 0 0 0-3 0H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-.5a1.5 1.5 0 0 0-3 0H9"
+              stroke={stroke}
+              strokeWidth="1.75"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path d="M9 12h6M9 16h6M9 8h2" stroke={stroke} strokeWidth="1.75" strokeLinecap="round" />
           </svg>
         );
       case "bolt":
@@ -157,13 +211,61 @@ function NavIconBox({
             <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" stroke={stroke} strokeWidth="1.75" strokeLinecap="round" />
           </svg>
         );
+      case "chart":
+        return (
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
+            <path d="M4 20V4M4 20h16M8 16V11M12 16V7M16 16v-4" stroke={stroke} strokeWidth="1.75" strokeLinecap="round" />
+          </svg>
+        );
+      case "folder":
+        return (
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
+            <path
+              d="M3 8a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8Z"
+              stroke={stroke}
+              strokeWidth="1.75"
+              strokeLinejoin="round"
+            />
+          </svg>
+        );
+      case "clock":
+        return (
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
+            <circle cx="12" cy="12" r="9" stroke={stroke} strokeWidth="1.75" />
+            <path d="M12 7v5l3 2" stroke={stroke} strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        );
+      case "help":
+        return (
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
+            <circle cx="12" cy="12" r="9" stroke={stroke} strokeWidth="1.75" />
+            <path d="M9.5 9.5a2.5 2.5 0 0 1 4.86 1c0 1.5-1.36 1.5-1.36 3" stroke={stroke} strokeWidth="1.75" strokeLinecap="round" />
+            <path d="M12 17h.01" stroke={stroke} strokeWidth="2.5" strokeLinecap="round" />
+          </svg>
+        );
+      case "gear":
+        return (
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
+            <path
+              d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"
+              stroke={stroke}
+              strokeWidth="1.75"
+            />
+            <path
+              d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82 1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"
+              stroke={stroke}
+              strokeWidth="1.25"
+              strokeLinejoin="round"
+            />
+          </svg>
+        );
       default:
         return null;
     }
   })();
   return (
     <span
-      className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${box}`}
+      className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] ${box}`}
       aria-hidden
     >
       {icon}
@@ -173,8 +275,21 @@ function NavIconBox({
 
 function isNavActive(pathname: string | null, href: string) {
   if (!pathname) return false;
-  if (href === "/dashboard" || href === "/teacher/dashboard") {
+  if (href === "/dashboard") {
     return pathname === href;
+  }
+  if (href === "/teacher/dashboard") {
+    return pathname === "/teacher/dashboard";
+  }
+  if (href === "/teacher/lessons") {
+    if (pathname === "/teacher/lessons" || pathname.startsWith("/teacher/lessons/")) return true;
+    if (pathname.startsWith("/teacher/live")) return true;
+    return false;
+  }
+  if (href === "/teacher/question-bank") {
+    if (pathname === "/teacher/question-bank" || pathname.startsWith("/teacher/question-bank/")) return true;
+    if (pathname.startsWith("/teacher/content/review")) return true;
+    return false;
   }
   return pathname === href || pathname.startsWith(`${href}/`);
 }
@@ -192,12 +307,31 @@ interface AppChromeProps {
   variant: AppChromeVariant;
   showLeadershipNav?: boolean;
   children: ReactNode;
+  /** Student dashboard-style layout: top bar only (no side nav). */
+  studentLayout?: "sidebar" | "topbar";
+  /** Subject options for the student top bar (Year 7 Maths style switcher). */
+  studentTopBarSubjects?: StudentTopBarSubjectOption[];
+}
+
+function studentInitials(displayName: string, email: string): string {
+  const name = displayName.trim();
+  const parts = name.split(/\s+/).filter(Boolean);
+  if (parts.length >= 2) {
+    return `${parts[0].charAt(0)}${parts[1].charAt(0)}`.toUpperCase();
+  }
+  if (parts.length === 1 && parts[0].length >= 2) {
+    return parts[0].slice(0, 2).toUpperCase();
+  }
+  const c = name.charAt(0) || email.charAt(0) || "?";
+  return c.toUpperCase();
 }
 
 export function AppChrome({
   variant,
   showLeadershipNav = false,
   children,
+  studentLayout = "sidebar",
+  studentTopBarSubjects = [],
 }: AppChromeProps) {
   const pathname = usePathname();
   const { data: authSession, status: sessionStatus } = useSession();
@@ -208,6 +342,8 @@ export function AppChrome({
   const userName = authSession?.user?.name ?? authSession?.user?.email ?? "Account";
   const userEmail = authSession?.user?.email ?? "";
   const initial = (userName.trim().charAt(0) || userEmail.charAt(0) || "?").toUpperCase();
+  const teacherInitials =
+    variant === "teacher" ? studentInitials(userName, userEmail) : initial;
 
   useEffect(() => {
     setMenuOpen(false);
@@ -223,7 +359,8 @@ export function AppChrome({
   }, [menuOpen]);
 
   useEffect(() => {
-    if (variant !== "student" || role !== "STUDENT" || sessionStatus !== "authenticated") return;
+    if (variant !== "student" || studentLayout === "topbar") return;
+    if (role !== "STUDENT" || sessionStatus !== "authenticated") return;
     let cancelled = false;
     (async () => {
       try {
@@ -238,47 +375,28 @@ export function AppChrome({
     return () => {
       cancelled = true;
     };
-  }, [variant, role, sessionStatus]);
+  }, [variant, role, sessionStatus, studentLayout]);
 
   const homeHref = variant === "teacher" ? "/teacher/dashboard" : "/dashboard";
   const tagline =
     variant === "teacher" ? "Teaching workspace" : "Your learning hub";
 
-  const teacherNav: NavItem[] = [
-    {
-      href: "/teacher/dashboard",
-      label: "Dashboard",
-      description: "Classes and analytics",
-      icon: "dashboard",
-    },
-    {
-      href: "/teacher/live/new",
-      label: "Live lesson",
-      description: "Start a session",
-      icon: "radio",
-    },
-    {
-      href: "/teacher/timetable",
-      label: "Timetables",
-      description: "Recurring class slots",
-      icon: "calendar",
-    },
-    {
-      href: "/teacher/content/review",
-      label: "Content review",
-      description: "English booklet gate",
-      icon: "file",
-    },
+  const teacherNavPrimary: NavItem[] = [
+    { href: "/teacher/dashboard", label: "Home", icon: "home" },
+    { href: "/teacher/lessons", label: "Lessons", icon: "bookOpen" },
+    { href: "/teacher/question-bank", label: "Question bank", icon: "clipboardList" },
+    { href: "/teacher/dashboard/classes", label: "Classes", icon: "users" },
+    { href: "/teacher/reports", label: "Reports", icon: "chart" },
+    { href: "/teacher/resources", label: "Resources", icon: "folder" },
+    { href: "/teacher/recent-sessions", label: "Recent sessions", icon: "clock" },
     ...(showLeadershipNav
-      ? ([
-          {
-            href: "/teacher/leadership",
-            label: "Leadership",
-            description: "School-wide overview",
-            icon: "users",
-          },
-        ] satisfies NavItem[])
+      ? ([{ href: "/teacher/leadership", label: "Leadership", icon: "dashboard" }] satisfies NavItem[])
       : []),
+  ];
+
+  const teacherNavSecondary: NavItem[] = [
+    { href: "/teacher/help", label: "Help centre", icon: "help" },
+    { href: "/teacher/settings", label: "Settings", icon: "gear" },
   ];
 
   const liveStudentItem: NavItem = {
@@ -321,47 +439,72 @@ export function AppChrome({
     active,
     badge,
     onNavigate,
+    variant = "default",
   }: {
     href: string;
     label: string;
-    description: string;
-    iconKind: NavItem["icon"];
+    description?: string;
+    iconKind: NavIconKind;
     active: boolean;
     badge?: number;
     onNavigate?: () => void;
+    variant?: "default" | "teacher";
   }) {
+    const teacher = variant === "teacher";
     return (
       <Link
         href={href}
         onClick={onNavigate}
-        className={`group relative flex items-center gap-3 rounded-2xl px-3 py-2.5 pl-3 transition-colors duration-150 ${
-          active
-            ? "bg-[rgba(99,102,241,0.12)] shadow-[inset_0_0_0_1px_rgba(99,102,241,0.35)]"
-            : "text-[color:var(--anx-text)] hover:bg-[var(--anx-surface-hover)]"
-        }`}
+        className={
+          teacher
+            ? `group relative flex items-center gap-3 rounded-xl py-2.5 pl-3 pr-2.5 transition-colors duration-150 ${
+                active
+                  ? "bg-[#f5f3ff] before:absolute before:left-0 before:top-1/2 before:h-[2.125rem] before:w-[4px] before:-translate-y-1/2 before:rounded-full before:bg-[#6366f1] before:content-['']"
+                  : "text-[#3f3f46] hover:bg-[#fafafa]"
+              }`
+            : `group relative flex items-center gap-3 rounded-2xl px-3 py-2.5 pl-3 transition-colors duration-150 ${
+                active
+                  ? "bg-[rgba(99,102,241,0.12)] shadow-[inset_0_0_0_1px_rgba(99,102,241,0.35)]"
+                  : "text-[color:var(--anx-text)] hover:bg-[var(--anx-surface-hover)]"
+              }`
+        }
       >
-        {active ? (
+        {!teacher && active ? (
           <span
             className="absolute left-0 top-1/2 h-8 w-1 -translate-y-1/2 rounded-full bg-[#6366f1]"
             aria-hidden
           />
         ) : null}
-        <NavIconBox kind={iconKind} active={active} />
+        <NavIconBox kind={iconKind} active={active} chrome={teacher ? "teacher" : "default"} />
         <span className="min-w-0 flex-1">
           <span
             className={`block text-[0.9375rem] font-semibold leading-snug tracking-tight ${
-              active ? "text-[#312e81]" : "text-[color:var(--anx-text)]"
+              teacher
+                ? active
+                  ? "text-[#312e81]"
+                  : "text-[#27272a]"
+                : active
+                  ? "text-[#312e81]"
+                  : "text-[color:var(--anx-text)]"
             }`}
           >
             {label}
           </span>
-          <span
-            className={`mt-0.5 block text-xs leading-relaxed ${
-              active ? "text-[#4f46e5]/90" : "text-[color:var(--anx-text-muted)]"
-            }`}
-          >
-            {description}
-          </span>
+          {description ? (
+            <span
+              className={`mt-0.5 block text-xs leading-relaxed ${
+                teacher
+                  ? active
+                    ? "text-[#5b21b6]/85"
+                    : "text-[#71717a]"
+                  : active
+                    ? "text-[#4f46e5]/90"
+                    : "text-[color:var(--anx-text-muted)]"
+              }`}
+            >
+              {description}
+            </span>
+          ) : null}
         </span>
         {badge !== undefined && badge > 0 ? (
           <span className="flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-[#ef4444] px-1.5 text-[10px] font-bold text-white">
@@ -445,12 +588,9 @@ export function AppChrome({
 
   function TeacherNav({ onNavigate }: { onNavigate?: () => void }) {
     return (
-      <div className="px-2 py-2">
-        <p className="mb-2 px-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-[color:var(--anx-text-muted)]">
-          Main
-        </p>
-        <nav className="flex flex-col gap-1" aria-label="Main">
-          {teacherNav.map((item) => {
+      <div className="flex flex-col gap-5 px-2 py-3">
+        <nav className="flex flex-col gap-0.5" aria-label="Primary">
+          {teacherNavPrimary.map((item) => {
             const active = isNavActive(pathname, item.href);
             return (
               <NavRow
@@ -461,6 +601,25 @@ export function AppChrome({
                 iconKind={item.icon}
                 active={active}
                 onNavigate={onNavigate}
+                variant="teacher"
+              />
+            );
+          })}
+        </nav>
+        <div className="mx-2 border-t border-[#e4e4e7]" />
+        <nav className="flex flex-col gap-0.5" aria-label="Secondary">
+          {teacherNavSecondary.map((item) => {
+            const active = isNavActive(pathname, item.href);
+            return (
+              <NavRow
+                key={item.href}
+                href={item.href}
+                label={item.label}
+                description={item.description}
+                iconKind={item.icon}
+                active={active}
+                onNavigate={onNavigate}
+                variant="teacher"
               />
             );
           })}
@@ -472,17 +631,77 @@ export function AppChrome({
   const brandBlock = (
     <Link
       href={homeHref}
-      className="flex items-center gap-3 rounded-2xl p-2 outline-none transition-colors hover:bg-[var(--anx-surface-hover)] focus-visible:ring-2 focus-visible:ring-[var(--anx-primary-glow)]"
+      className={`flex items-center gap-3 rounded-2xl p-2 outline-none focus-visible:ring-2 focus-visible:ring-[var(--anx-primary-glow)] ${
+        variant === "teacher"
+          ? "transition-colors hover:bg-[#f4f4f5]"
+          : "transition-colors hover:bg-[var(--anx-surface-hover)]"
+      }`}
       onClick={() => setMenuOpen(false)}
     >
       <LogoImage className="h-7 w-auto shrink-0 sm:h-8" />
       <div className="min-w-0 text-left">
-        <p className="truncate text-xs font-medium text-[color:var(--anx-text-muted)]">
+        <p
+          className={`truncate text-xs font-medium ${
+            variant === "teacher" ? "text-[#71717a]" : "text-[color:var(--anx-text-muted)]"
+          }`}
+        >
           {tagline}
         </p>
       </div>
     </Link>
   );
+
+  const logoOnly = (
+    <Link
+      href={homeHref}
+      className="flex shrink-0 items-center rounded-xl p-1 outline-none transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-[var(--anx-primary-glow)]"
+      aria-label="Home"
+    >
+      <LogoImage className="h-7 w-auto sm:h-8" />
+    </Link>
+  );
+
+  const studentTopBar =
+    variant === "student" &&
+    studentLayout === "topbar" &&
+    (role === "STUDENT" || sessionStatus === "loading") ? (
+      <header
+        className="sticky top-0 z-40 border-b border-[var(--anx-outline-variant)] bg-[color:var(--anx-surface-raised)]/95 px-4 py-2.5 backdrop-blur-md sm:px-6"
+        style={{ WebkitBackdropFilter: "blur(12px)" }}
+      >
+        <div className="mx-auto flex max-w-6xl items-center gap-3 sm:gap-4">
+          {logoOnly}
+          <div className="min-w-0 flex-1 flex justify-center sm:justify-start sm:pl-2">
+            <StudentTopBarSubjectSelector subjects={studentTopBarSubjects} />
+          </div>
+          <span
+            className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[var(--anx-outline-variant)] bg-[color:var(--anx-surface-bright)] text-[color:var(--anx-text-secondary)]"
+            title="Notifications"
+            aria-hidden
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M12 22a2 2 0 0 0 2-2H10a2 2 0 0 0 2 2Zm6-6V11a6 6 0 1 0-12 0v5l-2 2V20h16v-2l-2-2Z"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinejoin="round"
+              />
+            </svg>
+            <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-[var(--anx-primary)] ring-2 ring-[color:var(--anx-surface-bright)]" />
+          </span>
+          <StudentTopBarUserMenu userName={userName} initial={studentInitials(userName, userEmail)} />
+        </div>
+      </header>
+    ) : null;
+
+  if (studentTopBar) {
+    return (
+      <div className="flex min-h-screen flex-col bg-[color:var(--anx-surface-bright)]">
+        {studentTopBar}
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col">{children}</div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen flex-col bg-[color:var(--anx-surface-bright)] lg:flex-row">
@@ -530,14 +749,24 @@ export function AppChrome({
 
       <aside
         id="app-chrome-drawer"
-        className={`fixed inset-y-0 left-0 z-50 flex w-[min(18rem,88vw)] flex-col border-r border-[var(--anx-outline-variant)] bg-[color:var(--anx-surface-raised)] shadow-[var(--anx-shadow-lg)] transition-transform duration-200 ease-out lg:static lg:z-0 lg:w-[min(17.5rem,19vw)] lg:translate-x-0 lg:shadow-none ${
-          menuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
-        }`}
+        className={`fixed inset-y-0 left-0 z-50 flex w-[min(18rem,88vw)] flex-col border-r shadow-[var(--anx-shadow-lg)] transition-transform duration-200 ease-out lg:static lg:z-0 lg:w-[min(17.5rem,19vw)] lg:translate-x-0 lg:shadow-none ${
+          variant === "teacher"
+            ? "border-[#e4e4e7] bg-white lg:border-[#e4e4e7] lg:shadow-[1px_0_0_rgba(0,0,0,0.04)]"
+            : "border-[var(--anx-outline-variant)] bg-[color:var(--anx-surface-raised)] lg:shadow-none"
+        } ${menuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
       >
-        <div className="hidden border-b border-[var(--anx-outline-variant)] p-4 lg:block">
+        <div
+          className={`hidden p-4 lg:block ${
+            variant === "teacher" ? "border-b border-[#f4f4f5]" : "border-b border-[var(--anx-outline-variant)]"
+          }`}
+        >
           {brandBlock}
         </div>
-        <div className="border-b border-[var(--anx-outline-variant)] p-3 lg:hidden">
+        <div
+          className={`p-3 lg:hidden ${
+            variant === "teacher" ? "border-b border-[#f4f4f5]" : "border-b border-[var(--anx-outline-variant)]"
+          }`}
+        >
           {brandBlock}
         </div>
 
@@ -550,8 +779,18 @@ export function AppChrome({
           )}
         </div>
 
-        <div className="border-t border-[var(--anx-outline-variant)] p-4">
-          <div className="flex items-center gap-3">
+        <div
+          className={`p-4 ${
+            variant === "teacher" ? "border-t border-[#f4f4f5] bg-[#fafafa]" : "border-t border-[var(--anx-outline-variant)]"
+          }`}
+        >
+          <div
+            className={`flex items-center gap-3 rounded-xl border px-3 py-2.5 shadow-[var(--anx-shadow-sm)] ${
+              variant === "teacher"
+                ? "border-[#e4e4e7] bg-white"
+                : "border-[var(--anx-outline-variant)] bg-[color:var(--anx-surface-bright)]"
+            }`}
+          >
             <div
               className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white"
               style={{
@@ -560,24 +799,36 @@ export function AppChrome({
               }}
               aria-hidden
             >
-              {initial}
+              {variant === "teacher" ? teacherInitials : initial}
             </div>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-semibold text-[color:var(--anx-text)]">
+              <p
+                className={`truncate text-sm font-semibold ${
+                  variant === "teacher" ? "text-[#18181b]" : "text-[color:var(--anx-text)]"
+                }`}
+              >
                 {userName}
               </p>
-              <p className="truncate text-xs text-[color:var(--anx-text-muted)]">
+              <p
+                className={`truncate text-xs ${
+                  variant === "teacher" ? "text-[#71717a]" : "text-[color:var(--anx-text-muted)]"
+                }`}
+              >
                 {roleFooterLabel()}
               </p>
             </div>
-            <button
-              type="button"
-              onClick={() => signOut({ callbackUrl: "/login" })}
-              className="shrink-0 text-xs font-medium text-[color:var(--anx-text-muted)] transition hover:text-[color:var(--anx-text)]"
-            >
-              Sign out
-            </button>
           </div>
+          <button
+            type="button"
+            onClick={() => signOut({ callbackUrl: "/login" })}
+            className={`mt-3 w-full text-center text-xs font-medium transition ${
+              variant === "teacher"
+                ? "text-[#71717a] hover:text-[#6366f1]"
+                : "text-[color:var(--anx-text-muted)] hover:text-[color:var(--anx-text)]"
+            }`}
+          >
+            Sign out
+          </button>
         </div>
       </aside>
 

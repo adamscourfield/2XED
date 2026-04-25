@@ -1,5 +1,6 @@
 import { ReactNode } from 'react';
 import { AppChrome, type AppChromeVariant } from '@/components/AppChrome';
+import type { StudentTopBarSubjectOption } from '@/components/student/StudentTopBarSubjectSelector';
 
 interface LearningPageShellProps {
   title: string;
@@ -14,6 +15,12 @@ interface LearningPageShellProps {
   appChrome?: AppChromeVariant;
   /** Adds Leadership to the teacher nav (e.g. leadership role pages). */
   appChromeShowLeadershipNav?: boolean;
+  /** Omit the default title block (for custom in-page headers). */
+  hideHeader?: boolean;
+  /** Student chrome: `topbar` removes the side menu (dashboard-style). */
+  appChromeStudentLayout?: 'sidebar' | 'topbar';
+  /** Options for the student top-bar subject switcher. */
+  appChromeStudentSubjects?: StudentTopBarSubjectOption[];
 }
 
 export function LearningPageShell({
@@ -26,34 +33,44 @@ export function LearningPageShell({
   maxWidthClassName = 'max-w-5xl',
   appChrome,
   appChromeShowLeadershipNav = false,
+  hideHeader = false,
+  appChromeStudentLayout = 'sidebar',
+  appChromeStudentSubjects,
 }: LearningPageShellProps) {
   const main = (
     <main className="anx-shell flex-1">
       <div className={`mx-auto w-full ${maxWidthClassName} px-4 sm:px-6`}>
         {hero ? <div className="mb-8">{hero}</div> : null}
-        <header className="mb-8 space-y-4">
-          <div className="flex flex-wrap items-start justify-between gap-4">
-            <div className="space-y-1">
-              <h1 className="text-2xl font-bold tracking-tight sm:text-3xl" style={{ color: 'var(--anx-text)' }}>{title}</h1>
-              {subtitle && <p className="text-sm sm:text-base" style={{ color: 'var(--anx-text-muted)' }}>{subtitle}</p>}
+        {hideHeader ? null : (
+          <header className="mb-8 space-y-4">
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div className="space-y-1">
+                <h1 className="text-2xl font-bold tracking-tight sm:text-3xl" style={{ color: 'var(--anx-text)' }}>{title}</h1>
+                {subtitle && <p className="text-sm sm:text-base" style={{ color: 'var(--anx-text-muted)' }}>{subtitle}</p>}
+              </div>
+              {actions && <div className="flex items-center gap-2">{actions}</div>}
             </div>
-            {actions && <div className="flex items-center gap-2">{actions}</div>}
-          </div>
-          {meta && (
-            <div className="anx-card p-4 text-sm" style={{ color: 'var(--anx-text-secondary)' }}>
-              {meta}
-            </div>
-          )}
-        </header>
+            {meta && (
+              <div className="anx-card p-4 text-sm" style={{ color: 'var(--anx-text-secondary)' }}>
+                {meta}
+              </div>
+            )}
+          </header>
+        )}
 
-        <div className="space-y-6">{children}</div>
+        <div className={hideHeader ? '' : 'space-y-6'}>{children}</div>
       </div>
     </main>
   );
 
   if (appChrome) {
     return (
-      <AppChrome variant={appChrome} showLeadershipNav={appChromeShowLeadershipNav}>
+      <AppChrome
+        variant={appChrome}
+        showLeadershipNav={appChromeShowLeadershipNav}
+        studentLayout={appChrome === 'student' ? appChromeStudentLayout : 'sidebar'}
+        studentTopBarSubjects={appChrome === 'student' ? appChromeStudentSubjects : undefined}
+      >
         {main}
       </AppChrome>
     );
