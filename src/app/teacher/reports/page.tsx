@@ -15,10 +15,14 @@ export default async function TeacherReportsPage() {
   return (
     <LearningPageShell
       title="Reports"
+      titleClassName="text-2xl font-bold tracking-tight text-[#111827] sm:text-3xl"
       subtitle="Understand the impact of your teaching and drive durable learning."
+      subtitleClassName="max-w-2xl text-sm text-[#64748b] sm:text-base"
       appChrome="teacher"
       appChromeShowLeadershipNav={showLeadership}
-      maxWidthClassName="max-w-7xl"
+      maxWidthClassName="max-w-[min(100%,1600px)]"
+      innerClassName="sm:px-8 lg:px-10"
+      contentWrapperClassName="anx-reports-page -mx-4 rounded-2xl bg-[var(--report-canvas)] px-4 py-6 sm:-mx-6 sm:px-6 sm:py-8 lg:-mx-10 lg:px-10"
       actions={<TeacherReportsHeaderActions />}
     >
       <TeacherReportsDashboard />
