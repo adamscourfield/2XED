@@ -239,9 +239,9 @@ export function NewLiveSessionForm({ classrooms, subjects, skillsBySubject }: Pr
         subjectId,
         skillIds: practiceSkillIdsInPlan.join(','),
       });
-      if (classroomId && lastSessionId) {
+      if (classroomId) {
         qs.set('classroomId', classroomId);
-        qs.set('lastSessionId', lastSessionId);
+        if (lastSessionId) qs.set('lastSessionId', lastSessionId);
       }
       const res = await fetch(`/api/teacher/live-items-suggest?${qs.toString()}`);
       if (!res.ok) {
@@ -289,6 +289,7 @@ export function NewLiveSessionForm({ classrooms, subjects, skillsBySubject }: Pr
         subjectId,
         skillIds: practiceSkillIdsInPlan.join(','),
       });
+      if (lastSessionId) qs.set('lastSessionId', lastSessionId);
       const res = await fetch(
         `/api/teacher/classrooms/${classroomId}/opening-check-suggestions?${qs.toString()}`,
       );
@@ -522,6 +523,8 @@ export function NewLiveSessionForm({ classrooms, subjects, skillsBySubject }: Pr
         <p className="mt-1 text-sm leading-relaxed" style={{ color: 'var(--anx-text-muted)' }}>
           Pick questions now so students see them automatically in check mode when the lesson goes live. You can use one
           set for everyone, or different first questions per student (for example recap based on prior lesson or mastery).
+          With a class selected, suggested items are ranked using recent wrong answers in this cohort and, when you pick a
+          last lesson, how the class performed on those live checks.
         </p>
 
         {recentSessions.length > 0 && (
