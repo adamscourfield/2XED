@@ -250,11 +250,23 @@
   }
 
   .anx-landing-card {
-    border-radius: 2.25rem;
+    border-radius: 2.5rem;
     background: #ffffff;
     box-shadow:
-      0 28px 90px rgba(15, 23, 42, 0.07),
-      0 10px 32px rgba(15, 23, 42, 0.04);
+      0 32px 100px rgba(15, 23, 42, 0.075),
+      0 12px 36px rgba(15, 23, 42, 0.045);
+  }
+
+  /* Wordmark sits on a square canvas; size by width so the lettering reads at hero scale */
+  .anx-landing-wordmark {
+    width: min(15.5rem, calc(100vw - 5.5rem));
+    height: auto;
+  }
+
+  @media (min-width: 640px) {
+    .anx-landing-wordmark {
+      width: min(17.5rem, calc(100vw - 6rem));
+    }
   }
 
   /* Regular cards — lifted via background color, no border, no shadow */
