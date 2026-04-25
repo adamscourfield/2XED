@@ -14,10 +14,25 @@ export default function HomePage() {
             lead="Mastery paths, diagnostics, and live lessons — with progress your students can actually read."
             variant="compact"
           >
-            <div className="mt-6 flex justify-center">
+            <div className="mt-6 flex flex-col items-center gap-4">
               <div className="rounded-2xl bg-white/12 p-3 shadow-lg backdrop-blur-sm ring-1 ring-white/25">
-                <Image src="/ember-icon.svg" alt="Ember" width={44} height={55} />
+                <Image
+                  src="/Ember_logo_icon.png"
+                  alt=""
+                  width={80}
+                  height={80}
+                  className="h-14 w-14 sm:h-16 sm:w-16"
+                  aria-hidden
+                />
               </div>
+              <Image
+                src="/Ember_logo_text.png"
+                alt=""
+                width={1024}
+                height={1024}
+                className="h-7 w-auto opacity-95 sm:h-8"
+                aria-hidden
+              />
             </div>
           </StudentFlowHero>
 
