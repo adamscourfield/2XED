@@ -172,7 +172,7 @@ export function TeacherHomeDashboard({ data, displayName, greeting, userRole }: 
         <section className="td-home-card td-home-recent">
           <div className="td-home-card-head">
             <h2 className="td-home-card-title">Recent lessons</h2>
-            <Link href="/teacher/live/new" className="td-home-link-more">
+            <Link href="/teacher/lessons" className="td-home-link-more">
               View all lessons
               <span aria-hidden> ›</span>
             </Link>
