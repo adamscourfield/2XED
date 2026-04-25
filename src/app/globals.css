@@ -2415,3 +2415,458 @@
     border-bottom: 1px solid var(--anx-border);
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LIVE WORKSPACE — Teacher live lesson workspace (canvas-first)
+   Calm, classroom-friendly layout: persistent canvas with vertical toolbar,
+   right-side teaching control panel, and a thin teacher control bar.
+   ═══════════════════════════════════════════════════════════════════════════ */
+@layer components {
+  .anx-workspace-shell {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    flex: 1 1 auto;
+    min-height: 0;
+    height: 100%;
+    max-height: 100%;
+    overflow: hidden;
+    background: var(--anx-surface-bright);
+  }
+
+  .anx-workspace-topbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.875rem;
+    padding: 0.625rem 1rem;
+    background: var(--anx-surface-container-lowest);
+    border-bottom: 1px solid var(--anx-outline-variant);
+    z-index: 10;
+  }
+
+  .anx-workspace-body {
+    display: grid;
+    grid-template-columns: 56px minmax(0, 1fr) 360px;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .anx-workspace-toolbar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.75rem 0.375rem;
+    background: var(--anx-surface-container-lowest);
+    border-right: 1px solid var(--anx-outline-variant);
+  }
+
+  .anx-tool-btn {
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    color: var(--anx-text-secondary);
+    background: transparent;
+    border: 1px solid transparent;
+    transition: background 160ms var(--anx-transition-calm), color 160ms var(--anx-transition-calm), border-color 160ms var(--anx-transition-calm);
+    cursor: pointer;
+  }
+  .anx-tool-btn:hover {
+    background: var(--anx-surface-container);
+    color: var(--anx-text);
+  }
+  .anx-tool-btn[aria-pressed='true'] {
+    background: var(--anx-primary-soft);
+    color: var(--anx-primary);
+    border-color: rgba(74, 64, 224, 0.18);
+  }
+  .anx-tool-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .anx-tool-divider {
+    width: 24px;
+    height: 1px;
+    background: var(--anx-outline-variant);
+    margin: 0.25rem 0;
+  }
+
+  .anx-tool-swatch {
+    width: 22px;
+    height: 22px;
+    border-radius: 999px;
+    border: 2px solid var(--anx-border);
+    cursor: pointer;
+    padding: 0;
+  }
+  .anx-tool-swatch[aria-pressed='true'] {
+    border-color: var(--anx-primary);
+    box-shadow: 0 0 0 2px var(--anx-primary-glow);
+  }
+
+  .anx-canvas-stage {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    background: var(--anx-surface-bright);
+    padding: 1rem 1.25rem 0.75rem;
+    overflow: hidden;
+  }
+
+  .anx-canvas-board {
+    flex: 1 1 auto;
+    min-height: 0;
+    background: var(--anx-surface-container-lowest);
+    border: 1px solid var(--anx-outline-variant);
+    border-radius: 18px;
+    box-shadow: var(--anx-shadow-sm);
+    overflow: hidden;
+    position: relative;
+  }
+
+  .anx-canvas-surface {
+    width: 100%;
+    height: 100%;
+    display: block;
+    touch-action: none;
+    cursor: crosshair;
+  }
+
+  .anx-canvas-floating {
+    position: absolute;
+    bottom: 0.875rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.375rem 0.5rem;
+    background: var(--anx-surface-container-lowest);
+    border: 1px solid var(--anx-outline-variant);
+    border-radius: 999px;
+    box-shadow: var(--anx-shadow-sm);
+  }
+
+  .anx-canvas-floating .anx-tool-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+  }
+
+  .anx-canvas-floating-label {
+    padding: 0 0.5rem;
+    font-size: 0.75rem;
+    color: var(--anx-text-muted);
+    border-left: 1px solid var(--anx-outline-variant);
+    margin-left: 0.25rem;
+  }
+
+  /* Right-hand teaching control panel */
+  .anx-workspace-side {
+    overflow-y: auto;
+    background: var(--anx-surface-container-lowest);
+    border-left: 1px solid var(--anx-outline-variant);
+    padding: 1rem 1rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .anx-mode-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.5rem;
+  }
+
+  .anx-mode-tile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    padding: 0.625rem 0.25rem;
+    background: var(--anx-surface-container-lowest);
+    border: 1px solid var(--anx-outline-variant);
+    border-radius: 14px;
+    color: var(--anx-text-secondary);
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 160ms var(--anx-transition-calm),
+                border-color 160ms var(--anx-transition-calm),
+                color 160ms var(--anx-transition-calm);
+  }
+  .anx-mode-tile:hover {
+    background: var(--anx-surface-container-low);
+  }
+  .anx-mode-tile[aria-pressed='true'] {
+    background: var(--anx-primary-soft);
+    border-color: rgba(74, 64, 224, 0.32);
+    color: var(--anx-primary);
+  }
+  .anx-mode-tile-icon {
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    background: var(--anx-surface-container-low);
+    color: var(--anx-text-secondary);
+  }
+  .anx-mode-tile[aria-pressed='true'] .anx-mode-tile-icon {
+    background: var(--anx-primary);
+    color: var(--anx-on-primary, #fff);
+  }
+
+  .anx-signals-card {
+    background: var(--anx-surface-container-lowest);
+    border: 1px solid var(--anx-outline-variant);
+    border-radius: 16px;
+    padding: 0.875rem 1rem;
+  }
+
+  .anx-signal-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    font-size: 0.8125rem;
+    line-height: 1.45;
+    color: var(--anx-text);
+  }
+  .anx-signal-row + .anx-signal-row { margin-top: 0.5rem; }
+  .anx-signal-dot {
+    width: 16px;
+    height: 16px;
+    flex: 0 0 16px;
+    margin-top: 2px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+  }
+  .anx-signal-dot-ok    { background: var(--anx-success-soft); color: var(--anx-success); }
+  .anx-signal-dot-warn  { background: var(--anx-warning-soft); color: var(--anx-warning-text); }
+  .anx-signal-dot-issue { background: var(--anx-danger-soft);  color: var(--anx-danger-text); }
+
+  .anx-class-overview-bar {
+    display: flex;
+    height: 8px;
+    width: 100%;
+    border-radius: 999px;
+    overflow: hidden;
+    background: var(--anx-surface-container-high);
+  }
+  .anx-class-overview-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.5rem;
+    margin-top: 0.625rem;
+  }
+  .anx-class-overview-cell {
+    text-align: center;
+    padding: 0.25rem 0;
+  }
+  .anx-class-overview-cell-num {
+    font-size: 1.125rem;
+    font-weight: 700;
+    line-height: 1.1;
+  }
+  .anx-class-overview-cell-label {
+    margin-top: 2px;
+    font-size: 0.6875rem;
+    color: var(--anx-text-muted);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  /* Thin bottom teacher control bar */
+  .anx-workspace-bottombar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: var(--anx-surface-container-lowest);
+    border-top: 1px solid var(--anx-outline-variant);
+    z-index: 10;
+  }
+  .anx-workspace-bottombar-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.875rem;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--anx-text-secondary);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    transition: background 160ms var(--anx-transition-calm), color 160ms var(--anx-transition-calm);
+    border: 1px solid transparent;
+    cursor: pointer;
+  }
+  .anx-workspace-bottombar-btn:hover {
+    background: var(--anx-surface-container);
+    color: var(--anx-text);
+  }
+  .anx-workspace-bottombar-btn[data-tone='danger'] {
+    color: var(--anx-danger-text);
+  }
+  .anx-workspace-bottombar-btn[data-tone='danger']:hover {
+    background: var(--anx-danger-soft);
+  }
+
+  /* Live badge pill */
+  .anx-live-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.125rem 0.625rem;
+    border-radius: 999px;
+    background: var(--anx-danger-soft);
+    color: var(--anx-danger-text);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .anx-live-pill-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: var(--anx-danger-text);
+    animation: anxLivePulse 1.8s ease-out infinite;
+  }
+
+  /* Practice mode badge for student practice page */
+  .anx-practice-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.625rem;
+    border-radius: 999px;
+    background: var(--anx-primary-soft);
+    color: var(--anx-primary);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+
+  /* Student practice — progress dots */
+  .anx-progress-dots {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .anx-progress-dot {
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    background: var(--anx-surface-container-lowest);
+    color: var(--anx-text-muted);
+    border: 1.5px solid var(--anx-outline-variant);
+  }
+  .anx-progress-dot[data-state='done'] {
+    background: var(--anx-success);
+    color: white;
+    border-color: var(--anx-success);
+  }
+  .anx-progress-dot[data-state='current'] {
+    background: var(--anx-primary-soft);
+    color: var(--anx-primary);
+    border-color: var(--anx-primary);
+  }
+  .anx-progress-rail {
+    flex: 0 0 16px;
+    height: 2px;
+    background: var(--anx-outline-variant);
+    border-radius: 1px;
+  }
+  .anx-progress-rail[data-state='done'] {
+    background: var(--anx-success);
+  }
+
+  .anx-confidence-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+  .anx-confidence-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.75rem 0.875rem;
+    border-radius: 14px;
+    background: var(--anx-surface-container-lowest);
+    border: 1px solid var(--anx-outline-variant);
+    color: var(--anx-text);
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 160ms var(--anx-transition-calm), border-color 160ms var(--anx-transition-calm);
+  }
+  .anx-confidence-btn:hover {
+    background: var(--anx-surface-container-low);
+  }
+  .anx-confidence-btn[aria-pressed='true'] {
+    border-color: var(--anx-primary);
+    background: var(--anx-primary-soft);
+  }
+  .anx-confidence-btn-icon {
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+  }
+  .anx-confidence-btn-icon[data-tone='low']  { background: var(--anx-danger-soft);  color: var(--anx-danger-text); }
+  .anx-confidence-btn-icon[data-tone='mid']  { background: var(--anx-warning-soft); color: var(--anx-warning-text); }
+  .anx-confidence-btn-icon[data-tone='high'] { background: var(--anx-success-soft); color: var(--anx-success); }
+
+  .anx-think-prompt {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.875rem 1rem;
+    border-radius: 14px;
+    background: var(--anx-primary-soft);
+    border: 1px solid rgba(74, 64, 224, 0.16);
+    color: var(--anx-text);
+  }
+}
+
+@media (max-width: 1100px) {
+  .anx-workspace-body {
+    grid-template-columns: 56px minmax(0, 1fr) 320px;
+  }
+}
+
+@media (max-width: 900px) {
+  .anx-workspace-body {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+    overflow-y: auto;
+  }
+  .anx-workspace-toolbar {
+    flex-direction: row;
+    border-right: none;
+    border-bottom: 1px solid var(--anx-outline-variant);
+    overflow-x: auto;
+  }
+  .anx-workspace-side {
+    border-left: none;
+    border-top: 1px solid var(--anx-outline-variant);
+  }
+}

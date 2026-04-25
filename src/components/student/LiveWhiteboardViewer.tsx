@@ -11,8 +11,18 @@ interface Props {
 }
 
 function paint(ctx: CanvasRenderingContext2D, strokes: LiveStroke[], w: number, h: number) {
-  ctx.fillStyle = '#0f1419';
+  // Calm classroom-friendly background — matches the teacher's annotation canvas.
+  ctx.fillStyle = '#fbfbfd';
   ctx.fillRect(0, 0, w, h);
+  ctx.fillStyle = '#e6e6ef';
+  const step = 32;
+  for (let y = step; y < h; y += step) {
+    for (let x = step; x < w; x += step) {
+      ctx.beginPath();
+      ctx.arc(x, y, 1.2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
   for (const stroke of strokes) {
     if (stroke.points.length < 2) continue;
     ctx.beginPath();
