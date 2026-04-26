@@ -41,6 +41,8 @@ interface Item {
   question: string;
   type: string;
   options: unknown;
+  /** Present for opening checks / differentiated queue */
+  skillId?: string;
 }
 
 interface ExplanationRouteData {
@@ -78,7 +80,7 @@ type AppState =
   | { phase: 'explanation'; session: JoinedSession; explanationRoute: ExplanationRouteData; stepIndex: number; whiteboard: LiveWhiteboardPayload | null }
   | { phase: 'question'; session: JoinedSession; item: Item }
   | { phase: 'practice'; session: JoinedSession; item: Item; index: number; total: number }
-  | { phase: 'feedback'; session: JoinedSession; correct: boolean; nextItem: Item | null; index: number; total: number }
+  | { phase: 'feedback'; session: JoinedSession; correct: boolean; nextItem: (Item & { skillId?: string }) | null; index: number; total: number }
   | { phase: 'done'; session: JoinedSession };
 
 function broadcastTargetsStudentLane(content: CurrentContent, studentLane: string | null | undefined): boolean {
@@ -109,6 +111,7 @@ export default function StudentLivePage() {
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const sessionRef = useRef<JoinedSession | null>(null);
   const liveWhiteboardRef = useRef<LiveWhiteboardPayload | null>(null);
+  const lastExplanationTelemetryIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (appState.phase !== 'join') {
@@ -155,7 +158,9 @@ export default function StudentLivePage() {
 
         if (data.pendingRecheckItem) {
           const sess = sessionRef.current;
-          if (sess && appState.phase !== 'question') {
+          const skipRecheckPull =
+            appState.phase === 'question' || appState.phase === 'explanation' || appState.phase === 'feedback';
+          if (sess && !skipRecheckPull) {
             setAppState({ phase: 'question', session: sess, item: data.pendingRecheckItem });
             return;
           }
@@ -263,6 +268,7 @@ export default function StudentLivePage() {
       lastPhaseIndexRef.current = -1;
       lastBroadcastAtRef.current = null;
       lastWhiteboardVersionRef.current = -1;
+      lastExplanationTelemetryIdRef.current = null;
       setAppState({ phase: 'waiting', session });
     } catch {
       setError('Network error. Please try again.');
@@ -275,7 +281,7 @@ export default function StudentLivePage() {
     if (appState.phase !== 'question') return;
     setSubmitError(null);
     const { session, item } = appState;
-    const skillId = session.skill?.id;
+    const skillId = item.skillId ?? session.skill?.id;
     if (!skillId) { setSubmitError('No skill associated with this session.'); return; }
 
     setLoading(true);
@@ -296,8 +302,15 @@ export default function StudentLivePage() {
         setSubmitError(data.error ?? 'Failed to submit answer.');
         return;
       }
-      const result: { correct: boolean; nextItem: Item | null } = await res.json();
-      setAppState({ phase: 'feedback', session, correct: result.correct, nextItem: result.nextItem, index: 1, total: 1 });
+      const result: { correct: boolean; nextItem: (Item & { skillId?: string }) | null } = await res.json();
+      setAppState({
+        phase: 'feedback',
+        session,
+        correct: result.correct,
+        nextItem: result.nextItem,
+        index: 1,
+        total: 1,
+      });
     } catch {
       setSubmitError('Network error. Please try again.');
     } finally {
@@ -310,7 +323,7 @@ export default function StudentLivePage() {
     void _confidence; // confidence is captured client-side; backend integration is left for a follow-up
     setSubmitError(null);
     const { session, item, index, total } = appState;
-    const skillId = session.skill?.id;
+    const skillId = item.skillId ?? session.skill?.id;
     if (!skillId) { setSubmitError('No skill associated with this session.'); return; }
 
     setLoading(true);
@@ -449,7 +462,23 @@ export default function StudentLivePage() {
               onClick={() => {
                 const sess = appState.session;
                 if (appState.nextItem) {
-                  setAppState({ phase: 'practice', session: sess, item: appState.nextItem, index: appState.index + 1, total: appState.total });
+                  const ni = appState.nextItem;
+                  const mergedSession =
+                    ni.skillId && sess.skill?.id !== ni.skillId
+                      ? { ...sess, skill: { id: ni.skillId, code: sess.skill?.code ?? '', name: sess.skill?.name ?? '' } }
+                      : sess;
+                  const resumePractice = appState.total > 1;
+                  if (resumePractice) {
+                    setAppState({
+                      phase: 'practice',
+                      session: mergedSession,
+                      item: ni,
+                      index: appState.index + 1,
+                      total: appState.total,
+                    });
+                  } else {
+                    setAppState({ phase: 'question', session: mergedSession, item: ni });
+                  }
                 } else {
                   setAppState({ phase: 'waiting', session: sess });
                 }
@@ -544,6 +573,26 @@ export default function StudentLivePage() {
     screen = { kind: 'message', message: appState.message };
   } else if (appState.phase === 'whiteboard') {
     screen = { kind: 'watch', whiteboard: appState.whiteboard };
+  } else if (appState.phase === 'explanation') {
+    const ex = appState.explanation;
+    screen = {
+      kind: 'explanation',
+      explanation: ex,
+      whiteboard: liveWhiteboardRef.current,
+      onDismiss: () => {
+        void fetch(`/api/live-sessions/${appState.session.sessionId}/explanation-event`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            eventType: 'acknowledged',
+            explanationRouteId: ex.id,
+            skillId: ex.skillId,
+            routeType: ex.routeType,
+          }),
+        }).catch(() => {});
+        setAppState({ phase: 'waiting', session: appState.session });
+      },
+    };
   } else if (appState.phase === 'question') {
     const opts = Array.isArray(appState.item.options) ? (appState.item.options as string[]) : [];
     const stem = stripStudentQuestionLabel(appState.item.question) || appState.item.question;
