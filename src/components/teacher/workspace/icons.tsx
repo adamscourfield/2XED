@@ -50,20 +50,23 @@ export const EraserIcon = (p: IconProps = {}) =>
   );
 
 export const ShapeIcon = (p: IconProps = {}) =>
-  base(
-    <>
-      <rect x="3" y="3" width="8" height="8" rx="1.5" />
-      <circle cx="17" cy="17" r="4.5" />
-    </>,
-    p,
-  );
+  base(<rect x="5" y="5" width="14" height="14" rx="2.5" />, p);
 
 export const TextIcon = (p: IconProps = {}) =>
   base(
     <>
-      <path d="M5 5h14" />
-      <path d="M12 5v14" />
-      <path d="M9 19h6" />
+      <path d="M12 4v16" />
+      <path d="M8 4h8" />
+    </>,
+    p,
+  );
+
+/** Diagonal arrow (line tool / pointer affordance). */
+export const ArrowLineIcon = (p: IconProps = {}) =>
+  base(
+    <>
+      <path d="M5 19L19 5" />
+      <path d="M19 5h-6M19 5v6" />
     </>,
     p,
   );

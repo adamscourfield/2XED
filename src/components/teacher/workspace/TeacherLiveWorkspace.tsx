@@ -197,6 +197,8 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
   const [copied, setCopied] = useState(false);
   const [endingPrompt, setEndingPrompt] = useState(false);
   const [latestVersion, setLatestVersion] = useState(0);
+  const [canUndo, setCanUndo] = useState(false);
+  const [canRedo, setCanRedo] = useState(false);
 
   const canvasRef = useRef<AnnotationCanvasHandle>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -532,17 +534,18 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
 
       {/* ── Body ────────────────────────────────────────────────────────── */}
       <div className="anx-workspace-body">
-        <AnnotationToolbar
-          tool={tool}
-          color={color}
-          onToolChange={setTool}
-          onColorChange={setColor}
-          onUndo={() => canvasRef.current?.undo()}
-          onRedo={() => canvasRef.current?.redo()}
-          onInsertImage={handleInsertImageRequest}
-        />
-
         <div className="anx-canvas-stage">
+          <AnnotationToolbar
+            tool={tool}
+            color={color}
+            canUndo={canUndo}
+            canRedo={canRedo}
+            onToolChange={setTool}
+            onColorChange={setColor}
+            onUndo={() => canvasRef.current?.undo()}
+            onRedo={() => canvasRef.current?.redo()}
+            onInsertImage={handleInsertImageRequest}
+          />
           <div className="anx-canvas-board">
             <AnnotationCanvas
               ref={canvasRef}
@@ -550,6 +553,10 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
               color={color}
               width={3}
               onStateChange={scheduleBroadcast}
+              onHistoryChange={(u, r) => {
+                setCanUndo(u);
+                setCanRedo(r);
+              }}
               watermark={
                 sessionStatus === 'LOBBY' ? 'Lesson starts when you click Start' : undefined
               }
