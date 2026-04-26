@@ -1,8 +1,48 @@
 import { prisma } from '@/db/prisma';
 import { emitEvent } from '@/features/telemetry/eventService';
 import { calculateMastery, scheduleNextReview, MASTERY_STABLE_THRESHOLD } from './masteryService';
-import { deriveSkillStatus } from './skillStatus';
+import { deriveSkillStatus, type SkillStatus } from './skillStatus';
 import { grantReward } from '@/features/gamification/gamificationService';
+
+export interface MasteryUpdateResult {
+  mastery: number;
+  newConfirmedCount: number;
+  newStreak: number;
+  isDueReview: boolean;
+  previousStatus: SkillStatus;
+  nextStatus: SkillStatus;
+}
+
+export function computeMasteryUpdate(params: {
+  mastery: number;
+  existing: { mastery: number; confirmedCount: number; streak: number; nextReviewAt: Date | null } | null;
+  mode: 'PRACTICE' | 'REVIEW';
+  now: Date;
+}): MasteryUpdateResult {
+  const { mastery, existing, mode, now } = params;
+
+  const prevConfirmedCount = existing?.confirmedCount ?? 0;
+  const prevStreak = existing?.streak ?? 0;
+
+  const isDueReview = mode === 'REVIEW' && existing?.nextReviewAt != null && existing.nextReviewAt <= now;
+
+  let newConfirmedCount = prevConfirmedCount;
+  let newStreak = prevStreak;
+
+  if (mastery >= MASTERY_STABLE_THRESHOLD) {
+    newStreak = prevStreak + 1;
+    if (isDueReview) {
+      newConfirmedCount = Math.min(prevConfirmedCount + 1, 2);
+    }
+  } else {
+    newStreak = 0;
+  }
+
+  const previousStatus = deriveSkillStatus(existing?.mastery ?? 0, prevConfirmedCount);
+  const nextStatus = deriveSkillStatus(mastery, newConfirmedCount);
+
+  return { mastery, newConfirmedCount, newStreak, isDueReview, previousStatus, nextStatus };
+}
 
 export async function updateSkillMastery(
   userId: string,
@@ -20,27 +60,12 @@ export async function updateSkillMastery(
     select: { mastery: true, confirmedCount: true, streak: true, nextReviewAt: true },
   });
 
-  const prevConfirmedCount = existing?.confirmedCount ?? 0;
-  const prevStreak = existing?.streak ?? 0;
-
-  // confirmedCount only increments when completing a scheduled due review
-  const isDueReview = mode === 'REVIEW' && existing?.nextReviewAt != null && existing.nextReviewAt <= now;
-
-  let newConfirmedCount = prevConfirmedCount;
-  let newStreak = prevStreak;
-
-  if (mastery >= MASTERY_STABLE_THRESHOLD) {
-    newStreak = prevStreak + 1;
-    if (isDueReview) {
-      newConfirmedCount = Math.min(prevConfirmedCount + 1, 2);
-    }
-  } else {
-    // Failed review: confirmedCount stays unchanged; streak resets
-    newStreak = 0;
-  }
-
-  const previousStatus = deriveSkillStatus(existing?.mastery ?? 0, prevConfirmedCount);
-  const nextStatus = deriveSkillStatus(mastery, newConfirmedCount);
+  const { newConfirmedCount, newStreak, isDueReview, previousStatus, nextStatus } = computeMasteryUpdate({
+    mastery,
+    existing,
+    mode,
+    now,
+  });
   const nextReviewAt = scheduleNextReview(mastery, newConfirmedCount, now);
 
   const updateData = {
