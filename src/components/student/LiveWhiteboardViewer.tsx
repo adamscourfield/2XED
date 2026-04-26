@@ -8,19 +8,23 @@ interface Props {
   logicalHeight: number;
   strokes: LiveStroke[];
   className?: string;
+  /** When true, skips the background fill so the canvas is transparent (for overlaying on content). */
+  transparent?: boolean;
 }
 
-function paint(ctx: CanvasRenderingContext2D, strokes: LiveStroke[], w: number, h: number) {
-  // Calm classroom-friendly background — matches the teacher's annotation canvas.
-  ctx.fillStyle = '#fbfbfd';
-  ctx.fillRect(0, 0, w, h);
-  ctx.fillStyle = '#e6e6ef';
-  const step = 32;
-  for (let y = step; y < h; y += step) {
-    for (let x = step; x < w; x += step) {
-      ctx.beginPath();
-      ctx.arc(x, y, 1.2, 0, Math.PI * 2);
-      ctx.fill();
+function paint(ctx: CanvasRenderingContext2D, strokes: LiveStroke[], w: number, h: number, transparent?: boolean) {
+  if (!transparent) {
+    // Calm classroom-friendly background — matches the teacher's annotation canvas.
+    ctx.fillStyle = '#fbfbfd';
+    ctx.fillRect(0, 0, w, h);
+    ctx.fillStyle = '#e6e6ef';
+    const step = 32;
+    for (let y = step; y < h; y += step) {
+      for (let x = step; x < w; x += step) {
+        ctx.beginPath();
+        ctx.arc(x, y, 1.2, 0, Math.PI * 2);
+        ctx.fill();
+      }
     }
   }
   for (const stroke of strokes) {
@@ -39,7 +43,7 @@ function paint(ctx: CanvasRenderingContext2D, strokes: LiveStroke[], w: number, 
   }
 }
 
-export function LiveWhiteboardViewer({ logicalWidth, logicalHeight, strokes, className }: Props) {
+export function LiveWhiteboardViewer({ logicalWidth, logicalHeight, strokes, className, transparent }: Props) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const layoutRef = useRef({ cw: 0, ch: 0, dpr: 1 });
@@ -84,13 +88,17 @@ export function LiveWhiteboardViewer({ logicalWidth, logicalHeight, strokes, cla
     ctx.clearRect(0, 0, cw, ch);
     ctx.save();
     ctx.scale(cw / logicalWidth, ch / logicalHeight);
-    paint(ctx, strokes, logicalWidth, logicalHeight);
+    paint(ctx, strokes, logicalWidth, logicalHeight, transparent);
     ctx.restore();
   }, [logicalWidth, logicalHeight, strokes]);
 
   return (
     <div ref={wrapRef} className={`flex min-h-0 w-full flex-1 flex-col items-center justify-center ${className ?? ''}`}>
-      <canvas ref={canvasRef} className="touch-none rounded-lg shadow-lg" style={{ maxWidth: '100%', maxHeight: '100%' }} />
+      <canvas
+        ref={canvasRef}
+        className="touch-none rounded-lg shadow-lg"
+        style={{ maxWidth: '100%', maxHeight: '100%', background: transparent ? 'transparent' : undefined }}
+      />
     </div>
   );
 }

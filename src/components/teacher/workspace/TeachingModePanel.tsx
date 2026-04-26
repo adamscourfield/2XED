@@ -10,6 +10,12 @@ import {
 
 export type TeachingMode = 'CHECK' | 'MODEL' | 'EXPLAIN' | 'PRACTICE';
 
+interface ActiveExplanationInfo {
+  routeType: 'A' | 'B' | 'C';
+  stepIndex: number;
+  totalSteps: number;
+}
+
 interface Props {
   mode: TeachingMode;
   onModeChange: (mode: TeachingMode) => void;
@@ -17,6 +23,10 @@ interface Props {
   onNewCheckQuestion?: () => void;
   /** Trigger inserting bridging examples / repairs into the canvas. */
   onExplainOption?: (option: 'easier' | 'wrong-vs-right' | 'misconception' | 'comparison') => void;
+  /** Active explanation route info — shown as step controls in EXPLAIN mode. */
+  activeExplanation?: ActiveExplanationInfo | null;
+  /** Called when teacher advances/retreats the explanation step. */
+  onStepChange?: (step: number) => void;
   /** Trigger pushing practice work to students. */
   onAssignPractice?: (
     kind: 'easier' | 'similar' | 'challenge' | 'misconception',
@@ -76,21 +86,69 @@ function ModelMode() {
   );
 }
 
-function ExplainMode({ onExplainOption }: { onExplainOption?: Props['onExplainOption'] }) {
+function ExplainMode({
+  onExplainOption,
+  activeExplanation,
+  onStepChange,
+}: {
+  onExplainOption?: Props['onExplainOption'];
+  activeExplanation?: ActiveExplanationInfo | null;
+  onStepChange?: (step: number) => void;
+}) {
   const options: Array<{ key: Parameters<NonNullable<Props['onExplainOption']>>[0]; label: string; helper: string }> = [
     { key: 'easier', label: 'Easier model', helper: 'Bridge with a simpler worked example.' },
     { key: 'wrong-vs-right', label: 'Wrong vs right', helper: 'Compare a common mistake with correct working.' },
     { key: 'misconception', label: 'Misconception repair', helper: 'Insert a targeted correction.' },
     { key: 'comparison', label: 'Comparison example', helper: 'Show two related cases side by side.' },
   ];
+
+  const routeLabel: Record<string, string> = { A: 'Standard', B: 'Easier', C: 'Misconception repair' };
+
   return (
     <div className="flex flex-col gap-3">
       <div>
         <h3 className="text-base font-bold" style={{ color: 'var(--anx-text)' }}>Explain again</h3>
         <p className="mt-1 text-sm" style={{ color: 'var(--anx-text-muted)' }}>
-          Pick a bridging move. It drops onto the canvas — you can keep annotating.
+          {activeExplanation
+            ? 'Students are viewing this explanation. Advance the steps below.'
+            : 'Pick a bridging move. The explanation displays on student devices.'}
         </p>
       </div>
+
+      {activeExplanation && (
+        <div
+          className="rounded-2xl border px-3.5 py-3 flex flex-col gap-2"
+          style={{ borderColor: 'var(--anx-primary)', background: 'var(--anx-primary-soft)' }}
+        >
+          <p className="text-xs font-semibold" style={{ color: 'var(--anx-primary)' }}>
+            Route {activeExplanation.routeType} — {routeLabel[activeExplanation.routeType]}
+          </p>
+          <div className="flex items-center justify-between gap-2">
+            <button
+              type="button"
+              onClick={() => onStepChange?.(activeExplanation.stepIndex - 1)}
+              disabled={activeExplanation.stepIndex === 0}
+              className="rounded-lg border px-3 py-1.5 text-sm font-medium transition hover:bg-[var(--anx-surface-container-low)] disabled:opacity-30"
+              style={{ borderColor: 'var(--anx-outline-variant)', color: 'var(--anx-text)' }}
+            >
+              ← Prev
+            </button>
+            <span className="text-sm font-medium" style={{ color: 'var(--anx-text)' }}>
+              Step {activeExplanation.stepIndex + 1} / {activeExplanation.totalSteps}
+            </span>
+            <button
+              type="button"
+              onClick={() => onStepChange?.(activeExplanation.stepIndex + 1)}
+              disabled={activeExplanation.stepIndex === activeExplanation.totalSteps - 1}
+              className="rounded-lg border px-3 py-1.5 text-sm font-medium transition hover:bg-[var(--anx-surface-container-low)] disabled:opacity-30"
+              style={{ borderColor: 'var(--anx-outline-variant)', color: 'var(--anx-text)' }}
+            >
+              Next →
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 gap-2">
         {options.map((opt) => (
           <button
@@ -160,6 +218,8 @@ export function TeachingModePanel({
   onModeChange,
   onNewCheckQuestion,
   onExplainOption,
+  activeExplanation,
+  onStepChange,
   onAssignPractice,
 }: Props) {
   return (
@@ -192,7 +252,13 @@ export function TeachingModePanel({
       <div className="mt-4">
         {mode === 'CHECK' && <CheckMode onNewCheckQuestion={onNewCheckQuestion} />}
         {mode === 'MODEL' && <ModelMode />}
-        {mode === 'EXPLAIN' && <ExplainMode onExplainOption={onExplainOption} />}
+        {mode === 'EXPLAIN' && (
+          <ExplainMode
+            onExplainOption={onExplainOption}
+            activeExplanation={activeExplanation}
+            onStepChange={onStepChange}
+          />
+        )}
         {mode === 'PRACTICE' && <PracticeMode onAssignPractice={onAssignPractice} />}
       </div>
     </section>

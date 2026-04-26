@@ -11,6 +11,7 @@ const schema = z.object({
   // The content to push — can be an explanation route id, a message, etc.
   contentType: z.enum(['EXPLANATION', 'MESSAGE', 'PHASE', 'WHITEBOARD']),
   explanationRouteId: z.string().optional(),
+  stepIndex: z.number().int().min(0).optional(),
   message: z.string().max(500).optional(),
   phaseIndex: z.number().int().nonnegative().optional(),
   whiteboard: LiveWhiteboardPayloadSchema.optional(),
@@ -42,7 +43,7 @@ export async function POST(req: NextRequest, { params }: Props) {
   if (!liveSession) return NextResponse.json({ error: 'Session not found' }, { status: 404 });
   if (liveSession.teacherUserId !== userId) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
-  const { lanes, contentType, explanationRouteId, message, phaseIndex, whiteboard } = parsed.data;
+  const { lanes, contentType, explanationRouteId, stepIndex, message, phaseIndex, whiteboard } = parsed.data;
 
   const broadcastPayload: Record<string, unknown> = {
     contentType,
@@ -74,6 +75,7 @@ export async function POST(req: NextRequest, { params }: Props) {
     if (!route) return NextResponse.json({ error: 'Explanation route not found' }, { status: 404 });
     broadcastPayload.explanationRouteId = explanationRouteId;
     broadcastPayload.explanation = route;
+    broadcastPayload.stepIndex = stepIndex ?? 0;
   }
 
   if (contentType === 'MESSAGE' && message) {

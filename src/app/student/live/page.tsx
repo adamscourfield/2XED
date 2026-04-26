@@ -8,6 +8,7 @@ import { redirect } from 'next/navigation';
 import { AppChrome } from '@/components/AppChrome';
 import { StudentFlowHero } from '@/components/student/StudentFlowHero';
 import { StudentLiveView, type StudentLiveScreen } from '@/components/student/live/StudentLiveView';
+import { StudentExplanationView } from '@/components/student/live/StudentExplanationView';
 import {
   StudentPracticeView,
   type Confidence,
@@ -42,6 +43,14 @@ interface Item {
   options: unknown;
 }
 
+interface ExplanationRouteData {
+  id: string;
+  routeType: string;
+  misconceptionSummary: string;
+  workedExample: string;
+  animationSchema: unknown;
+}
+
 interface CurrentContent {
   contentType: 'EXPLANATION' | 'MESSAGE' | 'PHASE' | 'WHITEBOARD';
   targetLanes?: string[];
@@ -49,6 +58,8 @@ interface CurrentContent {
   phaseIndex?: number;
   broadcastAt?: string;
   whiteboard?: LiveWhiteboardPayload;
+  explanation?: ExplanationRouteData;
+  stepIndex?: number;
 }
 
 interface SessionPoll {
@@ -64,6 +75,7 @@ type AppState =
   | { phase: 'waiting'; session: JoinedSession }
   | { phase: 'between-phases'; session: JoinedSession; message: string }
   | { phase: 'whiteboard'; session: JoinedSession; whiteboard: LiveWhiteboardPayload }
+  | { phase: 'explanation'; session: JoinedSession; explanationRoute: ExplanationRouteData; stepIndex: number; whiteboard: LiveWhiteboardPayload | null }
   | { phase: 'question'; session: JoinedSession; item: Item }
   | { phase: 'practice'; session: JoinedSession; item: Item; index: number; total: number }
   | { phase: 'feedback'; session: JoinedSession; correct: boolean; nextItem: Item | null; index: number; total: number }
@@ -103,6 +115,9 @@ export default function StudentLivePage() {
       sessionRef.current = (appState as { session: JoinedSession }).session ?? null;
     }
     if (appState.phase === 'whiteboard') {
+      liveWhiteboardRef.current = appState.whiteboard;
+    }
+    if (appState.phase === 'explanation') {
       liveWhiteboardRef.current = appState.whiteboard;
     }
   }, [appState]);
@@ -150,7 +165,18 @@ export default function StudentLivePage() {
           lastBroadcastAtRef.current = data.currentContent.broadcastAt ?? null;
           const cc = data.currentContent;
           const laneOk = broadcastTargetsStudentLane(cc, data.studentLane);
-          if (cc.contentType === 'WHITEBOARD' && laneOk && cc.whiteboard) {
+          if (cc.contentType === 'EXPLANATION' && laneOk && cc.explanation) {
+            const sess = sessionRef.current;
+            if (sess) {
+              setAppState({
+                phase: 'explanation',
+                session: sess,
+                explanationRoute: cc.explanation,
+                stepIndex: cc.stepIndex ?? 0,
+                whiteboard: liveWhiteboardRef.current,
+              });
+            }
+          } else if (cc.contentType === 'WHITEBOARD' && laneOk && cc.whiteboard) {
             const wb = cc.whiteboard;
             const sess = sessionRef.current;
             if (!sess) return;
@@ -162,7 +188,11 @@ export default function StudentLivePage() {
               if (wb.version >= lastWhiteboardVersionRef.current) {
                 lastWhiteboardVersionRef.current = wb.version;
                 liveWhiteboardRef.current = wb;
-                setAppState({ phase: 'whiteboard', session: sess, whiteboard: wb });
+                // Stay in explanation phase on whiteboard updates — teacher is annotating
+                setAppState((prev) => {
+                  if (prev.phase === 'explanation') return { ...prev, whiteboard: wb };
+                  return { phase: 'whiteboard', session: sess, whiteboard: wb };
+                });
               }
             }
           } else if (cc.contentType === 'MESSAGE' && laneOk && cc.message) {
@@ -182,7 +212,7 @@ export default function StudentLivePage() {
       }
     }
 
-    const pollMs = appState.phase === 'whiteboard' ? 1500 : 3000;
+    const pollMs = appState.phase === 'whiteboard' || appState.phase === 'explanation' ? 1500 : 3000;
     pollRef.current = setInterval(pollSession, pollMs);
     return () => { if (pollRef.current) clearInterval(pollRef.current); };
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -478,6 +508,27 @@ export default function StudentLivePage() {
         }}
         onNeedHelp={() => {
           void fetch(`/api/live-sessions/${appState.session.sessionId}/escalate`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ reason: 'student_help_request' }),
+          }).catch(() => {});
+        }}
+      />
+    );
+  }
+
+  // ── Explanation mode ───────────────────────────────────────────────────
+  if (appState.phase === 'explanation') {
+    return (
+      <StudentExplanationView
+        lessonTitle={lessonTitle}
+        classLabel={classLabel}
+        explanationRoute={appState.explanationRoute}
+        stepIndex={appState.stepIndex}
+        whiteboard={appState.whiteboard}
+        onLeave={() => setAppState({ phase: 'waiting', session })}
+        onNeedHelp={() => {
+          void fetch(`/api/live-sessions/${session.sessionId}/escalate`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ reason: 'student_help_request' }),

@@ -13,6 +13,7 @@ import {
 } from './AnnotationCanvas';
 import { AnnotationToolbar } from './AnnotationToolbar';
 import { TeachingModePanel, type TeachingMode } from './TeachingModePanel';
+import { AnimationRenderer } from '@/components/explanation/AnimationRenderer';
 import { StudentSignalsPanel, type ClassOverview, type InterpretedSignal } from './StudentSignalsPanel';
 import { TeacherBottomBar } from './TeacherBottomBar';
 import { InviteIcon, SettingsIcon } from './icons';
@@ -69,6 +70,20 @@ interface SessionSnapshot {
   responseSummary: ResponseSummary[];
   supportSummary?: SupportSummary;
   skill?: { id: string; code: string; name: string } | null;
+}
+
+interface RouteWithSteps {
+  id: string;
+  routeType: 'A' | 'B' | 'C';
+  misconceptionSummary: string;
+  workedExample: string;
+  animationSchema: unknown;
+  steps: { title: string; explanation: string }[];
+}
+
+interface ActiveExplanation {
+  route: RouteWithSteps;
+  stepIndex: number;
 }
 
 interface Props {
@@ -169,6 +184,9 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
   const [endingPrompt, setEndingPrompt] = useState(false);
   const [latestVersion, setLatestVersion] = useState(0);
 
+  const [availableRoutes, setAvailableRoutes] = useState<Record<string, RouteWithSteps> | null>(null);
+  const [activeExplanation, setActiveExplanation] = useState<ActiveExplanation | null>(null);
+
   const canvasRef = useRef<AnnotationCanvasHandle>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const pendingStateRef = useRef<{ state: AnnotationCanvasState; version: number } | null>(null);
@@ -224,6 +242,20 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
       if (fallbackRef.current) clearInterval(fallbackRef.current);
     };
   }, [sessionId, fetchSnapshot]);
+
+  // ── Explanation routes for current skill ──────────────────────────────────
+  useEffect(() => {
+    if (!snapshot?.skill?.id) return;
+    fetch(`/api/live-sessions/${sessionId}/explanation-routes`)
+      .then((r) => r.json())
+      .then((data: { routes: Record<string, RouteWithSteps> }) => setAvailableRoutes(data.routes))
+      .catch(() => { /* soft fail */ });
+  }, [sessionId, snapshot?.skill?.id]);
+
+  // Clear explanation context when leaving EXPLAIN mode
+  useEffect(() => {
+    if (mode !== 'EXPLAIN') setActiveExplanation(null);
+  }, [mode]);
 
   // ── Canvas → student broadcast ─────────────────────────────────────────────
   const broadcastStrokes = useCallback(
@@ -318,14 +350,51 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
   function handleNewCheckQuestion() {
     canvasRef.current?.insertText('New check question — type the prompt');
   }
-  function handleExplainOption(option: 'easier' | 'wrong-vs-right' | 'misconception' | 'comparison') {
-    const labels: Record<typeof option, string> = {
-      easier: 'Easier model',
-      'wrong-vs-right': 'Wrong vs right',
-      misconception: 'Misconception repair',
-      comparison: 'Comparison example',
+
+  async function handleExplainOption(option: 'easier' | 'wrong-vs-right' | 'misconception' | 'comparison') {
+    const typeMap: Record<typeof option, 'A' | 'B' | 'C'> = {
+      easier: 'B',
+      'wrong-vs-right': 'A',
+      comparison: 'A',
+      misconception: 'C',
     };
-    canvasRef.current?.insertText(`${labels[option]} — annotate alongside`);
+    const route = availableRoutes?.[typeMap[option]];
+    if (!route) return;
+
+    setActiveExplanation({ route, stepIndex: 0 });
+    canvasRef.current?.clear();
+
+    try {
+      await fetch(`/api/live-sessions/${sessionId}/broadcast`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contentType: 'EXPLANATION',
+          explanationRouteId: route.id,
+          stepIndex: 0,
+        }),
+      });
+    } catch {
+      // soft fail
+    }
+  }
+
+  async function handleStepChange(newStep: number) {
+    if (!activeExplanation) return;
+    setActiveExplanation((prev) => (prev ? { ...prev, stepIndex: newStep } : null));
+    try {
+      await fetch(`/api/live-sessions/${sessionId}/broadcast`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contentType: 'EXPLANATION',
+          explanationRouteId: activeExplanation.route.id,
+          stepIndex: newStep,
+        }),
+      });
+    } catch {
+      // soft fail
+    }
   }
   async function handleAssignPractice(
     kind: 'easier' | 'similar' | 'challenge' | 'misconception',
@@ -465,15 +534,29 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
         />
 
         <div className="anx-canvas-stage">
-          <div className="anx-canvas-board">
+          <div className="anx-canvas-board" style={{ position: 'relative' }}>
+            {/* Explanation layer — AnimationRenderer sits behind the transparent canvas */}
+            {activeExplanation?.route.animationSchema && (
+              <div
+                className="absolute inset-0 overflow-hidden bg-white"
+                style={{ zIndex: 0 }}
+              >
+                <AnimationRenderer
+                  schema={activeExplanation.route.animationSchema as Parameters<typeof AnimationRenderer>[0]['schema']}
+                  currentStep={activeExplanation.stepIndex}
+                  onStepChange={handleStepChange}
+                />
+              </div>
+            )}
             <AnnotationCanvas
               ref={canvasRef}
               tool={tool}
               color={color}
               width={3}
               onStateChange={scheduleBroadcast}
+              transparent={!!activeExplanation}
               watermark={
-                sessionStatus === 'LOBBY' ? 'Lesson starts when you click Start' : undefined
+                !activeExplanation && sessionStatus === 'LOBBY' ? 'Lesson starts when you click Start' : undefined
               }
             />
             <input
@@ -504,6 +587,17 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
             onNewCheckQuestion={handleNewCheckQuestion}
             onExplainOption={handleExplainOption}
             onAssignPractice={handleAssignPractice}
+            activeExplanation={
+              activeExplanation
+                ? {
+                    routeType: activeExplanation.route.routeType,
+                    stepIndex: activeExplanation.stepIndex,
+                    totalSteps:
+                      (activeExplanation.route.animationSchema as { steps?: unknown[] } | null)?.steps?.length ?? 1,
+                  }
+                : null
+            }
+            onStepChange={handleStepChange}
           />
           <StudentSignalsPanel
             overview={studentSignals.overview}
