@@ -61,6 +61,8 @@ interface Props {
   onHistoryChange?: (canUndo: boolean, canRedo: boolean) => void;
   /** Optional placeholder content drawn behind strokes. */
   watermark?: string;
+  /** When true, the canvas background and dotted grid are omitted so content behind the canvas shows through. */
+  transparent?: boolean;
 }
 
 function rectFromPoints(a: { x: number; y: number }, b: { x: number; y: number }) {
@@ -86,31 +88,34 @@ function drawScene(
   w: number,
   h: number,
   watermark?: string,
+  transparent?: boolean,
 ) {
   ctx.clearRect(0, 0, w, h);
 
-  // soft dotted backdrop for a calm classroom feel
-  ctx.save();
-  ctx.fillStyle = '#fbfbfd';
-  ctx.fillRect(0, 0, w, h);
-  ctx.fillStyle = '#e6e6ef';
-  const step = 32;
-  for (let y = step; y < h; y += step) {
-    for (let x = step; x < w; x += step) {
-      ctx.beginPath();
-      ctx.arc(x, y, 1.2, 0, Math.PI * 2);
-      ctx.fill();
-    }
-  }
-  ctx.restore();
-
-  if (watermark) {
+  if (!transparent) {
+    // soft dotted backdrop for a calm classroom feel
     ctx.save();
-    ctx.fillStyle = 'rgba(74, 64, 224, 0.06)';
-    ctx.font = '600 36px var(--font-manrope), Manrope, system-ui, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText(watermark, w / 2, h / 2);
+    ctx.fillStyle = '#fbfbfd';
+    ctx.fillRect(0, 0, w, h);
+    ctx.fillStyle = '#e6e6ef';
+    const step = 32;
+    for (let y = step; y < h; y += step) {
+      for (let x = step; x < w; x += step) {
+        ctx.beginPath();
+        ctx.arc(x, y, 1.2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
     ctx.restore();
+
+    if (watermark) {
+      ctx.save();
+      ctx.fillStyle = 'rgba(74, 64, 224, 0.06)';
+      ctx.font = '600 36px var(--font-manrope), Manrope, system-ui, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(watermark, w / 2, h / 2);
+      ctx.restore();
+    }
   }
 
   // shapes (under strokes)
@@ -158,7 +163,7 @@ function emptyState(): AnnotationCanvasState {
 }
 
 export const AnnotationCanvas = forwardRef<AnnotationCanvasHandle, Props>(function AnnotationCanvas(
-  { tool, color, width, onStateChange, onHistoryChange, watermark },
+  { tool, color, width, onStateChange, watermark, transparent },
   ref,
 ) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -186,7 +191,7 @@ export const AnnotationCanvas = forwardRef<AnnotationCanvasHandle, Props>(functi
       if (!canvas) return;
       const ctx = canvas.getContext('2d');
       if (!ctx) return;
-      drawScene(ctx, s, CANVAS_W, CANVAS_H, watermark);
+      drawScene(ctx, s, CANVAS_W, CANVAS_H, watermark, transparent);
       // overlay live shape preview (not yet committed)
       if (previewShape.current) {
         const p = previewShape.current;
@@ -434,7 +439,7 @@ export const AnnotationCanvas = forwardRef<AnnotationCanvasHandle, Props>(functi
       width={CANVAS_W}
       height={CANVAS_H}
       className="anx-canvas-surface"
-      style={{ cursor }}
+      style={{ cursor, background: transparent ? 'transparent' : undefined }}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={endStroke}

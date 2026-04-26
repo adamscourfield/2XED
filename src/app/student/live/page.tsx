@@ -7,11 +7,8 @@ import { useSession } from 'next-auth/react';
 import { redirect } from 'next/navigation';
 import { AppChrome } from '@/components/AppChrome';
 import { StudentFlowHero } from '@/components/student/StudentFlowHero';
-import {
-  StudentLiveView,
-  type LiveExplanationPayload,
-  type StudentLiveScreen,
-} from '@/components/student/live/StudentLiveView';
+import { StudentLiveView, type StudentLiveScreen } from '@/components/student/live/StudentLiveView';
+import { StudentExplanationView } from '@/components/student/live/StudentExplanationView';
 import {
   StudentPracticeView,
   type Confidence,
@@ -48,6 +45,14 @@ interface Item {
   skillId?: string;
 }
 
+interface ExplanationRouteData {
+  id: string;
+  routeType: string;
+  misconceptionSummary: string;
+  workedExample: string;
+  animationSchema: unknown;
+}
+
 interface CurrentContent {
   contentType: 'EXPLANATION' | 'MESSAGE' | 'PHASE' | 'WHITEBOARD';
   targetLanes?: string[];
@@ -55,8 +60,8 @@ interface CurrentContent {
   phaseIndex?: number;
   broadcastAt?: string;
   whiteboard?: LiveWhiteboardPayload;
-  explanationRouteId?: string;
-  explanation?: LiveExplanationPayload;
+  explanation?: ExplanationRouteData;
+  stepIndex?: number;
 }
 
 interface SessionPoll {
@@ -72,7 +77,7 @@ type AppState =
   | { phase: 'waiting'; session: JoinedSession }
   | { phase: 'between-phases'; session: JoinedSession; message: string }
   | { phase: 'whiteboard'; session: JoinedSession; whiteboard: LiveWhiteboardPayload }
-  | { phase: 'explanation'; session: JoinedSession; explanation: LiveExplanationPayload }
+  | { phase: 'explanation'; session: JoinedSession; explanationRoute: ExplanationRouteData; stepIndex: number; whiteboard: LiveWhiteboardPayload | null }
   | { phase: 'question'; session: JoinedSession; item: Item }
   | { phase: 'practice'; session: JoinedSession; item: Item; index: number; total: number }
   | { phase: 'feedback'; session: JoinedSession; correct: boolean; nextItem: (Item & { skillId?: string }) | null; index: number; total: number }
@@ -116,23 +121,7 @@ export default function StudentLivePage() {
       liveWhiteboardRef.current = appState.whiteboard;
     }
     if (appState.phase === 'explanation') {
-      const ex = appState.explanation;
-      const sid = appState.session.sessionId;
-      if (lastExplanationTelemetryIdRef.current !== ex.id) {
-        lastExplanationTelemetryIdRef.current = ex.id;
-        void fetch(`/api/live-sessions/${sid}/explanation-event`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            eventType: 'shown',
-            explanationRouteId: ex.id,
-            skillId: ex.skillId,
-            routeType: ex.routeType,
-          }),
-        }).catch(() => {});
-      }
-    } else {
-      lastExplanationTelemetryIdRef.current = null;
+      liveWhiteboardRef.current = appState.whiteboard;
     }
   }, [appState]);
 
@@ -187,7 +176,9 @@ export default function StudentLivePage() {
               setAppState({
                 phase: 'explanation',
                 session: sess,
-                explanation: cc.explanation,
+                explanationRoute: cc.explanation,
+                stepIndex: cc.stepIndex ?? 0,
+                whiteboard: liveWhiteboardRef.current,
               });
             }
           } else if (cc.contentType === 'WHITEBOARD' && laneOk && cc.whiteboard) {
@@ -202,7 +193,11 @@ export default function StudentLivePage() {
               if (wb.version >= lastWhiteboardVersionRef.current) {
                 lastWhiteboardVersionRef.current = wb.version;
                 liveWhiteboardRef.current = wb;
-                setAppState({ phase: 'whiteboard', session: sess, whiteboard: wb });
+                // Stay in explanation phase on whiteboard updates — teacher is annotating
+                setAppState((prev) => {
+                  if (prev.phase === 'explanation') return { ...prev, whiteboard: wb };
+                  return { phase: 'whiteboard', session: sess, whiteboard: wb };
+                });
               }
             }
           } else if (cc.contentType === 'MESSAGE' && laneOk && cc.message) {
@@ -222,8 +217,7 @@ export default function StudentLivePage() {
       }
     }
 
-    const pollMs =
-      appState.phase === 'whiteboard' || appState.phase === 'explanation' ? 1500 : 3000;
+    const pollMs = appState.phase === 'whiteboard' || appState.phase === 'explanation' ? 1500 : 3000;
     pollRef.current = setInterval(pollSession, pollMs);
     return () => { if (pollRef.current) clearInterval(pollRef.current); };
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -543,6 +537,27 @@ export default function StudentLivePage() {
         }}
         onNeedHelp={() => {
           void fetch(`/api/live-sessions/${appState.session.sessionId}/escalate`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ reason: 'student_help_request' }),
+          }).catch(() => {});
+        }}
+      />
+    );
+  }
+
+  // ── Explanation mode ───────────────────────────────────────────────────
+  if (appState.phase === 'explanation') {
+    return (
+      <StudentExplanationView
+        lessonTitle={lessonTitle}
+        classLabel={classLabel}
+        explanationRoute={appState.explanationRoute}
+        stepIndex={appState.stepIndex}
+        whiteboard={appState.whiteboard}
+        onLeave={() => setAppState({ phase: 'waiting', session })}
+        onNeedHelp={() => {
+          void fetch(`/api/live-sessions/${session.sessionId}/escalate`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ reason: 'student_help_request' }),

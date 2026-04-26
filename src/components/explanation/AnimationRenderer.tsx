@@ -40,6 +40,10 @@ interface AnimationSchema {
 
 interface AnimationRendererProps {
   schema: AnimationSchema;
+  /** When provided, the renderer is controlled — internal step state is ignored. */
+  currentStep?: number;
+  /** Called when the user navigates steps in controlled mode (teacher view). */
+  onStepChange?: (step: number) => void;
 }
 
 const highlightColors: Record<string, string> = {
@@ -155,10 +159,12 @@ function renderVisual(visual: VisualPrimitive, key: number) {
   }
 }
 
-export function AnimationRenderer({ schema }: AnimationRendererProps) {
-  const [currentStep, setCurrentStep] = useState(0);
+export function AnimationRenderer({ schema, currentStep: controlledStep, onStepChange }: AnimationRendererProps) {
+  const isControlled = controlledStep !== undefined;
+  const [internalStep, setInternalStep] = useState(0);
   const [isSpeaking, setIsSpeaking] = useState(false);
 
+  const currentStep = isControlled ? controlledStep : internalStep;
   const step = schema.steps[currentStep];
   const isFirst = currentStep === 0;
   const isLast = currentStep === schema.steps.length - 1;
@@ -174,16 +180,22 @@ export function AnimationRenderer({ schema }: AnimationRendererProps) {
   }, []);
 
   const goNext = useCallback(() => {
-    if (isLast && schema.loopable) {
-      setCurrentStep(0);
-    } else if (!isLast) {
-      setCurrentStep((s) => s + 1);
+    if (isControlled) {
+      if (!isLast) onStepChange?.(currentStep + 1);
+      else if (schema.loopable) onStepChange?.(0);
+    } else {
+      if (isLast && schema.loopable) setInternalStep(0);
+      else if (!isLast) setInternalStep((s) => s + 1);
     }
-  }, [isLast, schema.loopable]);
+  }, [isControlled, isLast, schema.loopable, currentStep, onStepChange]);
 
   const goPrev = useCallback(() => {
-    if (!isFirst) setCurrentStep((s) => s - 1);
-  }, [isFirst]);
+    if (isControlled) {
+      if (!isFirst) onStepChange?.(currentStep - 1);
+    } else {
+      if (!isFirst) setInternalStep((s) => s - 1);
+    }
+  }, [isControlled, isFirst, currentStep, onStepChange]);
 
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
@@ -231,32 +243,34 @@ export function AnimationRenderer({ schema }: AnimationRendererProps) {
         </div>
       </div>
 
-      {/* Controls */}
-      <div className="flex items-center justify-between border-t border-gray-100 px-4 py-3">
-        <button
-          onClick={goPrev}
-          disabled={isFirst}
-          className="rounded px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-100 disabled:opacity-30"
-        >
-          ← Prev
-        </button>
-        <div className="flex gap-1">
-          {schema.steps.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setCurrentStep(i)}
-              className={`h-2 w-2 rounded-full ${i === currentStep ? 'bg-indigo-500' : 'bg-gray-300'}`}
-            />
-          ))}
+      {/* Controls — hidden in student-controlled mode (teacher advances steps) */}
+      {(!isControlled || onStepChange) && (
+        <div className="flex items-center justify-between border-t border-gray-100 px-4 py-3">
+          <button
+            onClick={goPrev}
+            disabled={isFirst}
+            className="rounded px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-100 disabled:opacity-30"
+          >
+            ← Prev
+          </button>
+          <div className="flex gap-1">
+            {schema.steps.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => isControlled ? onStepChange?.(i) : setInternalStep(i)}
+                className={`h-2 w-2 rounded-full ${i === currentStep ? 'bg-indigo-500' : 'bg-gray-300'}`}
+              />
+            ))}
+          </div>
+          <button
+            onClick={goNext}
+            disabled={isLast && !schema.loopable}
+            className="rounded px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-100 disabled:opacity-30"
+          >
+            Next →
+          </button>
         </div>
-        <button
-          onClick={goNext}
-          disabled={isLast && !schema.loopable}
-          className="rounded px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-100 disabled:opacity-30"
-        >
-          Next →
-        </button>
-      </div>
+      )}
 
       {/* Misconception strip */}
       <div className="border-t border-amber-200 bg-amber-50 px-6 py-3">
