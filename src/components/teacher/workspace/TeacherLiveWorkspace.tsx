@@ -245,17 +245,30 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
 
   // ── Explanation routes for current skill ──────────────────────────────────
   useEffect(() => {
-    if (!snapshot?.skill?.id) return;
+    if (!snapshot) return;
+    setAvailableRoutes(null); // clear stale routes before fetching for the new phase
     fetch(`/api/live-sessions/${sessionId}/explanation-routes`)
       .then((r) => r.json())
       .then((data: { routes: Record<string, RouteWithSteps> }) => setAvailableRoutes(data.routes))
       .catch(() => { /* soft fail */ });
-  }, [sessionId, snapshot?.skill?.id]);
+  }, [sessionId, snapshot?.skill?.id, snapshot?.currentPhaseIndex]);
 
-  // Clear explanation context when leaving EXPLAIN mode
+  // When leaving EXPLAIN mode, clear the canvas and broadcast 'clear' so students exit
+  // the explanation phase. The 'clear' action is the exit signal on the student side.
+  const prevModeRef = useRef<TeachingMode>(mode);
   useEffect(() => {
-    if (mode !== 'EXPLAIN') setActiveExplanation(null);
-  }, [mode]);
+    const wasExplain = prevModeRef.current === 'EXPLAIN';
+    prevModeRef.current = mode;
+    if (wasExplain && mode !== 'EXPLAIN') {
+      setActiveExplanation(null);
+      canvasRef.current?.clear();
+      const v = Date.now();
+      setLatestVersion(v);
+      void broadcastStrokes([], v, 'clear');
+    } else if (mode !== 'EXPLAIN') {
+      setActiveExplanation(null);
+    }
+  }, [mode, broadcastStrokes]);
 
   // ── Canvas → student broadcast ─────────────────────────────────────────────
   const broadcastStrokes = useCallback(
