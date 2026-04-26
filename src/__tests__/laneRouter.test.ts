@@ -41,6 +41,9 @@ vi.mock('@/db/prisma', () => ({
     item: {
       findFirst: vi.fn().mockResolvedValue({ id: 'item-1' }),
     },
+    event: {
+      create: vi.fn().mockResolvedValue({}),
+    },
   },
 }));
 
