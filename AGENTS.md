@@ -7,7 +7,7 @@
 
 ### Prerequisites
 - **Node.js 20** (use `nvm use 20`; Node 22+ may work but the project targets 20)
-- **PostgreSQL** running on localhost:5432 with user `anaxi`, password `anaxi_secret`, database `anaxi_learn`
+- **PostgreSQL** running on localhost:5432 with user `ember`, password `ember_secret`, database `ember`
 
 ### Environment
 Copy `.env.example` to `.env` before first run. The defaults in `.env.example` are sufficient for local development.
@@ -42,7 +42,7 @@ Copy `.env.example` to `.env` before first run. The defaults in `.env.example` a
 ### Test accounts
 | Role | Email | Password |
 |------|-------|----------|
-| Admin | admin@anaxi.local | admin123 |
+| Admin | admin@ember.local | admin123 |
 | Student | student@example.com | password123 |
 
 ### Starting PostgreSQL (if not running)

@@ -8,7 +8,7 @@
  * fallback "See explanation above." string.
  *
  * Run:
- *   DATABASE_URL="postgresql://anaxi:anaxi_secret@localhost:5432/anaxi_learn" \
+ *   DATABASE_URL="postgresql://ember:ember_secret@localhost:5432/ember" \
  *   npx ts-node -r tsconfig-paths/register --compiler-options '{"module":"CommonJS"}' \
  *   prisma/fix-route-b-step3-placeholders.ts
  */

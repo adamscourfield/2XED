@@ -2,15 +2,15 @@ services:
   postgres:
     image: postgres:15-alpine
     environment:
-      POSTGRES_USER: anaxi
-      POSTGRES_PASSWORD: anaxi_secret
-      POSTGRES_DB: anaxi_learn
+      POSTGRES_USER: ember
+      POSTGRES_PASSWORD: ember_secret
+      POSTGRES_DB: ember
     ports:
       - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U anaxi']
+      test: ['CMD-SHELL', 'pg_isready -U ember']
       interval: 5s
       timeout: 5s
       retries: 5
@@ -20,7 +20,7 @@ services:
     ports:
       - '3000:3000'
     environment:
-      DATABASE_URL: postgresql://anaxi:anaxi_secret@postgres:5432/anaxi_learn
+      DATABASE_URL: postgresql://ember:ember_secret@postgres:5432/ember
       NEXTAUTH_SECRET: your-secret-here-change-in-production
       NEXTAUTH_URL: http://localhost:3000
     depends_on:
