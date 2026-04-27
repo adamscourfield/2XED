@@ -19,8 +19,6 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import * as dotenv from 'dotenv';
-dotenv.config();
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -269,8 +267,8 @@ async function callAnthropic(skill: typeof SKILLS[0]): Promise<SkillEnrichment> 
   if (!apiKey) throw new Error('ANTHROPIC_API_KEY not set in .env');
 
   const body = {
-    model: 'claude-opus-4-6',
-    max_tokens: 1200,
+    model: 'claude-haiku-4-5-20251001',
+    max_tokens: 2500,
     system: SYSTEM_PROMPT,
     messages: [{ role: 'user', content: buildUserPrompt(skill) }],
   };
@@ -291,10 +289,13 @@ async function callAnthropic(skill: typeof SKILLS[0]): Promise<SkillEnrichment> 
   }
 
   const json = await res.json() as { content: Array<{ type: string; text: string }> };
-  const text = json.content.find(b => b.type === 'text')?.text ?? '';
+  const raw = json.content.find(b => b.type === 'text')?.text ?? '';
 
-  // Parse — model returns a single-element array
-  const parsed = JSON.parse(text.trim());
+  // Strip markdown fences if the model wrapped its output
+  const text = raw.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '').trim();
+
+  // Parse — model may return a single-element array or a plain object
+  const parsed = JSON.parse(text);
   const enrichment: SkillEnrichment = Array.isArray(parsed) ? parsed[0] : parsed;
   enrichment.code = skill.code; // ensure correct even if model hallucinates
   enrichment.name = skill.name;
@@ -304,8 +305,8 @@ async function callAnthropic(skill: typeof SKILLS[0]): Promise<SkillEnrichment> 
 // ── Main ──────────────────────────────────────────────────────────────────────
 
 const OUTPUT_PATH = path.join(__dirname, 'skill-enrichment.json');
-const CONCURRENCY = 5;   // parallel calls
-const DELAY_MS   = 200;  // between batches
+const CONCURRENCY = 1;    // one at a time to stay within rate limits
+const DELAY_MS   = 8000; // 8s between requests — gives token budget time to reset
 
 async function sleep(ms: number) {
   return new Promise(r => setTimeout(r, ms));
