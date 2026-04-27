@@ -28,9 +28,9 @@ export interface InterventionSuggestion {
   detail: string;
 }
 
-type SupportLevel = 'INDEPENDENT' | 'LIGHT_PROMPT' | 'WORKED_EXAMPLE' | 'SCAFFOLDED' | 'FULL_EXPLANATION';
+export type SupportLevel = 'INDEPENDENT' | 'LIGHT_PROMPT' | 'WORKED_EXAMPLE' | 'SCAFFOLDED' | 'FULL_EXPLANATION';
 
-type ParsedAttempt = {
+export type ParsedAttempt = {
   correct: boolean;
   supportLevel: SupportLevel;
   isDelayedRetrieval: boolean;
@@ -49,17 +49,17 @@ export interface RouteInput {
   dleTrend?: number;
 }
 
-function clamp01(value: number | undefined, fallback = 0): number {
+export function clamp01(value: number | undefined, fallback = 0): number {
   if (typeof value !== 'number' || Number.isNaN(value)) return fallback;
   return Math.max(0, Math.min(1, value));
 }
 
-function rateCorrect(items: Array<{ correct: boolean }>): number {
+export function rateCorrect(items: Array<{ correct: boolean }>): number {
   if (items.length === 0) return 0;
   return items.filter((x) => x.correct).length / items.length;
 }
 
-function median(values: number[]): number | null {
+export function median(values: number[]): number | null {
   if (values.length === 0) return null;
   const sorted = [...values].sort((a, b) => a - b);
   const mid = Math.floor(sorted.length / 2);
@@ -67,14 +67,14 @@ function median(values: number[]): number | null {
   return sorted[mid];
 }
 
-function classifyResponseTimeBand(ms: number | null): 'fast' | 'balanced' | 'slow' | 'unknown' {
+export function classifyResponseTimeBand(ms: number | null): 'fast' | 'balanced' | 'slow' | 'unknown' {
   if (ms == null) return 'unknown';
   if (ms < 8000) return 'fast';
   if (ms <= 35000) return 'balanced';
   return 'slow';
 }
 
-function computeCorrectnessTrendDelta(parsed: ParsedAttempt[]): number {
+export function computeCorrectnessTrendDelta(parsed: ParsedAttempt[]): number {
   const recent = parsed.slice(-3);
   const prior = parsed.slice(Math.max(0, parsed.length - 6), Math.max(0, parsed.length - 3));
   const recentRate = rateCorrect(recent);
@@ -228,7 +228,7 @@ export function getInterventionSuggestions(reason: GateDecisionReason): Interven
   }
 }
 
-function buildGateMetrics(parsed: ParsedAttempt[], config: EffectiveReteachConfig, failedLoops: number) {
+export function buildGateMetrics(parsed: ParsedAttempt[], config: EffectiveReteachConfig, failedLoops: number) {
   const independent = parsed.filter((a) => a.supportLevel === 'INDEPENDENT');
   const independentWindow = Math.max(1, Math.round(config.gateIndependentRateWindow));
   const independentWindowed = independent.slice(-independentWindow);
@@ -262,45 +262,10 @@ function buildGateMetrics(parsed: ParsedAttempt[], config: EffectiveReteachConfi
   };
 }
 
-export async function evaluateGate(input: {
-  userId: string;
-  subjectId: string;
-  skillId: string;
-  assignedPathId: string;
-}) {
-  const attempts = await prisma.event.findMany({
-    where: {
-      name: 'reteach_attempt_recorded',
-      studentUserId: input.userId,
-      subjectId: input.subjectId,
-      skillId: input.skillId,
-      payload: { path: ['assignedPathId'], equals: input.assignedPathId },
-    },
-    orderBy: { createdAt: 'asc' },
-    select: { payload: true, createdAt: true },
-  });
-
-  const parsed: ParsedAttempt[] = attempts.map((event) => {
-    const payload = (event.payload ?? {}) as {
-      correct?: boolean;
-      supportLevel?: string;
-      isDelayedRetrieval?: boolean;
-      step?: ReteachLoopStep;
-      responseTimeMs?: number | null;
-    };
-    return {
-      correct: payload.correct === true,
-      supportLevel: (payload.supportLevel as SupportLevel) ?? 'INDEPENDENT',
-      isDelayedRetrieval: payload.isDelayedRetrieval === true,
-      step: payload.step,
-      responseTimeMs: typeof payload.responseTimeMs === 'number' ? payload.responseTimeMs : undefined,
-    };
-  });
-
-  const config = await getEffectiveReteachConfig();
-  const failedLoops = await getRecentFailedLoops(input.userId, input.subjectId, input.skillId);
-  const metrics = buildGateMetrics(parsed, config, failedLoops);
-
+export function applyGatePolicy(
+  metrics: ReturnType<typeof buildGateMetrics>,
+  config: EffectiveReteachConfig
+): { decision: GateDecision; decisionReason: GateDecisionReason } {
   const rules = {
     masteryGateMet:
       metrics.consecutiveIndependentCorrect >= Math.max(1, Math.round(config.gateConsecutiveIndependentCorrect)) &&
@@ -345,6 +310,49 @@ export async function evaluateGate(input: {
     }
   }
 
+  return { decision, decisionReason };
+}
+
+export async function evaluateGate(input: {
+  userId: string;
+  subjectId: string;
+  skillId: string;
+  assignedPathId: string;
+}) {
+  const attempts = await prisma.event.findMany({
+    where: {
+      name: 'reteach_attempt_recorded',
+      studentUserId: input.userId,
+      subjectId: input.subjectId,
+      skillId: input.skillId,
+      payload: { path: ['assignedPathId'], equals: input.assignedPathId },
+    },
+    orderBy: { createdAt: 'asc' },
+    select: { payload: true, createdAt: true },
+  });
+
+  const parsed: ParsedAttempt[] = attempts.map((event) => {
+    const payload = (event.payload ?? {}) as {
+      correct?: boolean;
+      supportLevel?: string;
+      isDelayedRetrieval?: boolean;
+      step?: ReteachLoopStep;
+      responseTimeMs?: number | null;
+    };
+    return {
+      correct: payload.correct === true,
+      supportLevel: (payload.supportLevel as SupportLevel) ?? 'INDEPENDENT',
+      isDelayedRetrieval: payload.isDelayedRetrieval === true,
+      step: payload.step,
+      responseTimeMs: typeof payload.responseTimeMs === 'number' ? payload.responseTimeMs : undefined,
+    };
+  });
+
+  const config = await getEffectiveReteachConfig();
+  const failedLoops = await getRecentFailedLoops(input.userId, input.subjectId, input.skillId);
+  const metrics = buildGateMetrics(parsed, config, failedLoops);
+
+  const { decision, decisionReason } = applyGatePolicy(metrics, config);
   const interventionSuggestions = getInterventionSuggestions(decisionReason);
 
   const decisionTrace = {

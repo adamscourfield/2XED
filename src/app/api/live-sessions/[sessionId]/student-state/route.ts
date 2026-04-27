@@ -38,7 +38,14 @@ export async function GET(_req: NextRequest, { params }: Props) {
         studentUserId: userId,
       },
     },
-    select: { id: true, currentLane: true, currentExplanationId: true, pendingRecheckItemId: true },
+    select: {
+      id: true,
+      currentLane: true,
+      currentExplanationId: true,
+      pendingRecheckItemId: true,
+      openingCheckQueue: true,
+      openingCheckIndex: true,
+    },
   });
 
   if (!participant) return NextResponse.json({ error: 'Not a participant' }, { status: 403 });
@@ -55,7 +62,8 @@ export async function GET(_req: NextRequest, { params }: Props) {
 
   if (!liveSession) return NextResponse.json({ error: 'Session not found' }, { status: 404 });
 
-  let pendingRecheckItem: { id: string; question: string; type: string; options: unknown } | null = null;
+  let pendingRecheckItem: { id: string; question: string; type: string; options: unknown; skillId?: string } | null =
+    null;
 
   if (participant.currentLane === 'LANE_2' && participant.pendingRecheckItemId) {
     const nextRecheckItem = await prisma.item.findUnique({
@@ -65,11 +73,50 @@ export async function GET(_req: NextRequest, { params }: Props) {
         question: true,
         type: true,
         options: true,
+        skills: { select: { skillId: true }, take: 1 },
       },
     });
 
     if (nextRecheckItem) {
-      pendingRecheckItem = nextRecheckItem;
+      pendingRecheckItem = {
+        id: nextRecheckItem.id,
+        question: nextRecheckItem.question,
+        type: nextRecheckItem.type,
+        options: nextRecheckItem.options,
+        skillId: nextRecheckItem.skills[0]?.skillId ?? liveSession.skillId ?? undefined,
+      };
+    }
+  }
+
+  let openingCheckItem: typeof pendingRecheckItem = null;
+  if (liveSession.status === 'ACTIVE' && participant.currentLane === 'LANE_1' && !participant.pendingRecheckItemId) {
+    const queue = (participant.openingCheckQueue as Array<{ itemId: string; skillId: string }> | null) ?? [];
+    const idx = participant.openingCheckIndex ?? 0;
+    const slot = queue[idx];
+    if (slot) {
+      const answered = await prisma.liveAttempt.findFirst({
+        where: {
+          liveSessionId: sessionId,
+          studentUserId: userId,
+          itemId: slot.itemId,
+        },
+        select: { id: true },
+      });
+      if (!answered) {
+        const row = await prisma.item.findUnique({
+          where: { id: slot.itemId },
+          select: { id: true, question: true, type: true, options: true },
+        });
+        if (row) {
+          openingCheckItem = {
+            id: row.id,
+            question: row.question,
+            type: row.type,
+            options: row.options,
+            skillId: slot.skillId,
+          };
+        }
+      }
     }
   }
 
@@ -78,6 +125,6 @@ export async function GET(_req: NextRequest, { params }: Props) {
     currentPhaseIndex: liveSession.currentPhaseIndex,
     currentContent: liveSession.currentContent,
     studentLane: participant.currentLane,
-    pendingRecheckItem,
+    pendingRecheckItem: pendingRecheckItem ?? openingCheckItem,
   });
 }

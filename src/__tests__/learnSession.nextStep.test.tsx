@@ -67,6 +67,6 @@ describe('LearnSession clear next-step UX', () => {
 
     // Results always provide clear next actions.
     expect(screen.getByRole('button', { name: /practice again/i })).toBeTruthy();
-    expect(screen.getByRole('button', { name: /back to home/i })).toBeTruthy();
+    expect(screen.getByRole('button', { name: /back to dashboard/i })).toBeTruthy();
   });
 });

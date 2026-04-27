@@ -57,6 +57,8 @@ interface Props {
   color: string;
   width: number;
   onStateChange?: (state: AnnotationCanvasState, version: number) => void;
+  /** Fired when undo/redo availability changes (for toolbar controls). */
+  onHistoryChange?: (canUndo: boolean, canRedo: boolean) => void;
   /** Optional placeholder content drawn behind strokes. */
   watermark?: string;
   /** When true, the canvas background and dotted grid are omitted so content behind the canvas shows through. */
@@ -169,6 +171,15 @@ export const AnnotationCanvas = forwardRef<AnnotationCanvasHandle, Props>(functi
   const versionRef = useRef(0);
   const historyRef = useRef<AnnotationCanvasState[]>([emptyState()]);
   const futureRef = useRef<AnnotationCanvasState[]>([]);
+  const onHistoryChangeRef = useRef(onHistoryChange);
+  onHistoryChangeRef.current = onHistoryChange;
+
+  const emitHistory = useCallback(() => {
+    onHistoryChangeRef.current?.(
+      historyRef.current.length > 1,
+      futureRef.current.length > 0,
+    );
+  }, []);
   const isDrawing = useRef(false);
   const currentStroke = useRef<LiveStroke | null>(null);
   const dragOrigin = useRef<{ x: number; y: number } | null>(null);
@@ -204,6 +215,10 @@ export const AnnotationCanvas = forwardRef<AnnotationCanvasHandle, Props>(functi
   useEffect(() => {
     redraw(state);
   }, [state, redraw]);
+
+  useEffect(() => {
+    emitHistory();
+  }, [state, emitHistory]);
 
   const commit = useCallback(
     (next: AnnotationCanvasState) => {

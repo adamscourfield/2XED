@@ -34,6 +34,56 @@ function startOfWeek(date: Date): Date {
   return d;
 }
 
+export interface GuessingSafeguardState {
+  rapidWrongStreak: number;
+  lastWrongAt: Date | null;
+  penaltyRemaining: number;
+}
+
+export interface GuessingSafeguardTransition extends GuessingSafeguardState {
+  penaltyApplied: boolean;
+  xpMultiplier: number;
+}
+
+export function computeGuessingSafeguardTransition(
+  state: GuessingSafeguardState,
+  correct: boolean,
+  answeredAt: Date
+): GuessingSafeguardTransition {
+  let penaltyRemaining = state.penaltyRemaining;
+  let penaltyApplied = false;
+
+  if (penaltyRemaining > 0) {
+    penaltyApplied = true;
+    penaltyRemaining -= 1;
+  }
+
+  let rapidWrongStreak = state.rapidWrongStreak;
+  let lastWrongAt = state.lastWrongAt;
+
+  if (!correct) {
+    const isRapidWrong =
+      lastWrongAt != null && answeredAt.getTime() - lastWrongAt.getTime() <= RAPID_WRONG_WINDOW_MS;
+    rapidWrongStreak = isRapidWrong ? rapidWrongStreak + 1 : 1;
+    lastWrongAt = answeredAt;
+
+    if (rapidWrongStreak >= RAPID_WRONG_TRIGGER) {
+      penaltyRemaining = PENALTY_QUESTION_COUNT;
+      rapidWrongStreak = 0;
+    }
+  } else {
+    rapidWrongStreak = 0;
+  }
+
+  return {
+    rapidWrongStreak,
+    lastWrongAt,
+    penaltyRemaining,
+    penaltyApplied,
+    xpMultiplier: penaltyApplied ? 0.5 : 1,
+  };
+}
+
 export async function consumeGuessingSafeguard(
   userId: string,
   correct: boolean,
@@ -47,44 +97,21 @@ export async function consumeGuessingSafeguard(
       select: { rapidWrongStreak: true, lastWrongAt: true, penaltyRemaining: true },
     });
 
-    let penaltyRemaining = state.penaltyRemaining;
-    let penaltyApplied = false;
-
-    if (penaltyRemaining > 0) {
-      penaltyApplied = true;
-      penaltyRemaining -= 1;
-    }
-
-    let rapidWrongStreak = state.rapidWrongStreak;
-    let lastWrongAt = state.lastWrongAt;
-
-    if (!correct) {
-      const isRapidWrong =
-        lastWrongAt != null && answeredAt.getTime() - lastWrongAt.getTime() <= RAPID_WRONG_WINDOW_MS;
-      rapidWrongStreak = isRapidWrong ? rapidWrongStreak + 1 : 1;
-      lastWrongAt = answeredAt;
-
-      if (rapidWrongStreak >= RAPID_WRONG_TRIGGER) {
-        penaltyRemaining = PENALTY_QUESTION_COUNT;
-        rapidWrongStreak = 0;
-      }
-    } else {
-      rapidWrongStreak = 0;
-    }
+    const transition = computeGuessingSafeguardTransition(state, correct, answeredAt);
 
     await tx.guessingSafeguardState.update({
       where: { userId },
       data: {
-        rapidWrongStreak,
-        lastWrongAt,
-        penaltyRemaining,
+        rapidWrongStreak: transition.rapidWrongStreak,
+        lastWrongAt: transition.lastWrongAt,
+        penaltyRemaining: transition.penaltyRemaining,
       },
     });
 
     return {
-      xpMultiplier: penaltyApplied ? 0.5 : 1,
-      penaltyApplied,
-      penaltyRemaining,
+      xpMultiplier: transition.xpMultiplier,
+      penaltyApplied: transition.penaltyApplied,
+      penaltyRemaining: transition.penaltyRemaining,
     };
   });
 }

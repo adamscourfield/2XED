@@ -11,7 +11,7 @@ type Props = {
   userRole: string;
 };
 
-function formatSessionTime(d: Date): string {
+export function formatSessionTime(d: Date): string {
   const now = new Date();
   const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const startOfYesterday = new Date(startOfToday);
@@ -41,20 +41,20 @@ function lessonIconSymbol(skillCode: string | null | undefined, subjectTitle: st
   return subjectTitle.trim().charAt(0).toUpperCase() || '?';
 }
 
-function iconHue(seed: string): string {
+export function iconHue(seed: string): string {
   let h = 0;
   for (let i = 0; i < seed.length; i += 1) h = (h + seed.charCodeAt(i) * (i + 1)) % 360;
   return `hsl(${h} 62% 46%)`;
 }
 
-function classCodeLabel(externalClassId: string, subjectSlug: string | null): string {
+export function classCodeLabel(externalClassId: string, subjectSlug: string | null): string {
   if (subjectSlug && subjectSlug.length <= 5) return subjectSlug.toUpperCase();
   if (externalClassId.length <= 6) return externalClassId.toUpperCase();
   return externalClassId.slice(-4).toUpperCase();
 }
 
 const QUICK_LINKS = [
-  { href: '/teacher/content/review', label: 'Question bank', icon: 'bank' as const },
+  { href: '/teacher/question-bank', label: 'Question bank', icon: 'bank' as const },
   { href: '/teacher/reports', label: 'Reports', icon: 'chart' as const },
   { href: '/teacher/resources', label: 'Resources', icon: 'folder' as const },
 ];
@@ -172,7 +172,7 @@ export function TeacherHomeDashboard({ data, displayName, greeting, userRole }: 
         <section className="td-home-card td-home-recent">
           <div className="td-home-card-head">
             <h2 className="td-home-card-title">Recent lessons</h2>
-            <Link href="/teacher/live/new" className="td-home-link-more">
+            <Link href="/teacher/lessons" className="td-home-link-more">
               View all lessons
               <span aria-hidden> ›</span>
             </Link>

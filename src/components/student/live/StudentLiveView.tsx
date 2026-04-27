@@ -3,16 +3,33 @@
 import Image from 'next/image';
 import { useState, type FormEvent } from 'react';
 import { LiveWhiteboardViewer } from '@/components/student/LiveWhiteboardViewer';
+import { AnimationRenderer } from '@/components/explanation/AnimationRenderer';
+import { sanitizeStudentCopy } from '@/features/learn/studentCopy';
 import {
   HelpIcon,
   MessageIcon,
 } from '@/components/teacher/workspace/icons';
 import type { LiveWhiteboardPayload } from '@/lib/live/whiteboard-strokes';
 
+export type LiveExplanationPayload = {
+  id: string;
+  skillId: string;
+  routeType: string;
+  misconceptionSummary: string;
+  workedExample: string;
+  animationSchema: unknown | null;
+};
+
 export type StudentLiveScreen =
   | { kind: 'waiting' }
   | { kind: 'message'; message: string }
   | { kind: 'watch'; whiteboard?: LiveWhiteboardPayload | null }
+  | {
+      kind: 'explanation';
+      explanation: LiveExplanationPayload;
+      whiteboard?: LiveWhiteboardPayload | null;
+      onDismiss: () => void;
+    }
   | {
       kind: 'check';
       whiteboard?: LiveWhiteboardPayload | null;
@@ -322,6 +339,55 @@ export function StudentLiveView({
             <SidePanel
               title="Watch the board"
               body="Follow what your teacher is showing. You don’t need to do anything yet — they’ll let you know when it’s your turn."
+              onNeedHelp={onNeedHelp}
+              onMessageTeacher={onMessageTeacher}
+            />
+          </>
+        )}
+
+        {screen.kind === 'explanation' && (
+          <>
+            <div className="flex min-h-0 flex-col gap-4">
+              <CanvasFrame whiteboard={screen.whiteboard} />
+              <div className="anx-card flex flex-col gap-4 p-5 sm:p-6">
+                <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--anx-primary)' }}>
+                  Model explanation
+                </p>
+                {screen.explanation.animationSchema ? (
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  <AnimationRenderer schema={screen.explanation.animationSchema as any} />
+                ) : (
+                  <div className="space-y-4">
+                    {sanitizeStudentCopy(screen.explanation.misconceptionSummary) && (
+                      <div className="anx-callout-warning rounded-xl px-4 py-3 text-sm">
+                        <p className="font-semibold" style={{ color: 'var(--anx-text)' }}>Watch out for this</p>
+                        <p className="mt-1 leading-relaxed" style={{ color: 'var(--anx-text-secondary)' }}>
+                          {sanitizeStudentCopy(screen.explanation.misconceptionSummary)}
+                        </p>
+                      </div>
+                    )}
+                    {sanitizeStudentCopy(screen.explanation.workedExample) && (
+                      <div className="rounded-xl border px-4 py-3 text-sm" style={{ borderColor: 'var(--anx-outline-variant)' }}>
+                        <p className="font-semibold" style={{ color: 'var(--anx-text)' }}>Worked example</p>
+                        <p className="mt-1 whitespace-pre-wrap leading-relaxed" style={{ color: 'var(--anx-text-secondary)' }}>
+                          {sanitizeStudentCopy(screen.explanation.workedExample)}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
+                <button
+                  type="button"
+                  onClick={screen.onDismiss}
+                  className="anx-btn-primary w-full py-3 text-sm"
+                >
+                  I’ve watched this — continue
+                </button>
+              </div>
+            </div>
+            <SidePanel
+              title="Follow along"
+              body="Your teacher shared a model from the lesson bank. Read or play the steps, then tap continue when you’re ready."
               onNeedHelp={onNeedHelp}
               onMessageTeacher={onMessageTeacher}
             />
