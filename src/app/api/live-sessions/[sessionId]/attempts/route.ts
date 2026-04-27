@@ -64,6 +64,14 @@ export async function POST(req: NextRequest, { params }: Props) {
 
   const correct = item.answer.trim().toLowerCase() === answer.trim().toLowerCase();
 
+  // If wrong, look up which misconception the chosen distractor signals.
+  // misconceptionMap on AI-generated items maps option text -> misconception ID.
+  let misconceptionId: string | null = null;
+  if (!correct && item.misconceptionMap && typeof item.misconceptionMap === 'object') {
+    const map = item.misconceptionMap as Record<string, string | null>;
+    misconceptionId = map[answer] ?? null;
+  }
+
   const createdAttempt = await prisma.liveAttempt.create({
     data: {
       liveSessionId: sessionId,
@@ -73,6 +81,7 @@ export async function POST(req: NextRequest, { params }: Props) {
       answer,
       correct,
       responseTimeMs,
+      misconceptionId,
     },
   });
 

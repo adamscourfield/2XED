@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/features/auth/authOptions';
 import { prisma } from '@/db/prisma';
 import { fetchSampleItemsBySkillIds } from '@/lib/live/live-check-plan';
+import { ensureItemPool } from '@/lib/ai/questionGenerator';
 import {
   fetchItemsForDisplay,
   getClassWrongHotspots,
@@ -84,6 +85,24 @@ export async function GET(req: NextRequest) {
       }
     }
   }
+
+  // Ensure each skill has an adequate item pool — generate AI questions for any
+  // skill that has fewer than 3 authored items. Fire-and-forget in parallel so
+  // the response is not blocked if generation takes a moment; the teacher can
+  // refresh the picker to see newly generated items.
+  const skillRows = await prisma.skill.findMany({
+    where: { id: { in: skillIds } },
+    select: { id: true, code: true, masteryDefinition: true },
+  });
+  const enrichedSkillIds = skillRows
+    .filter(s => s.masteryDefinition !== null)
+    .map(s => ({ id: s.id, code: s.code }));
+
+  void Promise.allSettled(
+    enrichedSkillIds.map(s =>
+      ensureItemPool({ skillCode: s.code, skillId: s.id, minItems: 3, generateCount: 5 })
+    )
+  );
 
   const baseItemsBySkill = await fetchSampleItemsBySkillIds(skillIds, subjectId, 12);
 

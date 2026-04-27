@@ -556,44 +556,9 @@ async function main() {
     });
   }
 
-  // 6️⃣ Placeholder MCQ items per skill (2 per skill, idempotent by question text)
-  for (const def of skillDefs) {
-    const skillId = skillMap.get(def.code);
-    if (!skillId) continue;
-    const placeholderItems = [
-      {
-        question: `[${def.code}] Placeholder question 1 for: ${def.name}`,
-        options: ['Option A', 'Option B', 'Option C', 'Option D'],
-        answer: 'Option A',
-      },
-      {
-        question: `[${def.code}] Placeholder question 2 for: ${def.name}`,
-        options: ['Option A', 'Option B', 'Option C', 'Option D'],
-        answer: 'Option A',
-      },
-    ];
-    for (const itemData of placeholderItems) {
-      let item = await prisma.item.findFirst({
-        where: { question: itemData.question },
-      });
-      if (!item) {
-        item = await prisma.item.create({
-          data: {
-            question: itemData.question,
-            options: itemData.options,
-            answer: itemData.answer,
-            type: 'MCQ',
-            subjectId: subject.id,
-          },
-        });
-      }
-      await prisma.itemSkill.upsert({
-        where: { itemId_skillId: { itemId: item.id, skillId } },
-        update: {},
-        create: { itemId: item.id, skillId },
-      });
-    }
-  }
+  // Items are generated at runtime via AI (src/lib/ai/questionGenerator.ts).
+  // No placeholder items are seeded — the generation layer populates the pool
+  // on demand when a teacher opens the session builder.
 
   console.log('✅ Seed complete:', {
     student: student.email,
