@@ -1,4 +1,5 @@
 import type {
+  AngleVisual,
   ArithmeticLayoutVisual,
   BarModelVisual,
   ChartVisual,
@@ -9,8 +10,10 @@ import type {
   FrequencyTreeVisual,
   MathsVisual,
   NumberLineVisual,
+  PartWholeBarModelVisual,
   SampleSpaceGridVisual,
   ShapeVisual,
+  TimetableVisual,
   VennTwoSetVisual,
 } from './types';
 
@@ -118,11 +121,63 @@ function validateTimetable(visual: TimetableVisual): string[] {
     issues.push('timetable needs rows');
   }
   const n = visual.columnHeaders.length;
-  if (visual.rows.some((row) => !Array.isArray(row.cells) || row.cells.length !== n)) {
+  if (visual.rows.some((row: { cells: unknown }) => !Array.isArray(row.cells) || row.cells.length !== n)) {
     issues.push('timetable row cell counts must match headers');
   }
   return issues;
 }
+
+function validatePartWholeBarModel(visual: PartWholeBarModelVisual): string[] {
+  const issues: string[] = [];
+  if (!hasText(visual.altText)) issues.push('missing alt text');
+  if (typeof visual.total !== 'number' || !Number.isFinite(visual.total)) {
+    issues.push('part-whole bar model requires a numeric total');
+  }
+  if (!Array.isArray(visual.parts) || visual.parts.length === 0) {
+    issues.push('part-whole bar model requires at least one part');
+  }
+  return issues;
+}
+
+function validateDataTable(visual: DataTableVisual): string[] {
+  const issues: string[] = [];
+  if (!hasText(visual.altText)) issues.push('missing alt text');
+  if (!Array.isArray(visual.columnHeaders) || visual.columnHeaders.length === 0) {
+    issues.push('data table requires column headers');
+  }
+  if (!Array.isArray(visual.rows) || visual.rows.length === 0) {
+    issues.push('data table requires rows');
+  }
+  return issues;
+}
+
+function validateSampleSpaceGrid(visual: SampleSpaceGridVisual): string[] {
+  const issues: string[] = [];
+  if (!hasText(visual.altText)) issues.push('missing alt text');
+  if (!Array.isArray(visual.rowLabels) || visual.rowLabels.length === 0) {
+    issues.push('sample space grid requires row labels');
+  }
+  if (!Array.isArray(visual.columnLabels) || visual.columnLabels.length === 0) {
+    issues.push('sample space grid requires column labels');
+  }
+  if (!Array.isArray(visual.cells) || visual.cells.length !== visual.rowLabels.length) {
+    issues.push('sample space grid cell rows must match row labels');
+  }
+  return issues;
+}
+
+function validateVennTwoSet(visual: VennTwoSetVisual): string[] {
+  const issues: string[] = [];
+  if (!hasText(visual.altText)) issues.push('missing alt text');
+  if (!Array.isArray(visual.aOnly)) issues.push('venn diagram requires aOnly array');
+  if (!Array.isArray(visual.intersection)) issues.push('venn diagram requires intersection array');
+  if (!Array.isArray(visual.bOnly)) issues.push('venn diagram requires bOnly array');
+  return issues;
+}
+
+// AngleVisual validator is inline in the switch — no complex fields to check.
+// Keeping the reference here so TypeScript tracks the import.
+function _checkAngleVisualImported(_: AngleVisual): void { /* used to suppress unused-import */ }
 
 function validateFrequencyTreeNode(node: FrequencyTreeNode, depth: number): string[] {
   const issues: string[] = [];
