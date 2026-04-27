@@ -183,6 +183,29 @@ model Skill {
   intro             String?
   subjectId         String
   createdAt         DateTime           @default(now())
+
+  // ── AI generation enrichment ──────────────────────────────────────────────
+  // A precise description of what mastery of this skill looks like.
+  // Used in generation prompts and verification calls.
+  masteryDefinition    String?
+
+  // Structured misconception taxonomy. Array of MisconceptionEntry:
+  // { id: string, label: string, description: string, frequency: "HIGH"|"MEDIUM"|"LOW" }
+  // The id is the shared key between generation (distractor tagging) and
+  // LiveAttempt.misconceptionId (teacher signal).
+  misconceptions       Json?
+
+  // What makes questions on this skill easier or harder.
+  // Array of { dimension: string, easy: string, hard: string }
+  difficultyDimensions Json?
+
+  // Real-world or cross-topic contexts suitable for transfer questions.
+  // Array of { context: string, example: string }
+  transferContexts     Json?
+
+  // Rich prose context passed directly into the generation system prompt.
+  // Everything a good maths teacher would know before writing questions on this topic.
+  generativeContext    String?
   subject           Subject            @relation(fields: [subjectId], references: [id])
   prerequisites     SkillPrereq[]      @relation("SkillToPrereq")
   dependents        SkillPrereq[]      @relation("PrereqToSkill")
@@ -746,6 +769,9 @@ model LiveAttempt {
   answer        String
   correct       Boolean
   responseTimeMs Int
+  // References misconceptions[].id on the Skill node — set when the student
+  // selects a distractor that was tagged to a specific misconception at generation time.
+  misconceptionId String?
   createdAt     DateTime    @default(now())
 
   session       LiveSession @relation(fields: [liveSessionId], references: [id], onDelete: Cascade)
