@@ -6,6 +6,7 @@ import { prisma } from '@/db/prisma';
 import { recordKnowledgeAttempt } from '@/features/knowledge-state/knowledgeStateService';
 import { emitEvent } from '@/features/telemetry/eventService';
 import { escalateLane } from '@/lib/live/lane-router';
+import { generateQuestionsForSkill } from '@/lib/ai/questionGenerator';
 
 const schema = z.object({
   itemId: z.string().min(1),
@@ -201,20 +202,36 @@ export async function POST(req: NextRequest, { params }: Props) {
 
   if (!nextItem) {
     const sessionSkillId = liveSession.skillId ?? skillId;
-    const poolItem = await prisma.item.findFirst({
+    let poolItem = await prisma.item.findFirst({
       where: {
         id: { notIn: Array.from(answeredSet) },
-        skills: {
-          some: { skillId: sessionSkillId },
-        },
+        skills: { some: { skillId: sessionSkillId } },
       },
-      select: {
-        id: true,
-        question: true,
-        type: true,
-        options: true,
-      },
+      select: { id: true, question: true, type: true, options: true },
     });
+
+    // Pool exhausted — generate fresh AI questions and serve the first one.
+    if (!poolItem) {
+      try {
+        const skill = await prisma.skill.findUnique({
+          where: { id: sessionSkillId },
+          select: { code: true, masteryDefinition: true },
+        });
+        if (skill?.masteryDefinition) {
+          const generated = await generateQuestionsForSkill({ skillCode: skill.code, count: 5 });
+          if (generated.length > 0) {
+            poolItem = await prisma.item.findUnique({
+              where: { id: generated[0].id },
+              select: { id: true, question: true, type: true, options: true },
+            });
+          }
+        }
+      } catch (err) {
+        // Generation failure is non-fatal — student simply gets no next item.
+        console.warn('[attempts] AI generation fallback failed:', (err as Error).message);
+      }
+    }
+
     if (poolItem) {
       nextItem = { ...poolItem, skillId: sessionSkillId };
     }
