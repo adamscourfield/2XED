@@ -183,6 +183,43 @@ export interface FrequencyTreeVisual extends VisualCaptioned {
   root: FrequencyTreeNode;
 }
 
+/** Equal-parts / equal-groups bar model (N3 multiplication/division context). */
+export interface BarModelSegment {
+  value: number;
+  label: string;
+}
+
+export interface BarModelVisual extends VisualCaptioned {
+  type: 'bar-model';
+  total: number;
+  segments: BarModelSegment[];
+}
+
+/** Two-set Venn diagram (S1 probability). */
+export interface VennTwoSetCounts {
+  aOnly: number;
+  intersection: number;
+  bOnly: number;
+  outside: number;
+}
+
+export interface VennTwoSetVisual extends VisualCaptioned {
+  type: 'venn-two-set';
+  aOnly: string[];
+  intersection: string[];
+  bOnly: string[];
+  outside: string[];
+  counts?: VennTwoSetCounts;
+}
+
+/** Sample space grid (S1 probability — two-event outcomes). */
+export interface SampleSpaceGridVisual extends VisualCaptioned {
+  type: 'sample-space-grid';
+  rowLabels: string[];
+  columnLabels: string[];
+  cells: string[][];
+}
+
 export type MathsVisual =
   | ArithmeticLayoutVisual
   | ShapeVisual
@@ -194,4 +231,7 @@ export type MathsVisual =
   | PartWholeBarModelVisual
   | DataTableVisual
   | TimetableVisual
-  | FrequencyTreeVisual;
+  | FrequencyTreeVisual
+  | BarModelVisual
+  | VennTwoSetVisual
+  | SampleSpaceGridVisual;

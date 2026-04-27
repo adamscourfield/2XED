@@ -1464,12 +1464,11 @@ function inferGeneratedVisuals(question: string, primarySkillCode?: string, rawO
 
   const ordered: Array<
     | BarModelVisual
+    | ChartVisual
     | ArithmeticLayoutVisual
     | ShapeVisual
     | NumberLineVisual
     | FractionBarVisual
-    | SampleSpaceGridVisual
-    | VennTwoSetVisual
     | null
   > = lower.includes('number line')
     ? [
@@ -1499,8 +1498,8 @@ function inferGeneratedVisuals(question: string, primarySkillCode?: string, rawO
     (
       visual
     ): visual is
-      | ChartVisual
       | BarModelVisual
+      | ChartVisual
       | ArithmeticLayoutVisual
       | ShapeVisual
       | NumberLineVisual
