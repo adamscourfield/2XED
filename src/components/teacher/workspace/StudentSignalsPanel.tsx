@@ -16,9 +16,19 @@ export interface InterpretedSignal {
   text: string;
 }
 
+export interface MisconceptionSignal {
+  misconceptionId: string;
+  label: string;
+  description: string;
+  studentCount: number;
+  studentNames: string[];
+}
+
 interface Props {
   overview: ClassOverview;
   signals: InterpretedSignal[];
+  misconceptionSignals?: MisconceptionSignal[] | null;
+  /** @deprecated pass misconceptionSignals instead */
   topMisconception?: { text: string; studentCount: number } | null;
   suggestedMove?: { text: string; cta?: string; onAct?: () => void } | null;
   onViewDetailedResponses?: () => void;
@@ -57,6 +67,7 @@ function toneIcon(tone: InterpretedSignal['tone']) {
 export function StudentSignalsPanel({
   overview,
   signals,
+  misconceptionSignals,
   topMisconception,
   suggestedMove,
   onViewDetailedResponses,
@@ -142,7 +153,46 @@ export function StudentSignalsPanel({
         </div>
       </div>
 
-      {topMisconception && (
+      {/* Real-time misconception breakdown — populated from LiveAttempt.misconceptionId */}
+      {misconceptionSignals && misconceptionSignals.length > 0 ? (
+        <div className="mt-4 space-y-2">
+          <p className="text-xs font-semibold" style={{ color: 'var(--anx-text-secondary)' }}>
+            Misconceptions in play
+          </p>
+          {misconceptionSignals.map((mc) => (
+            <div
+              key={mc.misconceptionId}
+              className="rounded-2xl px-3 py-3"
+              style={{ background: mc.studentCount >= 3 ? 'var(--anx-warning-soft)' : 'var(--anx-surface-container-low)' }}
+            >
+              <div className="flex items-start gap-2">
+                <span
+                  className="anx-signal-dot"
+                  style={{
+                    background: mc.studentCount >= 3 ? 'var(--anx-warning-text)' : 'var(--anx-outline-variant)',
+                    color: mc.studentCount >= 3 ? '#fff' : 'var(--anx-text-muted)',
+                  }}
+                  aria-hidden
+                >
+                  {mc.studentCount}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p
+                    className="text-xs font-semibold leading-snug"
+                    style={{ color: mc.studentCount >= 3 ? 'var(--anx-warning-text)' : 'var(--anx-text-secondary)' }}
+                  >
+                    {mc.label}
+                  </p>
+                  <p className="mt-0.5 text-xs leading-snug" style={{ color: 'var(--anx-text-muted)' }}>
+                    {mc.studentNames.join(', ')}{mc.studentNames.length < mc.studentCount ? ` +${mc.studentCount - mc.studentNames.length} more` : ''}
+                  </p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : topMisconception ? (
+        // Fallback to legacy prop if no signal data yet
         <div className="mt-4 rounded-2xl bg-[var(--anx-warning-soft)] px-3 py-3">
           <div className="flex items-start gap-2">
             <span className="anx-signal-dot anx-signal-dot-warn" aria-hidden>!</span>
@@ -156,7 +206,7 @@ export function StudentSignalsPanel({
             </div>
           </div>
         </div>
-      )}
+      ) : null}
 
       {suggestedMove && (
         <div className="mt-4 rounded-2xl bg-[var(--anx-primary-soft)] px-3 py-3">

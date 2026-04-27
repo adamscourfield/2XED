@@ -14,7 +14,7 @@ import {
 import { AnnotationToolbar } from './AnnotationToolbar';
 import { TeachingModePanel, type TeachingMode } from './TeachingModePanel';
 import { AnimationRenderer } from '@/components/explanation/AnimationRenderer';
-import { StudentSignalsPanel, type ClassOverview, type InterpretedSignal } from './StudentSignalsPanel';
+import { StudentSignalsPanel, type ClassOverview, type InterpretedSignal, type MisconceptionSignal } from './StudentSignalsPanel';
 import { TeacherBottomBar } from './TeacherBottomBar';
 import { InviteIcon, SettingsIcon } from './icons';
 import type { LiveStroke } from '@/lib/live/whiteboard-strokes';
@@ -94,6 +94,7 @@ interface SessionSnapshot {
   skillId?: string | null;
   skill?: { id: string; code: string; name: string } | null;
   recommendedExplanation?: RecommendedExplanation | null;
+  misconceptionSignals?: MisconceptionSignal[] | null;
 }
 
 interface RouteWithSteps {
@@ -133,6 +134,7 @@ const BROADCAST_DEBOUNCE_MS = 350;
 function deriveSignals(snapshot: SessionSnapshot | null): {
   overview: ClassOverview;
   signals: InterpretedSignal[];
+  misconceptionSignals: MisconceptionSignal[] | null;
   topMisconception: { text: string; studentCount: number } | null;
   suggestedMove: { text: string; cta?: string } | null;
 } {
@@ -140,6 +142,7 @@ function deriveSignals(snapshot: SessionSnapshot | null): {
     return {
       overview: { total: 0, responded: 0, correct: 0, partiallyCorrect: 0, incorrect: 0 },
       signals: [],
+      misconceptionSignals: null,
       topMisconception: null,
       suggestedMove: null,
     };
@@ -187,22 +190,42 @@ function deriveSignals(snapshot: SessionSnapshot | null): {
     signals.push({ tone: 'warn', text: 'Sign errors are appearing in several answers.' });
   }
 
+  // Use real misconception signal data from the backend when available.
+  const misconceptionSignals =
+    snapshot.misconceptionSignals && snapshot.misconceptionSignals.length > 0
+      ? snapshot.misconceptionSignals
+      : null;
+
+  // Legacy fallback: derive a rough top misconception from lane counts when
+  // no tagged signals exist yet (e.g. early in the session, or authored items
+  // without misconceptionMap).
   const topMisconception =
-    snapshot.laneCounts.LANE_3 > 0
+    !misconceptionSignals && snapshot.laneCounts.LANE_3 > 0
       ? {
           text: `Common mistake on the most recent ${skillName} question.`,
           studentCount: snapshot.laneCounts.LANE_3,
         }
       : null;
 
+  // Surface the top misconception label in the interpretive signals if it's
+  // affecting 3+ students, so the teacher gets a text-form alert too.
+  if (misconceptionSignals && misconceptionSignals[0]?.studentCount >= 3) {
+    signals.push({
+      tone: 'issue',
+      text: `${misconceptionSignals[0].studentCount} students: "${misconceptionSignals[0].label}"`,
+    });
+  }
+
   const suggestedMove =
     correctRate < 0.5 && responded > 0
       ? { text: `Reinforce ${skillName} with a quick worked example.`, cta: 'Show example' }
       : snapshot.laneCounts.LANE_3 > 0
         ? { text: 'Push a misconception repair to Lane 3.', cta: 'Send repair' }
-        : null;
+        : misconceptionSignals && misconceptionSignals.length > 0
+          ? { text: `Address "${misconceptionSignals[0].label}" — ${misconceptionSignals[0].studentCount} students affected.`, cta: 'Send repair' }
+          : null;
 
-  return { overview, signals, topMisconception, suggestedMove };
+  return { overview, signals, misconceptionSignals, topMisconception, suggestedMove };
 }
 
 function classLabel(snapshot: SessionSnapshot | null): string {
@@ -653,6 +676,7 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
           <StudentSignalsPanel
             overview={studentSignals.overview}
             signals={studentSignals.signals}
+            misconceptionSignals={studentSignals.misconceptionSignals}
             topMisconception={studentSignals.topMisconception}
             suggestedMove={
               studentSignals.suggestedMove

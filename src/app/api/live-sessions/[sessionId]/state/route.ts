@@ -55,6 +55,7 @@ export async function GET(_req: NextRequest, { params }: Props) {
           studentUserId: true,
           skillId: true,
           correct: true,
+          misconceptionId: true,
         },
       },
       skill: { select: { id: true, code: true, name: true } },
@@ -185,6 +186,51 @@ export async function GET(_req: NextRequest, { params }: Props) {
 
   const participantCount = liveSession.participants.filter((p) => p.isActive).length;
 
+  // ── Misconception signal aggregation ────────────────────────────────────
+  // Count distinct students per misconceptionId across all wrong attempts.
+  // Join with skill enrichment to attach human-readable labels.
+  const mcStudentMap = new Map<string, Set<string>>();
+  for (const attempt of liveSession.liveAttempts) {
+    if (!attempt.correct && attempt.misconceptionId) {
+      const existing = mcStudentMap.get(attempt.misconceptionId) ?? new Set<string>();
+      existing.add(attempt.studentUserId);
+      mcStudentMap.set(attempt.misconceptionId, existing);
+    }
+  }
+
+  // Load misconception labels from the skills referenced in this session
+  const skillIdsInSession = [...new Set(liveSession.liveAttempts.map((a) => a.skillId))];
+  const skillsWithEnrichment = skillIdsInSession.length > 0
+    ? await prisma.skill.findMany({
+        where: { id: { in: skillIdsInSession } },
+        select: { misconceptions: true },
+      })
+    : [];
+
+  type McEntry = { id: string; label: string; description: string };
+  const mcLabelMap = new Map<string, { label: string; description: string }>();
+  for (const skill of skillsWithEnrichment) {
+    if (!skill.misconceptions) continue;
+    const entries = skill.misconceptions as unknown as McEntry[];
+    for (const entry of entries) {
+      if (entry.id && !mcLabelMap.has(entry.id)) {
+        mcLabelMap.set(entry.id, { label: entry.label, description: entry.description });
+      }
+    }
+  }
+
+  const misconceptionSignals = Array.from(mcStudentMap.entries())
+    .map(([misconceptionId, students]) => ({
+      misconceptionId,
+      label: mcLabelMap.get(misconceptionId)?.label ?? misconceptionId,
+      description: mcLabelMap.get(misconceptionId)?.description ?? '',
+      studentCount: students.size,
+      studentNames: [...students]
+        .map((id) => studentNameMap.get(id) ?? 'Unknown')
+        .slice(0, 5),
+    }))
+    .sort((a, b) => b.studentCount - a.studentCount);
+
   return NextResponse.json({
     sessionId: liveSession.id,
     status: liveSession.status,
@@ -202,5 +248,6 @@ export async function GET(_req: NextRequest, { params }: Props) {
     responseSummary,
     recommendedExplanation,
     supportSummary,
+    misconceptionSignals,
   });
 }
