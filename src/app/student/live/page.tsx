@@ -53,6 +53,14 @@ interface ExplanationRouteData {
   animationSchema: unknown;
 }
 
+interface ExplanationRouteData {
+  id: string;
+  routeType: string;
+  misconceptionSummary: string;
+  workedExample: string;
+  animationSchema: unknown;
+}
+
 interface CurrentContent {
   contentType: 'EXPLANATION' | 'MESSAGE' | 'PHASE' | 'WHITEBOARD';
   targetLanes?: string[];
@@ -193,9 +201,10 @@ export default function StudentLivePage() {
               if (wb.version >= lastWhiteboardVersionRef.current) {
                 lastWhiteboardVersionRef.current = wb.version;
                 liveWhiteboardRef.current = wb;
-                // Stay in explanation phase on whiteboard updates — teacher is annotating
+                // Stay in explanation phase on 'show' (incremental annotation).
+                // On 'clear' the teacher is resetting the board — exit explanation.
                 setAppState((prev) => {
-                  if (prev.phase === 'explanation') return { ...prev, whiteboard: wb };
+                  if (prev.phase === 'explanation' && wb.action === 'show') return { ...prev, whiteboard: wb };
                   return { phase: 'whiteboard', session: sess, whiteboard: wb };
                 });
               }
