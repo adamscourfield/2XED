@@ -49,7 +49,7 @@ npm test
 Copy `.env.example` to `.env` and set:
 
 ```
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/anaxi_learn
+DATABASE_URL=postgresql://ember:ember_secret@localhost:5432/ember
 NEXTAUTH_SECRET=your-secret-here
 NEXTAUTH_URL=http://localhost:3000
 ```
@@ -83,7 +83,7 @@ npm run dev
 
 ### Admin Access
 - URL: http://localhost:3000
-- Admin email: admin@anaxi.local
+- Admin email: admin@ember.local
 - Admin password: admin123
 - Student email: student@example.com
 - Student password: password123

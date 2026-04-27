@@ -22,10 +22,10 @@ async function main() {
   // Admin user
   const adminPassword = await bcrypt.hash('admin123', 10);
   await prisma.user.upsert({
-    where: { email: 'admin@anaxi.local' },
+    where: { email: 'admin@ember.local' },
     update: {},
     create: {
-      email: 'admin@anaxi.local',
+      email: 'admin@ember.local',
       password: adminPassword,
       name: 'Admin',
       role: 'ADMIN',
@@ -51,7 +51,7 @@ async function main() {
     update: {},
     create: {
       userId: teacher.id,
-      externalSource: 'anaxi_observe',
+      externalSource: 'ember_observe',
       externalTeacherId: 'demo-teacher-001',
       externalSchoolId: 'demo-school-001',
       displayName: 'Demo Teacher',
@@ -60,10 +60,10 @@ async function main() {
 
   // Demo classroom
   const classroom = await prisma.classroom.upsert({
-    where: { externalSource_externalClassId: { externalSource: 'anaxi_observe', externalClassId: 'demo-class-7a' } },
+    where: { externalSource_externalClassId: { externalSource: 'ember_observe', externalClassId: 'demo-class-7a' } },
     update: {},
     create: {
-      externalSource: 'anaxi_observe',
+      externalSource: 'ember_observe',
       externalClassId: 'demo-class-7a',
       externalSchoolId: 'demo-school-001',
       name: 'Year 7A — Maths',
@@ -89,7 +89,7 @@ async function main() {
     update: {},
     create: {
       userId: student.id,
-      externalSource: 'anaxi_observe',
+      externalSource: 'ember_observe',
       externalStudentId: 'demo-student-001',
       externalSchoolId: 'demo-school-001',
     },

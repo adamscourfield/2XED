@@ -98,7 +98,7 @@ export interface ParsedBooklet {
  * Returns the page image as a base64-encoded PNG string.
  */
 function renderPageToPng(pdfPath: string, pageNum: number): string {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'anaxi-booklet-'));
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ember-booklet-'));
   const outputPrefix = path.join(tmpDir, 'page');
 
   try {

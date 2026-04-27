@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://anaxi.learn/schemas/unit-question-mapping.json",
+  "$id": "https://ember.app/schemas/unit-question-mapping.json",
   "title": "Anaxi-Learn Unit Question Mapping",
   "type": "object",
   "required": [

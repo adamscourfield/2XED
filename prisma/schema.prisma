@@ -587,7 +587,7 @@ model InterventionFlag {
 model TeacherProfile {
   id                String             @id @default(cuid())
   userId            String             @unique
-  externalSource    String             @default("anaxi_observe")
+  externalSource    String             @default("ember_observe")
   externalTeacherId String
   externalSchoolId  String?
   displayName       String?
@@ -602,7 +602,7 @@ model TeacherProfile {
 model StudentProfile {
   id                String                @id @default(cuid())
   userId            String                @unique
-  externalSource    String                @default("anaxi_observe")
+  externalSource    String                @default("ember_observe")
   externalStudentId String
   externalSchoolId  String?
   createdAt         DateTime              @default(now())
@@ -615,7 +615,7 @@ model StudentProfile {
 
 model Classroom {
   id               String                @id @default(cuid())
-  externalSource   String                @default("anaxi_observe")
+  externalSource   String                @default("ember_observe")
   externalClassId  String
   externalSchoolId String?
   name             String
