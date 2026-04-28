@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { StaffAnalyticsDisclosure } from '@/components/staff/StaffAnalyticsDisclosure';
 import { DashboardLessonCalendar } from '@/components/DashboardLessonCalendar';
 import type { EventPayload } from '@/app/teacher/dashboard/teacherDashboardData';
 import {
@@ -53,7 +54,7 @@ export function TeacherDashboardClassesView({
             {[7, 30, 90].map((d) => (
               <Link
                 key={d}
-                href={`/teacher/dashboard/classes?days=${d}${subtopicFilter ? `&subtopic=${encodeURIComponent(subtopicFilter)}` : ''}`}
+                href={`/teacher/dashboard/classes/analytics?days=${d}${subtopicFilter ? `&subtopic=${encodeURIComponent(subtopicFilter)}` : ''}`}
                 className={`staff-dash-pill${days === d ? ' staff-dash-pill--active' : ''}`}
               >
                 Last {d} days
@@ -211,6 +212,25 @@ export function TeacherDashboardClassesView({
                   </div>
                 </div>
 
+                <StaffAnalyticsDisclosure
+                  storageKey={`teacher-class-analytics:${cls.id}`}
+                  expandHashId={`class-analytics-${cls.id}`}
+                  summary={
+                    <>
+                      Full student roster with risk and durability.{' '}
+                      {requiringAction.length === 0 ? (
+                        <>No students flagged for follow-up in this window.</>
+                      ) : (
+                        <>
+                          <strong>
+                            {requiringAction.length} student{requiringAction.length !== 1 ? 's' : ''}
+                          </strong>{' '}
+                          flagged for follow-up.
+                        </>
+                      )}
+                    </>
+                  }
+                >
                 <div className="staff-dash-metric-grid staff-dash-metric-grid--5">
                   <div className="staff-dash-metric-tile staff-dash-metric-tile--accent">
                     <p className="staff-dash-metric-label">Question events</p>
@@ -340,6 +360,7 @@ export function TeacherDashboardClassesView({
                     </tbody>
                   </table>
                 </div>
+                </StaffAnalyticsDisclosure>
               </section>
             );
           })}
