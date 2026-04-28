@@ -4076,6 +4076,26 @@
     cursor: crosshair;
   }
 
+  .anx-canvas-host {
+    position: relative;
+    z-index: 10;
+    min-height: 0;
+  }
+
+  .anx-canvas-tool-ring {
+    border: 2px solid var(--anx-primary);
+    border-radius: 999px;
+    opacity: 0.85;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.7);
+    transition: opacity 80ms ease;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .anx-canvas-tool-ring {
+      display: none;
+    }
+  }
+
   .anx-canvas-floating {
     position: absolute;
     bottom: 0.875rem;

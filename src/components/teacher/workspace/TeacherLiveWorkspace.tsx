@@ -11,6 +11,7 @@ import {
   CANVAS_H,
   type CanvasTool,
 } from './AnnotationCanvas';
+import { AnnotationToolbar } from './AnnotationToolbar';
 import { TeachingModePanel, type TeachingMode } from './TeachingModePanel';
 import { AnimationRenderer } from '@/components/explanation/AnimationRenderer';
 import { StudentSignalsPanel, type ClassOverview, type InterpretedSignal, type MisconceptionSignal, type StudentMessageSignal, type StudentResponseDetail, type RubricCriterionSignal } from './StudentSignalsPanel';
@@ -660,6 +661,17 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
       <div className="anx-workspace-body">
         <div className="anx-canvas-stage">
           <div className="anx-canvas-board" style={{ position: 'relative' }}>
+            <AnnotationToolbar
+              tool={tool}
+              color={color}
+              canUndo={canUndo}
+              canRedo={canRedo}
+              onToolChange={setTool}
+              onColorChange={setColor}
+              onUndo={() => canvasRef.current?.undo()}
+              onRedo={() => canvasRef.current?.redo()}
+              onInsertImage={handleInsertImageRequest}
+            />
             {/* Explanation layer — AnimationRenderer sits behind the transparent canvas */}
             {!!activeExplanation?.route.animationSchema && (
               <div
@@ -679,6 +691,10 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
               color={color}
               width={3}
               onStateChange={scheduleBroadcast}
+              onHistoryChange={(u, r) => {
+                setCanUndo(u);
+                setCanRedo(r);
+              }}
               transparent={!!activeExplanation}
               watermark={
                 !activeExplanation && sessionStatus === 'LOBBY' ? 'Lesson starts when you click Start' : undefined
