@@ -347,54 +347,58 @@ export function StudentSignalsPanel({
         <ChevronRightIcon size={16} className={`transition-transform ${showDetail ? 'rotate-90' : ''}`} />
       </button>
 
-      {showDetail && (
-        <div className="mt-2 space-y-1">
-          {!studentResponses || studentResponses.length === 0 ? (
-            <p className="px-2 py-2 text-xs" style={{ color: 'var(--anx-text-muted)' }}>
-              No responses yet.
-            </p>
-          ) : (
-            studentResponses.map((s) => {
-              const laneColor =
-                s.lane === 'LANE_3' ? 'var(--anx-danger-text)' :
-                s.lane === 'LANE_2' ? 'var(--anx-warning-text)' :
-                'var(--anx-success)';
-              const laneLabel = s.lane === 'LANE_3' ? 'Reteach' : s.lane === 'LANE_2' ? 'Support' : 'On track';
-              return (
-                <div
-                  key={s.studentUserId}
-                  className="flex items-center gap-2 rounded-xl px-2 py-2"
-                  style={{ background: 'var(--anx-surface-container-low)' }}
-                >
-                  <span
-                    className="h-2 w-2 shrink-0 rounded-full"
-                    style={{ background: laneColor }}
-                    title={laneLabel}
-                    aria-label={laneLabel}
-                  />
-                  <span className="min-w-0 flex-1 truncate text-xs font-medium" style={{ color: 'var(--anx-text)' }}>
-                    {s.name}
-                  </span>
-                  {s.attemptCount > 0 ? (
-                    <span className="shrink-0 text-xs tabular-nums" style={{ color: 'var(--anx-text-muted)' }}>
-                      {s.correctCount}/{s.attemptCount}
-                      {s.partialCount > 0 && <span style={{ color: 'var(--anx-warning-text)' }}> · {s.partialCount} partial</span>}
-                      {s.lastOutcome === 'correct' && <span style={{ color: 'var(--anx-success)' }}> ✓</span>}
-                      {s.lastOutcome === 'partial' && <span style={{ color: 'var(--anx-warning-text)' }}> ~</span>}
-                      {s.lastOutcome === 'incorrect' && <span style={{ color: 'var(--anx-danger-text)' }}> ✗</span>}
+      <div
+        className={`grid overflow-hidden transition-[grid-template-rows] duration-300 ease-out ${showDetail ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}
+      >
+        <div className="min-h-0 overflow-hidden">
+          <div className="mt-2 space-y-1 pb-1">
+            {!studentResponses || studentResponses.length === 0 ? (
+              <p className="px-2 py-2 text-xs" style={{ color: 'var(--anx-text-muted)' }}>
+                No responses yet.
+              </p>
+            ) : (
+              studentResponses.map((s) => {
+                const laneColor =
+                  s.lane === 'LANE_3' ? 'var(--anx-danger-text)' :
+                  s.lane === 'LANE_2' ? 'var(--anx-warning-text)' :
+                  'var(--anx-success)';
+                const laneLabel = s.lane === 'LANE_3' ? 'Reteach' : s.lane === 'LANE_2' ? 'Support' : 'On track';
+                return (
+                  <div
+                    key={s.studentUserId}
+                    className="flex items-center gap-2 rounded-xl px-2 py-2"
+                    style={{ background: 'var(--anx-surface-container-low)' }}
+                  >
+                    <span
+                      className="h-2 w-2 shrink-0 rounded-full"
+                      style={{ background: laneColor }}
+                      title={laneLabel}
+                      aria-label={laneLabel}
+                    />
+                    <span className="min-w-0 flex-1 truncate text-xs font-medium" style={{ color: 'var(--anx-text)' }}>
+                      {s.name}
                     </span>
-                  ) : (
-                    <span className="shrink-0 text-xs" style={{ color: 'var(--anx-text-muted)' }}>—</span>
-                  )}
-                  {s.hasOpenFlag && (
-                    <span className="shrink-0 text-[10px]" style={{ color: 'var(--anx-danger-text)' }} title="Intervention flag">⚑</span>
-                  )}
-                </div>
-              );
-            })
-          )}
+                    {s.attemptCount > 0 ? (
+                      <span className="shrink-0 text-xs tabular-nums" style={{ color: 'var(--anx-text-muted)' }}>
+                        {s.correctCount}/{s.attemptCount}
+                        {s.partialCount > 0 && <span style={{ color: 'var(--anx-warning-text)' }}> · {s.partialCount} partial</span>}
+                        {s.lastOutcome === 'correct' && <span style={{ color: 'var(--anx-success)' }}> ✓</span>}
+                        {s.lastOutcome === 'partial' && <span style={{ color: 'var(--anx-warning-text)' }}> ~</span>}
+                        {s.lastOutcome === 'incorrect' && <span style={{ color: 'var(--anx-danger-text)' }}> ✗</span>}
+                      </span>
+                    ) : (
+                      <span className="shrink-0 text-xs" style={{ color: 'var(--anx-text-muted)' }}>—</span>
+                    )}
+                    {s.hasOpenFlag && (
+                      <span className="shrink-0 text-[10px]" style={{ color: 'var(--anx-danger-text)' }} title="Intervention flag">⚑</span>
+                    )}
+                  </div>
+                );
+              })
+            )}
+          </div>
         </div>
-      )}
+      </div>
     </section>
   );
 }

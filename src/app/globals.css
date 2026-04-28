@@ -4322,6 +4322,16 @@
     transition: transform 200ms var(--anx-transition-calm, ease);
   }
 
+  .student-live-chrome-pill-morph {
+    animation: anxLivePhaseIn 240ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .student-live-chrome-pill-morph {
+      animation: none;
+    }
+  }
+
   .student-live-phase-hint {
     transition: color 0.2s ease, opacity 0.2s ease;
   }
@@ -4556,11 +4566,242 @@
     background: var(--anx-success);
   }
 
+  @keyframes studentLiveGuidanceTextIn {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 4px, 0);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  .student-live-guidance-text-in {
+    animation: studentLiveGuidanceTextIn 0.22s ease-out both;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .student-live-guidance-text-in {
+      animation: none;
+    }
+  }
+
+  .anx-student-live-page-scene {
+    animation: anxLivePhaseIn 260ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .anx-student-live-page-scene {
+      animation: none;
+    }
+  }
+
+  .anx-student-live-scene {
+    animation: anxLivePhaseIn 240ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    min-height: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .anx-student-live-scene {
+      animation: none;
+    }
+  }
+
+  /* MCQ rows — clearer keyboard focus + subtle selected lift */
+  .anx-option {
+    transition:
+      transform 180ms cubic-bezier(0.34, 1.56, 0.64, 1),
+      box-shadow 180ms ease,
+      border-color 180ms ease;
+  }
+
+  .anx-option:focus-within {
+    outline: 2px solid var(--anx-primary);
+    outline-offset: 2px;
+    border-radius: 12px;
+  }
+
+  .anx-option.anx-option-selected:not(:focus-within) {
+    transform: scale(1.01);
+    box-shadow: 0 4px 14px rgba(74, 64, 224, 0.12);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .anx-option {
+      transition: border-color 180ms ease, box-shadow 180ms ease;
+    }
+    .anx-option.anx-option-selected:not(:focus-within) {
+      transform: none;
+    }
+  }
+
+  .student-live-submit-press:not(:disabled):active {
+    transition: transform 80ms ease, box-shadow 80ms ease;
+    transform: translateY(1px) scale(0.985);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .student-live-submit-press:not(:disabled):active {
+      transform: none;
+    }
+  }
+
+  .student-join-code-ready {
+    box-shadow: 0 0 0 3px rgba(74, 64, 224, 0.35);
+  }
+
+  @keyframes studentFeedbackConfettiFall {
+    0% {
+      opacity: 1;
+      transform: translate3d(0, 0, 0) rotate(0deg);
+    }
+    100% {
+      opacity: 0;
+      transform: translate3d(var(--tx, 0px), 120px, 0) rotate(260deg);
+    }
+  }
+
+  .student-feedback-confetti-piece {
+    position: absolute;
+    left: calc(12% + var(--i, 0) * 6%);
+    top: 10%;
+    width: 6px;
+    height: 10px;
+    border-radius: 2px;
+    background: var(--anx-primary);
+    opacity: 0;
+    animation: studentFeedbackConfettiFall 720ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: calc(var(--i, 0) * 28ms);
+    --tx: calc((var(--i, 0) - 7) * 8px);
+  }
+
+  .student-feedback-confetti-piece:nth-child(odd) {
+    background: #22c55e;
+  }
+
+  .student-feedback-confetti-piece:nth-child(3n) {
+    background: #f59e0b;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .student-feedback-confetti {
+      display: none;
+    }
+  }
+
+  @keyframes anxNewSessionStepOutLtr {
+    from {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+    to {
+      opacity: 0;
+      transform: translate3d(-18px, 0, 0);
+    }
+  }
+
+  @keyframes anxNewSessionStepInLtr {
+    from {
+      opacity: 0;
+      transform: translate3d(18px, 0, 0);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  @keyframes anxNewSessionStepInRtl {
+    from {
+      opacity: 0;
+      transform: translate3d(-18px, 0, 0);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  .anx-new-session-step-leave {
+    animation: anxNewSessionStepOutLtr 200ms cubic-bezier(0.4, 0, 1, 1) both;
+  }
+
+  .anx-new-session-step-enter--ltr {
+    animation: anxNewSessionStepInLtr 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .anx-new-session-step-enter--rtl {
+    animation: anxNewSessionStepInRtl 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .anx-new-session-step-leave,
+    .anx-new-session-step-enter--ltr,
+    .anx-new-session-step-enter--rtl {
+      animation: none;
+    }
+  }
+
+  /* Teacher live workspace — first snapshot load */
+  @keyframes anxWorkspaceSkelPulse {
+    50% {
+      opacity: 0.55;
+    }
+  }
+
+  .anx-workspace-shell--loading .anx-workspace-skel-line,
+  .anx-workspace-shell--loading .anx-workspace-skel-canvas,
+  .anx-workspace-shell--loading .anx-workspace-skel-card {
+    animation: anxWorkspaceSkelPulse 1.1s ease-in-out infinite;
+    background: linear-gradient(
+      90deg,
+      var(--anx-surface-container-high) 0%,
+      var(--anx-surface-container-low) 50%,
+      var(--anx-surface-container-high) 100%
+    );
+    background-size: 200% 100%;
+  }
+
+  .anx-workspace-skel-canvas {
+    width: 100%;
+    min-height: min(52vh, 420px);
+    background: var(--anx-surface-container-low);
+  }
+
+  .anx-workspace-skel-card {
+    background: var(--anx-surface-container-lowest);
+    border: 1px solid var(--anx-outline-variant);
+  }
+
+  .anx-workspace-side-skel {
+    min-width: 0;
+  }
+
+  /* Annotation toolbar — icon swap micro-motion */
+  .anx-tool-btn .anx-tool-icon-slot {
+    display: inline-flex;
+    transition: opacity 140ms ease, transform 140ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .anx-tool-btn--active .anx-tool-icon-slot {
+    transform: scale(1.06);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .anx-tool-btn .anx-tool-icon-slot,
+    .anx-tool-btn--active .anx-tool-icon-slot {
+      transition: none;
+      transform: none;
+    }
+  }
+
   .anx-confidence-row {
     display: grid;
     grid-template-columns: 1fr;
     gap: 0.5rem;
   }
+
   .anx-confidence-btn {
     display: inline-flex;
     align-items: center;
@@ -4573,7 +4814,11 @@
     font-size: 0.875rem;
     font-weight: 600;
     cursor: pointer;
-    transition: background 160ms var(--anx-transition-calm), border-color 160ms var(--anx-transition-calm);
+    transition:
+      background 160ms var(--anx-transition-calm),
+      border-color 160ms var(--anx-transition-calm),
+      transform 220ms cubic-bezier(0.34, 1.56, 0.64, 1),
+      box-shadow 220ms ease;
   }
   .anx-confidence-btn:hover {
     background: var(--anx-surface-container-low);
@@ -4581,6 +4826,14 @@
   .anx-confidence-btn[aria-pressed='true'] {
     border-color: var(--anx-primary);
     background: var(--anx-primary-soft);
+    box-shadow: 0 2px 12px rgba(74, 64, 224, 0.15);
+    transform: scale(1.02);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .anx-confidence-btn[aria-pressed='true'] {
+      transform: none;
+    }
   }
   .anx-confidence-btn-icon {
     width: 28px;

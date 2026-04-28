@@ -11,7 +11,6 @@ import {
   CANVAS_H,
   type CanvasTool,
 } from './AnnotationCanvas';
-import { AnnotationToolbar } from './AnnotationToolbar';
 import { TeachingModePanel, type TeachingMode } from './TeachingModePanel';
 import { AnimationRenderer } from '@/components/explanation/AnimationRenderer';
 import { StudentSignalsPanel, type ClassOverview, type InterpretedSignal, type MisconceptionSignal, type StudentMessageSignal, type StudentResponseDetail, type RubricCriterionSignal } from './StudentSignalsPanel';
@@ -232,6 +231,7 @@ function lessonTitle(snapshot: SessionSnapshot | null): string {
 
 export function TeacherLiveWorkspace({ sessionId }: Props) {
   const [snapshot, setSnapshot] = useState<SessionSnapshot | null>(null);
+  const [snapshotLoading, setSnapshotLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [tool, setTool] = useState<CanvasTool>('pen');
   const [color, setColor] = useState<string>('#1f1f23');
@@ -261,6 +261,7 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
       const res = await fetch(`/api/live-sessions/${sessionId}/state`);
       if (!res.ok) {
         setError('Failed to load session.');
+        setSnapshotLoading(false);
         return;
       }
       const data = await res.json();
@@ -268,6 +269,8 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
       setPaused(data.status === 'PAUSED');
     } catch {
       setError('Network error.');
+    } finally {
+      setSnapshotLoading(false);
     }
   }, [sessionId]);
 
@@ -311,6 +314,7 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
       .then((r) => r.json())
       .then((data: { routes: Record<string, RouteWithSteps> }) => setAvailableRoutes(data.routes))
       .catch(() => { /* soft fail */ });
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- only refetch routes when skill or phase index identity changes
   }, [sessionId, snapshot?.skill?.id, snapshot?.currentPhaseIndex]);
 
   // ── Canvas → student broadcast ─────────────────────────────────────────────
@@ -520,6 +524,48 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
         <Link href="/teacher/dashboard" className="anx-btn-secondary mt-6 px-5 py-2.5 text-sm no-underline">
           Back to dashboard
         </Link>
+      </div>
+    );
+  }
+
+  if (snapshotLoading && !snapshot) {
+    return (
+      <div className="anx-workspace-shell anx-workspace-shell--loading">
+        <header className="anx-workspace-topbar anx-workspace-skeleton-bar">
+          <div className="anx-workspace-skel-line h-7 w-7 rounded-lg" />
+          <div className="anx-workspace-skel-line h-6 w-16 rounded-full" />
+          <div className="min-w-0 flex-1 space-y-2">
+            <div className="anx-workspace-skel-line h-3 w-24 rounded" />
+            <div className="anx-workspace-skel-line h-5 w-48 max-w-full rounded" />
+          </div>
+          <div className="ml-auto flex gap-2">
+            <div className="anx-workspace-skel-line h-8 w-24 rounded-full" />
+            <div className="anx-workspace-skel-line h-8 w-20 rounded-full" />
+          </div>
+        </header>
+        <div className="anx-workspace-body">
+          <div className="anx-canvas-stage">
+            <div className="anx-workspace-skel-canvas rounded-2xl" />
+          </div>
+          <aside className="anx-workspace-side anx-workspace-side-skel space-y-3">
+            <div className="anx-workspace-skel-card rounded-2xl p-4">
+              <div className="anx-workspace-skel-line mb-3 h-3 w-28 rounded" />
+              <div className="space-y-2">
+                <div className="anx-workspace-skel-line h-3 w-full rounded" />
+                <div className="anx-workspace-skel-line h-3 max-w-[83%] rounded" />
+              </div>
+            </div>
+            <div className="anx-workspace-skel-card rounded-2xl p-4">
+              <div className="anx-workspace-skel-line mb-2 h-3 w-32 rounded" />
+              <div className="anx-workspace-skel-line h-16 w-full rounded-xl" />
+            </div>
+          </aside>
+        </div>
+        <div className="anx-workspace-bottombar anx-workspace-skeleton-bar">
+          <div className="anx-workspace-skel-line h-9 w-24 rounded-lg" />
+          <div className="anx-workspace-skel-line h-9 w-28 rounded-lg" />
+          <div className="anx-workspace-skel-line ml-auto h-9 w-20 rounded-lg" />
+        </div>
       </div>
     );
   }

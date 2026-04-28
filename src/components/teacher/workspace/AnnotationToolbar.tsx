@@ -52,7 +52,7 @@ function ToolButton({
       disabled={disabled}
       onClick={onClick}
     >
-      {children}
+      <span className="anx-tool-icon-slot">{children}</span>
     </button>
   );
 }

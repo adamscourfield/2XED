@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 interface Classroom {
@@ -110,7 +110,7 @@ export function NewLiveSessionForm({ classrooms, subjects, skillsBySubject }: Pr
   // Step 2 — ordered phase list
   const [phases, setPhases] = useState<LessonPhase[]>([]);
 
-  const [step, setStep] = useState<1 | 2 | 3>(1);
+  const [step, setStep] = useState<1 | 2>(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -123,6 +123,18 @@ export function NewLiveSessionForm({ classrooms, subjects, skillsBySubject }: Pr
   const [bankLoading, setBankLoading] = useState(false);
   const [perStudentSuggestLoading, setPerStudentSuggestLoading] = useState(false);
   const [skillFlashId, setSkillFlashId] = useState<string | null>(null);
+
+  const prevStepRef = useRef<1 | 2>(1);
+  useEffect(() => {
+    prevStepRef.current = step;
+  }, [step]);
+
+  const stepEnterClass =
+    step > prevStepRef.current
+      ? 'anx-new-session-step-enter--ltr'
+      : step < prevStepRef.current
+        ? 'anx-new-session-step-enter--rtl'
+        : 'anx-new-session-step-enter--ltr';
 
   const skillsForSubject = skillsBySubject.filter((s) => s.subjectId === subjectId);
 
@@ -393,7 +405,7 @@ export function NewLiveSessionForm({ classrooms, subjects, skillsBySubject }: Pr
   // ── Step 1: Pick classroom, subject, skills ────────────────────────────────
   if (step === 1) {
     return (
-      <div key="new-live-step-1" className="anx-new-session-step-enter">
+      <div key="new-live-step-1" className={`anx-new-session-step-enter ${stepEnterClass}`}>
       <div className="anx-card space-y-6 p-6 sm:p-8">
         <StepIndicator current={1} />
         <div>
@@ -510,7 +522,7 @@ export function NewLiveSessionForm({ classrooms, subjects, skillsBySubject }: Pr
 
   // ── Step 2: Arrange phases ─────────────────────────────────────────────────
   return (
-    <div key="new-live-step-2" className="anx-new-session-step-enter">
+    <div key="new-live-step-2" className={`anx-new-session-step-enter ${stepEnterClass}`}>
     <div className="anx-card space-y-6 p-6 sm:p-8">
       <StepIndicator current={2} />
       <div>
