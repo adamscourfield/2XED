@@ -1,5 +1,6 @@
 'use client';
 
+import { useLivePhasePrimaryFocus } from '@/components/student/live/useLivePhasePrimaryFocus';
 import { AnimationRenderer } from '@/components/explanation/AnimationRenderer';
 import { LiveWhiteboardViewer } from '@/components/student/LiveWhiteboardViewer';
 import { HelpIcon } from '@/components/teacher/workspace/icons';
@@ -37,6 +38,7 @@ export function StudentExplanationView({
   onNeedHelp,
 }: Props) {
   const schema = explanationRoute.animationSchema as Parameters<typeof AnimationRenderer>[0]['schema'] | null;
+  useLivePhasePrimaryFocus(`${explanationRoute.id}-${stepIndex}`);
 
   return (
     <div className="flex min-h-screen flex-col bg-[color:var(--anx-surface-bright)]">
@@ -47,7 +49,7 @@ export function StudentExplanationView({
         mode="explanation"
         phaseHint={`Model · Step ${Math.min(stepIndex + 1, totalSteps)} of ${Math.max(totalSteps, 1)}`}
       >
-        <StudentLivePhaseStrip active="Watch" />
+        <StudentLivePhaseStrip active="Model" />
       </StudentLiveSessionChrome>
 
       <main className="mx-auto grid w-full max-w-6xl flex-1 grid-cols-1 gap-5 px-4 py-5 sm:px-6 lg:grid-cols-[minmax(0,1fr),320px]">
@@ -156,6 +158,7 @@ export function StudentExplanationView({
             <button
               type="button"
               onClick={onNeedHelp}
+              data-live-primary-focus=""
               className="inline-flex items-center justify-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition hover:bg-[var(--anx-primary-soft)]"
               style={{ borderColor: 'var(--anx-outline-variant)', color: 'var(--anx-primary)' }}
             >

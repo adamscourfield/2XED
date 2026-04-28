@@ -1,10 +1,11 @@
 'use client';
 
-const STEPS = ['Wait', 'Watch', 'Check', 'Practice'] as const;
+/** Four beats that match real flows: prep → teacher-led → model → student attempt */
+const STEPS = ['Ready', 'Watch', 'Model', 'Try'] as const;
 
-type StepId = (typeof STEPS)[number];
+export type LiveStripStepId = (typeof STEPS)[number];
 
-/** Maps coarse student live phases to the nearest strip step for orientation */
+/** Maps coarse student live phases to the strip (explanation = Model, not “Practice”) */
 export function livePhaseToStripStep(
   phase:
     | 'waiting'
@@ -13,24 +14,24 @@ export function livePhaseToStripStep(
     | 'check'
     | 'practice'
     | 'explanation'
-    | 'feedback'
-): StepId {
+    | 'feedback',
+): LiveStripStepId {
   switch (phase) {
     case 'watch':
     case 'message':
       return 'Watch';
+    case 'explanation':
+      return 'Model';
     case 'check':
     case 'feedback':
-      return 'Check';
     case 'practice':
-    case 'explanation':
-      return 'Practice';
+      return 'Try';
     default:
-      return 'Wait';
+      return 'Ready';
   }
 }
 
-export function StudentLivePhaseStrip({ active }: { active: StepId }) {
+export function StudentLivePhaseStrip({ active }: { active: LiveStripStepId }) {
   const activeIndex = STEPS.indexOf(active);
   return (
     <div className="student-live-phase-strip" role="navigation" aria-label="Lesson progress">
