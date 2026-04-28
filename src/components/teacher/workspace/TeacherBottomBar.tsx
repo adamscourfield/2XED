@@ -22,7 +22,7 @@ export function TeacherBottomBar({
   screensLocked,
 }: Props) {
   return (
-    <div className="anx-workspace-bottombar">
+    <div className={`anx-workspace-bottombar${paused ? ' anx-workspace-bottombar--paused' : ''}`}>
       <button type="button" className="anx-workspace-bottombar-btn" onClick={onTogglePause}>
         {paused ? <PlayIcon size={16} /> : <PauseIcon size={16} />}
         {paused ? 'Resume' : 'Pause'}
