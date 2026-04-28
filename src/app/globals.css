@@ -4284,6 +4284,226 @@
     animation: anxLivePulse 1.8s ease-out infinite;
   }
 
+  .anx-practice-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.625rem;
+    border-radius: 999px;
+    background: var(--anx-primary-soft);
+    color: var(--anx-primary);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+
+  /* Live lesson — phase transitions (student) */
+  @keyframes anxLivePhaseIn {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 6px, 0);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  .anx-live-phase-transition {
+    animation: anxLivePhaseIn 220ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .anx-live-phase-transition {
+      animation: none;
+    }
+  }
+
+  .student-live-chrome-pill-wrap {
+    transition: transform 200ms var(--anx-transition-calm, ease);
+  }
+
+  .student-live-phase-hint {
+    transition: color 0.2s ease, opacity 0.2s ease;
+  }
+
+  .student-live-phase-strip {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem 0.5rem;
+  }
+
+  .student-live-phase-strip__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .student-live-phase-strip__rail {
+    display: block;
+    width: 0.75rem;
+    height: 2px;
+    border-radius: 1px;
+    background: var(--anx-outline-variant);
+    transition: background 0.2s ease;
+  }
+
+  .student-live-phase-strip__rail[data-done='true'] {
+    background: var(--anx-primary);
+  }
+
+  .student-live-phase-strip__pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 999px;
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--anx-text-muted);
+    background: var(--anx-surface-container-low);
+    border: 1px solid var(--anx-outline-variant);
+    transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+  }
+
+  .student-live-phase-strip__pill[data-state='current'] {
+    color: var(--anx-on-primary, #fff);
+    background: var(--anx-primary);
+    border-color: var(--anx-primary);
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.04);
+  }
+
+  .student-live-phase-strip__pill[data-state='done'] {
+    color: var(--anx-success);
+    background: var(--anx-success-soft);
+    border-color: rgba(34, 197, 94, 0.35);
+  }
+
+  .student-live-phase-strip__text {
+    line-height: 1;
+  }
+
+  @keyframes studentLiveGuidanceIn {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 4px, 0);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  .student-live-guidance-enter {
+    animation: studentLiveGuidanceIn 0.25s ease-out both;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .student-live-guidance-enter {
+      animation: none;
+    }
+  }
+
+  @keyframes studentLiveCardBreath {
+    0%,
+    100% {
+      box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
+    }
+    50% {
+      box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.2);
+    }
+  }
+
+  .student-live-waiting-card {
+    animation: studentLiveCardBreath 3.2s ease-in-out infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .student-live-waiting-card {
+      animation: none;
+    }
+  }
+
+  .student-live-waiting-placeholder {
+    position: relative;
+  }
+
+  @keyframes studentLiveRing {
+    0%,
+    100% {
+      transform: scale(1);
+      opacity: 0.5;
+    }
+    50% {
+      transform: scale(1.05);
+      opacity: 0.9;
+    }
+  }
+
+  .student-live-waiting-ring {
+    border: 2px solid var(--anx-primary-soft);
+    animation: studentLiveRing 2.2s ease-in-out infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .student-live-waiting-ring {
+      animation: none;
+    }
+  }
+
+  .student-live-msg-composer {
+    grid-template-rows: 0fr;
+  }
+
+  .student-live-msg-composer--open {
+    grid-template-rows: 1fr;
+  }
+
+  .student-live-busy-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    border-radius: inherit;
+    background: rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(1px);
+    pointer-events: none;
+  }
+
+  .student-live-submit-ready:not(:disabled) {
+    box-shadow: 0 8px 22px rgba(74, 64, 224, 0.22);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .student-live-submit-ready:not(:disabled) {
+      box-shadow: var(--anx-btn-primary-shadow, none);
+    }
+  }
+
+  .anx-workspace-bottombar--paused {
+    background: linear-gradient(180deg, var(--anx-warning-soft) 0%, var(--anx-surface-container-lowest) 100%);
+    border-top-color: rgba(245, 158, 11, 0.45);
+  }
+
+  .anx-signal-row-appear {
+    animation: anxLivePhaseIn 0.22s ease-out both;
+  }
+
+  .anx-new-session-step-enter {
+    animation: anxLivePhaseIn 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .anx-new-session-step-enter {
+      animation: none;
+    }
+  }
+
+  .anx-skill-pickflash {
+    animation: anxLivePhaseIn 0.2s ease-out both;
+  }
+
   /* Practice mode badge for student practice page */
   .anx-practice-pill {
     display: inline-flex;

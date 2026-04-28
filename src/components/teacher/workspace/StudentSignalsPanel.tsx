@@ -127,7 +127,7 @@ export function StudentSignalsPanel({
           <p className="text-xs font-semibold" style={{ color: 'var(--anx-text-secondary)' }}>What we’re seeing</p>
           <div className="mt-2">
             {signals.map((s, i) => (
-              <div key={i} className="anx-signal-row">
+              <div key={`${s.text}-${i}`} className="anx-signal-row anx-signal-row-appear" style={{ animationDelay: `${Math.min(i, 6) * 45}ms` }}>
                 {toneIcon(s.tone)}
                 <span>{s.text}</span>
               </div>

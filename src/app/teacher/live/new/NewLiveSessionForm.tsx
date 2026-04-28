@@ -122,6 +122,7 @@ export function NewLiveSessionForm({ classrooms, subjects, skillsBySubject }: Pr
   const [bankBySkill, setBankBySkill] = useState<Array<{ skillId: string; items: BankItem[] }>>([]);
   const [bankLoading, setBankLoading] = useState(false);
   const [perStudentSuggestLoading, setPerStudentSuggestLoading] = useState(false);
+  const [skillFlashId, setSkillFlashId] = useState<string | null>(null);
 
   const skillsForSubject = skillsBySubject.filter((s) => s.subjectId === subjectId);
 
@@ -163,6 +164,8 @@ export function NewLiveSessionForm({ classrooms, subjects, skillsBySubject }: Pr
     setSelectedSkillIds((prev) =>
       prev.includes(skillId) ? prev.filter((id) => id !== skillId) : [...prev, skillId]
     );
+    setSkillFlashId(skillId);
+    window.setTimeout(() => setSkillFlashId(null), 480);
   }
 
   function buildPhasesFromSelection() {
@@ -390,6 +393,7 @@ export function NewLiveSessionForm({ classrooms, subjects, skillsBySubject }: Pr
   // ── Step 1: Pick classroom, subject, skills ────────────────────────────────
   if (step === 1) {
     return (
+      <div key="new-live-step-1" className="anx-new-session-step-enter">
       <div className="anx-card space-y-6 p-6 sm:p-8">
         <StepIndicator current={1} />
         <div>
@@ -471,7 +475,7 @@ export function NewLiveSessionForm({ classrooms, subjects, skillsBySubject }: Pr
                             selected
                               ? 'bg-[var(--anx-primary-soft)] font-medium text-[var(--anx-primary)]'
                               : 'text-[var(--anx-text-secondary)] hover:bg-[var(--anx-surface-container-low)]'
-                          }`}
+                          } ${skillFlashId === skill.id ? 'anx-skill-pickflash' : ''}`}
                         >
                           <input
                             type="checkbox"
@@ -500,11 +504,13 @@ export function NewLiveSessionForm({ classrooms, subjects, skillsBySubject }: Pr
           Build lesson plan →
         </button>
       </div>
+      </div>
     );
   }
 
   // ── Step 2: Arrange phases ─────────────────────────────────────────────────
   return (
+    <div key="new-live-step-2" className="anx-new-session-step-enter">
     <div className="anx-card space-y-6 p-6 sm:p-8">
       <StepIndicator current={2} />
       <div>
@@ -724,6 +730,7 @@ export function NewLiveSessionForm({ classrooms, subjects, skillsBySubject }: Pr
           {loading ? 'Launching…' : 'Launch lesson →'}
         </button>
       </div>
+    </div>
     </div>
   );
 }

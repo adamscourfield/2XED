@@ -1,8 +1,9 @@
 'use client';
 
-import Image from 'next/image';
 import { useState, type FormEvent } from 'react';
 import { CanvasInput, type CanvasInputData } from '@/components/question/CanvasInput';
+import { StudentLiveSessionChrome } from '@/components/student/live/StudentLiveSessionChrome';
+import { StudentLivePhaseStrip } from '@/components/student/live/StudentLivePhaseStrip';
 import {
   HelpIcon,
   MessageIcon,
@@ -87,6 +88,7 @@ export function StudentPracticeView({
   const [confidence, setConfidence] = useState<Confidence | null>(null);
   const [messageOpen, setMessageOpen] = useState(false);
   const [draft, setDraft] = useState('');
+  const [sentFlash, setSentFlash] = useState(false);
   const [canvasData, setCanvasData] = useState<CanvasInputData | null>(null);
 
   const isCanvasInput = question.type === 'CANVAS_INPUT';
@@ -100,45 +102,26 @@ export function StudentPracticeView({
     onSubmit(answer, confidence, canvasData);
   }
 
+  const hasTextAnswer = Boolean(answer.trim());
+  const hasCanvasAnswer = Boolean(canvasData);
+  const canSubmitForm = !busy && (hasTextAnswer || hasCanvasAnswer);
+
   return (
     <div className={`flex min-h-screen flex-col bg-[color:var(--anx-surface-bright)] ${className ?? ''}`}>
-      {/* ── Top bar ─────────────────────────────────────────────────────── */}
-      <header className="flex flex-wrap items-center gap-3 border-b px-4 py-3 sm:px-6"
-        style={{ borderColor: 'var(--anx-outline-variant)', background: 'var(--anx-surface-container-lowest)' }}
+      <StudentLiveSessionChrome
+        lessonTitle={lessonTitle}
+        classLabel={classLabel}
+        onLeave={onLeave}
+        mode="practice"
+        phaseHint="Practice · Your turn"
       >
-        <Image src="/Ember_logo_icon.png" alt="Ember" width={512} height={512} className="h-7 w-7" priority />
-        <span className="anx-practice-pill">Practice</span>
-        <div className="min-w-0">
-          <p className="truncate text-sm font-semibold leading-none" style={{ color: 'var(--anx-text)' }}>
-            {lessonTitle}
-          </p>
-          {classLabel && (
-            <p className="mt-1 text-xs leading-none" style={{ color: 'var(--anx-text-muted)' }}>
-              {classLabel}
-            </p>
-          )}
-        </div>
-        <div className="ml-auto flex items-center gap-2">
-          {classLabel && (
-            <span className="hidden text-xs sm:inline" style={{ color: 'var(--anx-text-muted)' }}>
-              You’re in class: <strong style={{ color: 'var(--anx-text-secondary)' }}>{classLabel}</strong>
-            </span>
-          )}
-          {onLeave && (
-            <button
-              type="button"
-              onClick={onLeave}
-              className="anx-btn-secondary px-3 py-1.5 text-xs"
-            >
-              Leave
-            </button>
-          )}
-        </div>
-      </header>
+        <StudentLivePhaseStrip active="Practice" />
+      </StudentLiveSessionChrome>
 
       {/* ── Main grid ───────────────────────────────────────────────────── */}
       <main className="mx-auto grid w-full max-w-6xl flex-1 grid-cols-1 gap-6 px-4 py-6 sm:px-6 lg:grid-cols-[minmax(0,1fr),320px]">
-        <section className="anx-card flex flex-col gap-5 p-6 sm:p-8">
+        <section className="relative anx-card flex flex-col gap-5 p-6 sm:p-8">
+          {busy ? <div className="student-live-busy-overlay" aria-hidden /> : null}
           <div className="flex items-center gap-2">
             <span
               className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold"
@@ -162,7 +145,7 @@ export function StudentPracticeView({
             )}
           </div>
 
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <form onSubmit={handleSubmit} className={`relative flex flex-col gap-4 ${busy ? 'opacity-90' : ''}`}>
             {error && <div className="anx-callout-danger text-sm">{error}</div>}
             {question.options && question.options.length > 0 ? (
               <div className="flex flex-col gap-2">
@@ -233,8 +216,8 @@ export function StudentPracticeView({
               </button>
               <button
                 type="submit"
-                disabled={busy || (!answer.trim() && !canvasData)}
-                className="anx-btn-primary inline-flex items-center gap-2 px-6 py-3 text-sm disabled:opacity-50"
+                disabled={!canSubmitForm}
+                className={`anx-btn-primary inline-flex items-center gap-2 px-6 py-3 text-sm transition ${canSubmitForm ? 'student-live-submit-ready' : 'opacity-50'}`}
               >
                 {busy ? 'Submitting…' : 'Submit answer'}
               </button>
@@ -327,38 +310,47 @@ export function StudentPracticeView({
           <button
             type="button"
             onClick={() => setMessageOpen((v) => !v)}
-            className="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition hover:bg-[var(--anx-surface-hover)]"
+            aria-expanded={messageOpen}
+            className="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition hover:bg-[var(--anx-surface-hover)] active:scale-[0.98]"
             style={{ borderColor: 'var(--anx-outline-variant)', color: 'var(--anx-text-secondary)' }}
           >
             <MessageIcon size={16} />
             Send message to teacher
           </button>
         </div>
-        {messageOpen && (
-          <div className="mx-auto mt-3 flex w-full max-w-2xl items-center gap-2">
-            <input
-              type="text"
-              value={draft}
-              onChange={(e) => setDraft(e.target.value)}
-              placeholder="Quick message to your teacher…"
-              className="anx-input flex-1"
-            />
-            <button
-              type="button"
-              onClick={() => {
-                if (draft.trim() && onMessageTeacher) {
-                  onMessageTeacher(draft.trim());
-                  setDraft('');
-                  setMessageOpen(false);
-                }
-              }}
-              className="anx-btn-primary px-4 py-2 text-sm"
-              disabled={!draft.trim()}
-            >
-              Send
-            </button>
+        <div className={`student-live-msg-composer mx-auto grid max-w-2xl overflow-hidden transition-[grid-template-rows] duration-200 ease-out ${messageOpen ? 'student-live-msg-composer--open' : ''}`}>
+          <div className="min-h-0 overflow-hidden">
+            <div className="flex items-center gap-2 pt-3">
+              <input
+                type="text"
+                value={draft}
+                onChange={(e) => setDraft(e.target.value)}
+                placeholder="Quick message to your teacher…"
+                className="anx-input flex-1"
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  if (draft.trim() && onMessageTeacher) {
+                    onMessageTeacher(draft.trim());
+                    setDraft('');
+                    setSentFlash(true);
+                    window.setTimeout(() => setSentFlash(false), 1800);
+                  }
+                }}
+                className="anx-btn-primary shrink-0 px-4 py-2 text-sm transition-transform active:scale-[0.97]"
+                disabled={!draft.trim()}
+              >
+                Send
+              </button>
+            </div>
+            {sentFlash ? (
+              <p className="mt-2 text-center text-xs font-medium" style={{ color: 'var(--anx-success)' }}>
+                Sent — your teacher can see this.
+              </p>
+            ) : null}
           </div>
-        )}
+        </div>
       </footer>
     </div>
   );

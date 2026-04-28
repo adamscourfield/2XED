@@ -1,10 +1,11 @@
 'use client';
 
-import Image from 'next/image';
 import { AnimationRenderer } from '@/components/explanation/AnimationRenderer';
 import { LiveWhiteboardViewer } from '@/components/student/LiveWhiteboardViewer';
 import { HelpIcon } from '@/components/teacher/workspace/icons';
 import type { LiveWhiteboardPayload } from '@/lib/live/whiteboard-strokes';
+import { StudentLiveSessionChrome } from '@/components/student/live/StudentLiveSessionChrome';
+import { StudentLivePhaseStrip } from '@/components/student/live/StudentLivePhaseStrip';
 
 interface ExplanationRouteData {
   id: string;
@@ -39,34 +40,15 @@ export function StudentExplanationView({
 
   return (
     <div className="flex min-h-screen flex-col bg-[color:var(--anx-surface-bright)]">
-      {/* Top bar */}
-      <header
-        className="flex flex-wrap items-center gap-3 border-b px-4 py-3 sm:px-6"
-        style={{ borderColor: 'var(--anx-outline-variant)', background: 'var(--anx-surface-container-lowest)' }}
+      <StudentLiveSessionChrome
+        lessonTitle={lessonTitle}
+        classLabel={classLabel}
+        onLeave={onLeave}
+        mode="explanation"
+        phaseHint={`Model · Step ${Math.min(stepIndex + 1, totalSteps)} of ${Math.max(totalSteps, 1)}`}
       >
-        <Image src="/Ember_logo_icon.png" alt="Ember" width={512} height={512} className="h-7 w-7" priority />
-        <span className="anx-live-pill">
-          <span className="anx-live-pill-dot" />
-          Live
-        </span>
-        <div className="min-w-0">
-          <p className="truncate text-sm font-semibold leading-none" style={{ color: 'var(--anx-text)' }}>
-            {lessonTitle}
-          </p>
-          {classLabel && (
-            <p className="mt-1 text-xs leading-none" style={{ color: 'var(--anx-text-muted)' }}>
-              {classLabel}
-            </p>
-          )}
-        </div>
-        <div className="ml-auto">
-          {onLeave && (
-            <button type="button" onClick={onLeave} className="anx-btn-secondary px-3 py-1.5 text-xs">
-              Leave
-            </button>
-          )}
-        </div>
-      </header>
+        <StudentLivePhaseStrip active="Watch" />
+      </StudentLiveSessionChrome>
 
       <main className="mx-auto grid w-full max-w-6xl flex-1 grid-cols-1 gap-5 px-4 py-5 sm:px-6 lg:grid-cols-[minmax(0,1fr),320px]">
         {/* Main explanation area with whiteboard overlay */}
