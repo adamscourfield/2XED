@@ -103,7 +103,7 @@
 
     /* ── Shadows — tiered elevation (dashboard cards + live chrome share sm/md) ─ */
     --anx-shadow-float: 0 24px 56px rgba(36, 24, 92, 0.14), 0 8px 24px rgba(4, 14, 31, 0.06);
-    --anx-shadow-sm:    0 8px 32px rgba(4,14,31,0.04);
+    --anx-shadow-sm:    0 8px 32px rgba(4,14,31,0.04); /* base tier — prefer --anx-shadow-card on bordered UI */
     --anx-shadow-md:    0 12px 36px rgba(4,14,31,0.05);
     --anx-shadow-lg:    0 20px 40px rgba(4,14,31,0.06);
     --anx-shadow-xl:    0 24px 48px rgba(4,14,31,0.06);
@@ -342,7 +342,7 @@
   .anx-dashboard-hero {
     border-radius: var(--anx-radius-xl);
     background: linear-gradient(90deg, var(--anx-dashboard-hero-from) 0%, var(--anx-dashboard-hero-to) 100%);
-    box-shadow: var(--anx-shadow-sm);
+    box-shadow: var(--anx-shadow-card);
   }
 
   .anx-dashboard-hero-cta {
@@ -1329,7 +1329,7 @@
     border-radius: var(--anx-radius-xl);
     padding: 1.35rem 1.35rem 1.5rem;
     background: var(--anx-surface-container-lowest);
-    box-shadow: var(--anx-shadow-sm);
+    box-shadow: var(--anx-shadow-card);
     transition: background 200ms ease;
   }
 
@@ -1520,7 +1520,7 @@
     border-radius: var(--anx-radius-xl);
     padding: 1.25rem 1.25rem 1.35rem;
     background: var(--anx-surface-container-lowest);
-    box-shadow: var(--anx-shadow-sm);
+    box-shadow: var(--anx-shadow-card);
   }
 
   .student-dash-live {
@@ -1575,7 +1575,7 @@
 
   .student-dash-subject-chip:hover {
     background: var(--anx-surface-container);
-    box-shadow: var(--anx-shadow-sm);
+    box-shadow: var(--anx-shadow-card);
   }
 
   .student-dash-reward-list {
@@ -1721,7 +1721,7 @@
     font-size: 0.875rem;
     font-weight: 600;
     color: var(--anx-text);
-    box-shadow: var(--anx-shadow-sm);
+    box-shadow: var(--anx-shadow-card);
   }
 
   .stu-top-subject {
@@ -2078,13 +2078,13 @@
     background: var(--anx-surface-container-lowest);
     padding: 0.75rem 0.85rem;
     text-decoration: none;
-    box-shadow: var(--anx-shadow-sm);
+    box-shadow: var(--anx-shadow-card);
     transition: border-color 0.15s ease, box-shadow 0.15s ease;
   }
 
   .stu-dash-tile:hover {
     border-color: rgba(99, 102, 241, 0.35);
-    box-shadow: var(--anx-shadow-sm);
+    box-shadow: var(--anx-shadow-card);
   }
 
   .stu-dash-tile-icon {
@@ -2164,7 +2164,7 @@
     border: 1px solid var(--anx-outline-variant);
     background: var(--anx-surface-container-lowest);
     padding: 1rem 1.25rem;
-    box-shadow: var(--anx-shadow-sm);
+    box-shadow: var(--anx-shadow-card);
   }
 
   .stu-dash-achievement-icon {
@@ -2209,7 +2209,7 @@
     border: 1px solid var(--anx-outline-variant);
     background: var(--anx-surface-container-lowest);
     padding: 1.1rem 1.2rem 1.2rem;
-    box-shadow: var(--anx-shadow-sm);
+    box-shadow: var(--anx-shadow-card);
   }
 
   .stu-dash-card-title {
@@ -3114,7 +3114,7 @@
     font-size: 0.875rem;
     font-weight: 600;
     color: var(--anx-text);
-    box-shadow: var(--anx-shadow-sm);
+    box-shadow: var(--anx-shadow-card);
   }
 
   .td-class-select {
@@ -3236,7 +3236,7 @@
     border: 1px solid var(--anx-outline-variant);
     background: var(--anx-surface-container-lowest);
     padding: 1.35rem 1.35rem 1.5rem;
-    box-shadow: var(--anx-shadow-sm);
+    box-shadow: var(--anx-shadow-card);
   }
 
   .td-home-action-icon {
@@ -3323,7 +3323,7 @@
     border: 1px solid var(--anx-outline-variant);
     background: var(--anx-surface-container-lowest);
     padding: 1.15rem 1.25rem 1.25rem;
-    box-shadow: var(--anx-shadow-sm);
+    box-shadow: var(--anx-shadow-card);
   }
 
   .td-home-card-head {
@@ -3788,7 +3788,7 @@
   .anx-conductor-topbar {
     background: var(--anx-surface-container-lowest);
     border-bottom: 1px solid var(--anx-border);
-    box-shadow: var(--anx-shadow-sm);
+    box-shadow: var(--anx-shadow-card);
     z-index: 10;
   }
 
@@ -4117,7 +4117,7 @@
     background: var(--anx-surface-container-lowest);
     border: 1px solid var(--anx-outline-variant);
     border-radius: 18px;
-    box-shadow: var(--anx-shadow-sm);
+    box-shadow: var(--anx-shadow-card);
     overflow: hidden;
     position: relative;
   }
@@ -4162,7 +4162,7 @@
     background: var(--anx-surface-container-lowest);
     border: 1px solid var(--anx-outline-variant);
     border-radius: 999px;
-    box-shadow: var(--anx-shadow-sm);
+    box-shadow: var(--anx-shadow-card);
   }
 
   .anx-canvas-floating .anx-tool-btn {

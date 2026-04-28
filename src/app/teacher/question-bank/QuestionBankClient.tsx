@@ -366,10 +366,7 @@ export function QuestionBankClient() {
         <ul className={`${view === 'grid' ? 'grid gap-4 sm:grid-cols-2' : 'space-y-4'} list-none p-0`}>
           {filteredDemo.map((item) => (
             <li key={item.id}>
-              <article
-                className="anx-card relative flex flex-col gap-3 p-4 sm:flex-row sm:items-start sm:justify-between sm:gap-4"
-                style={{ boxShadow: 'var(--anx-shadow-sm)' }}
-              >
+              <article className="anx-card relative flex flex-col gap-3 p-4 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
                 <div className="flex min-w-0 flex-1 gap-3">
                   <div
                     className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold"

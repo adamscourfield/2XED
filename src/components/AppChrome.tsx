@@ -711,7 +711,7 @@ export function AppChrome({
       >
         <button
           type="button"
-          className="flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--anx-outline-variant)] bg-white text-[color:var(--anx-text)] shadow-[var(--anx-shadow-sm)] transition hover:bg-[var(--anx-surface-soft)]"
+          className="flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--anx-outline-variant)] bg-white text-[color:var(--anx-text)] shadow-[var(--anx-shadow-card)] transition hover:bg-[var(--anx-surface-soft)]"
           aria-expanded={menuOpen}
           aria-controls="app-chrome-drawer"
           onClick={() => setMenuOpen((o) => !o)}
@@ -785,7 +785,7 @@ export function AppChrome({
           }`}
         >
           <div
-            className={`flex items-center gap-3 rounded-xl border px-3 py-2.5 shadow-[var(--anx-shadow-sm)] ${
+            className={`flex items-center gap-3 rounded-xl border px-3 py-2.5 shadow-[var(--anx-shadow-card)] ${
               variant === "teacher"
                 ? "border-[#e4e4e7] bg-white"
                 : "border-[var(--anx-outline-variant)] bg-[color:var(--anx-surface-bright)]"
