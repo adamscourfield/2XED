@@ -23,6 +23,16 @@ const PRACTICE_INTENT_MAP: Record<z.infer<typeof schema>['kind'], LiveItemIntent
   misconception: 'PRACTICE_MISCONCEPTION',
 };
 
+function buildPracticeItemPayload(item: NonNullable<Awaited<ReturnType<typeof selectLiveItem>>['item']>) {
+  return {
+    id: item.id,
+    question: item.question,
+    type: item.type,
+    options: item.options,
+    skillId: item.skillId,
+  };
+}
+
 export async function POST(req: NextRequest, { params }: Props) {
   const session = await getServerSession(authOptions);
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -98,6 +108,134 @@ export async function POST(req: NextRequest, { params }: Props) {
         }).then((row) => row?.misconceptionId ?? null)
       : null;
 
+  if (audience === 'individual') {
+    const usedItemIds = new Set<string>();
+    const resolvedAssignments: Array<[string, Awaited<ReturnType<typeof selectLiveItem>>]> = [];
+
+    for (const studentUserId of targetStudentIds) {
+      const individualMisconceptionId =
+        kind === 'misconception'
+          ? await prisma.liveAttempt.findFirst({
+              where: {
+                liveSessionId: sessionId,
+                studentUserId,
+                skillId: targetSkillId,
+                correct: false,
+                misconceptionId: { not: null },
+              },
+              orderBy: { createdAt: 'desc' },
+              select: { misconceptionId: true },
+            }).then((row) => row?.misconceptionId ?? misconceptionId)
+          : misconceptionId;
+
+      let selection = await selectLiveItem({
+        sessionId,
+        subjectId: liveSession.subjectId,
+        skillId: targetSkillId,
+        intent: PRACTICE_INTENT_MAP[kind],
+        audience,
+        targetStudentIds: [studentUserId],
+        misconceptionId: individualMisconceptionId,
+        excludeItemIds: [...usedItemIds],
+      });
+
+      if (!selection.item) {
+        selection = await selectLiveItem({
+          sessionId,
+          subjectId: liveSession.subjectId,
+          skillId: targetSkillId,
+          intent: PRACTICE_INTENT_MAP[kind],
+          audience: 'lane',
+          targetStudentIds,
+          misconceptionId,
+          excludeItemIds: [...usedItemIds],
+        });
+      }
+
+      if (!selection.item && usedItemIds.size > 0) {
+        selection = await selectLiveItem({
+          sessionId,
+          subjectId: liveSession.subjectId,
+          skillId: targetSkillId,
+          intent: PRACTICE_INTENT_MAP[kind],
+          audience: 'lane',
+          targetStudentIds,
+          misconceptionId,
+        });
+      }
+
+      if (!selection.item) continue;
+      usedItemIds.add(selection.item.id);
+      resolvedAssignments.push([studentUserId, selection]);
+    }
+
+    if (resolvedAssignments.length === 0) {
+      return NextResponse.json({ error: 'Unable to select practice items for the targeted students.' }, { status: 404 });
+    }
+
+    const unassignedStudentIds = targetStudentIds.filter(
+      (studentUserId) => !resolvedAssignments.some(([assignedId]) => assignedId === studentUserId)
+    );
+
+    if (unassignedStudentIds.length > 0) {
+      const fallbackSelection = await selectLiveItem({
+        sessionId,
+        subjectId: liveSession.subjectId,
+        skillId: targetSkillId,
+        intent: PRACTICE_INTENT_MAP[kind],
+        audience: 'lane',
+        targetStudentIds,
+        misconceptionId,
+      });
+      if (fallbackSelection.item) {
+        for (const studentUserId of unassignedStudentIds) {
+          resolvedAssignments.push([studentUserId, fallbackSelection]);
+        }
+      }
+    }
+
+    const individualAssignments = Object.fromEntries(
+      resolvedAssignments.map(([studentUserId, selection]) => [
+        studentUserId,
+        {
+          item: buildPracticeItemPayload(selection.item!),
+          selectionReason: selection.selectionReason,
+          score: selection.score,
+        },
+      ])
+    );
+
+    const content = {
+      contentType: 'PRACTICE' as const,
+      kind,
+      audience,
+      targetLanes: lanes,
+      broadcastAt: new Date().toISOString(),
+      questionNumber: 1,
+      totalQuestions: 1,
+      individualAssignments,
+    };
+
+    await prisma.liveSession.update({
+      where: { id: sessionId },
+      data: {
+        currentContent: content as Parameters<typeof prisma.liveSession.update>[0]['data']['currentContent'],
+      },
+    });
+
+    return NextResponse.json({
+      success: true,
+      content,
+      assignments: Object.fromEntries(
+        resolvedAssignments.map(([studentUserId, selection]) => [studentUserId, {
+          score: selection.score,
+          selectionReason: selection.selectionReason,
+          generated: selection.generated,
+        }])
+      ),
+    });
+  }
+
   const selection = await selectLiveItem({
     sessionId,
     subjectId: liveSession.subjectId,
@@ -118,13 +256,7 @@ export async function POST(req: NextRequest, { params }: Props) {
     audience,
     targetLanes: lanes,
     broadcastAt: new Date().toISOString(),
-    item: {
-      id: selection.item.id,
-      question: selection.item.question,
-      type: selection.item.type,
-      options: selection.item.options,
-      skillId: selection.item.skillId,
-    },
+    item: buildPracticeItemPayload(selection.item),
     questionNumber: 1,
     totalQuestions: 1,
   };

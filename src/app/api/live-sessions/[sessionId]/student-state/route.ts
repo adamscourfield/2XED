@@ -120,10 +120,26 @@ export async function GET(_req: NextRequest, { params }: Props) {
     }
   }
 
+  let currentContent = liveSession.currentContent as Record<string, unknown> | null;
+  if (
+    currentContent?.contentType === 'PRACTICE' &&
+    currentContent?.audience === 'individual' &&
+    currentContent?.individualAssignments &&
+    typeof currentContent.individualAssignments === 'object'
+  ) {
+    const assignment = (currentContent.individualAssignments as Record<string, { item?: unknown }>)[userId] ?? null;
+    currentContent = assignment?.item
+      ? {
+          ...currentContent,
+          item: assignment.item,
+        }
+      : null;
+  }
+
   return NextResponse.json({
     status: liveSession.status,
     currentPhaseIndex: liveSession.currentPhaseIndex,
-    currentContent: liveSession.currentContent,
+    currentContent,
     studentLane: participant.currentLane,
     pendingRecheckItem: pendingRecheckItem ?? openingCheckItem,
   });

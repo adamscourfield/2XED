@@ -16,6 +16,7 @@ interface SelectLiveItemParams {
   audience: LiveItemAudience;
   targetStudentIds?: string[];
   misconceptionId?: string | null;
+  excludeItemIds?: string[];
 }
 
 interface ScoredItem {
@@ -187,7 +188,7 @@ function toSelectionResult(scored: ScoredItem[], generated: boolean): LiveItemSe
 }
 
 export async function selectLiveItem(params: SelectLiveItemParams): Promise<LiveItemSelectionResult> {
-  const { sessionId, subjectId, skillId, intent, audience, targetStudentIds = [], misconceptionId } = params;
+  const { sessionId, subjectId, skillId, intent, audience, targetStudentIds = [], misconceptionId, excludeItemIds = [] } = params;
 
   const skill = await prisma.skill.findUnique({
     where: { id: skillId },
@@ -226,6 +227,7 @@ export async function selectLiveItem(params: SelectLiveItemParams): Promise<Live
     where: {
       subjectId,
       skills: { some: { skillId } },
+      ...(excludeItemIds.length > 0 ? { id: { notIn: excludeItemIds } } : {}),
     },
     select: {
       id: true,
