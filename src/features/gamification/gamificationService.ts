@@ -12,6 +12,8 @@ export interface UserGamificationSummary {
   tokens: number;
   streakDays: number;
   activeDaysThisWeek: number;
+  /** Sum of positive XP from the reward ledger since Monday 00:00 (local week aligned with activity metrics). */
+  weekXpEarned: number;
 }
 
 export interface GuessingSafeguardResult {
@@ -271,10 +273,19 @@ export async function getUserGamificationSummary(userId: string): Promise<UserGa
 
   const activeDaySet = new Set(weeklyEvents.map((e) => e.createdAt.toISOString().slice(0, 10)));
 
+  const weekXpAgg = await prisma.rewardTransaction.aggregate({
+    where: {
+      userId,
+      createdAt: { gte: weekStart },
+    },
+    _sum: { xpDelta: true },
+  });
+
   return {
     xp: balance?.xpTotal ?? 0,
     tokens: balance?.tokenTotal ?? 0,
     streakDays: balance?.streakDays ?? 0,
     activeDaysThisWeek: activeDaySet.size,
+    weekXpEarned: Math.max(0, weekXpAgg._sum.xpDelta ?? 0),
   };
 }
