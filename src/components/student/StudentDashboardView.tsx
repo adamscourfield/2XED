@@ -25,8 +25,6 @@ export type StudentLivePromo = {
   classLine: string;
 };
 
-const CONTINUE_TYPES = ['Worksheet', 'Check', 'Model', 'Practice'] as const;
-
 function tileAccent(i: number): { bg: string; icon: string } {
   const accents = [
     { bg: 'rgba(99, 102, 241, 0.18)', icon: '#4f46e5' },
@@ -59,9 +57,13 @@ export function StudentDashboardView({
 }: Props) {
   const firstName = displayName.split(/\s+/)[0] || displayName;
   const continueSubjects = subjects.filter((s) => s.onboardingComplete && s.nextSkillName).slice(0, 4);
-  const xpRingDeg = Math.min(360, Math.max(36, Math.round((gamification.streakDays / 14) * 360)));
+  /** Ring shows practice-day coverage this week (Mon–Sun), aligned with activity metrics. */
+  const practiceDaysRingDeg = Math.min(
+    360,
+    Math.round((Math.min(7, gamification.activeDaysThisWeek) / 7) * 360)
+  );
   const donutStyle: CSSProperties = {
-    background: `conic-gradient(var(--anx-primary) ${xpRingDeg}deg, var(--anx-surface-container-high) 0)`,
+    background: `conic-gradient(var(--anx-primary) ${practiceDaysRingDeg}deg, var(--anx-surface-container-high) 0)`,
   };
 
   const timetableHref = primarySubjectSlug ? `/learn/${primarySubjectSlug}` : '/dashboard';
@@ -143,7 +145,7 @@ export function StudentDashboardView({
                       <span className="stu-dash-tile-icon" style={{ background: accent.bg, color: accent.icon }}>
                         {s.emoji}
                       </span>
-                      <span className="stu-dash-tile-type">{CONTINUE_TYPES[i % CONTINUE_TYPES.length]}</span>
+                      <span className="stu-dash-tile-type">{s.title}</span>
                       <span className="stu-dash-tile-title">{s.nextSkillName}</span>
                       <span className="stu-dash-tile-bar-track">
                         <span className="stu-dash-tile-bar-fill" style={{ width: `${pct}%` }} />
@@ -173,9 +175,8 @@ export function StudentDashboardView({
                 You completed {weekActivityCount} activit{weekActivityCount === 1 ? 'y' : 'ies'} this week.
               </p>
             </div>
-            <div className="stu-dash-achievement-xp">
-              +
-              {Math.min(999, weekActivityCount * 30) || 50} XP
+            <div className="stu-dash-achievement-xp" title="XP earned from rewards this week">
+              +{gamification.weekXpEarned.toLocaleString('en-GB')} XP
             </div>
           </section>
         </div>
@@ -196,15 +197,15 @@ export function StudentDashboardView({
                 <p className="stu-dash-muted m-0 text-sm">
                   You&apos;re on a {gamification.streakDays} day streak.
                 </p>
+                <p className="stu-dash-muted m-0 mt-1 text-xs">
+                  This week: {gamification.activeDaysThisWeek} day{gamification.activeDaysThisWeek !== 1 ? 's' : ''} with
+                  practice (out of 7)
+                </p>
               </div>
             </div>
           </section>
         </aside>
       </div>
-
-      <p className="stu-dash-footer-msg">
-        You&apos;re doing great, {firstName}. Keep it up! 💪
-      </p>
     </div>
   );
 }
