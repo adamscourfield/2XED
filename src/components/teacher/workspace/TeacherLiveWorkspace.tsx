@@ -414,8 +414,15 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
   }
 
   // ── Mode-driven actions ───────────────────────────────────────────────────
-  function handleNewCheckQuestion() {
-    canvasRef.current?.insertText('New check question — type the prompt');
+  async function handleNewCheckQuestion() {
+    try {
+      await fetch(`/api/live-sessions/${sessionId}/check`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+    } catch {
+      // soft fail for now
+    }
   }
 
   async function handleExplainOption(option: 'easier' | 'wrong-vs-right' | 'misconception' | 'comparison') {
@@ -474,17 +481,13 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
           ? ['LANE_2']
           : ['LANE_3'];
     try {
-      await fetch(`/api/live-sessions/${sessionId}/broadcast`, {
+      await fetch(`/api/live-sessions/${sessionId}/practice`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          lanes,
-          contentType: 'MESSAGE',
-          message: `Practice → ${kind} (${audience}). Open your devices.`,
-        }),
+        body: JSON.stringify({ kind, audience, lanes }),
       });
     } catch {
-      // ignore — visual cue stays in canvas
+      // soft fail for now
     }
   }
 

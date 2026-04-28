@@ -244,6 +244,7 @@ model Item {
   options          Json
   answer           String
   misconceptionMap Json?
+  liveMetadata     Json?
   subjectId        String?
   createdAt        DateTime          @default(now())
   subject          Subject?          @relation(fields: [subjectId], references: [id])

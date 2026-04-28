@@ -62,7 +62,7 @@ interface ExplanationRouteData {
 }
 
 interface CurrentContent {
-  contentType: 'EXPLANATION' | 'MESSAGE' | 'PHASE' | 'WHITEBOARD';
+  contentType: 'EXPLANATION' | 'MESSAGE' | 'PHASE' | 'WHITEBOARD' | 'PRACTICE' | 'CHECK';
   targetLanes?: string[];
   message?: string;
   phaseIndex?: number;
@@ -70,6 +70,9 @@ interface CurrentContent {
   whiteboard?: LiveWhiteboardPayload;
   explanation?: ExplanationRouteData;
   stepIndex?: number;
+  item?: Item;
+  totalQuestions?: number;
+  questionNumber?: number;
 }
 
 interface SessionPoll {
@@ -86,7 +89,7 @@ type AppState =
   | { phase: 'between-phases'; session: JoinedSession; message: string }
   | { phase: 'whiteboard'; session: JoinedSession; whiteboard: LiveWhiteboardPayload }
   | { phase: 'explanation'; session: JoinedSession; explanationRoute: ExplanationRouteData; stepIndex: number; whiteboard: LiveWhiteboardPayload | null }
-  | { phase: 'question'; session: JoinedSession; item: Item }
+  | { phase: 'question'; session: JoinedSession; item: Item; source: 'broadcast' | 'targeted' }
   | { phase: 'practice'; session: JoinedSession; item: Item; index: number; total: number }
   | { phase: 'feedback'; session: JoinedSession; correct: boolean; nextItem: (Item & { skillId?: string }) | null; index: number; total: number }
   | { phase: 'done'; session: JoinedSession };
@@ -169,7 +172,7 @@ export default function StudentLivePage() {
           const skipRecheckPull =
             appState.phase === 'question' || appState.phase === 'explanation' || appState.phase === 'feedback';
           if (sess && !skipRecheckPull) {
-            setAppState({ phase: 'question', session: sess, item: data.pendingRecheckItem });
+            setAppState({ phase: 'question', session: sess, item: data.pendingRecheckItem, source: 'targeted' });
             return;
           }
         }
@@ -212,6 +215,27 @@ export default function StudentLivePage() {
           } else if (cc.contentType === 'MESSAGE' && laneOk && cc.message) {
             const sess = sessionRef.current;
             if (sess) setAppState({ phase: 'between-phases', session: sess, message: cc.message });
+          } else if (cc.contentType === 'PRACTICE' && laneOk && cc.item) {
+            const sess = sessionRef.current;
+            if (sess) {
+              setAppState({
+                phase: 'practice',
+                session: sess,
+                item: cc.item,
+                index: cc.questionNumber ?? 1,
+                total: cc.totalQuestions ?? 1,
+              });
+            }
+          } else if (cc.contentType === 'CHECK' && laneOk && cc.item) {
+            const sess = sessionRef.current;
+            if (sess) {
+              setAppState({
+                phase: 'question',
+                session: sess,
+                item: cc.item,
+                source: 'broadcast',
+              });
+            }
           }
         }
 
@@ -289,7 +313,7 @@ export default function StudentLivePage() {
   async function submitCheckAnswer(answer: string) {
     if (appState.phase !== 'question') return;
     setSubmitError(null);
-    const { session, item } = appState;
+    const { session, item, source } = appState;
     const skillId = item.skillId ?? session.skill?.id;
     if (!skillId) { setSubmitError('No skill associated with this session.'); return; }
 
@@ -316,7 +340,7 @@ export default function StudentLivePage() {
         phase: 'feedback',
         session,
         correct: result.correct,
-        nextItem: result.nextItem,
+        nextItem: source === 'broadcast' ? null : result.nextItem,
         index: 1,
         total: 1,
       });
@@ -486,7 +510,7 @@ export default function StudentLivePage() {
                       total: appState.total,
                     });
                   } else {
-                    setAppState({ phase: 'question', session: mergedSession, item: ni });
+                    setAppState({ phase: 'question', session: mergedSession, item: ni, source: 'targeted' });
                   }
                 } else {
                   setAppState({ phase: 'waiting', session: sess });

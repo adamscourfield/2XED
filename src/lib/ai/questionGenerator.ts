@@ -12,6 +12,7 @@
 
 import { prisma } from '@/db/prisma';
 import { Prisma } from '@prisma/client';
+import { inferLiveItemMetadata, toPrismaJson } from '@/lib/live/liveItemMetadata';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -176,6 +177,15 @@ async function persistItems(
       acceptedAnswers: [q.answer],
     };
 
+    const liveMetadata = inferLiveItemMetadata({
+      question: q.question,
+      type: 'MCQ',
+      options,
+      answer: q.answer,
+      misconceptionMap: q.misconceptionMap,
+      source: 'AI_GENERATED',
+    });
+
     const item = await prisma.item.create({
       data: {
         question: q.question,
@@ -183,6 +193,7 @@ async function persistItems(
         options: options as unknown as Prisma.InputJsonValue,
         answer: q.answer,
         misconceptionMap: q.misconceptionMap as unknown as Prisma.InputJsonValue,
+        liveMetadata: toPrismaJson(liveMetadata),
         subjectId: subjectId ?? undefined,
         skills: {
           create: { skillId },

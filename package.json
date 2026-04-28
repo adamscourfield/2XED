@@ -26,6 +26,7 @@
     "db:extract:explanations": "ts-node -r tsconfig-paths/register --compiler-options '{\"module\":\"CommonJS\"}' prisma/extract-explanations-from-pptx.ts",
     "db:normalize:step-question-types": "ts-node -r tsconfig-paths/register --compiler-options '{\"module\":\"CommonJS\"}' prisma/normalize-explanation-step-question-types.ts",
     "db:normalize:item-routing-purpose": "ts-node -r tsconfig-paths/register --compiler-options '{\"module\":\"CommonJS\"}' prisma/normalize-item-routing-purpose.ts",
+    "db:backfill:live-item-metadata": "ts-node -r tsconfig-paths/register --compiler-options '{\"module\":\"CommonJS\"}' prisma/backfill-live-item-metadata.ts",
     "validate:learning": "node scripts/validate-learning-config.mjs",
     "validate:items": "node scripts/validate-item-answer-types.mjs",
     "audit:question-bank:answer-modes": "ts-node -r tsconfig-paths/register --compiler-options '{\"module\":\"CommonJS\"}' scripts/audit-question-bank-answer-modes.ts",
