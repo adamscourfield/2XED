@@ -24,6 +24,15 @@ export interface MisconceptionSignal {
   studentNames: string[];
 }
 
+export interface StudentMessageSignal {
+  studentUserId: string;
+  studentName: string;
+  kind: 'message' | 'help';
+  message: string | null;
+  lane: 'LANE_1' | 'LANE_2' | 'LANE_3' | null;
+  createdAt: string;
+}
+
 interface Props {
   overview: ClassOverview;
   signals: InterpretedSignal[];
@@ -31,6 +40,7 @@ interface Props {
   /** @deprecated pass misconceptionSignals instead */
   topMisconception?: { text: string; studentCount: number } | null;
   suggestedMove?: { text: string; cta?: string; onAct?: () => void } | null;
+  studentMessages?: StudentMessageSignal[] | null;
   onViewDetailedResponses?: () => void;
 }
 
@@ -70,6 +80,7 @@ export function StudentSignalsPanel({
   misconceptionSignals,
   topMisconception,
   suggestedMove,
+  studentMessages,
   onViewDetailedResponses,
 }: Props) {
   const [showDetail, setShowDetail] = useState(false);
@@ -238,6 +249,34 @@ export function StudentSignalsPanel({
               )}
             </div>
           </div>
+        </div>
+      )}
+
+      {studentMessages && studentMessages.length > 0 && (
+        <div className="mt-4 space-y-2">
+          <p className="text-xs font-semibold" style={{ color: 'var(--anx-text-secondary)' }}>
+            Student messages
+          </p>
+          {studentMessages.map((entry) => (
+            <div
+              key={`${entry.kind}-${entry.studentUserId}-${entry.createdAt}`}
+              className="rounded-2xl border px-3 py-3"
+              style={{ borderColor: 'var(--anx-outline-variant)', background: 'var(--anx-surface-container-low)' }}
+            >
+              <p className="text-xs font-semibold" style={{ color: 'var(--anx-text)' }}>
+                {entry.studentName}
+                {entry.lane ? ` · ${entry.lane.replace('_', ' ')}` : ''}
+              </p>
+              <p className="mt-0.5 text-xs" style={{ color: 'var(--anx-text-secondary)' }}>
+                {entry.kind === 'help' ? 'Needs help' : 'Message teacher'}
+              </p>
+              {entry.message ? (
+                <p className="mt-2 text-sm leading-relaxed" style={{ color: 'var(--anx-text)' }}>
+                  {entry.message}
+                </p>
+              ) : null}
+            </div>
+          ))}
         </div>
       )}
 

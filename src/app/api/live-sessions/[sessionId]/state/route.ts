@@ -17,6 +17,15 @@ interface LiveSupportEventSummary {
   }>;
 }
 
+interface StudentMessageSummary {
+  studentUserId: string;
+  studentName: string;
+  kind: 'message' | 'help';
+  message: string | null;
+  lane: 'LANE_1' | 'LANE_2' | 'LANE_3' | null;
+  createdAt: string;
+}
+
 interface Props {
   params: Promise<{ sessionId: string }>;
 }
@@ -118,6 +127,8 @@ export async function GET(_req: NextRequest, { params }: Props) {
           'live_explanation_acknowledged',
           'live_support_recheck_started',
           'live_support_recheck_completed',
+          'live_student_message',
+          'live_student_help_request',
         ],
       },
       payload: {
@@ -136,6 +147,20 @@ export async function GET(_req: NextRequest, { params }: Props) {
   });
 
   const studentNameMap = new Map(liveSession.participants.map((participant) => [participant.studentUserId, participant.student.name ?? participant.student.email]));
+
+  const messageEvents = supportEvents.filter((event) => event.name === 'live_student_message' || event.name === 'live_student_help_request');
+
+  const studentMessages: StudentMessageSummary[] = messageEvents
+    .filter((event) => Boolean(event.studentUserId))
+    .slice(0, 8)
+    .map((event) => ({
+      studentUserId: event.studentUserId!,
+      studentName: studentNameMap.get(event.studentUserId!) ?? 'Unknown student',
+      kind: event.name === 'live_student_message' ? 'message' : 'help',
+      message: ((event.payload as { message?: string | null }).message ?? null),
+      lane: ((event.payload as { lane?: 'LANE_1' | 'LANE_2' | 'LANE_3' | null }).lane ?? null),
+      createdAt: event.createdAt.toISOString(),
+    }));
 
   const supportSummary: LiveSupportEventSummary & {
     latestOutcomes: Array<{
@@ -248,6 +273,7 @@ export async function GET(_req: NextRequest, { params }: Props) {
     responseSummary,
     recommendedExplanation,
     supportSummary,
+    studentMessages,
     misconceptionSignals,
   });
 }

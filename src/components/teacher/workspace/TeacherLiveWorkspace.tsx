@@ -14,7 +14,7 @@ import {
 import { AnnotationToolbar } from './AnnotationToolbar';
 import { TeachingModePanel, type TeachingMode } from './TeachingModePanel';
 import { AnimationRenderer } from '@/components/explanation/AnimationRenderer';
-import { StudentSignalsPanel, type ClassOverview, type InterpretedSignal, type MisconceptionSignal } from './StudentSignalsPanel';
+import { StudentSignalsPanel, type ClassOverview, type InterpretedSignal, type MisconceptionSignal, type StudentMessageSignal } from './StudentSignalsPanel';
 import { TeacherBottomBar } from './TeacherBottomBar';
 import { InviteIcon, SettingsIcon } from './icons';
 import type { LiveStroke } from '@/lib/live/whiteboard-strokes';
@@ -91,6 +91,7 @@ interface SessionSnapshot {
   laneStudents: { LANE_1: LaneStudent[]; LANE_2: LaneStudent[]; LANE_3: LaneStudent[] };
   responseSummary: ResponseSummary[];
   supportSummary?: SupportSummary;
+  studentMessages?: StudentMessageSignal[] | null;
   skillId?: string | null;
   skill?: { id: string; code: string; name: string } | null;
   recommendedExplanation?: RecommendedExplanation | null;
@@ -690,6 +691,7 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
                   }
                 : null
             }
+            studentMessages={snapshot?.studentMessages ?? null}
           />
         </aside>
       </div>

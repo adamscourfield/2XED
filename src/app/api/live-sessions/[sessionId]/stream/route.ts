@@ -134,6 +134,8 @@ export async function GET(req: NextRequest, { params }: Props) {
             'live_explanation_acknowledged',
             'live_support_recheck_started',
             'live_support_recheck_completed',
+            'live_student_message',
+            'live_student_help_request',
           ],
         },
         payload: {
@@ -150,6 +152,22 @@ export async function GET(req: NextRequest, { params }: Props) {
       },
       take: 50,
     });
+
+    const studentMessages = supportEvents
+      .filter((event) => event.name === 'live_student_message' || event.name === 'live_student_help_request')
+      .filter((event) => Boolean(event.studentUserId))
+      .slice(0, 8)
+      .map((event) => {
+        const participant = ls.participants.find((p) => p.studentUserId === event.studentUserId);
+        return {
+          studentUserId: event.studentUserId!,
+          studentName: participant?.student.name ?? participant?.student.email ?? 'Unknown student',
+          kind: event.name === 'live_student_message' ? 'message' : 'help',
+          message: ((event.payload as { message?: string | null }).message ?? null),
+          lane: ((event.payload as { lane?: 'LANE_1' | 'LANE_2' | 'LANE_3' | null }).lane ?? null),
+          createdAt: event.createdAt.toISOString(),
+        };
+      });
 
     return {
       sessionId: ls.id,
@@ -185,6 +203,7 @@ export async function GET(req: NextRequest, { params }: Props) {
             };
           }),
       },
+      studentMessages,
     };
   }
 
