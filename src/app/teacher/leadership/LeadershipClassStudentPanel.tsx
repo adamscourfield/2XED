@@ -1,0 +1,136 @@
+'use client';
+
+import { StaffAnalyticsDisclosure } from '@/components/staff/StaffAnalyticsDisclosure';
+
+export type LeadershipClassStudentRow = {
+  id: string;
+  name: string;
+  riskLevel: 'RED' | 'AMBER' | 'GREEN';
+  riskScore: number;
+  avgDle: string;
+  durability: 'AT_RISK' | 'DEVELOPING' | 'DURABLE' | null;
+  masteryAvg: number;
+  accuracy: string;
+  trendLabel: string;
+};
+
+type ClassSummary = {
+  name: string;
+  yearGroup: string | null;
+  teacherName: string;
+  studentCount: number;
+  avgMastery: number;
+  clsTrendLabel: string;
+  atRisk: number;
+  amber: number;
+};
+
+type Props = {
+  storageKey: string;
+  /** Open by default when head badges suggest attention (preference still persisted per browser). */
+  defaultOpen?: boolean;
+  classSummary: ClassSummary;
+  studentRows: LeadershipClassStudentRow[];
+};
+
+export function LeadershipClassStudentPanel({ storageKey, defaultOpen, classSummary, studentRows }: Props) {
+  const { name, yearGroup, teacherName, studentCount, avgMastery, clsTrendLabel, atRisk, amber } = classSummary;
+
+  return (
+    <div className="staff-dash-class-panel">
+      <div className="staff-dash-class-head flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <p className="staff-dash-class-title m-0">{name}</p>
+          <p className="staff-dash-class-meta m-0 mt-1">
+            {yearGroup ?? '—'} · {teacherName} · {studentCount} students
+          </p>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          {atRisk > 0 && <span className="anx-badge anx-badge-red">{atRisk} at risk</span>}
+          {amber > 0 && <span className="anx-badge anx-badge-amber">{amber} amber</span>}
+          <span className="text-xs text-[color:var(--anx-text-muted)]">
+            {avgMastery}% mastery · {clsTrendLabel}
+          </span>
+        </div>
+      </div>
+
+      <StaffAnalyticsDisclosure
+        storageKey={storageKey}
+        defaultOpen={defaultOpen}
+        summary={
+          <>
+            {studentRows.length} student{studentRows.length !== 1 ? 's' : ''} in this class. Open for risk, DLE, and per-student
+            trends.
+          </>
+        }
+      >
+        <div className="staff-dash-table-wrap">
+          <table className="staff-dash-table">
+            <thead>
+              <tr>
+                <th>Student</th>
+                <th>Risk</th>
+                <th>DLE</th>
+                <th>Durability</th>
+                <th>Mastery</th>
+                <th>Accuracy</th>
+                <th>Trend</th>
+              </tr>
+            </thead>
+            <tbody>
+              {studentRows.map((row) => (
+                <tr
+                  key={row.id}
+                  className={row.riskLevel === 'RED' ? 'bg-rose-50/60' : row.riskLevel === 'AMBER' ? 'bg-amber-50/40' : ''}
+                >
+                  <td className="font-medium">{row.name}</td>
+                  <td>
+                    <span
+                      className={`rounded px-2 py-0.5 text-xs font-bold ${
+                        row.riskLevel === 'RED'
+                          ? 'bg-rose-100 text-rose-800'
+                          : row.riskLevel === 'AMBER'
+                            ? 'bg-amber-100 text-amber-800'
+                            : 'bg-emerald-100 text-emerald-800'
+                      }`}
+                    >
+                      {row.riskLevel} ({row.riskScore})
+                    </span>
+                  </td>
+                  <td className="font-mono text-xs">{row.avgDle}</td>
+                  <td>
+                    {row.durability ? (
+                      <span
+                        className={`rounded px-2 py-0.5 text-xs font-semibold ${
+                          row.durability === 'AT_RISK'
+                            ? 'bg-rose-100 text-rose-800'
+                            : row.durability === 'DEVELOPING'
+                              ? 'bg-amber-100 text-amber-800'
+                              : 'bg-emerald-100 text-emerald-800'
+                        }`}
+                      >
+                        {row.durability}
+                      </span>
+                    ) : (
+                      <span className="text-[color:var(--anx-text-muted)]">—</span>
+                    )}
+                  </td>
+                  <td className="font-medium">{row.masteryAvg}%</td>
+                  <td>{row.accuracy}</td>
+                  <td className="text-xs text-[color:var(--anx-text-secondary)]">{row.trendLabel}</td>
+                </tr>
+              ))}
+              {studentRows.length === 0 && (
+                <tr>
+                  <td colSpan={7} className="py-8 text-center text-sm text-[color:var(--anx-text-muted)]">
+                    No students enrolled.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </StaffAnalyticsDisclosure>
+    </div>
+  );
+}
