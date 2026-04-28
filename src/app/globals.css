@@ -4916,6 +4916,23 @@
     width: auto;
     padding: 0.25rem 0 0;
   }
+
+  /* Keep toolbar above thumb zone / bottom bar; enlarge touch targets */
+  .anx-workspace-toolbar {
+    bottom: calc(4.75rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  .anx-tool-btn {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .anx-workspace-bottombar-btn {
+    min-height: 44px;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
   .anx-workspace-side {
     border-left: none;
     border-top: 1px solid var(--anx-outline-variant);

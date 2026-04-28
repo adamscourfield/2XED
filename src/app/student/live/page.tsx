@@ -651,6 +651,12 @@ export default function StudentLivePage() {
                   <p className="mt-2 text-sm leading-relaxed" style={{ color: 'var(--anx-text-muted)' }}>
                     {feedbackLine}
                   </p>
+                  {appState.total > 1 ? (
+                    <p className="mt-3 text-xs font-medium tabular-nums" style={{ color: 'var(--anx-text-muted)' }}>
+                      Question {Math.min(appState.index, appState.total)} of {appState.total}
+                      {appState.nextItem ? ' · Next up when you continue' : ''}
+                    </p>
+                  ) : null}
                 </div>
                 <button
                   type="button"

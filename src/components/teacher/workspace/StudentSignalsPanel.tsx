@@ -62,6 +62,8 @@ interface Props {
   studentResponses?: StudentResponseDetail[] | null;
   rubricCriteria?: RubricCriterionSignal[] | null;
   onViewDetailedResponses?: () => void;
+  /** Lane distribution — used for empty-state copy when all zeros */
+  laneCounts?: { LANE_1: number; LANE_2: number; LANE_3: number } | null;
 }
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
@@ -104,6 +106,7 @@ export function StudentSignalsPanel({
   studentResponses,
   rubricCriteria,
   onViewDetailedResponses,
+  laneCounts,
 }: Props) {
   const [showDetail, setShowDetail] = useState(false);
   const noResponses = overview.total - overview.responded;
@@ -111,6 +114,13 @@ export function StudentSignalsPanel({
   const correctPct = (overview.correct / total) * 100;
   const partialPct = (overview.partiallyCorrect / total) * 100;
   const incorrectPct = (overview.incorrect / total) * 100;
+
+  const laneSum =
+    laneCounts !== undefined && laneCounts !== null
+      ? laneCounts.LANE_1 + laneCounts.LANE_2 + laneCounts.LANE_3
+      : null;
+  const showLaneEmptyHint =
+    laneSum !== null && overview.total > 0 && laneSum === 0 && overview.responded === 0;
 
   return (
     <section className="anx-signals-card">
@@ -121,6 +131,18 @@ export function StudentSignalsPanel({
           Live
         </span>
       </div>
+
+      {overview.total === 0 ? (
+        <p className="mt-3 rounded-2xl bg-[var(--anx-surface-container-low)] px-3 py-3 text-xs leading-relaxed" style={{ color: 'var(--anx-text-muted)' }}>
+          No students connected yet — lane counts and responses appear when learners join.
+        </p>
+      ) : null}
+
+      {showLaneEmptyHint ? (
+        <p className="mt-3 rounded-2xl border px-3 py-3 text-xs leading-relaxed" style={{ borderColor: 'var(--anx-outline-variant)', color: 'var(--anx-text-secondary)' }}>
+          Everyone is still on track — no learners are in support or reteach lanes yet.
+        </p>
+      ) : null}
 
       {signals.length > 0 ? (
         <div className="mt-3 rounded-2xl bg-[var(--anx-surface-container-low)] px-3 py-3">

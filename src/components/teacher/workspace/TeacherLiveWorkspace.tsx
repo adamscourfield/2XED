@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   AnnotationCanvas,
+  annotationStateHasContent,
   type AnnotationCanvasHandle,
   type AnnotationCanvasState,
   CANVAS_W,
@@ -16,6 +17,7 @@ import { TeachingModePanel, type TeachingMode } from './TeachingModePanel';
 import { AnimationRenderer } from '@/components/explanation/AnimationRenderer';
 import { StudentSignalsPanel, type ClassOverview, type InterpretedSignal, type MisconceptionSignal, type StudentMessageSignal, type StudentResponseDetail, type RubricCriterionSignal } from './StudentSignalsPanel';
 import { TeacherBottomBar } from './TeacherBottomBar';
+import { EndSessionDialog } from './EndSessionDialog';
 import { InviteIcon, SettingsIcon } from './icons';
 import type { LiveStroke } from '@/lib/live/whiteboard-strokes';
 
@@ -242,6 +244,7 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
   const [copied, setCopied] = useState(false);
   const [endingPrompt, setEndingPrompt] = useState(false);
   const [latestVersion, setLatestVersion] = useState(0);
+  const [canvasHasContent, setCanvasHasContent] = useState(false);
   const [canUndo, setCanUndo] = useState(false);
   const [canRedo, setCanRedo] = useState(false);
 
@@ -383,6 +386,7 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
       pendingStateRef.current = null;
       setLatestVersion(pending.version);
       void broadcastStrokes(pending.state.strokes, pending.version, 'show');
+      setCanvasHasContent(annotationStateHasContent(pending.state));
     }, BROADCAST_DEBOUNCE_MS);
   }
 
@@ -695,11 +699,50 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
                 setCanUndo(u);
                 setCanRedo(r);
               }}
+              onBoardContentChange={setCanvasHasContent}
               transparent={!!activeExplanation}
               watermark={
                 !activeExplanation && sessionStatus === 'LOBBY' ? 'Lesson starts when you click Start' : undefined
               }
             />
+            {sessionStatus === 'ACTIVE' && paused ? (
+              <div
+                className="pointer-events-none absolute inset-x-0 top-3 z-[18] flex justify-center px-4"
+                aria-live="polite"
+              >
+                <p
+                  className="max-w-lg rounded-full border px-4 py-2 text-center text-xs font-medium shadow-sm"
+                  style={{
+                    borderColor: 'var(--anx-outline-variant)',
+                    background: 'var(--anx-warning-soft)',
+                    color: 'var(--anx-text-secondary)',
+                  }}
+                >
+                  Paused — students keep seeing the last frame until you resume.
+                </p>
+              </div>
+            ) : null}
+            {sessionStatus === 'ACTIVE' &&
+            !paused &&
+            !activeExplanation &&
+            !canvasHasContent &&
+            latestVersion > 0 ? (
+              <div
+                className="pointer-events-none absolute inset-x-0 bottom-14 z-[18] flex justify-center px-4 sm:bottom-4"
+                aria-live="polite"
+              >
+                <p
+                  className="max-w-md rounded-xl border px-3 py-2 text-center text-[11px] leading-snug shadow-sm"
+                  style={{
+                    borderColor: 'var(--anx-outline-variant)',
+                    background: 'rgba(255, 255, 255, 0.92)',
+                    color: 'var(--anx-text-secondary)',
+                  }}
+                >
+                  Students still see your last board until you draw again — or they follow along when you push checks and explanations.
+                </p>
+              </div>
+            ) : null}
             <input
               ref={fileInputRef}
               type="file"
@@ -761,6 +804,7 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
             }
             studentMessages={snapshot?.studentMessages ?? null}
             studentResponses={snapshot?.studentResponses ?? null}
+            laneCounts={snapshot?.laneCounts ?? null}
           />
         </aside>
       </div>
@@ -779,36 +823,18 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
       />
 
       {/* End session confirmation */}
-      {endingPrompt && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 px-4">
-          <div className="anx-card max-w-sm space-y-4 p-6">
-            <div>
-              <h3 className="text-lg font-bold" style={{ color: 'var(--anx-text)' }}>
-                End the session?
-              </h3>
-              <p className="mt-1 text-sm" style={{ color: 'var(--anx-text-muted)' }}>
-                Students will be returned to their dashboard. You can review responses afterwards.
-              </p>
-            </div>
-            <div className="flex justify-end gap-2">
-              <button type="button" onClick={() => setEndingPrompt(false)} className="anx-btn-secondary px-4 py-2 text-sm">
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setEndingPrompt(false);
-                  void setStatus('COMPLETED');
-                }}
-                className="anx-btn-primary px-4 py-2 text-sm"
-                style={{ background: 'var(--anx-danger-text)' }}
-              >
-                End session
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <EndSessionDialog
+        open={endingPrompt}
+        title="End the session?"
+        description="Students will be returned to their dashboard. You can review responses afterwards."
+        cancelLabel="Cancel"
+        confirmLabel="End session"
+        onCancel={() => setEndingPrompt(false)}
+        onConfirm={() => {
+          setEndingPrompt(false);
+          void setStatus('COMPLETED');
+        }}
+      />
 
       {/* Hidden version readout for downstream tests / debug */}
       <span aria-hidden style={{ display: 'none' }} data-canvas-version={latestVersion} />

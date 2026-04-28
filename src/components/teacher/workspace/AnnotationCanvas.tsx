@@ -59,6 +59,8 @@ interface Props {
   onStateChange?: (state: AnnotationCanvasState, version: number) => void;
   /** Fired when undo/redo availability changes (for toolbar controls). */
   onHistoryChange?: (canUndo: boolean, canRedo: boolean) => void;
+  /** Whether the board has strokes, text, shapes, or a background image. */
+  onBoardContentChange?: (hasContent: boolean) => void;
   /** Optional placeholder content drawn behind strokes. */
   watermark?: string;
   /** When true, the canvas background and dotted grid are omitted so content behind the canvas shows through. */
@@ -162,8 +164,14 @@ function emptyState(): AnnotationCanvasState {
   return { strokes: [], texts: [], shapes: [], bgImage: null };
 }
 
+export function annotationStateHasContent(s: AnnotationCanvasState): boolean {
+  if (s.strokes.length > 0 || s.texts.length > 0 || s.shapes.length > 0) return true;
+  if (s.bgImage?.src) return true;
+  return false;
+}
+
 export const AnnotationCanvas = forwardRef<AnnotationCanvasHandle, Props>(function AnnotationCanvas(
-  { tool, color, width, onStateChange, onHistoryChange, watermark, transparent },
+  { tool, color, width, onStateChange, onHistoryChange, onBoardContentChange, watermark, transparent },
   ref,
 ) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -175,6 +183,9 @@ export const AnnotationCanvas = forwardRef<AnnotationCanvasHandle, Props>(functi
   const futureRef = useRef<AnnotationCanvasState[]>([]);
   const onHistoryChangeRef = useRef(onHistoryChange);
   onHistoryChangeRef.current = onHistoryChange;
+
+  const onBoardContentChangeRef = useRef(onBoardContentChange);
+  onBoardContentChangeRef.current = onBoardContentChange;
 
   const emitHistory = useCallback(() => {
     onHistoryChangeRef.current?.(
@@ -221,6 +232,10 @@ export const AnnotationCanvas = forwardRef<AnnotationCanvasHandle, Props>(functi
   useEffect(() => {
     emitHistory();
   }, [state, emitHistory]);
+
+  useEffect(() => {
+    onBoardContentChangeRef.current?.(annotationStateHasContent(state));
+  }, [state]);
 
   const commit = useCallback(
     (next: AnnotationCanvasState) => {
