@@ -509,14 +509,12 @@
 
   .anx-btn-primary:hover:not(:disabled) {
     background: linear-gradient(90deg, var(--anx-primary) 0%, #a4a1ff 100%);
-    box-shadow: 0 12px 32px rgba(74, 64, 224, 0.34);
     transform: scale(1.02);
     box-shadow: 0 12px 32px rgba(112, 42, 225, 0.34);
   }
 
   .anx-btn-primary:active:not(:disabled) {
     background: linear-gradient(90deg, var(--anx-primary-active) 0%, var(--anx-primary) 100%);
-    box-shadow: 0 6px 18px rgba(74, 64, 224, 0.22);
     transform: scale(0.98);
     box-shadow: 0 6px 18px rgba(112, 42, 225, 0.22);
   }

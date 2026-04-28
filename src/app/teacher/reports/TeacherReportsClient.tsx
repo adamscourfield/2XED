@@ -468,12 +468,12 @@ function DLEOverview() {
             retrieval.
           </p>
           <div className="mt-6 flex flex-col items-stretch gap-3 rounded-xl border border-[rgba(15,23,42,0.06)] bg-[#f8fafc] px-4 py-5">
-            <div className="flex items-center justify-center gap-2 rounded-lg bg-white px-3 py-2.5 text-sm font-semibold text-[#1a1a1a] shadow-sm ring-1 ring-[rgba(15,23,42,0.05)]">
+            <div className="flex items-center justify-center gap-2 rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2.5 text-sm font-semibold text-on-surface shadow-md">
               <IconBrain className="shrink-0" style={{ color: "var(--report-purple)" }} />
               Retained learning
             </div>
             <div className="text-center text-lg font-light text-[#94a3b8]">÷</div>
-            <div className="flex items-center justify-center gap-2 rounded-lg bg-white px-3 py-2.5 text-sm font-semibold text-[#1a1a1a] shadow-sm ring-1 ring-[rgba(15,23,42,0.05)]">
+            <div className="flex items-center justify-center gap-2 rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2.5 text-sm font-semibold text-on-surface shadow-md">
               <IconClock className="shrink-0" style={{ color: "var(--report-purple)" }} />
               Teaching hours
             </div>
@@ -695,7 +695,7 @@ export function TeacherReportsDashboard() {
         className={
           tab === "dle"
             ? "pt-4"
-            : "rounded-xl border border-dashed border-[rgba(15,23,42,0.12)] bg-white/80 p-10 text-center shadow-sm"
+            : "rounded-xl border border-dashed border-outline-variant bg-surface-container-lowest/90 p-10 text-center shadow-md"
         }
       >
         {tab === "dle" ? (

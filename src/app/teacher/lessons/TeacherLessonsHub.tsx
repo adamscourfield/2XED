@@ -182,19 +182,19 @@ export function TeacherLessonsHub({ rows, classOptions }: Props) {
   const to = Math.min(safePage * PAGE_SIZE, filtered.length);
 
   const selectClass =
-    'rounded-lg border border-[#e5e7eb] bg-white px-3 py-2 text-sm text-[#111827] shadow-sm outline-none transition focus:border-[#6366f1] focus:ring-2 focus:ring-[#6366f1]/20';
+    'rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-sm text-on-surface shadow-md outline-none transition-colors duration-200 ease-calm focus:border-primary focus:ring-2 focus:ring-primary/20';
 
   return (
     <div className="space-y-6">
       <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0 space-y-1">
-          <h1 className="text-2xl font-bold tracking-tight text-[#111827] sm:text-3xl">Lessons</h1>
-          <p className="text-sm text-[#6b7280] sm:text-base">Create, organise and deliver live lessons.</p>
+          <h1 className="text-2xl font-bold tracking-tight text-on-surface sm:text-3xl">Lessons</h1>
+          <p className="text-sm text-muted sm:text-base">Create, organise and deliver live lessons.</p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <TeacherHomeClassSelector classes={classOptions} />
           <span
-            className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-[#e5e7eb] bg-white text-[#4b5563]"
+            className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-outline-variant bg-surface-container-lowest text-on-surface-variant shadow-md"
             title="Notifications"
             aria-hidden
           >
@@ -206,11 +206,11 @@ export function TeacherLessonsHub({ rows, classOptions }: Props) {
                 strokeLinejoin="round"
               />
             </svg>
-            <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-[#6366f1] ring-2 ring-white" />
+            <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-primary ring-2 ring-surface-container-lowest" />
           </span>
           <Link
             href="/teacher/live/new"
-            className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#6366f1] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#4f46e5] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#6366f1]"
+            className="anx-btn-primary gap-2 px-4 py-2.5 text-sm no-underline"
           >
             <span aria-hidden>+</span> New lesson
           </Link>
@@ -219,7 +219,7 @@ export function TeacherLessonsHub({ rows, classOptions }: Props) {
 
       <div className="flex flex-col gap-8 xl:flex-row xl:items-start">
         <div className="min-w-0 flex-1 space-y-5">
-          <div className="flex gap-6 border-b border-[#e5e7eb]">
+          <div className="flex gap-6 border-b border-outline-variant">
             {(
               [
                 ['mine', 'My lessons'],
@@ -234,13 +234,13 @@ export function TeacherLessonsHub({ rows, classOptions }: Props) {
                   setTab(key);
                   setPage(1);
                 }}
-                className={`relative -mb-px pb-3 text-sm font-semibold transition ${
-                  tab === key ? 'text-[#4f46e5]' : 'text-[#6b7280] hover:text-[#111827]'
+                className={`relative -mb-px pb-3 text-sm font-semibold transition-colors duration-200 ease-calm ${
+                  tab === key ? 'text-primary' : 'text-muted hover:text-on-surface'
                 }`}
               >
                 {label}
                 {tab === key ? (
-                  <span className="absolute bottom-0 left-0 right-0 h-0.5 rounded-full bg-[#6366f1]" aria-hidden />
+                  <span className="absolute bottom-0 left-0 right-0 h-0.5 rounded-full bg-primary" aria-hidden />
                 ) : null}
               </button>
             ))}
@@ -250,7 +250,7 @@ export function TeacherLessonsHub({ rows, classOptions }: Props) {
             <>
               <div className="flex flex-col gap-3 lg:flex-row lg:flex-wrap lg:items-center lg:gap-3">
                 <div className="relative min-w-[12rem] flex-1 lg:max-w-xs">
-                  <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#9ca3af]" aria-hidden>
+                  <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant opacity-70" aria-hidden>
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                       <path
                         d="M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16Zm9 2-4.35-4.35"
@@ -268,7 +268,7 @@ export function TeacherLessonsHub({ rows, classOptions }: Props) {
                       setSearch(e.target.value);
                       setPage(1);
                     }}
-                    className="w-full rounded-lg border border-[#e5e7eb] bg-white py-2 pl-10 pr-3 text-sm text-[#111827] placeholder:text-[#9ca3af] outline-none focus:border-[#6366f1] focus:ring-2 focus:ring-[#6366f1]/20"
+                    className="w-full rounded-lg border border-outline-variant bg-surface-container-lowest py-2 pl-10 pr-3 text-sm text-on-surface shadow-md placeholder:text-on-surface-variant placeholder:opacity-70 outline-none transition-colors duration-200 ease-calm focus:border-primary focus:ring-2 focus:ring-primary/20"
                   />
                 </div>
                 <select
@@ -333,7 +333,7 @@ export function TeacherLessonsHub({ rows, classOptions }: Props) {
                   <option value="Completed">Completed</option>
                 </select>
                 <div className="ml-auto flex items-center gap-2">
-                  <span className="text-xs font-medium text-[#6b7280]">Sort by:</span>
+                  <span className="text-xs font-medium text-muted">Sort by:</span>
                   <select
                     className={selectClass}
                     value={sortBy}
@@ -346,15 +346,15 @@ export function TeacherLessonsHub({ rows, classOptions }: Props) {
                 </div>
               </div>
 
-              <div className="overflow-hidden rounded-lg border border-[#e5e7eb] bg-white shadow-sm">
+              <div className="anx-card overflow-hidden p-0">
                 <div className="overflow-x-auto">
                   <table className="w-full min-w-[640px] border-collapse text-left text-sm">
                     <thead>
-                      <tr className="border-b border-[#f3f4f6] bg-[#fafafa]">
+                      <tr className="border-b border-divider bg-surface-container-low">
                         {['Lesson', 'Year group', 'Topic', 'Type', 'Updated', 'Actions'].map((col) => (
                           <th
                             key={col}
-                            className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-[#9ca3af]"
+                            className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-on-surface-variant opacity-80"
                           >
                             {col}
                           </th>
@@ -364,9 +364,9 @@ export function TeacherLessonsHub({ rows, classOptions }: Props) {
                     <tbody>
                       {pageRows.length === 0 ? (
                         <tr>
-                          <td colSpan={6} className="px-4 py-10 text-center text-sm text-[#6b7280]">
+                          <td colSpan={6} className="px-4 py-10 text-center text-sm text-muted">
                             No lessons match your filters.{' '}
-                            <Link href="/teacher/live/new" className="font-semibold text-[#4f46e5] hover:underline">
+                            <Link href="/teacher/live/new" className="font-semibold text-primary hover:underline">
                               Create a new lesson
                             </Link>
                           </td>
@@ -380,19 +380,19 @@ export function TeacherLessonsHub({ rows, classOptions }: Props) {
                           const bg = iconHue(r.id);
                           const yg = r.yearGroup?.trim() || '—';
                           return (
-                            <tr key={r.id} className="border-b border-[#f3f4f6] last:border-0">
+                            <tr key={r.id} className="border-b border-divider last:border-0">
                               <td className="px-4 py-3">
                                 <div className="flex items-start gap-3">
                                   <div
-                                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-xs font-bold text-white shadow-sm"
+                                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-xs font-bold text-on-primary shadow-md"
                                     style={{ background: bg }}
                                     aria-hidden
                                   >
                                     {sym}
                                   </div>
                                   <div className="min-w-0">
-                                    <p className="font-semibold text-[#111827]">{title}</p>
-                                    <p className="mt-0.5 text-xs text-[#6b7280]">
+                                    <p className="font-semibold text-on-surface">{title}</p>
+                                    <p className="mt-0.5 text-xs text-muted">
                                       {r.classroomName}
                                       {r.participantCount > 0
                                         ? ` · ${r.participantCount} student${r.participantCount !== 1 ? 's' : ''}`
@@ -401,29 +401,29 @@ export function TeacherLessonsHub({ rows, classOptions }: Props) {
                                   </div>
                                 </div>
                               </td>
-                              <td className="px-4 py-3 align-top text-[#374151]">{yg}</td>
-                              <td className="px-4 py-3 align-top text-[#374151]">{topic}</td>
+                              <td className="px-4 py-3 align-top text-on-surface">{yg}</td>
+                              <td className="px-4 py-3 align-top text-on-surface">{topic}</td>
                               <td className="px-4 py-3 align-top">
                                 <span
-                                  className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+                                    className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ${
                                     typeInfo.tone === 'live'
-                                      ? 'bg-[#eef2ff] text-[#4338ca]'
+                                      ? 'bg-primary/10 text-primary'
                                       : typeInfo.tone === 'worksheet'
-                                        ? 'bg-[#e0f2fe] text-[#0369a1]'
-                                        : 'bg-[#ffedd5] text-[#c2410c]'
+                                        ? 'bg-[var(--anx-info-soft)] text-[var(--anx-info-ink)]'
+                                        : 'bg-warning-soft text-warning'
                                   }`}
                                 >
                                   {typeInfo.label}
                                 </span>
                               </td>
-                              <td className="px-4 py-3 align-top whitespace-nowrap text-[#374151]">
+                              <td className="px-4 py-3 align-top whitespace-nowrap text-on-surface">
                                 {formatUpdated(new Date(r.updatedAt))}
                               </td>
                               <td className="px-4 py-3 align-top">
                                 <div className="flex justify-end">
                                   <Link
                                     href={`/teacher/live/${r.id}`}
-                                    className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-transparent text-[#6b7280] transition hover:border-[#e5e7eb] hover:bg-[#f9fafb] hover:text-[#111827]"
+                                    className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-transparent text-muted transition-colors duration-200 ease-calm hover:border-outline-variant hover:bg-surface-bright hover:text-on-surface"
                                     aria-label={`Open lesson ${title}`}
                                   >
                                     <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
@@ -441,8 +441,8 @@ export function TeacherLessonsHub({ rows, classOptions }: Props) {
                     </tbody>
                   </table>
                 </div>
-                <div className="flex flex-col gap-3 border-t border-[#f3f4f6] bg-[#fafafa] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-                  <p className="text-xs text-[#6b7280]">
+                <div className="flex flex-col gap-3 border-t border-divider bg-surface-container-low px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+                  <p className="text-xs text-muted">
                     {filtered.length === 0
                       ? 'Showing 0 lessons'
                       : `Showing ${from} to ${to} of ${filtered.length} lesson${filtered.length !== 1 ? 's' : ''}`}
@@ -451,7 +451,7 @@ export function TeacherLessonsHub({ rows, classOptions }: Props) {
                     <nav className="flex items-center gap-1" aria-label="Pagination">
                       <button
                         type="button"
-                        className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#e5e7eb] bg-white text-[#374151] disabled:opacity-40"
+                        className="flex h-8 w-8 items-center justify-center rounded-lg border border-outline-variant bg-surface-container-lowest text-on-surface shadow-md transition-colors duration-200 ease-calm disabled:opacity-40"
                         disabled={safePage <= 1}
                         onClick={() => setPage((p) => Math.max(1, p - 1))}
                         aria-label="Previous page"
@@ -463,10 +463,10 @@ export function TeacherLessonsHub({ rows, classOptions }: Props) {
                           key={n}
                           type="button"
                           onClick={() => setPage(n)}
-                          className={`flex h-8 min-w-8 items-center justify-center rounded-lg px-2 text-sm font-semibold ${
+                          className={`flex h-8 min-w-8 items-center justify-center rounded-lg px-2 text-sm font-semibold transition-colors duration-200 ease-calm ${
                             n === safePage
-                              ? 'bg-[#6366f1] text-white'
-                              : 'border border-[#e5e7eb] bg-white text-[#374151] hover:bg-[#f9fafb]'
+                              ? 'bg-primary text-on-primary'
+                              : 'border border-outline-variant bg-surface-container-lowest text-on-surface shadow-md hover:bg-surface-bright'
                           }`}
                         >
                           {n}
@@ -474,7 +474,7 @@ export function TeacherLessonsHub({ rows, classOptions }: Props) {
                       ))}
                       <button
                         type="button"
-                        className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#e5e7eb] bg-white text-[#374151] disabled:opacity-40"
+                        className="flex h-8 w-8 items-center justify-center rounded-lg border border-outline-variant bg-surface-container-lowest text-on-surface shadow-md transition-colors duration-200 ease-calm disabled:opacity-40"
                         disabled={safePage >= totalPages}
                         onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                         aria-label="Next page"
@@ -487,9 +487,9 @@ export function TeacherLessonsHub({ rows, classOptions }: Props) {
               </div>
             </>
           ) : (
-            <div className="rounded-lg border border-dashed border-[#e5e7eb] bg-[#fafafa] px-6 py-14 text-center">
-              <p className="text-sm font-medium text-[#374151]">Nothing here yet</p>
-              <p className="mt-1 text-sm text-[#6b7280]">
+            <div className="rounded-lg border border-dashed border-outline-variant bg-surface-container-low px-6 py-14 text-center">
+              <p className="text-sm font-medium text-on-surface">Nothing here yet</p>
+              <p className="mt-1 text-sm text-muted">
                 {tab === 'shared'
                   ? 'Lessons shared with you by colleagues will appear in this tab.'
                   : 'Your school’s shared lesson library will appear here when it is available.'}
@@ -497,11 +497,11 @@ export function TeacherLessonsHub({ rows, classOptions }: Props) {
             </div>
           )}
 
-          <div className="rounded-lg border border-[#c7d2fe] bg-[#f5f3ff] px-4 py-4 sm:px-5 sm:py-5">
+          <div className="rounded-lg border border-primary/20 bg-primary/5 px-4 py-4 sm:px-5 sm:py-5">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex min-w-0 items-start gap-3">
                 <span
-                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-[#6366f1] text-white shadow-sm"
+                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-primary text-on-primary shadow-md"
                   aria-hidden
                 >
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
@@ -515,17 +515,17 @@ export function TeacherLessonsHub({ rows, classOptions }: Props) {
                   </svg>
                 </span>
                 <div className="min-w-0">
-                  <p className="font-semibold text-[#312e81]">Let Ember build for you</p>
-                  <p className="mt-0.5 text-sm text-[#4c1d95]/80">
+                  <p className="font-semibold text-on-surface">Let Ember build for you</p>
+                  <p className="mt-0.5 text-sm text-on-surface-variant">
                     Generate a lesson or quiz in seconds. Save time and focus on teaching.
                   </p>
                 </div>
               </div>
               <Link
                 href="/teacher/live/new"
-                className="inline-flex shrink-0 items-center justify-center gap-2 self-start rounded-lg border-2 border-[#6366f1] bg-white px-4 py-2.5 text-sm font-semibold text-[#4f46e5] shadow-sm transition hover:bg-[#eef2ff] sm:self-center"
+                className="anx-btn-secondary gap-2 self-start px-4 py-2.5 text-sm no-underline sm:self-center"
               >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-[#6366f1]" aria-hidden>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-primary-container" aria-hidden>
                   <path
                     d="M12 3l1.09 3.36L16.5 5.5l-2.86 2.08L15.18 11 12 9.27 8.82 11l1.54-3.42L7.5 5.5l3.41-.14L12 3Z"
                     stroke="currentColor"
@@ -539,16 +539,16 @@ export function TeacherLessonsHub({ rows, classOptions }: Props) {
           </div>
         </div>
 
-        <aside className="w-full shrink-0 space-y-4 rounded-lg border border-[#e5e7eb] bg-white p-4 shadow-sm xl:w-[17.5rem]">
+        <aside className="anx-card w-full shrink-0 space-y-4 p-4 xl:w-[17.5rem]">
           <div>
-            <h2 className="text-base font-semibold text-[#111827]">Organise your lessons</h2>
-            <p className="mt-1 text-xs leading-relaxed text-[#6b7280]">
+            <h2 className="text-base font-semibold text-on-surface">Organise your lessons</h2>
+            <p className="mt-1 text-xs leading-relaxed text-muted">
               Group sessions by topic. Click a folder to filter the table.
             </p>
           </div>
           <button
             type="button"
-            className="w-full rounded-lg border-2 border-[#6366f1] bg-white py-2.5 text-sm font-semibold text-[#4f46e5] transition hover:bg-[#eef2ff]"
+            className="anx-btn-secondary w-full"
           >
             + New folder
           </button>
@@ -564,11 +564,11 @@ export function TeacherLessonsHub({ rows, classOptions }: Props) {
                       setFolderFilter(active ? null : name);
                       setPage(1);
                     }}
-                    className={`flex w-full items-center gap-3 rounded-lg px-2 py-2.5 text-left text-sm transition ${
-                      active ? 'bg-[#eef2ff] text-[#312e81]' : 'text-[#374151] hover:bg-[#f9fafb]'
+                    className={`flex w-full items-center gap-3 rounded-lg px-2 py-2.5 text-left text-sm transition-colors duration-200 ease-calm ${
+                      active ? 'bg-primary/10 text-primary' : 'text-on-surface hover:bg-surface-bright'
                     }`}
                   >
-                    <span className="text-[#9ca3af]" aria-hidden>
+                    <span className="text-on-surface-variant opacity-70" aria-hidden>
                       <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                         <path
                           d="M3 7a2 2 0 0 1 2-2h4l2 2h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z"
@@ -579,7 +579,7 @@ export function TeacherLessonsHub({ rows, classOptions }: Props) {
                       </svg>
                     </span>
                     <span className="min-w-0 flex-1 font-medium">{name}</span>
-                    <span className="shrink-0 text-xs text-[#6b7280]">
+                    <span className="shrink-0 text-xs text-muted">
                       {count} lesson{count !== 1 ? 's' : ''}
                     </span>
                   </button>
@@ -589,7 +589,7 @@ export function TeacherLessonsHub({ rows, classOptions }: Props) {
           </ul>
           <button
             type="button"
-            className="flex w-full items-center justify-center gap-1 text-sm font-semibold text-[#4f46e5] hover:underline"
+            className="flex w-full items-center justify-center gap-1 text-sm font-semibold text-primary hover:underline"
             onClick={() => {
               setFolderFilter(null);
               setPage(1);
