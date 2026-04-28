@@ -68,6 +68,16 @@ function RowActionsMenu({ classroomId }: { classroomId: string }) {
             <Link
               role="menuitem"
               className="tc-row-menu-item"
+              href={`/teacher/dashboard/classes/analytics#class-analytics-${classroomId}`}
+              onClick={() => setOpen(false)}
+            >
+              Class analytics
+            </Link>
+          </li>
+          <li role="none">
+            <Link
+              role="menuitem"
+              className="tc-row-menu-item"
               href={`/teacher/live/new?classroomId=${encodeURIComponent(classroomId)}`}
               onClick={() => setOpen(false)}
             >
