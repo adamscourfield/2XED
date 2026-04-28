@@ -90,20 +90,40 @@
     /* Primary button — soft elevated shadow (30% indigo) */
     --anx-btn-primary-shadow: 0 10px 28px rgba(74, 64, 224, 0.3);
 
-    /* ── Radius — design scale (xs / sm / lg / xl / full) ───────── */
-    --anx-radius-xs: 0.5rem;   /* 8px — tiny chips */
-    --anx-radius-sm: 0.75rem;  /* 12px — inputs, inner elements */
-    --anx-radius-lg: 1rem;     /* 16px — cards */
-    --anx-radius-xl: 1.5rem;   /* 24px — modals, floating panels */
-    /* Legacy alias: default “card” radius */
+    /* ── Radius — design scale (xs → xl). Use tokens; avoid one-off rem values on surfaces. ─ */
+    --anx-radius-xs: 0.5rem;    /* 8px — chips, tight UI */
+    --anx-radius-sm: 0.75rem;   /* 12px — inputs, inset tiles */
+    --anx-radius-md: 0.875rem;  /* 14px — medium inset (between sm / default card) */
+    --anx-radius-lg: 1rem;      /* 16px — default cards, lists */
+    --anx-radius-xl: 1.5rem;    /* 24px — hero tiles, staff panels, featured strips */
+    --anx-radius-glass: var(--anx-radius-xl); /* frosted panels — keep in sync with .anx-panel */
+    --anx-radius-full: 9999px;  /* pills — prefer over literal 999px in product chrome */
+    /* Default card corner — alias to lg */
     --anx-radius: var(--anx-radius-lg);
 
-    /* ── Shadows — floating elements only (extra-diffused) ───────── */
+    /* ── Shadows — tiered elevation (dashboard cards + live chrome share sm/md) ─ */
     --anx-shadow-float: 0 24px 56px rgba(36, 24, 92, 0.14), 0 8px 24px rgba(4, 14, 31, 0.06);
     --anx-shadow-sm:    0 8px 32px rgba(4,14,31,0.04);
     --anx-shadow-md:    0 12px 36px rgba(4,14,31,0.05);
     --anx-shadow-lg:    0 20px 40px rgba(4,14,31,0.06);
     --anx-shadow-xl:    0 24px 48px rgba(4,14,31,0.06);
+    /* Product surfaces: bordered cards (.anx-card, staff dash, student dash strips) */
+    --anx-shadow-card: var(--anx-shadow-sm);
+
+    /*
+      Motion catalog — live lesson + scene transitions (prefers-reduced-motion disables animations).
+      Enter easing is shared across anxLivePhaseIn, student live scenes, and chrome morph.
+      Durations: phase/content swaps use ~220–280ms; full page scene wrapper uses the longer token.
+    */
+    --anx-motion-ease-enter: cubic-bezier(0.22, 1, 0.36, 1);
+    --anx-motion-ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+    --anx-transition-calm: cubic-bezier(0.4, 0, 0.2, 1); /* UI chrome: tabs, toolbars */
+    --anx-motion-duration-live-phase-ms: 240;       /* inner phase blocks, chrome pill morph */
+    --anx-motion-duration-live-page-scene-ms: 260;   /* .anx-student-live-page-scene — route shell */
+    --anx-motion-duration-live-inner-scene-ms: 240;  /* .anx-student-live-scene — embedded scene */
+    --anx-motion-duration-live-phase-transition-ms: 220; /* .anx-live-phase-transition */
+    --anx-motion-duration-step-panel-ms: 280;       /* NewLiveSessionForm step panels */
+    --anx-motion-duration-micro-ms: 200;             /* skill flash, tiny pops */
 
     /* ── Spacing scale (numeric keys → px at 16px root) ───────────── */
     --anx-space-2:  0.5rem;   /* 8px  — scale 2 */
@@ -269,20 +289,25 @@
     }
   }
 
-  /* Regular cards — lifted via background color, no border, no shadow */
+  /* Regular cards — light boundary + soft lift (aligned with staff dash / student dash strips) */
   .anx-card {
     @apply transition-colors duration-200;
     border-radius: var(--anx-radius);
+    border: 1px solid var(--anx-outline-variant);
     background: var(--anx-surface-container-lowest);
+    box-shadow: var(--anx-shadow-card);
   }
 
   .anx-card:hover {
     background: var(--anx-surface-container-low);
+    box-shadow: var(--anx-shadow-md);
   }
 
   .anx-card-flat {
     border-radius: var(--anx-radius);
+    border: 1px solid var(--anx-outline-variant);
     background: var(--anx-surface-container-lowest);
+    box-shadow: none;
   }
 
   /* Teacher reports — reference palette + canvas (scoped via wrapper class) */
@@ -303,11 +328,9 @@
   }
 
   .anx-reports-card {
-    border-radius: 1rem;
+    border-radius: var(--anx-radius-lg);
     background: #ffffff;
-    box-shadow:
-      0 1px 2px rgba(15, 23, 42, 0.04),
-      0 6px 20px rgba(15, 23, 42, 0.06);
+    box-shadow: var(--anx-shadow-card);
     border: 1px solid rgba(15, 23, 42, 0.05);
   }
 
@@ -1895,7 +1918,7 @@
     border-radius: var(--anx-radius-xl);
     background: linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(167, 139, 250, 0.14) 100%);
     border: 1px solid rgba(99, 102, 241, 0.2);
-    box-shadow: var(--anx-shadow-sm);
+    box-shadow: var(--anx-shadow-card);
     overflow: hidden;
   }
 
@@ -2634,7 +2657,8 @@
     border-radius: var(--anx-radius-xl);
     padding: 1.2rem 1.25rem 1.3rem;
     background: var(--anx-surface-container-lowest);
-    box-shadow: var(--anx-shadow-sm);
+    border: 1px solid var(--anx-outline-variant);
+    box-shadow: var(--anx-shadow-card);
   }
 
   .staff-dash-side-title {
@@ -2691,7 +2715,8 @@
     text-decoration: none;
     color: var(--anx-text-secondary);
     background: var(--anx-surface-container-lowest);
-    box-shadow: var(--anx-shadow-sm);
+    border: 1px solid var(--anx-outline-variant);
+    box-shadow: var(--anx-shadow-card);
     transition: background 160ms ease, color 160ms ease;
   }
 
@@ -2709,7 +2734,8 @@
     border-radius: var(--anx-radius-xl);
     overflow: hidden;
     background: var(--anx-surface-container-lowest);
-    box-shadow: var(--anx-shadow-sm);
+    box-shadow: var(--anx-shadow-card);
+    border: 1px solid var(--anx-outline-variant);
   }
 
   .staff-dash-class-head {
@@ -3579,7 +3605,7 @@
 
   .td-home-mini-card:hover {
     border-color: rgba(99, 102, 241, 0.35);
-    box-shadow: var(--anx-shadow-sm);
+    box-shadow: var(--anx-shadow-card);
   }
 
   .td-home-mini-card--new {
@@ -3668,6 +3694,10 @@
     .anx-dashboard-hero-cta:hover,
     .anx-dashboard-hero-cta:active {
       transform: none;
+    }
+
+    .anx-card:hover {
+      box-shadow: var(--anx-shadow-card);
     }
 
     .student-dash-list-row:hover,
@@ -4340,7 +4370,10 @@
     letter-spacing: 0.04em;
   }
 
-  /* Live lesson — phase transitions (student) */
+  /*
+    anxLivePhaseIn — canonical fade + 6px lift-in for live flows.
+    Motion tokens: --anx-motion-ease-enter, --anx-motion-duration-*-ms (see :root catalog).
+  */
   @keyframes anxLivePhaseIn {
     from {
       opacity: 0;
@@ -4353,7 +4386,7 @@
   }
 
   .anx-live-phase-transition {
-    animation: anxLivePhaseIn 220ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation: anxLivePhaseIn calc(var(--anx-motion-duration-live-phase-transition-ms) * 1ms) var(--anx-motion-ease-enter) both;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -4367,7 +4400,7 @@
   }
 
   .student-live-chrome-pill-morph {
-    animation: anxLivePhaseIn 240ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation: anxLivePhaseIn calc(var(--anx-motion-duration-live-phase-ms) * 1ms) var(--anx-motion-ease-enter) both;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -4541,11 +4574,11 @@
   }
 
   .anx-signal-row-appear {
-    animation: anxLivePhaseIn 0.22s ease-out both;
+    animation: anxLivePhaseIn calc(var(--anx-motion-duration-live-phase-transition-ms) * 1ms) var(--anx-motion-ease-standard) both;
   }
 
   .anx-new-session-step-enter {
-    animation: anxLivePhaseIn 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation: anxLivePhaseIn calc(var(--anx-motion-duration-step-panel-ms) * 1ms) var(--anx-motion-ease-enter) both;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -4555,20 +4588,7 @@
   }
 
   .anx-skill-pickflash {
-    animation: anxLivePhaseIn 0.2s ease-out both;
-  }
-
-  /* Practice mode badge for student practice page */
-  .anx-practice-pill {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.25rem 0.625rem;
-    border-radius: 999px;
-    background: var(--anx-primary-soft);
-    color: var(--anx-primary);
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.04em;
+    animation: anxLivePhaseIn calc(var(--anx-motion-duration-micro-ms) * 1ms) ease-out both;
   }
 
   /* Student practice — progress dots */
@@ -4632,7 +4652,7 @@
   }
 
   .anx-student-live-page-scene {
-    animation: anxLivePhaseIn 260ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation: anxLivePhaseIn calc(var(--anx-motion-duration-live-page-scene-ms) * 1ms) var(--anx-motion-ease-enter) both;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -4642,7 +4662,7 @@
   }
 
   .anx-student-live-scene {
-    animation: anxLivePhaseIn 240ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation: anxLivePhaseIn calc(var(--anx-motion-duration-live-inner-scene-ms) * 1ms) var(--anx-motion-ease-enter) both;
     min-height: 0;
   }
 
