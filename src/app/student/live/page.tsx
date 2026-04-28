@@ -14,6 +14,7 @@ import {
   type Confidence,
   type PracticeQuestion,
 } from '@/components/student/live/StudentPracticeView';
+import type { CanvasInputData } from '@/components/question/CanvasInput';
 import { stripStudentQuestionLabel } from '@/features/items/itemMeta';
 import type { LiveWhiteboardPayload } from '@/lib/live/whiteboard-strokes';
 
@@ -353,7 +354,7 @@ export default function StudentLivePage() {
     }
   }
 
-  async function submitPracticeAnswer(answer: string, confidence: Confidence | null) {
+  async function submitPracticeAnswer(answer: string, confidence: Confidence | null, canvasData?: CanvasInputData | null) {
     if (appState.phase !== 'practice') return;
     setSubmitError(null);
     const { session, item, index, total } = appState;
@@ -370,6 +371,13 @@ export default function StudentLivePage() {
           itemId: item.id,
           skillId,
           answer,
+          canvasData: canvasData
+            ? {
+                snapshotBase64: canvasData.snapshotBase64,
+                snapshotCropped: canvasData.snapshotCropped,
+                strokes: canvasData.strokes,
+              }
+            : null,
           responseTimeMs: Date.now() - start,
           ...(confidence ? { confidence } : {}),
         }),
@@ -544,11 +552,16 @@ export default function StudentLivePage() {
     }
     const item = appState.item;
     const stem = stripStudentQuestionLabel(item.question) || item.question;
-    const options = Array.isArray(item.options) ? (item.options as string[]) : [];
+    const options = Array.isArray(item.options)
+      ? (item.options as string[])
+      : item.options && typeof item.options === 'object' && Array.isArray((item.options as { choices?: unknown }).choices)
+        ? ((item.options as { choices: unknown[] }).choices.filter((choice): choice is string => typeof choice === 'string'))
+        : [];
     const question: PracticeQuestion = {
       id: item.id,
+      type: item.type,
       stem: <p className="m-0 whitespace-pre-wrap">{stem}</p>,
-      placeholder: 'Type your answer…',
+      placeholder: item.type === 'EXTENDED_WRITING' ? 'Write your response here…' : 'Type your answer…',
       tip: 'Take your time — read the question carefully first.',
       options: options.length > 0 ? options : undefined,
     };
@@ -610,26 +623,6 @@ export default function StudentLivePage() {
     screen = { kind: 'message', message: appState.message };
   } else if (appState.phase === 'whiteboard') {
     screen = { kind: 'watch', whiteboard: appState.whiteboard };
-  } else if (appState.phase === 'explanation') {
-    const ex = appState.explanation;
-    screen = {
-      kind: 'explanation',
-      explanation: ex,
-      whiteboard: liveWhiteboardRef.current,
-      onDismiss: () => {
-        void fetch(`/api/live-sessions/${appState.session.sessionId}/explanation-event`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            eventType: 'acknowledged',
-            explanationRouteId: ex.id,
-            skillId: ex.skillId,
-            routeType: ex.routeType,
-          }),
-        }).catch(() => {});
-        setAppState({ phase: 'waiting', session: appState.session });
-      },
-    };
   } else if (appState.phase === 'question') {
     const opts = Array.isArray(appState.item.options) ? (appState.item.options as string[]) : [];
     const stem = stripStudentQuestionLabel(appState.item.question) || appState.item.question;

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
+import { Prisma } from '@prisma/client';
 import { z } from 'zod';
 import { authOptions } from '@/features/auth/authOptions';
 import { prisma } from '@/db/prisma';
@@ -7,17 +8,55 @@ import { recordKnowledgeAttempt } from '@/features/knowledge-state/knowledgeStat
 import { emitEvent } from '@/features/telemetry/eventService';
 import { escalateLane } from '@/lib/live/lane-router';
 import { generateQuestionsForSkill } from '@/lib/ai/questionGenerator';
+import { aiMarkingService, markSchema } from '@/features/qa/AIMarkingService';
 
 const schema = z.object({
   itemId: z.string().min(1),
   skillId: z.string().min(1),
-  answer: z.string().min(1),
+  answer: z.string().optional().default(''),
+  canvasData: z
+    .object({
+      snapshotBase64: z.string().min(1),
+      snapshotCropped: z.string().optional(),
+      strokes: z.array(z.unknown()).optional(),
+    })
+    .nullable()
+    .optional(),
   responseTimeMs: z.number().int().min(0),
   confidence: z.enum(['low', 'mid', 'high']).optional(),
+}).refine((data) => data.answer.trim().length > 0 || !!data.canvasData, {
+  message: 'Answer or canvas data is required',
+  path: ['answer'],
 });
 
 interface Props {
   params: Promise<{ sessionId: string }>;
+}
+
+const RUBRIC_MARKING_CORRECT_THRESHOLD = 0.6;
+
+function hasRubricPayload(options: unknown): boolean {
+  return !!options && typeof options === 'object' && 'rubric' in options;
+}
+
+function shouldUseRichMarking(item: { type: string; options: unknown }): boolean {
+  return item.type === 'EXTENDED_WRITING' || item.type === 'CANVAS_INPUT' || hasRubricPayload(item.options);
+}
+
+function getWeaknessTags(markingResult: { criteria?: Array<{ element?: string; score?: number; maxScore?: number }> } | null): string[] {
+  const criteria = Array.isArray(markingResult?.criteria) ? markingResult.criteria : [];
+  const ranked = criteria
+    .map((criterion) => {
+      const element = typeof criterion.element === 'string' ? criterion.element.trim() : '';
+      const score = typeof criterion.score === 'number' ? criterion.score : null;
+      const maxScore = typeof criterion.maxScore === 'number' ? criterion.maxScore : null;
+      const ratio = score !== null && maxScore && maxScore > 0 ? score / maxScore : 1;
+      return { element, ratio };
+    })
+    .filter((criterion) => criterion.element.length > 0)
+    .sort((a, b) => a.ratio - b.ratio);
+
+  return ranked.slice(0, 2).map((criterion) => criterion.element);
 }
 
 export async function POST(req: NextRequest, { params }: Props) {
@@ -33,7 +72,7 @@ export async function POST(req: NextRequest, { params }: Props) {
   const parsed = schema.safeParse(await req.json());
   if (!parsed.success) return NextResponse.json({ error: 'Invalid input' }, { status: 400 });
 
-  const { itemId, skillId, answer, responseTimeMs, confidence } = parsed.data;
+  const { itemId, skillId, answer, canvasData, responseTimeMs, confidence } = parsed.data;
 
   // Verify student is a participant in this session
   const participant = await prisma.liveParticipant.findUnique({
@@ -64,7 +103,19 @@ export async function POST(req: NextRequest, { params }: Props) {
   const item = await prisma.item.findUnique({ where: { id: itemId } });
   if (!item) return NextResponse.json({ error: 'Item not found' }, { status: 404 });
 
-  const correct = item.answer.trim().toLowerCase() === answer.trim().toLowerCase();
+  let markingResult: ReturnType<typeof markSchema.parse> | null = null;
+  let correct = item.answer.trim().toLowerCase() === answer.trim().toLowerCase();
+
+  if (shouldUseRichMarking(item)) {
+    const marked = await aiMarkingService.mark({
+      questionId: itemId,
+      answer,
+      canvasData: canvasData ?? null,
+      mode: 'DRAFT',
+    });
+    markingResult = markSchema.parse(marked);
+    correct = markingResult.score >= RUBRIC_MARKING_CORRECT_THRESHOLD;
+  }
 
   // If wrong, look up which misconception the chosen distractor signals.
   // misconceptionMap on AI-generated items maps option text -> misconception ID.
@@ -83,10 +134,13 @@ export async function POST(req: NextRequest, { params }: Props) {
       answer,
       correct,
       responseTimeMs,
+      markingResult: markingResult as unknown as Prisma.InputJsonValue,
       misconceptionId,
       confidence: confidence ?? null,
     },
   });
+
+  const weaknessTags = getWeaknessTags(markingResult);
 
   // Update knowledge state via knowledge state service
   await recordKnowledgeAttempt({
@@ -134,7 +188,7 @@ export async function POST(req: NextRequest, { params }: Props) {
         },
       });
       const failedExplanationId = participant.currentExplanationId ?? '';
-      const escalation = await escalateLane(participant.id, sessionId, failedExplanationId);
+      const escalation = await escalateLane(participant.id, sessionId, failedExplanationId, weaknessTags);
       recheckOutcome = 'escalated_lane_3';
       laneAfterAttempt = escalation.newLane;
     }
@@ -156,6 +210,7 @@ export async function POST(req: NextRequest, { params }: Props) {
         correct,
         laneAfterAttempt,
         outcome: recheckOutcome,
+        weaknessTags,
       },
     });
   } else {
@@ -241,6 +296,7 @@ export async function POST(req: NextRequest, { params }: Props) {
 
   return NextResponse.json({
     correct,
+    markingResult,
     nextItem: nextItem
       ? {
           id: nextItem.id,

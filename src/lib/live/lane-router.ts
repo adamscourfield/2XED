@@ -31,6 +31,15 @@ export type HandbackResult = {
   studentUserId: string;
 };
 
+function normalizeTags(tags: string[] | null | undefined): string[] {
+  return [...new Set((tags ?? []).map((tag) => tag.trim().toLowerCase()).filter(Boolean))];
+}
+
+function scoreRouteMatch(summary: string, tags: string[]): number {
+  const haystack = summary.toLowerCase();
+  return tags.reduce((score, tag) => (haystack.includes(tag) ? score + 1 : score), 0);
+}
+
 // ─── assignLane ──────────────────────────────────────────────────────────────
 
 export async function assignLane(
@@ -184,7 +193,8 @@ export async function assignLane(
 export async function escalateLane(
   participantId: string,
   sessionId: string,
-  failedExplanationId: string
+  failedExplanationId: string,
+  weaknessTags?: string[]
 ): Promise<EscalationResult> {
   const participant = await prisma.liveParticipant.findUnique({
     where: { id: participantId },
@@ -199,7 +209,7 @@ export async function escalateLane(
   const routes = await prisma.explanationRoute.findMany({
     where: { skillId: participant.session.skillId, isActive: true },
     orderBy: { defaultPriorityRank: 'asc' },
-    select: { id: true },
+    select: { id: true, misconceptionSummary: true },
   });
 
   // Step 2 — Fetch all explanation attempts for this student in this session
@@ -224,8 +234,17 @@ export async function escalateLane(
     usedExplanationIds.add(previousExplanations.currentExplanationId);
   }
 
-  // Step 3 — Find next unused route
-  const nextRoute = routes.find(r => !usedExplanationIds.has(r.id));
+  // Step 3 — Find next unused route, prioritising explanations that match the student's weakest rubric criteria.
+  const weaknessTagSet = normalizeTags(weaknessTags);
+  const rankedRoutes = routes
+    .filter((route) => !usedExplanationIds.has(route.id))
+    .map((route) => ({
+      ...route,
+      weaknessScore: scoreRouteMatch(route.misconceptionSummary ?? '', weaknessTagSet),
+    }))
+    .sort((a, b) => b.weaknessScore - a.weaknessScore);
+
+  const nextRoute = rankedRoutes[0];
 
   let holdingAtFinalCheck = false;
   let nextExplanationId: string | null = null;
@@ -391,8 +410,11 @@ export async function checkReteachThreshold(sessionId: string): Promise<void> {
 
 async function selectExplanationRoute(
   skillId: string,
-  misconceptionTag: string | null
+  misconceptionTag: string | null,
+  weaknessTags?: string[] | null
 ): Promise<string> {
+  const tags = normalizeTags([misconceptionTag ?? '', ...(weaknessTags ?? [])]);
+
   // Fetch ExplanationPerformance records for this skill, ordered by dle DESC
   const performances = await prisma.explanationPerformance.findMany({
     where: { skillId },
@@ -405,12 +427,14 @@ async function selectExplanationRoute(
   });
 
   if (performances.length > 0) {
-    // If misconceptionTag provided: prefer routes matching tag
-    if (misconceptionTag) {
-      const matching = performances.find(p =>
-        p.explanation.misconceptionSummary.toLowerCase().includes(misconceptionTag.toLowerCase())
-      );
-      if (matching) return matching.explanationId;
+    if (tags.length > 0) {
+      const ranked = performances
+        .map((performance) => ({
+          performance,
+          matchScore: scoreRouteMatch(performance.explanation.misconceptionSummary ?? '', tags),
+        }))
+        .sort((a, b) => b.matchScore - a.matchScore);
+      if ((ranked[0]?.matchScore ?? 0) > 0) return ranked[0]!.performance.explanationId;
     }
     return performances[0].explanationId;
   }

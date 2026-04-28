@@ -17,6 +17,15 @@ export interface ExplainBridgePayload {
   explanationId?: string;
 }
 
+function normalizeWeaknessTags(tags: string[] | undefined): string[] {
+  return [...new Set((tags ?? []).map((tag) => tag.trim().toLowerCase()).filter(Boolean))];
+}
+
+function routeWeaknessScore(summary: string, tags: string[]): number {
+  const haystack = summary.toLowerCase();
+  return tags.reduce((score, tag) => (haystack.includes(tag) ? score + 1 : score), 0);
+}
+
 function formatBody(misconceptionSummary: string, workedExample: string): string {
   const m = misconceptionSummary.trim();
   const w = workedExample.trim();
@@ -152,12 +161,14 @@ export async function getRecommendedExplanationForLiveSession(
     phases: unknown;
     primarySkillId: string | null | undefined;
     responseSummary: Array<{ skillId: string; answeredCount: number; correctCount: number }>;
+    weaknessTags?: string[];
   },
 ): Promise<RecommendedExplanationSnapshot | null> {
   const focusSkillId = pickSkillIdForExplanationRecommendation(params);
   if (!focusSkillId) return null;
 
-  const top = await prisma.explanationPerformance.findFirst({
+  const weaknessTags = normalizeWeaknessTags(params.weaknessTags);
+  const candidates = await prisma.explanationPerformance.findMany({
     where: { skillId: focusSkillId },
     include: {
       explanation: {
@@ -173,7 +184,16 @@ export async function getRecommendedExplanationForLiveSession(
     orderBy: { dle: 'desc' },
   });
 
-  if (!top) return null;
+  if (candidates.length === 0) return null;
+
+  const ranked = [...candidates].sort((a, b) => {
+    const weaknessDelta = routeWeaknessScore(b.explanation.misconceptionSummary ?? '', weaknessTags)
+      - routeWeaknessScore(a.explanation.misconceptionSummary ?? '', weaknessTags);
+    if (weaknessDelta !== 0) return weaknessDelta;
+    return b.dle - a.dle;
+  });
+
+  const top = ranked[0]!;
 
   return {
     explanationId: top.explanationId,

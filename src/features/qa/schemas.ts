@@ -70,6 +70,16 @@ export const MarkRequestSchema = z.object({
 export const markSchema = z.object({
   correct: z.boolean(),
   score: z.number().min(0).max(1),
+  criteria: z
+    .array(
+      z.object({
+        element: z.string().min(1),
+        score: z.number().min(0),
+        maxScore: z.number().positive(),
+        summary: z.string().optional(),
+      })
+    )
+    .default([]),
   feedback: z.string(),
   wtm: z.string(),
   ebi: z.string(),

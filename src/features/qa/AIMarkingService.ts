@@ -18,6 +18,12 @@ export interface MarkRequest {
 export interface MarkResult {
   correct: boolean;
   score: number;       // 0–1
+  criteria: Array<{
+    element: string;
+    score: number;
+    maxScore: number;
+    summary?: string;
+  }>;
   feedback: string;
   wtm: string;
   ebi: string;
@@ -136,7 +142,18 @@ Use a warm but rigorous tone — the goal is growth, not praise or criticism for
 When marking, use the following rubric criteria:
 ${JSON.stringify(rubric, null, 2)}
 
-Respond using the schema provided.`;
+Return valid JSON only.
+Include criterion-level scoring using this shape:
+{
+  "correct": boolean,
+  "score": number,
+  "criteria": [{ "element": string, "score": number, "maxScore": number, "summary": string }],
+  "feedback": string,
+  "wtm": string,
+  "ebi": string,
+  "flagged": boolean
+}
+Respond using the rubric criteria names where possible.`;
 }
 
 function buildUserPrompt(
@@ -152,7 +169,7 @@ ${answer}
 Rubric:
 ${JSON.stringify(rubric, null, 2)}
 
-Mark the student's answer against the rubric. Respond with the required schema.`;
+Mark the student's answer against the rubric. Respond with the required JSON schema, including criterion-level scores.`;
 }
 
 function buildImagePrompt(question: string, rubric: unknown): string {
@@ -166,7 +183,7 @@ Question: ${question}
 Rubric:
 ${JSON.stringify(rubric, null, 2)}
 
-Respond using the required schema.`;
+Respond using the required JSON schema, including criterion-level scores.`;
 }
 
 // ── LLM call ───────────────────────────────────────────────────────────────────
@@ -174,6 +191,16 @@ Respond using the required schema.`;
 const LLM_RESPONSE_SCHEMA = z.object({
   correct: z.boolean(),
   score: z.number().min(0).max(1),
+  criteria: z
+    .array(
+      z.object({
+        element: z.string().min(1),
+        score: z.number().min(0),
+        maxScore: z.number().positive(),
+        summary: z.string().optional(),
+      })
+    )
+    .default([]),
   feedback: z.string(),
   wtm: z.string(),
   ebi: z.string(),
@@ -187,7 +214,7 @@ async function callLLM(
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) throw new Error('OPENAI_API_KEY is not configured');
 
-  const content: object =
+  const content: string | object =
     imageBase64
       ? [
           { type: 'text' as const, text: messages[messages.length - 1].content as string },
@@ -283,6 +310,7 @@ export class AIMarkingService {
       const result = await callLLM(messages, imageBase64);
       return {
         ...result,
+        criteria: Array.isArray(result.criteria) ? result.criteria : [],
         feedback: result.feedback ?? '',
         wtm: result.wtm ?? '',
         ebi: result.ebi ?? '',
@@ -301,7 +329,7 @@ export class AIMarkingService {
     try {
       const item = await prisma.item.findUnique({
         where: { id: questionId },
-        select: { question: true },
+        select: { question: true, options: true },
       });
       if (!item) return null;
 

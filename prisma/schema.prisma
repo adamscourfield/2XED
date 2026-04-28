@@ -770,6 +770,9 @@ model LiveAttempt {
   answer        String
   correct       Boolean
   responseTimeMs Int
+  // Full structured marking output for rubric/open-response items.
+  // When present, downstream consumers should prefer this over the binary correct flag.
+  markingResult Json?
   // References misconceptions[].id on the Skill node — set when the student
   // selects a distractor that was tagged to a specific misconception at generation time.
   misconceptionId String?

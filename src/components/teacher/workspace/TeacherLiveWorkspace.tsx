@@ -14,7 +14,7 @@ import {
 import { AnnotationToolbar } from './AnnotationToolbar';
 import { TeachingModePanel, type TeachingMode } from './TeachingModePanel';
 import { AnimationRenderer } from '@/components/explanation/AnimationRenderer';
-import { StudentSignalsPanel, type ClassOverview, type InterpretedSignal, type MisconceptionSignal, type StudentMessageSignal, type StudentResponseDetail } from './StudentSignalsPanel';
+import { StudentSignalsPanel, type ClassOverview, type InterpretedSignal, type MisconceptionSignal, type StudentMessageSignal, type StudentResponseDetail, type RubricCriterionSignal } from './StudentSignalsPanel';
 import { TeacherBottomBar } from './TeacherBottomBar';
 import { InviteIcon, SettingsIcon } from './icons';
 import type { LiveStroke } from '@/lib/live/whiteboard-strokes';
@@ -45,6 +45,8 @@ interface ResponseSummary {
   totalParticipants: number;
   answeredCount: number;
   correctCount: number;
+  partialCount?: number;
+  incorrectCount?: number;
 }
 
 interface LaneStudent {
@@ -90,13 +92,13 @@ interface SessionSnapshot {
   laneCounts: { LANE_1: number; LANE_2: number; LANE_3: number };
   laneStudents: { LANE_1: LaneStudent[]; LANE_2: LaneStudent[]; LANE_3: LaneStudent[] };
   responseSummary: ResponseSummary[];
+  rubricCriteria?: RubricCriterionSignal[] | null;
   supportSummary?: SupportSummary;
   studentMessages?: StudentMessageSignal[] | null;
   skillId?: string | null;
   skill?: { id: string; code: string; name: string } | null;
   recommendedExplanation?: RecommendedExplanation | null;
   misconceptionSignals?: MisconceptionSignal[] | null;
-  studentMessages?: StudentMessageSignal[] | null;
   studentResponses?: StudentResponseDetail[] | null;
 }
 
@@ -144,13 +146,14 @@ function deriveSignals(snapshot: SessionSnapshot | null): {
       : snapshot.responseSummary[0];
   const responded = summary?.answeredCount ?? 0;
   const correct = summary?.correctCount ?? 0;
-  const incorrect = Math.max(0, responded - correct);
+  const partial = summary?.partialCount ?? 0;
+  const incorrect = summary?.incorrectCount ?? Math.max(0, responded - correct - partial);
 
   const overview: ClassOverview = {
     total,
     responded,
     correct,
-    partiallyCorrect: 0,
+    partiallyCorrect: partial,
     incorrect,
   };
 
@@ -683,6 +686,7 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
             signals={studentSignals.signals}
             misconceptionSignals={studentSignals.misconceptionSignals}
             topMisconception={studentSignals.topMisconception}
+            rubricCriteria={snapshot?.rubricCriteria ?? null}
             suggestedMove={
               studentSignals.suggestedMove
                 ? {

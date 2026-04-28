@@ -26,6 +26,27 @@ interface StudentMessageSummary {
   createdAt: string;
 }
 
+interface MarkingCriterion {
+  element?: string;
+  score?: number;
+  maxScore?: number;
+}
+
+interface StoredMarkingResult {
+  score?: number;
+  criteria?: MarkingCriterion[];
+}
+
+function getAttemptOutcome(attempt: { correct: boolean; markingResult: unknown }): 'correct' | 'partial' | 'incorrect' {
+  const marking = (attempt.markingResult as StoredMarkingResult | null) ?? null;
+  if (marking && typeof marking.score === 'number') {
+    if (marking.score >= 0.6) return 'correct';
+    if (marking.score > 0) return 'partial';
+    return 'incorrect';
+  }
+  return attempt.correct ? 'correct' : 'incorrect';
+}
+
 interface Props {
   params: Promise<{ sessionId: string }>;
 }
@@ -64,6 +85,7 @@ export async function GET(_req: NextRequest, { params }: Props) {
           studentUserId: true,
           skillId: true,
           correct: true,
+          markingResult: true,
           misconceptionId: true,
         },
       },
@@ -90,7 +112,7 @@ export async function GET(_req: NextRequest, { params }: Props) {
   // Build per-skill response summary
   const skillSummary = new Map<
     string,
-    { total: number; answered: Set<string>; correct: number }
+    { total: number; answered: Set<string>; correct: number; partial: number; incorrect: number }
   >();
 
   const participantIds = new Set(liveSession.participants.map((p) => p.studentUserId));
@@ -100,9 +122,14 @@ export async function GET(_req: NextRequest, { params }: Props) {
       total: participantIds.size,
       answered: new Set<string>(),
       correct: 0,
+      partial: 0,
+      incorrect: 0,
     };
     entry.answered.add(attempt.studentUserId);
-    if (attempt.correct) entry.correct += 1;
+    const outcome = getAttemptOutcome(attempt);
+    if (outcome === 'correct') entry.correct += 1;
+    else if (outcome === 'partial') entry.partial += 1;
+    else entry.incorrect += 1;
     skillSummary.set(attempt.skillId, entry);
   }
 
@@ -111,12 +138,36 @@ export async function GET(_req: NextRequest, { params }: Props) {
     totalParticipants: s.total,
     answeredCount: s.answered.size,
     correctCount: s.correct,
+    partialCount: s.partial,
+    incorrectCount: s.incorrect,
   }));
+
+  const weaknessCriterionScores = new Map<string, { total: number; count: number }>();
+  for (const attempt of liveSession.liveAttempts) {
+    const marking = (attempt.markingResult as { criteria?: Array<{ element?: string; score?: number; maxScore?: number }> } | null) ?? null;
+    const criteria = Array.isArray(marking?.criteria) ? marking.criteria : [];
+    for (const criterion of criteria) {
+      const element = typeof criterion.element === 'string' ? criterion.element.trim() : '';
+      const score = typeof criterion.score === 'number' ? criterion.score : null;
+      const maxScore = typeof criterion.maxScore === 'number' ? criterion.maxScore : null;
+      if (!element || score === null || maxScore === null || maxScore <= 0) continue;
+      const entry = weaknessCriterionScores.get(element) ?? { total: 0, count: 0 };
+      entry.total += score / maxScore;
+      entry.count += 1;
+      weaknessCriterionScores.set(element, entry);
+    }
+  }
+  const weaknessTags = Array.from(weaknessCriterionScores.entries())
+    .map(([element, entry]) => ({ element, average: entry.total / entry.count }))
+    .sort((a, b) => a.average - b.average)
+    .slice(0, 3)
+    .map((entry) => entry.element);
 
   const recommendedExplanation = await getRecommendedExplanationForLiveSession(prisma, {
     phases: liveSession.phases,
     primarySkillId: liveSession.skillId,
     responseSummary,
+    weaknessTags,
   });
 
   const supportEvents = await prisma.event.findMany({
@@ -147,20 +198,6 @@ export async function GET(_req: NextRequest, { params }: Props) {
   });
 
   const studentNameMap = new Map(liveSession.participants.map((participant) => [participant.studentUserId, participant.student.name ?? participant.student.email]));
-
-  const messageEvents = supportEvents.filter((event) => event.name === 'live_student_message' || event.name === 'live_student_help_request');
-
-  const studentMessages: StudentMessageSummary[] = messageEvents
-    .filter((event) => Boolean(event.studentUserId))
-    .slice(0, 8)
-    .map((event) => ({
-      studentUserId: event.studentUserId!,
-      studentName: studentNameMap.get(event.studentUserId!) ?? 'Unknown student',
-      kind: event.name === 'live_student_message' ? 'message' : 'help',
-      message: ((event.payload as { message?: string | null }).message ?? null),
-      lane: ((event.payload as { lane?: 'LANE_1' | 'LANE_2' | 'LANE_3' | null }).lane ?? null),
-      createdAt: event.createdAt.toISOString(),
-    }));
 
   const supportSummary: LiveSupportEventSummary & {
     latestOutcomes: Array<{
@@ -270,14 +307,44 @@ export async function GET(_req: NextRequest, { params }: Props) {
       createdAt: e.createdAt.toISOString(),
     }));
 
+  // ── Rubric criteria aggregation ───────────────────────────────────────────
+  const rubricCriterionMap = new Map<string, { totalScore: number; totalMaxScore: number; count: number; students: Set<string> }>();
+  for (const attempt of liveSession.liveAttempts) {
+    const marking = (attempt.markingResult as StoredMarkingResult | null) ?? null;
+    const criteria = Array.isArray(marking?.criteria) ? marking.criteria : [];
+    for (const criterion of criteria) {
+      const element = typeof criterion.element === 'string' ? criterion.element : null;
+      const score = typeof criterion.score === 'number' ? criterion.score : null;
+      const maxScore = typeof criterion.maxScore === 'number' ? criterion.maxScore : null;
+      if (!element || score === null || maxScore === null) continue;
+      const entry = rubricCriterionMap.get(element) ?? { totalScore: 0, totalMaxScore: 0, count: 0, students: new Set<string>() };
+      entry.totalScore += score;
+      entry.totalMaxScore += maxScore;
+      entry.count += 1;
+      entry.students.add(attempt.studentUserId);
+      rubricCriterionMap.set(element, entry);
+    }
+  }
+
+  const rubricCriteria = Array.from(rubricCriterionMap.entries())
+    .map(([element, entry]) => ({
+      element,
+      averageScore: entry.count > 0 ? entry.totalScore / entry.count : 0,
+      averageMaxScore: entry.count > 0 ? entry.totalMaxScore / entry.count : 0,
+      affectedStudents: entry.students.size,
+    }))
+    .sort((a, b) => (a.averageScore / Math.max(a.averageMaxScore, 1)) - (b.averageScore / Math.max(b.averageMaxScore, 1)));
+
   // ── Per-student response breakdown ────────────────────────────────────────
   // Build attempt counts per student from the already-fetched liveAttempts.
-  const studentAttemptMap = new Map<string, { total: number; correct: number; lastCorrect: boolean | null }>();
+  const studentAttemptMap = new Map<string, { total: number; correct: number; partial: number; lastOutcome: 'correct' | 'partial' | 'incorrect' | null }>();
   for (const attempt of liveSession.liveAttempts) {
-    const entry = studentAttemptMap.get(attempt.studentUserId) ?? { total: 0, correct: 0, lastCorrect: null };
+    const entry = studentAttemptMap.get(attempt.studentUserId) ?? { total: 0, correct: 0, partial: 0, lastOutcome: null };
+    const outcome = getAttemptOutcome(attempt);
     entry.total += 1;
-    if (attempt.correct) entry.correct += 1;
-    entry.lastCorrect = attempt.correct;
+    if (outcome === 'correct') entry.correct += 1;
+    if (outcome === 'partial') entry.partial += 1;
+    entry.lastOutcome = outcome;
     studentAttemptMap.set(attempt.studentUserId, entry);
   }
 
@@ -290,14 +357,15 @@ export async function GET(_req: NextRequest, { params }: Props) {
   const studentResponses = liveSession.participants
     .filter((p) => p.isActive)
     .map((p) => {
-      const attempts = studentAttemptMap.get(p.studentUserId) ?? { total: 0, correct: 0, lastCorrect: null };
+      const attempts = studentAttemptMap.get(p.studentUserId) ?? { total: 0, correct: 0, partial: 0, lastOutcome: null };
       return {
         studentUserId: p.studentUserId,
         name: p.student.name ?? p.student.email,
         lane: studentLaneMap.get(p.studentUserId) ?? 'LANE_1' as const,
         attemptCount: attempts.total,
         correctCount: attempts.correct,
-        lastCorrect: attempts.lastCorrect,
+        partialCount: attempts.partial,
+        lastOutcome: attempts.lastOutcome,
         hasOpenFlag: p.student.interventionFlags.length > 0,
       };
     })
@@ -322,7 +390,7 @@ export async function GET(_req: NextRequest, { params }: Props) {
     supportSummary,
     studentMessages,
     misconceptionSignals,
-    studentMessages,
+    rubricCriteria,
     studentResponses,
   });
 }

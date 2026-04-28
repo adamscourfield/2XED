@@ -50,7 +50,7 @@ export interface MarkingMetadata {
   correctAnswer: string;
   distractors?: string[];
   tolerance?: number;
-  rubric?: string;
+  rubric?: unknown;
 }
 
 export interface QualityMetadata {

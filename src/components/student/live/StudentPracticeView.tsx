@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import { useState, type FormEvent } from 'react';
+import { CanvasInput, type CanvasInputData } from '@/components/question/CanvasInput';
 import {
   HelpIcon,
   MessageIcon,
@@ -14,6 +15,7 @@ import {
 export interface PracticeQuestion {
   id: string;
   stem: React.ReactNode;
+  type?: string;
   helperText?: string;
   answerPrefix?: React.ReactNode;
   placeholder?: string;
@@ -33,7 +35,7 @@ interface Props {
   initialAnswer?: string;
   busy?: boolean;
   error?: string | null;
-  onSubmit: (answer: string, confidence: Confidence | null) => void;
+  onSubmit: (answer: string, confidence: Confidence | null, canvasData?: CanvasInputData | null) => void;
   onLeave?: () => void;
   onNeedHelp?: () => void;
   onMessageTeacher?: (message: string) => void;
@@ -85,11 +87,17 @@ export function StudentPracticeView({
   const [confidence, setConfidence] = useState<Confidence | null>(null);
   const [messageOpen, setMessageOpen] = useState(false);
   const [draft, setDraft] = useState('');
+  const [canvasData, setCanvasData] = useState<CanvasInputData | null>(null);
+
+  const isCanvasInput = question.type === 'CANVAS_INPUT';
+  const isExtendedWriting = question.type === 'EXTENDED_WRITING';
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    if (!answer.trim() || busy) return;
-    onSubmit(answer, confidence);
+    const hasTextAnswer = !!answer.trim();
+    const hasCanvasAnswer = !!canvasData;
+    if ((!hasTextAnswer && !hasCanvasAnswer) || busy) return;
+    onSubmit(answer, confidence, canvasData);
   }
 
   return (
@@ -175,6 +183,22 @@ export function StudentPracticeView({
                   </label>
                 ))}
               </div>
+            ) : isCanvasInput ? (
+              <CanvasInput
+                questionId={question.id}
+                mode="draw+type"
+                onChange={setCanvasData}
+                disabled={busy}
+              />
+            ) : isExtendedWriting ? (
+              <textarea
+                value={answer}
+                onChange={(e) => setAnswer(e.target.value)}
+                placeholder={question.placeholder ?? 'Write your response here…'}
+                className="min-h-48 w-full rounded-2xl border px-4 py-3.5 text-base outline-none transition focus:border-[var(--anx-primary)] focus:shadow-[0_0_0_3px_var(--anx-primary-glow)] resize-y"
+                style={{ borderColor: 'var(--anx-outline-variant)', background: 'var(--anx-surface-container-lowest)', color: 'var(--anx-text)' }}
+                autoFocus
+              />
             ) : (
               <label
                 className="flex items-center gap-3 rounded-2xl border px-4 py-3.5 transition focus-within:border-[var(--anx-primary)] focus-within:shadow-[0_0_0_3px_var(--anx-primary-glow)]"
@@ -209,13 +233,13 @@ export function StudentPracticeView({
               </button>
               <button
                 type="submit"
-                disabled={busy || !answer.trim()}
+                disabled={busy || (!answer.trim() && !canvasData)}
                 className="anx-btn-primary inline-flex items-center gap-2 px-6 py-3 text-sm disabled:opacity-50"
               >
                 {busy ? 'Submitting…' : 'Submit answer'}
               </button>
             </div>
-            {!question.options?.length && (
+            {!question.options?.length && !isCanvasInput && (
               <p className="text-right text-xs" style={{ color: 'var(--anx-text-muted)' }}>
                 Press{' '}
                 <kbd

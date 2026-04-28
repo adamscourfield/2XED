@@ -33,13 +33,21 @@ export interface StudentMessageSignal {
   createdAt: string;
 }
 
+export interface RubricCriterionSignal {
+  element: string;
+  averageScore: number;
+  averageMaxScore: number;
+  affectedStudents: number;
+}
+
 export interface StudentResponseDetail {
   studentUserId: string;
   name: string;
   lane: 'LANE_1' | 'LANE_2' | 'LANE_3';
   attemptCount: number;
   correctCount: number;
-  lastCorrect: boolean | null;
+  partialCount: number;
+  lastOutcome: 'correct' | 'partial' | 'incorrect' | null;
   hasOpenFlag: boolean;
 }
 
@@ -52,6 +60,7 @@ interface Props {
   suggestedMove?: { text: string; cta?: string; onAct?: () => void } | null;
   studentMessages?: StudentMessageSignal[] | null;
   studentResponses?: StudentResponseDetail[] | null;
+  rubricCriteria?: RubricCriterionSignal[] | null;
   onViewDetailedResponses?: () => void;
 }
 
@@ -93,6 +102,7 @@ export function StudentSignalsPanel({
   suggestedMove,
   studentMessages,
   studentResponses,
+  rubricCriteria,
   onViewDetailedResponses,
 }: Props) {
   const [showDetail, setShowDetail] = useState(false);
@@ -175,6 +185,35 @@ export function StudentSignalsPanel({
           </div>
         </div>
       </div>
+
+      {rubricCriteria && rubricCriteria.length > 0 && (
+        <div className="mt-4 space-y-2">
+          <p className="text-xs font-semibold" style={{ color: 'var(--anx-text-secondary)' }}>
+            Rubric criteria
+          </p>
+          {rubricCriteria.map((criterion) => (
+            <div
+              key={criterion.element}
+              className="rounded-2xl border px-3 py-3"
+              style={{ borderColor: 'var(--anx-outline-variant)', background: 'var(--anx-surface-container-low)' }}
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--anx-text-muted)' }}>
+                    {criterion.element}
+                  </p>
+                  <p className="mt-1 text-sm" style={{ color: 'var(--anx-text)' }}>
+                    Avg {criterion.averageScore.toFixed(1)} / {criterion.averageMaxScore.toFixed(1)}
+                  </p>
+                </div>
+                <span className="shrink-0 text-xs" style={{ color: 'var(--anx-text-muted)' }}>
+                  {criterion.affectedStudents} student{criterion.affectedStudents === 1 ? '' : 's'}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Real-time misconception breakdown — populated from LiveAttempt.misconceptionId */}
       {misconceptionSignals && misconceptionSignals.length > 0 ? (
@@ -339,8 +378,10 @@ export function StudentSignalsPanel({
                   {s.attemptCount > 0 ? (
                     <span className="shrink-0 text-xs tabular-nums" style={{ color: 'var(--anx-text-muted)' }}>
                       {s.correctCount}/{s.attemptCount}
-                      {s.lastCorrect === true && <span style={{ color: 'var(--anx-success)' }}> ✓</span>}
-                      {s.lastCorrect === false && <span style={{ color: 'var(--anx-danger-text)' }}> ✗</span>}
+                      {s.partialCount > 0 && <span style={{ color: 'var(--anx-warning-text)' }}> · {s.partialCount} partial</span>}
+                      {s.lastOutcome === 'correct' && <span style={{ color: 'var(--anx-success)' }}> ✓</span>}
+                      {s.lastOutcome === 'partial' && <span style={{ color: 'var(--anx-warning-text)' }}> ~</span>}
+                      {s.lastOutcome === 'incorrect' && <span style={{ color: 'var(--anx-danger-text)' }}> ✗</span>}
                     </span>
                   ) : (
                     <span className="shrink-0 text-xs" style={{ color: 'var(--anx-text-muted)' }}>—</span>
