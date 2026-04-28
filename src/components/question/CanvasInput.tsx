@@ -31,6 +31,8 @@ export interface CanvasInputProps {
   disabled?: boolean;
   penColor?: string;
   penWidth?: number;
+  /** Live lesson: mark the primary surface for keyboard focus after a phase change */
+  markPrimaryFocus?: boolean;
 }
 
 interface UndoStack {
@@ -108,6 +110,7 @@ export function CanvasInput({
   disabled = false,
   penColor = '#1a1a1a',
   penWidth = 2,
+  markPrimaryFocus = false,
 }: CanvasInputProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const offscreenRef = useRef<HTMLCanvasElement | null>(null);
@@ -339,7 +342,9 @@ export function CanvasInput({
           ref={canvasRef}
           width={800}
           height={300}
-          className="touch-none rounded border border-gray-300"
+          tabIndex={markPrimaryFocus ? 0 : undefined}
+          data-live-primary-focus={markPrimaryFocus ? '' : undefined}
+          className="touch-none rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
           style={{ cursor: disabled ? 'not-allowed' : 'crosshair' }}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
@@ -355,6 +360,7 @@ export function CanvasInput({
           onChange={handleTextChange}
           disabled={disabled}
           placeholder="Type your answer here…"
+          data-live-primary-focus={markPrimaryFocus ? '' : undefined}
           className="min-h-24 rounded border border-gray-300 p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
         />
       )}

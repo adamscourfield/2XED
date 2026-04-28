@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, type FormEvent } from 'react';
+import { useLivePhasePrimaryFocus } from '@/components/student/live/useLivePhasePrimaryFocus';
 import { CanvasInput, type CanvasInputData } from '@/components/question/CanvasInput';
 import { StudentLiveSessionChrome } from '@/components/student/live/StudentLiveSessionChrome';
 import { StudentLivePhaseStrip } from '@/components/student/live/StudentLivePhaseStrip';
@@ -91,6 +92,8 @@ export function StudentPracticeView({
   const [sentFlash, setSentFlash] = useState(false);
   const [canvasData, setCanvasData] = useState<CanvasInputData | null>(null);
 
+  useLivePhasePrimaryFocus(`${question.id}-${questionNumber}`);
+
   const isCanvasInput = question.type === 'CANVAS_INPUT';
   const isExtendedWriting = question.type === 'EXTENDED_WRITING';
 
@@ -115,7 +118,7 @@ export function StudentPracticeView({
         mode="practice"
         phaseHint="Practice · Your turn"
       >
-        <StudentLivePhaseStrip active="Practice" />
+        <StudentLivePhaseStrip active="Try" />
       </StudentLiveSessionChrome>
 
       {/* ── Main grid ───────────────────────────────────────────────────── */}
@@ -149,7 +152,7 @@ export function StudentPracticeView({
             {error && <div className="anx-callout-danger text-sm">{error}</div>}
             {question.options && question.options.length > 0 ? (
               <div className="flex flex-col gap-2">
-                {question.options.map((opt) => (
+                {question.options.map((opt, optIdx) => (
                   <label
                     key={opt}
                     className={`anx-option flex cursor-pointer items-center gap-3 py-3 ${answer === opt ? 'anx-option-selected' : ''}`}
@@ -161,6 +164,7 @@ export function StudentPracticeView({
                       checked={answer === opt}
                       onChange={() => setAnswer(opt)}
                       className="accent-[var(--anx-primary)]"
+                      data-live-primary-focus={optIdx === 0 ? '' : undefined}
                     />
                     <span className="text-sm font-medium" style={{ color: 'var(--anx-text)' }}>{opt}</span>
                   </label>
@@ -172,6 +176,7 @@ export function StudentPracticeView({
                 mode="draw+type"
                 onChange={setCanvasData}
                 disabled={busy}
+                markPrimaryFocus
               />
             ) : isExtendedWriting ? (
               <textarea
@@ -180,7 +185,7 @@ export function StudentPracticeView({
                 placeholder={question.placeholder ?? 'Write your response here…'}
                 className="min-h-48 w-full rounded-2xl border px-4 py-3.5 text-base outline-none transition focus:border-[var(--anx-primary)] focus:shadow-[0_0_0_3px_var(--anx-primary-glow)] resize-y"
                 style={{ borderColor: 'var(--anx-outline-variant)', background: 'var(--anx-surface-container-lowest)', color: 'var(--anx-text)' }}
-                autoFocus
+                data-live-primary-focus=""
               />
             ) : (
               <label
@@ -199,7 +204,7 @@ export function StudentPracticeView({
                   placeholder={question.placeholder ?? 'Type your answer…'}
                   className="w-full bg-transparent text-lg outline-none"
                   style={{ color: 'var(--anx-text)' }}
-                  autoFocus
+                  data-live-primary-focus=""
                 />
               </label>
             )}

@@ -12,6 +12,7 @@ import type { LiveWhiteboardPayload } from '@/lib/live/whiteboard-strokes';
 import { StudentLiveSessionChrome } from '@/components/student/live/StudentLiveSessionChrome';
 import { LivePhaseTransition } from '@/components/student/live/LivePhaseTransition';
 import { StudentLivePhaseStrip, livePhaseToStripStep } from '@/components/student/live/StudentLivePhaseStrip';
+import { useLivePhasePrimaryFocus } from '@/components/student/live/useLivePhasePrimaryFocus';
 
 export type LiveExplanationPayload = {
   id: string;
@@ -90,6 +91,7 @@ function SidePanel({
   body,
   onNeedHelp,
   onMessageTeacher,
+  primaryFocusHelp,
   children,
 }: {
   guidanceSlotKey: string;
@@ -97,6 +99,8 @@ function SidePanel({
   body: string;
   onNeedHelp?: () => void;
   onMessageTeacher?: (message: string) => void;
+  /** Move keyboard focus here after a phase change (one per screen). */
+  primaryFocusHelp?: boolean;
   children?: React.ReactNode;
 }) {
   const [messageOpen, setMessageOpen] = useState(false);
@@ -113,6 +117,7 @@ function SidePanel({
         <button
           type="button"
           onClick={onNeedHelp}
+          data-live-primary-focus={primaryFocusHelp ? '' : undefined}
           className="inline-flex items-center justify-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition hover:bg-[var(--anx-primary-soft)] active:scale-[0.98]"
           style={{ borderColor: 'var(--anx-outline-variant)', color: 'var(--anx-primary)' }}
         >
@@ -244,6 +249,7 @@ function CheckAnswerCard({
                   checked={answer === opt}
                   onChange={() => setAnswer(opt)}
                   className="accent-[var(--anx-primary)]"
+                  data-live-primary-focus={options[0] === opt ? '' : undefined}
                 />
                 <span className="text-sm font-medium">{opt}</span>
               </label>
@@ -256,7 +262,7 @@ function CheckAnswerCard({
             onChange={(e) => setAnswer(e.target.value)}
             placeholder="Type your answer…"
             className="anx-input"
-            autoFocus
+            data-live-primary-focus=""
           />
         )}
         <div className="flex items-center justify-between gap-3">
@@ -293,6 +299,7 @@ export function StudentLiveView({
   const stripActive = livePhaseToStripStep(screen.kind);
   const phaseHint = phaseHintFor(screen);
   const transitionKey = `${screen.kind}-${screen.kind === 'message' ? screen.message : ''}`;
+  useLivePhasePrimaryFocus(transitionKey);
 
   return (
     <div className="flex min-h-screen flex-col bg-[color:var(--anx-surface-bright)]">
@@ -331,13 +338,18 @@ export function StudentLiveView({
                 body="Your teacher will start any moment. Keep this tab open."
                 onNeedHelp={onNeedHelp}
                 onMessageTeacher={onMessageTeacher}
+                primaryFocusHelp
               />
             </>
           )}
 
           {screen.kind === 'message' && (
             <>
-              <div className="anx-card flex flex-1 flex-col items-center justify-center gap-3 p-10 text-center">
+              <div
+                className="anx-card flex flex-1 flex-col items-center justify-center gap-3 p-10 text-center outline-none focus-visible:ring-2 focus-visible:ring-[var(--anx-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--anx-surface-bright)] rounded-2xl"
+                tabIndex={-1}
+                data-live-primary-focus=""
+              >
                 <div className="text-4xl" aria-hidden>
                   💬
                 </div>
@@ -367,6 +379,7 @@ export function StudentLiveView({
                 body="Follow what your teacher is showing. You don’t need to do anything yet — they’ll let you know when it’s your turn."
                 onNeedHelp={onNeedHelp}
                 onMessageTeacher={onMessageTeacher}
+                primaryFocusHelp
               />
             </>
           )}
@@ -406,7 +419,12 @@ export function StudentLiveView({
                       )}
                     </div>
                   )}
-                  <button type="button" onClick={screen.onDismiss} className="anx-btn-primary w-full py-3 text-sm transition-transform active:scale-[0.99]">
+                  <button
+                    type="button"
+                    onClick={screen.onDismiss}
+                    data-live-primary-focus=""
+                    className="anx-btn-primary w-full py-3 text-sm transition-transform active:scale-[0.99]"
+                  >
                     I’ve watched this — continue
                   </button>
                 </div>
