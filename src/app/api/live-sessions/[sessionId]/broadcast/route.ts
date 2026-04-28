@@ -70,12 +70,16 @@ export async function POST(req: NextRequest, { params }: Props) {
         misconceptionSummary: true,
         workedExample: true,
         animationSchema: true,
+        steps: { select: { id: true } },
       },
     });
     if (!route) return NextResponse.json({ error: 'Explanation route not found' }, { status: 404 });
     broadcastPayload.explanationRouteId = explanationRouteId;
     broadcastPayload.explanation = route;
     broadcastPayload.stepIndex = stepIndex ?? 0;
+    broadcastPayload.totalSteps = route.animationSchema
+      ? ((route.animationSchema as { steps?: unknown[] }).steps?.length ?? 1)
+      : (route.steps.length || 1);
   }
 
   if (contentType === 'MESSAGE' && message) {

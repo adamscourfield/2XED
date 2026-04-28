@@ -19,6 +19,7 @@ interface Props {
   classLabel?: string;
   explanationRoute: ExplanationRouteData;
   stepIndex: number;
+  totalSteps: number;
   whiteboard: LiveWhiteboardPayload | null;
   onLeave?: () => void;
   onNeedHelp?: () => void;
@@ -29,6 +30,7 @@ export function StudentExplanationView({
   classLabel,
   explanationRoute,
   stepIndex,
+  totalSteps,
   whiteboard,
   onLeave,
   onNeedHelp,
@@ -68,10 +70,38 @@ export function StudentExplanationView({
 
       <main className="mx-auto grid w-full max-w-6xl flex-1 grid-cols-1 gap-5 px-4 py-5 sm:px-6 lg:grid-cols-[minmax(0,1fr),320px]">
         {/* Main explanation area with whiteboard overlay */}
-        <div className="anx-card flex min-h-[320px] flex-1 flex-col overflow-hidden p-3 sm:p-4">
-          <div style={{ position: 'relative', flex: 1, minHeight: 0 }}>
-            {/* Explanation content */}
-            <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
+        <div className="flex min-h-0 flex-col gap-4">
+          <div className="anx-card flex items-center justify-between gap-3 px-5 py-4 sm:px-6">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--anx-text-muted)' }}>
+                Teacher explanation
+              </p>
+              <p className="mt-1 text-sm font-semibold" style={{ color: 'var(--anx-text)' }}>
+                Step {Math.min(stepIndex + 1, totalSteps)} of {Math.max(totalSteps, 1)}
+              </p>
+            </div>
+            <div className="flex items-center gap-2" aria-hidden>
+              {Array.from({ length: Math.max(totalSteps, 1) }).map((_, idx) => (
+                <span
+                  key={`step-${idx}`}
+                  className="h-2.5 w-2.5 rounded-full"
+                  style={{
+                    background:
+                      idx === stepIndex
+                        ? 'var(--anx-primary)'
+                        : idx < stepIndex
+                          ? 'var(--anx-primary-soft)'
+                          : 'var(--anx-surface-container-high)',
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div className="anx-card flex min-h-[320px] flex-1 flex-col overflow-hidden p-3 sm:p-4">
+            <div style={{ position: 'relative', flex: 1, minHeight: 0 }}>
+              {/* Explanation content */}
+              <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
               {schema ? (
                 <AnimationRenderer
                   schema={schema}
@@ -80,41 +110,49 @@ export function StudentExplanationView({
                 />
               ) : (
                 /* Fallback for routes without animationSchema */
-                <div className="flex flex-col gap-4 h-full overflow-y-auto p-2">
-                  <div
-                    className="rounded-xl border-l-4 p-4 text-sm"
+                <div className="flex h-full flex-col gap-5 overflow-y-auto p-2 sm:p-4">
+                  <section
+                    className="rounded-2xl border-l-4 px-5 py-4 sm:px-6"
                     style={{ borderColor: 'var(--anx-warning)', background: 'var(--anx-warning-soft)', color: 'var(--anx-text)' }}
                   >
-                    <p className="font-semibold">Common mistake to watch out for:</p>
-                    <p className="mt-1">{explanationRoute.misconceptionSummary}</p>
-                  </div>
-                  <div
-                    className="rounded-xl border p-4"
+                    <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--anx-text-secondary)' }}>
+                      Common mistake
+                    </p>
+                    <h2 className="mt-2 text-lg font-bold leading-snug" style={{ color: 'var(--anx-text)' }}>
+                      Watch out for this
+                    </h2>
+                    <p className="mt-3 text-base leading-relaxed" style={{ color: 'var(--anx-text)' }}>
+                      {explanationRoute.misconceptionSummary}
+                    </p>
+                  </section>
+                  <section
+                    className="rounded-2xl border px-5 py-5 sm:px-6"
                     style={{ borderColor: 'var(--anx-outline-variant)', background: 'var(--anx-surface-container-lowest)' }}
                   >
-                    <p className="text-xs font-semibold uppercase tracking-wide mb-2" style={{ color: 'var(--anx-text-muted)' }}>
+                    <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--anx-text-muted)' }}>
                       Worked example
                     </p>
-                    <p className="text-sm leading-relaxed whitespace-pre-wrap" style={{ color: 'var(--anx-text)' }}>
+                    <p className="mt-3 whitespace-pre-wrap text-base leading-8" style={{ color: 'var(--anx-text)' }}>
                       {explanationRoute.workedExample}
                     </p>
-                  </div>
+                  </section>
                 </div>
               )}
             </div>
 
-            {/* Teacher annotation overlay — transparent canvas with only strokes */}
-            {whiteboard && whiteboard.strokes.length > 0 && (
-              <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
-                <LiveWhiteboardViewer
-                  logicalWidth={whiteboard.width}
-                  logicalHeight={whiteboard.height}
-                  strokes={whiteboard.strokes}
-                  transparent
-                  className="rounded-2xl"
-                />
-              </div>
-            )}
+              {/* Teacher annotation overlay — transparent canvas with only strokes */}
+              {whiteboard && whiteboard.strokes.length > 0 && (
+                <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+                  <LiveWhiteboardViewer
+                    logicalWidth={whiteboard.width}
+                    logicalHeight={whiteboard.height}
+                    strokes={whiteboard.strokes}
+                    transparent
+                    className="rounded-2xl"
+                  />
+                </div>
+              )}
+            </div>
           </div>
         </div>
 

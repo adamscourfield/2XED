@@ -18,6 +18,7 @@ export interface PracticeQuestion {
   answerPrefix?: React.ReactNode;
   placeholder?: string;
   tip?: string;
+  options?: string[];
 }
 
 export type Confidence = 'low' | 'mid' | 'high';
@@ -141,7 +142,7 @@ export function StudentPracticeView({
 
           <div>
             <p className="text-base font-semibold" style={{ color: 'var(--anx-text)' }}>
-              Solve for x:
+              Your question
             </p>
             <div className="mt-3 text-2xl font-semibold leading-snug" style={{ color: 'var(--anx-text)' }}>
               {question.stem}
@@ -155,25 +156,46 @@ export function StudentPracticeView({
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             {error && <div className="anx-callout-danger text-sm">{error}</div>}
-            <label
-              className="flex items-center gap-3 rounded-2xl border px-4 py-3.5 transition focus-within:border-[var(--anx-primary)] focus-within:shadow-[0_0_0_3px_var(--anx-primary-glow)]"
-              style={{ borderColor: 'var(--anx-outline-variant)', background: 'var(--anx-surface-container-lowest)' }}
-            >
-              {question.answerPrefix && (
-                <span className="shrink-0 text-xl font-semibold" style={{ color: 'var(--anx-text-secondary)' }}>
-                  {question.answerPrefix}
-                </span>
-              )}
-              <input
-                type="text"
-                value={answer}
-                onChange={(e) => setAnswer(e.target.value)}
-                placeholder={question.placeholder ?? 'Type your answer…'}
-                className="w-full bg-transparent text-lg outline-none"
-                style={{ color: 'var(--anx-text)' }}
-                autoFocus
-              />
-            </label>
+            {question.options && question.options.length > 0 ? (
+              <div className="flex flex-col gap-2">
+                {question.options.map((opt) => (
+                  <label
+                    key={opt}
+                    className={`anx-option flex cursor-pointer items-center gap-3 py-3 ${answer === opt ? 'anx-option-selected' : ''}`}
+                  >
+                    <input
+                      type="radio"
+                      name={`practice-answer-${question.id}`}
+                      value={opt}
+                      checked={answer === opt}
+                      onChange={() => setAnswer(opt)}
+                      className="accent-[var(--anx-primary)]"
+                    />
+                    <span className="text-sm font-medium" style={{ color: 'var(--anx-text)' }}>{opt}</span>
+                  </label>
+                ))}
+              </div>
+            ) : (
+              <label
+                className="flex items-center gap-3 rounded-2xl border px-4 py-3.5 transition focus-within:border-[var(--anx-primary)] focus-within:shadow-[0_0_0_3px_var(--anx-primary-glow)]"
+                style={{ borderColor: 'var(--anx-outline-variant)', background: 'var(--anx-surface-container-lowest)' }}
+              >
+                {question.answerPrefix && (
+                  <span className="shrink-0 text-xl font-semibold" style={{ color: 'var(--anx-text-secondary)' }}>
+                    {question.answerPrefix}
+                  </span>
+                )}
+                <input
+                  type="text"
+                  value={answer}
+                  onChange={(e) => setAnswer(e.target.value)}
+                  placeholder={question.placeholder ?? 'Type your answer…'}
+                  className="w-full bg-transparent text-lg outline-none"
+                  style={{ color: 'var(--anx-text)' }}
+                  autoFocus
+                />
+              </label>
+            )}
 
             <div className="flex flex-wrap items-center justify-between gap-3">
               <button
@@ -193,16 +215,18 @@ export function StudentPracticeView({
                 {busy ? 'Submitting…' : 'Submit answer'}
               </button>
             </div>
-            <p className="text-right text-xs" style={{ color: 'var(--anx-text-muted)' }}>
-              Press{' '}
-              <kbd
-                className="rounded-md border px-1.5 py-0.5 font-mono text-[10px]"
-                style={{ borderColor: 'var(--anx-outline-variant)', background: 'var(--anx-surface-container-low)' }}
-              >
-                Enter ↵
-              </kbd>{' '}
-              to submit
-            </p>
+            {!question.options?.length && (
+              <p className="text-right text-xs" style={{ color: 'var(--anx-text-muted)' }}>
+                Press{' '}
+                <kbd
+                  className="rounded-md border px-1.5 py-0.5 font-mono text-[10px]"
+                  style={{ borderColor: 'var(--anx-outline-variant)', background: 'var(--anx-surface-container-low)' }}
+                >
+                  Enter ↵
+                </kbd>{' '}
+                to submit
+              </p>
+            )}
           </form>
         </section>
 

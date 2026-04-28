@@ -397,14 +397,6 @@ export function StudentLiveView({
         {screen.kind === 'check' && (
           <>
             <div className="flex min-h-0 flex-col gap-4">
-              <CanvasFrame whiteboard={screen.whiteboard} />
-            </div>
-            <SidePanel
-              title="Quick check"
-              body="Answer the question your teacher just asked. There’s no rush."
-              onNeedHelp={onNeedHelp}
-              onMessageTeacher={onMessageTeacher}
-            >
               <CheckAnswerCard
                 questionStem={screen.questionStem}
                 options={screen.options}
@@ -413,7 +405,14 @@ export function StudentLiveView({
                 onSubmit={screen.onSubmit}
                 onNeedHelp={onNeedHelp}
               />
-            </SidePanel>
+              {screen.whiteboard && <CanvasFrame whiteboard={screen.whiteboard} />}
+            </div>
+            <SidePanel
+              title="Quick check"
+              body="Answer the question first. Use the board only if your teacher is pointing something out there."
+              onNeedHelp={onNeedHelp}
+              onMessageTeacher={onMessageTeacher}
+            />
           </>
         )}
       </main>

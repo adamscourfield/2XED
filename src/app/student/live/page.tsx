@@ -70,6 +70,7 @@ interface CurrentContent {
   whiteboard?: LiveWhiteboardPayload;
   explanation?: ExplanationRouteData;
   stepIndex?: number;
+  totalSteps?: number;
   item?: Item;
   totalQuestions?: number;
   questionNumber?: number;
@@ -88,7 +89,7 @@ type AppState =
   | { phase: 'waiting'; session: JoinedSession }
   | { phase: 'between-phases'; session: JoinedSession; message: string }
   | { phase: 'whiteboard'; session: JoinedSession; whiteboard: LiveWhiteboardPayload }
-  | { phase: 'explanation'; session: JoinedSession; explanationRoute: ExplanationRouteData; stepIndex: number; whiteboard: LiveWhiteboardPayload | null }
+  | { phase: 'explanation'; session: JoinedSession; explanationRoute: ExplanationRouteData; stepIndex: number; totalSteps: number; whiteboard: LiveWhiteboardPayload | null }
   | { phase: 'question'; session: JoinedSession; item: Item; source: 'broadcast' | 'targeted' }
   | { phase: 'practice'; session: JoinedSession; item: Item; index: number; total: number }
   | { phase: 'feedback'; session: JoinedSession; correct: boolean; nextItem: (Item & { skillId?: string }) | null; index: number; total: number }
@@ -189,6 +190,7 @@ export default function StudentLivePage() {
                 session: sess,
                 explanationRoute: cc.explanation,
                 stepIndex: cc.stepIndex ?? 0,
+                totalSteps: cc.totalSteps ?? (((cc.explanation.animationSchema as { steps?: unknown[] } | null)?.steps?.length ?? 1)),
                 whiteboard: liveWhiteboardRef.current,
               });
             }
@@ -542,12 +544,13 @@ export default function StudentLivePage() {
     }
     const item = appState.item;
     const stem = stripStudentQuestionLabel(item.question) || item.question;
+    const options = Array.isArray(item.options) ? (item.options as string[]) : [];
     const question: PracticeQuestion = {
       id: item.id,
       stem: <p className="m-0 whitespace-pre-wrap">{stem}</p>,
-      answerPrefix: 'x =',
       placeholder: 'Type your answer…',
       tip: 'Take your time — read the question carefully first.',
+      options: options.length > 0 ? options : undefined,
     };
     return (
       <StudentPracticeView
@@ -587,6 +590,7 @@ export default function StudentLivePage() {
         classLabel={classLabel}
         explanationRoute={appState.explanationRoute}
         stepIndex={appState.stepIndex}
+        totalSteps={appState.totalSteps}
         whiteboard={appState.whiteboard}
         onLeave={() => setAppState({ phase: 'waiting', session })}
         onNeedHelp={() => {
