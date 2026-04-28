@@ -310,23 +310,6 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
       .catch(() => { /* soft fail */ });
   }, [sessionId, snapshot?.skill?.id, snapshot?.currentPhaseIndex]);
 
-  // When leaving EXPLAIN mode, clear the canvas and broadcast 'clear' so students exit
-  // the explanation phase. The 'clear' action is the exit signal on the student side.
-  const prevModeRef = useRef<TeachingMode>(mode);
-  useEffect(() => {
-    const wasExplain = prevModeRef.current === 'EXPLAIN';
-    prevModeRef.current = mode;
-    if (wasExplain && mode !== 'EXPLAIN') {
-      setActiveExplanation(null);
-      canvasRef.current?.clear();
-      const v = Date.now();
-      setLatestVersion(v);
-      void broadcastStrokes([], v, 'clear');
-    } else if (mode !== 'EXPLAIN') {
-      setActiveExplanation(null);
-    }
-  }, [mode, broadcastStrokes]);
-
   // ── Canvas → student broadcast ─────────────────────────────────────────────
   const broadcastStrokes = useCallback(
     async (strokes: LiveStroke[], version: number, action: 'show' | 'clear' | 'hide' = 'show') => {
@@ -352,6 +335,23 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
     },
     [sessionId],
   );
+
+  // When leaving EXPLAIN mode, clear the canvas and broadcast 'clear' so students exit
+  // the explanation phase. The 'clear' action is the exit signal on the student side.
+  const prevModeRef = useRef<TeachingMode>(mode);
+  useEffect(() => {
+    const wasExplain = prevModeRef.current === 'EXPLAIN';
+    prevModeRef.current = mode;
+    if (wasExplain && mode !== 'EXPLAIN') {
+      setActiveExplanation(null);
+      canvasRef.current?.clear();
+      const v = Date.now();
+      setLatestVersion(v);
+      void broadcastStrokes([], v, 'clear');
+    } else if (mode !== 'EXPLAIN') {
+      setActiveExplanation(null);
+    }
+  }, [mode, broadcastStrokes]);
 
   const ensureVisibleToStudents = useCallback(async () => {
     if (hasEnsuredVisibleRef.current) return;
@@ -612,7 +612,7 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
         <div className="anx-canvas-stage">
           <div className="anx-canvas-board" style={{ position: 'relative' }}>
             {/* Explanation layer — AnimationRenderer sits behind the transparent canvas */}
-            {activeExplanation?.route.animationSchema && (
+            {!!activeExplanation?.route.animationSchema && (
               <div
                 className="absolute inset-0 overflow-hidden bg-white"
                 style={{ zIndex: 0 }}
