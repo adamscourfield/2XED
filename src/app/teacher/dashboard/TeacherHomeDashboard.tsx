@@ -106,6 +106,8 @@ export function TeacherHomeDashboard({ data, displayName, greeting, userRole }: 
   });
 
   const recentForList = recentSessions.slice(0, 5);
+  const recentIdsForList = new Set(recentForList.map((s) => s.id));
+  const continueSessions = recentSessions.filter((s) => !recentIdsForList.has(s.id)).slice(0, 3);
 
   return (
     <div className="td-home">
@@ -121,17 +123,6 @@ export function TeacherHomeDashboard({ data, displayName, greeting, userRole }: 
         </div>
         <div className="td-home-header-controls">
           <TeacherHomeClassSelector classes={classes} />
-          <span className="td-home-bell" title="Notifications" aria-hidden>
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
-              <path
-                d="M12 22a2 2 0 0 0 2-2H10a2 2 0 0 0 2 2Zm6-6V11a6 6 0 1 0-12 0v5l-2 2V20h16v-2l-2-2Z"
-                stroke="currentColor"
-                strokeWidth="1.6"
-                strokeLinejoin="round"
-              />
-            </svg>
-            <span className="td-home-bell-dot" />
-          </span>
         </div>
       </header>
 
@@ -161,8 +152,10 @@ export function TeacherHomeDashboard({ data, displayName, greeting, userRole }: 
             </svg>
           </div>
           <h2 className="td-home-action-title">Let Ember build for you</h2>
-          <p className="td-home-action-desc">Use AI-assisted flows to draft practice and structure your next session.</p>
-          <Link href="/teacher/live/new" className="td-home-btn td-home-btn--outline">
+          <p className="td-home-action-desc">
+            Draft questions with AI, then start a live session when you are ready.
+          </p>
+          <Link href="/teacher/question-bank/generate" className="td-home-btn td-home-btn--outline">
             Generate with AI
           </Link>
         </div>
@@ -203,9 +196,6 @@ export function TeacherHomeDashboard({ data, displayName, greeting, userRole }: 
                         {st.label}
                       </span>
                       <span className="td-home-lesson-time">{formatSessionTime(ls.createdAt)}</span>
-                    </div>
-                    <div className="td-home-lesson-menu" aria-hidden>
-                      ···
                     </div>
                   </li>
                 );
@@ -277,7 +267,7 @@ export function TeacherHomeDashboard({ data, displayName, greeting, userRole }: 
           </Link>
         </div>
         <div className="td-home-continue-row">
-          {recentSessions.slice(0, 3).map((ls) => {
+          {continueSessions.map((ls) => {
             const title = ls.skill?.name ?? ls.subject.title;
             const mins = Math.max(0, Math.round((Date.now() - ls.updatedAt.getTime()) / 60000));
             const edited = mins < 1 ? 'just now' : mins < 60 ? `${mins}m ago` : `${Math.round(mins / 60)}h ago`;

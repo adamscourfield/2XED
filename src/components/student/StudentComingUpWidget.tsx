@@ -76,7 +76,17 @@ export function StudentComingUpWidget() {
         Coming up
       </h2>
       {events === null ? (
-        <p className="stu-dash-muted m-0 text-sm">Loading…</p>
+        <div className="stu-dash-coming-skel" aria-hidden>
+          <div className="stu-dash-coming-skel-feature">
+            <span className="stu-dash-coming-skel-line stu-dash-coming-skel-line--short" />
+            <span className="stu-dash-coming-skel-line stu-dash-coming-skel-line--medium" />
+            <span className="stu-dash-coming-skel-line stu-dash-coming-skel-line--long" />
+          </div>
+          <div className="stu-dash-coming-skel-row">
+            <span className="stu-dash-coming-skel-line stu-dash-coming-skel-line--tiny" />
+            <span className="stu-dash-coming-skel-line stu-dash-coming-skel-line--grow" />
+          </div>
+        </div>
       ) : list.length === 0 ? (
         <p className="stu-dash-muted m-0 text-sm">Nothing scheduled in the next two weeks.</p>
       ) : (
