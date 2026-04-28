@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import { StudentFocusedChrome } from '@/components/student/StudentFocusedChrome';
 import { ExplanationBlockRenderer } from '@/components/english/ExplanationBlockRenderer';
 import { QuestionBlock } from '@/components/english/QuestionBlock';
-import type { ExplanationBlock, ExplanationBlockType, QuestionBlock as QuestionBlockType, MarkResult } from '@/features/content/types';
+import type { ExplanationBlock, ExplanationBlockType, QuestionBlock as QuestionBlockType } from '@/features/content/types';
+import type { MarkResult } from '@/features/qa/AIMarkingService';
 
 // ── Props ──────────────────────────────────────────────────────────────────────
 

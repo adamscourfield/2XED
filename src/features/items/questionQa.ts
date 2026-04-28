@@ -111,8 +111,8 @@ export function summarizeQuestionQa(item: QaItemShape): QaSummary {
   }
 
   return {
-    answerType,
-    answerModeLabel: labelForAnswerType(answerType),
+    answerType: answerType as AnswerType,
+    answerModeLabel: labelForAnswerType(answerType as AnswerType),
     displayQuestion,
     choices: content.choices,
     issues,

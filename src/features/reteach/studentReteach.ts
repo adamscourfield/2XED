@@ -310,7 +310,7 @@ export function applyGatePolicy(
     }
   }
 
-  return { decision, decisionReason };
+  return { decision, decisionReason, rules };
 }
 
 export async function evaluateGate(input: {
@@ -352,7 +352,7 @@ export async function evaluateGate(input: {
   const failedLoops = await getRecentFailedLoops(input.userId, input.subjectId, input.skillId);
   const metrics = buildGateMetrics(parsed, config, failedLoops);
 
-  const { decision, decisionReason } = applyGatePolicy(metrics, config);
+  const { decision, decisionReason, rules } = applyGatePolicy(metrics, config);
   const interventionSuggestions = getInterventionSuggestions(decisionReason);
 
   const decisionTrace = {

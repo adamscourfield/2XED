@@ -464,7 +464,7 @@ export function LearnSession({ subject, skill, items, retryItems, userId, gamifi
           )}
 
           {explanationRoute?.animationSchema ? (
-            <AnimationRenderer schema={explanationRoute.animationSchema} />
+            <AnimationRenderer schema={explanationRoute.animationSchema as Parameters<typeof AnimationRenderer>[0]['schema']} />
           ) : (
             <div className="space-y-4 rounded-2xl border p-6" style={{ borderColor: 'var(--anx-border)', background: 'var(--anx-surface)' }}>
               {sanitizeStudentCopy(explanationRoute?.misconceptionSummary) && (
