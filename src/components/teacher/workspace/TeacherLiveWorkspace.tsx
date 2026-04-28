@@ -14,7 +14,7 @@ import {
 import { AnnotationToolbar } from './AnnotationToolbar';
 import { TeachingModePanel, type TeachingMode } from './TeachingModePanel';
 import { AnimationRenderer } from '@/components/explanation/AnimationRenderer';
-import { StudentSignalsPanel, type ClassOverview, type InterpretedSignal, type MisconceptionSignal, type StudentMessageSignal } from './StudentSignalsPanel';
+import { StudentSignalsPanel, type ClassOverview, type InterpretedSignal, type MisconceptionSignal, type StudentMessageSignal, type StudentResponseDetail } from './StudentSignalsPanel';
 import { TeacherBottomBar } from './TeacherBottomBar';
 import { InviteIcon, SettingsIcon } from './icons';
 import type { LiveStroke } from '@/lib/live/whiteboard-strokes';
@@ -96,6 +96,8 @@ interface SessionSnapshot {
   skill?: { id: string; code: string; name: string } | null;
   recommendedExplanation?: RecommendedExplanation | null;
   misconceptionSignals?: MisconceptionSignal[] | null;
+  studentMessages?: StudentMessageSignal[] | null;
+  studentResponses?: StudentResponseDetail[] | null;
 }
 
 interface RouteWithSteps {
@@ -692,6 +694,7 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
                 : null
             }
             studentMessages={snapshot?.studentMessages ?? null}
+            studentResponses={snapshot?.studentResponses ?? null}
           />
         </aside>
       </div>

@@ -13,6 +13,7 @@ const schema = z.object({
   skillId: z.string().min(1),
   answer: z.string().min(1),
   responseTimeMs: z.number().int().min(0),
+  confidence: z.enum(['low', 'mid', 'high']).optional(),
 });
 
 interface Props {
@@ -32,7 +33,7 @@ export async function POST(req: NextRequest, { params }: Props) {
   const parsed = schema.safeParse(await req.json());
   if (!parsed.success) return NextResponse.json({ error: 'Invalid input' }, { status: 400 });
 
-  const { itemId, skillId, answer, responseTimeMs } = parsed.data;
+  const { itemId, skillId, answer, responseTimeMs, confidence } = parsed.data;
 
   // Verify student is a participant in this session
   const participant = await prisma.liveParticipant.findUnique({
@@ -83,6 +84,7 @@ export async function POST(req: NextRequest, { params }: Props) {
       correct,
       responseTimeMs,
       misconceptionId,
+      confidence: confidence ?? null,
     },
   });
 

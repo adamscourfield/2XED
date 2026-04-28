@@ -256,6 +256,53 @@ export async function GET(_req: NextRequest, { params }: Props) {
     }))
     .sort((a, b) => b.studentCount - a.studentCount);
 
+  // ── Student messages ─────────────────────────────────────────────────────
+  const studentMessages = supportEvents
+    .filter((e) => e.name === 'live_student_message' || e.name === 'live_student_help_request')
+    .filter((e) => Boolean(e.studentUserId))
+    .slice(0, 10)
+    .map((e) => ({
+      studentUserId: e.studentUserId!,
+      studentName: studentNameMap.get(e.studentUserId!) ?? 'Unknown student',
+      kind: e.name === 'live_student_message' ? ('message' as const) : ('help' as const),
+      message: ((e.payload as { message?: string | null }).message ?? null),
+      lane: ((e.payload as { lane?: 'LANE_1' | 'LANE_2' | 'LANE_3' | null }).lane ?? null),
+      createdAt: e.createdAt.toISOString(),
+    }));
+
+  // ── Per-student response breakdown ────────────────────────────────────────
+  // Build attempt counts per student from the already-fetched liveAttempts.
+  const studentAttemptMap = new Map<string, { total: number; correct: number; lastCorrect: boolean | null }>();
+  for (const attempt of liveSession.liveAttempts) {
+    const entry = studentAttemptMap.get(attempt.studentUserId) ?? { total: 0, correct: 0, lastCorrect: null };
+    entry.total += 1;
+    if (attempt.correct) entry.correct += 1;
+    entry.lastCorrect = attempt.correct;
+    studentAttemptMap.set(attempt.studentUserId, entry);
+  }
+
+  // Determine each active participant's lane
+  const studentLaneMap = new Map<string, 'LANE_1' | 'LANE_2' | 'LANE_3'>();
+  for (const p of liveSession.participants) {
+    if (p.isActive) studentLaneMap.set(p.studentUserId, p.currentLane);
+  }
+
+  const studentResponses = liveSession.participants
+    .filter((p) => p.isActive)
+    .map((p) => {
+      const attempts = studentAttemptMap.get(p.studentUserId) ?? { total: 0, correct: 0, lastCorrect: null };
+      return {
+        studentUserId: p.studentUserId,
+        name: p.student.name ?? p.student.email,
+        lane: studentLaneMap.get(p.studentUserId) ?? 'LANE_1' as const,
+        attemptCount: attempts.total,
+        correctCount: attempts.correct,
+        lastCorrect: attempts.lastCorrect,
+        hasOpenFlag: p.student.interventionFlags.length > 0,
+      };
+    })
+    .sort((a, b) => a.lane.localeCompare(b.lane) || (a.name ?? '').localeCompare(b.name ?? ''));
+
   return NextResponse.json({
     sessionId: liveSession.id,
     status: liveSession.status,
@@ -275,5 +322,7 @@ export async function GET(_req: NextRequest, { params }: Props) {
     supportSummary,
     studentMessages,
     misconceptionSignals,
+    studentMessages,
+    studentResponses,
   });
 }

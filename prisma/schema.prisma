@@ -773,6 +773,8 @@ model LiveAttempt {
   // References misconceptions[].id on the Skill node — set when the student
   // selects a distractor that was tagged to a specific misconception at generation time.
   misconceptionId String?
+  // Student's self-reported confidence at time of practice submission: 'low' | 'mid' | 'high'
+  confidence    String?
   createdAt     DateTime    @default(now())
 
   session       LiveSession @relation(fields: [liveSessionId], references: [id], onDelete: Cascade)

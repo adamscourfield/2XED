@@ -33,6 +33,16 @@ export interface StudentMessageSignal {
   createdAt: string;
 }
 
+export interface StudentResponseDetail {
+  studentUserId: string;
+  name: string;
+  lane: 'LANE_1' | 'LANE_2' | 'LANE_3';
+  attemptCount: number;
+  correctCount: number;
+  lastCorrect: boolean | null;
+  hasOpenFlag: boolean;
+}
+
 interface Props {
   overview: ClassOverview;
   signals: InterpretedSignal[];
@@ -41,6 +51,7 @@ interface Props {
   topMisconception?: { text: string; studentCount: number } | null;
   suggestedMove?: { text: string; cta?: string; onAct?: () => void } | null;
   studentMessages?: StudentMessageSignal[] | null;
+  studentResponses?: StudentResponseDetail[] | null;
   onViewDetailedResponses?: () => void;
 }
 
@@ -81,6 +92,7 @@ export function StudentSignalsPanel({
   topMisconception,
   suggestedMove,
   studentMessages,
+  studentResponses,
   onViewDetailedResponses,
 }: Props) {
   const [showDetail, setShowDetail] = useState(false);
@@ -265,16 +277,16 @@ export function StudentSignalsPanel({
             >
               <p className="text-xs font-semibold" style={{ color: 'var(--anx-text)' }}>
                 {entry.studentName}
-                {entry.lane ? ` · ${entry.lane.replace('_', ' ')}` : ''}
+                {entry.lane ? <span style={{ color: 'var(--anx-text-muted)' }}> · {entry.lane.replace('_', ' ')}</span> : ''}
               </p>
               <p className="mt-0.5 text-xs" style={{ color: 'var(--anx-text-secondary)' }}>
-                {entry.kind === 'help' ? 'Needs help' : 'Message teacher'}
+                {entry.kind === 'help' ? '🙋 Needs help' : '💬 Message'}
               </p>
-              {entry.message ? (
-                <p className="mt-2 text-sm leading-relaxed" style={{ color: 'var(--anx-text)' }}>
+              {entry.message && (
+                <p className="mt-1.5 text-sm leading-relaxed" style={{ color: 'var(--anx-text)' }}>
                   {entry.message}
                 </p>
-              ) : null}
+              )}
             </div>
           ))}
         </div>
@@ -291,13 +303,55 @@ export function StudentSignalsPanel({
       >
         <span className="inline-flex items-center gap-2">
           <PeopleIcon size={16} />
-          View detailed responses
+          {showDetail ? 'Hide' : 'View'} detailed responses
         </span>
-        <ChevronRightIcon size={16} />
+        <ChevronRightIcon size={16} className={`transition-transform ${showDetail ? 'rotate-90' : ''}`} />
       </button>
+
       {showDetail && (
-        <div className="mt-2 rounded-xl border px-3 py-2 text-xs" style={{ borderColor: 'var(--anx-outline-variant)', color: 'var(--anx-text-muted)' }}>
-          Detailed per-student response breakdown opens in the side panel. Stay focused on the class first — drill in only when needed.
+        <div className="mt-2 space-y-1">
+          {!studentResponses || studentResponses.length === 0 ? (
+            <p className="px-2 py-2 text-xs" style={{ color: 'var(--anx-text-muted)' }}>
+              No responses yet.
+            </p>
+          ) : (
+            studentResponses.map((s) => {
+              const laneColor =
+                s.lane === 'LANE_3' ? 'var(--anx-danger-text)' :
+                s.lane === 'LANE_2' ? 'var(--anx-warning-text)' :
+                'var(--anx-success)';
+              const laneLabel = s.lane === 'LANE_3' ? 'Reteach' : s.lane === 'LANE_2' ? 'Support' : 'On track';
+              return (
+                <div
+                  key={s.studentUserId}
+                  className="flex items-center gap-2 rounded-xl px-2 py-2"
+                  style={{ background: 'var(--anx-surface-container-low)' }}
+                >
+                  <span
+                    className="h-2 w-2 shrink-0 rounded-full"
+                    style={{ background: laneColor }}
+                    title={laneLabel}
+                    aria-label={laneLabel}
+                  />
+                  <span className="min-w-0 flex-1 truncate text-xs font-medium" style={{ color: 'var(--anx-text)' }}>
+                    {s.name}
+                  </span>
+                  {s.attemptCount > 0 ? (
+                    <span className="shrink-0 text-xs tabular-nums" style={{ color: 'var(--anx-text-muted)' }}>
+                      {s.correctCount}/{s.attemptCount}
+                      {s.lastCorrect === true && <span style={{ color: 'var(--anx-success)' }}> ✓</span>}
+                      {s.lastCorrect === false && <span style={{ color: 'var(--anx-danger-text)' }}> ✗</span>}
+                    </span>
+                  ) : (
+                    <span className="shrink-0 text-xs" style={{ color: 'var(--anx-text-muted)' }}>—</span>
+                  )}
+                  {s.hasOpenFlag && (
+                    <span className="shrink-0 text-[10px]" style={{ color: 'var(--anx-danger-text)' }} title="Intervention flag">⚑</span>
+                  )}
+                </div>
+              );
+            })
+          )}
         </div>
       )}
     </section>

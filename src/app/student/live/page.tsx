@@ -353,9 +353,8 @@ export default function StudentLivePage() {
     }
   }
 
-  async function submitPracticeAnswer(answer: string, _confidence: Confidence | null) {
+  async function submitPracticeAnswer(answer: string, confidence: Confidence | null) {
     if (appState.phase !== 'practice') return;
-    void _confidence; // confidence is captured client-side; backend integration is left for a follow-up
     setSubmitError(null);
     const { session, item, index, total } = appState;
     const skillId = item.skillId ?? session.skill?.id;
@@ -372,6 +371,7 @@ export default function StudentLivePage() {
           skillId,
           answer,
           responseTimeMs: Date.now() - start,
+          ...(confidence ? { confidence } : {}),
         }),
       });
       if (!res.ok) {
