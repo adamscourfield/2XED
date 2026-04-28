@@ -79,17 +79,6 @@ export function TeacherClassesPageActions({ scopeOptions }: Props) {
       >
         <ScopeSelectInner options={scopeOptions} />
       </Suspense>
-      <span className="td-home-bell shrink-0" title="Notifications" aria-hidden>
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
-          <path
-            d="M12 22a2 2 0 0 0 2-2H10a2 2 0 0 0 2 2Zm6-6V11a6 6 0 1 0-12 0v5l-2 2V20h16v-2l-2-2Z"
-            stroke="currentColor"
-            strokeWidth="1.6"
-            strokeLinejoin="round"
-          />
-        </svg>
-        <span className="td-home-bell-dot" />
-      </span>
       <button
         type="button"
         className="anx-btn-primary text-sm opacity-60 cursor-not-allowed shrink-0"

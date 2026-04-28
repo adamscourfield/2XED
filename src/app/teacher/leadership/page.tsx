@@ -389,40 +389,41 @@ export default async function LeadershipDashboardPage({ searchParams }: Props) {
 
             <div className="staff-dash-section-gap">
               {subjectGroups.map((group) => (
-                <section key={group.subject.id} className="staff-dash-subject-block">
-                  <div className="staff-dash-subject-header">
-                    <div>
-                      <h2 className="staff-dash-subject-title">{group.subject.title}</h2>
-                      <p className="staff-dash-subject-sub">
-                        {group.totalStudents} students · {group.classrooms.length} classrooms ·{' '}
-                        <span
+                <section key={group.subject.id} id={`leadership-subject-${group.subject.id}`} className="scroll-mt-24">
+                  <div className="staff-dash-subject-block">
+                    <div className="staff-dash-subject-header">
+                      <div>
+                        <h2 className="staff-dash-subject-title">{group.subject.title}</h2>
+                        <p className="staff-dash-subject-sub">
+                          {group.totalStudents} students · {group.classrooms.length} classrooms ·{' '}
+                          <span
+                            style={{
+                              color:
+                                group.subjectTrend === 'UP'
+                                  ? 'var(--anx-success)'
+                                  : group.subjectTrend === 'DOWN'
+                                    ? 'var(--anx-danger)'
+                                    : 'var(--anx-text-muted)',
+                            }}
+                          >
+                            {trendLabel(group.subjectTrend)}
+                          </span>{' '}
+                          · {group.atRiskCount} at risk · {group.durableCount} durable
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xs text-[color:var(--anx-text-muted)]">Avg mastery</p>
+                        <p
+                          className="text-lg font-bold"
                           style={{
                             color:
-                              group.subjectTrend === 'UP'
-                                ? 'var(--anx-success)'
-                                : group.subjectTrend === 'DOWN'
-                                  ? 'var(--anx-danger)'
-                                  : 'var(--anx-text-muted)',
+                              group.avgMastery >= 70 ? 'var(--anx-success)' : group.avgMastery >= 50 ? 'var(--anx-warning)' : 'var(--anx-danger)',
                           }}
                         >
-                          {trendLabel(group.subjectTrend)}
-                        </span>{' '}
-                        · {group.atRiskCount} at risk · {group.durableCount} durable
-                      </p>
+                          {group.avgMastery}%
+                        </p>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <p className="text-xs text-[color:var(--anx-text-muted)]">Avg mastery</p>
-                      <p
-                        className="text-lg font-bold"
-                        style={{
-                          color:
-                            group.avgMastery >= 70 ? 'var(--anx-success)' : group.avgMastery >= 50 ? 'var(--anx-warning)' : 'var(--anx-danger)',
-                        }}
-                      >
-                        {group.avgMastery}%
-                      </p>
-                    </div>
-                  </div>
 
                   <div className="flex flex-col gap-3">
                     {group.classrooms.map((cls) => (

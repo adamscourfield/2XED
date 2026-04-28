@@ -54,7 +54,7 @@ export function TeacherDashboardClassesView({
             {[7, 30, 90].map((d) => (
               <Link
                 key={d}
-                href={`/teacher/dashboard/classes?days=${d}${subtopicFilter ? `&subtopic=${encodeURIComponent(subtopicFilter)}` : ''}`}
+                href={`/teacher/dashboard/classes/analytics?days=${d}${subtopicFilter ? `&subtopic=${encodeURIComponent(subtopicFilter)}` : ''}`}
                 className={`staff-dash-pill${days === d ? ' staff-dash-pill--active' : ''}`}
               >
                 Last {d} days
@@ -218,6 +218,7 @@ export function TeacherDashboardClassesView({
 
                 <StaffAnalyticsDisclosure
                   storageKey={`teacher-class-analytics:${cls.id}`}
+                  expandHashId={`class-analytics-${cls.id}`}
                   summary={
                     <>
                       Full student roster with risk and durability.{' '}
