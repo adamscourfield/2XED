@@ -17,6 +17,8 @@ export type DashboardSubjectSummary = {
   nextLabel: string;
   nextSkillStarted: boolean;
   nextSkillIsDue: boolean;
+  /** Rough practice session length for dashboard tiles (minutes). */
+  estimatedPracticeMinutes: number;
 };
 
 export type StudentLivePromo = {
@@ -140,13 +142,21 @@ export function StudentDashboardView({
                 {continueSubjects.map((s, i) => {
                   const accent = tileAccent(i);
                   const pct = Math.min(100, Math.max(8, s.averageMastery));
+                  const skillTitleOk = Boolean(s.nextSkillName?.trim());
+                  const showFallbackChips = !skillTitleOk || !s.emoji?.trim();
                   return (
                     <Link key={s.id} href={s.nextHref} className="stu-dash-tile">
                       <span className="stu-dash-tile-icon" style={{ background: accent.bg, color: accent.icon }}>
-                        {s.emoji}
+                        {s.emoji?.trim() ? s.emoji : s.title.slice(0, 2)}
                       </span>
                       <span className="stu-dash-tile-type">{s.title}</span>
-                      <span className="stu-dash-tile-title">{s.nextSkillName}</span>
+                      <span className="stu-dash-tile-title">{skillTitleOk ? s.nextSkillName : 'Continue practice'}</span>
+                      {showFallbackChips ? (
+                        <span className="stu-dash-tile-chips" aria-label="Subject and session length">
+                          <span className="stu-dash-tile-chip">{s.title}</span>
+                          <span className="stu-dash-tile-chip">~{s.estimatedPracticeMinutes} min</span>
+                        </span>
+                      ) : null}
                       <span className="stu-dash-tile-bar-track">
                         <span className="stu-dash-tile-bar-fill" style={{ width: `${pct}%` }} />
                       </span>

@@ -29,12 +29,25 @@ type Props = {
   storageKey: string;
   /** Open by default when head badges suggest attention (preference still persisted per browser). */
   defaultOpen?: boolean;
+  /** Analytics window (days) for copy in empty states. */
+  windowDays?: number;
   classSummary: ClassSummary;
   studentRows: LeadershipClassStudentRow[];
 };
 
-export function LeadershipClassStudentPanel({ storageKey, defaultOpen, classSummary, studentRows }: Props) {
+export function LeadershipClassStudentPanel({
+  storageKey,
+  defaultOpen,
+  windowDays = 30,
+  classSummary,
+  studentRows,
+}: Props) {
   const { name, yearGroup, teacherName, studentCount, avgMastery, clsTrendLabel, atRisk, amber } = classSummary;
+
+  const noElevatedRiskInClass =
+    studentCount > 0 &&
+    studentRows.length > 0 &&
+    studentRows.every((r) => r.riskLevel === 'GREEN' && r.durability !== 'AT_RISK');
 
   return (
     <div className="staff-dash-class-panel">
@@ -60,10 +73,26 @@ export function LeadershipClassStudentPanel({ storageKey, defaultOpen, classSumm
         summary={
           <>
             {studentRows.length} student{studentRows.length !== 1 ? 's' : ''} in this class. Open for risk, DLE, and per-student
-            trends.
+            trends.{' '}
+            {atRisk === 0 && studentCount > 0 ? (
+              <span className="text-emerald-800">No at-risk students in this class for the last {windowDays} days.</span>
+            ) : null}
           </>
         }
       >
+        {noElevatedRiskInClass ? (
+          <p
+            className="mb-3 rounded-lg border px-3 py-2 text-sm"
+            style={{
+              borderColor: 'var(--anx-outline-variant)',
+              background: 'rgba(16, 185, 129, 0.08)',
+              color: 'var(--anx-text-secondary)',
+            }}
+          >
+            No at-risk students in the last {windowDays} days — knowledge states and practice signals look stable in this
+            class.
+          </p>
+        ) : null}
         <div className="staff-dash-table-wrap">
           <table className="staff-dash-table">
             <thead>

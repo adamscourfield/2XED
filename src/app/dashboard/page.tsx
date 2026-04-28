@@ -135,6 +135,8 @@ export default async function DashboardPage() {
     const nextSkillStarted = Boolean(nextSkillMastery?.lastPracticedAt);
     const nextSkillIsDue = !nextSkillMastery?.nextReviewAt || nextSkillMastery.nextReviewAt <= now;
 
+    const estimatedPracticeMinutes = Math.min(45, Math.max(8, Math.round(subject.skills.length * 1.2)));
+
     return {
       id: subject.id,
       slug: subject.slug,
@@ -149,6 +151,7 @@ export default async function DashboardPage() {
       nextLabel: onboardingComplete ? (nextSkillStarted ? 'Continue learning' : 'Start practice') : 'Start diagnostic',
       nextSkillStarted,
       nextSkillIsDue,
+      estimatedPracticeMinutes,
     };
   });
 

@@ -11,6 +11,8 @@ type Props = {
   stripActive: LiveStripStepId;
   mode: StudentLiveChromeMode;
   phaseHint?: string;
+  /** Appended after the base hint (e.g. “Updating…” during slow polls). */
+  phaseHintSuffix?: string;
   onLeave?: () => void;
   children: ReactNode;
 };
@@ -22,6 +24,7 @@ export function StudentLiveUnifiedShell({
   stripActive,
   mode,
   phaseHint,
+  phaseHintSuffix,
   onLeave,
   children,
 }: Props) {
@@ -32,7 +35,7 @@ export function StudentLiveUnifiedShell({
         classLabel={classLabel}
         onLeave={onLeave}
         mode={mode}
-        phaseHint={phaseHint}
+        phaseHint={phaseHintSuffix ? `${phaseHint ?? ''}${phaseHint ? ' · ' : ''}${phaseHintSuffix}` : phaseHint}
       >
         <StudentLivePhaseStrip active={stripActive} />
       </StudentLiveSessionChrome>

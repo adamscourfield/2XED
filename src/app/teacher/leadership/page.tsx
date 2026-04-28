@@ -20,9 +20,11 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/features/auth/authOptions';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+import type { Prisma } from '@prisma/client';
 import { prisma } from '@/db/prisma';
 import { LearningPageShell } from '@/components/LearningPageShell';
 import { StaffDashboardShell } from '@/components/staff/StaffDashboardShell';
+import { StaffAnalyticsRetryBanner } from '@/components/staff/StaffAnalyticsRetryBanner';
 import { LeadershipClassStudentPanel } from '@/app/teacher/leadership/LeadershipClassStudentPanel';
 
 const DAYS_DEFAULT = 30;
@@ -86,38 +88,80 @@ export default async function LeadershipDashboardPage({ searchParams }: Props) {
   const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
   const trendWindowStart = new Date(since.getTime() - days * 24 * 60 * 60 * 1000);
 
-  // All subjects
-  const subjects = await prisma.subject.findMany({ select: { id: true, title: true, slug: true } });
-
-  // All classrooms with enrollments + teacher info (subject matched via subjectSlug)
-  const allClassrooms = await prisma.classroom.findMany({
-    include: {
-      teachers: {
-        take: 1,
-        include: { teacherProfile: { include: { user: { select: { name: true, email: true } } } } },
-      },
-      enrollments: {
-        include: {
-          student: {
-            include: {
-              skillMasteries: { select: { mastery: true, confirmedCount: true, nextReviewAt: true, lastPracticedAt: true } },
-              knowledgeSkillStates: { select: { latestDle: true, durabilityBand: true } },
-              attempts: {
-                where: { createdAt: { gte: since } },
-                select: { correct: true, createdAt: true },
-              },
+  const leadershipClassroomInclude = {
+    teachers: {
+      take: 1,
+      include: { teacherProfile: { include: { user: { select: { name: true, email: true } } } } },
+    },
+    enrollments: {
+      include: {
+        student: {
+          include: {
+            skillMasteries: { select: { mastery: true, confirmedCount: true, nextReviewAt: true, lastPracticedAt: true } },
+            knowledgeSkillStates: { select: { latestDle: true, durabilityBand: true } },
+            attempts: {
+              where: { createdAt: { gte: since } },
+              select: { correct: true, createdAt: true },
             },
           },
         },
       },
     },
-  });
+  } satisfies Prisma.ClassroomInclude;
 
-  // All question attempts in window (for school-wide trends)
-  const schoolAttempts = await prisma.questionAttempt.findMany({
-    where: { occurredAt: { gte: trendWindowStart } },
-    select: { userId: true, correct: true, occurredAt: true, skill: { select: { subjectId: true } } },
-  });
+  type LeadershipClassroom = Prisma.ClassroomGetPayload<{ include: typeof leadershipClassroomInclude }>;
+
+  let subjects: Array<{ id: string; title: string; slug: string }>;
+  let allClassrooms: LeadershipClassroom[];
+  let schoolAttempts: Array<{
+    userId: string;
+    correct: boolean;
+    occurredAt: Date;
+    skill: { subjectId: string };
+  }>;
+
+  try {
+    const bundle = await Promise.all([
+      prisma.subject.findMany({ select: { id: true, title: true, slug: true } }),
+      prisma.classroom.findMany({
+        include: leadershipClassroomInclude,
+      }),
+      prisma.questionAttempt.findMany({
+        where: { occurredAt: { gte: trendWindowStart } },
+        select: { userId: true, correct: true, occurredAt: true, skill: { select: { subjectId: true } } },
+      }),
+    ]);
+    subjects = bundle[0];
+    allClassrooms = bundle[1];
+    schoolAttempts = bundle[2];
+  } catch {
+    const displayName = user.name?.trim() || user.email?.split('@')[0] || 'there';
+    return (
+      <LearningPageShell
+        title="Leadership dashboard"
+        subtitle="Cross-classroom overview with filters for time range and subject."
+        maxWidthClassName="max-w-7xl"
+        appChrome="teacher"
+        appChromeShowLeadershipNav
+      >
+        <StaffDashboardShell
+          variant="leadership"
+          eyebrow="School overview"
+          displayName={displayName}
+          title="Whole-school learning health"
+          lead="We couldn’t load classroom analytics. Check your connection and try again."
+          stats={[
+            { label: 'Students', value: '—' },
+            { label: 'Classrooms', value: '—' },
+            { label: 'Practice', value: '—' },
+            { label: 'Risk / durable', value: '—' },
+          ]}
+        >
+          <StaffAnalyticsRetryBanner message="Something went wrong while loading leadership analytics." />
+        </StaffDashboardShell>
+      </LearningPageShell>
+    );
+  }
 
   const now = new Date();
 
@@ -386,6 +430,7 @@ export default async function LeadershipDashboardPage({ searchParams }: Props) {
                         key={cls.id}
                         storageKey={`leadership-class-students:${cls.id}`}
                         defaultOpen={cls.atRisk > 0 || cls.amber > 0}
+                        windowDays={days}
                         classSummary={{
                           name: cls.name,
                           yearGroup: cls.yearGroup,

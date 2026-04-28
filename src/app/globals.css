@@ -2097,6 +2097,26 @@
     overflow: hidden;
   }
 
+  .stu-dash-tile-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-top: 0.35rem;
+  }
+
+  .stu-dash-tile-chip {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 9999px;
+    padding: 0.15rem 0.45rem;
+    font-size: 0.625rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--anx-text-secondary);
+    background: var(--anx-surface-container-high);
+    border: 1px solid var(--anx-outline-variant);
+  }
+
   .stu-dash-tile-bar-track {
     display: block;
     margin-top: 0.5rem;
@@ -3022,6 +3042,10 @@
     flex-wrap: wrap;
     align-items: center;
     gap: 0.75rem;
+  }
+
+  .td-home-section-alert {
+    width: 100%;
   }
 
   .td-home-bell {

@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { TeacherHomeClassSelector } from '@/app/teacher/dashboard/TeacherHomeClassSelector';
+import { StaffAnalyticsRetryBanner } from '@/components/staff/StaffAnalyticsRetryBanner';
 import type { loadTeacherDashboardData } from '@/app/teacher/dashboard/teacherDashboardData';
 
 type DashboardData = Awaited<ReturnType<typeof loadTeacherDashboardData>>;
@@ -93,7 +94,7 @@ function QuickIcon({ kind }: { kind: 'bank' | 'chart' | 'folder' }) {
 }
 
 export function TeacherHomeDashboard({ data, displayName, greeting, userRole }: Props) {
-  const { teacherProfile, recentSessions } = data;
+  const { teacherProfile, recentSessions, analyticsLoadFailed } = data;
   const classes = teacherProfile.classrooms.map((tc) => {
     const c = tc.classroom;
     return {
@@ -125,6 +126,12 @@ export function TeacherHomeDashboard({ data, displayName, greeting, userRole }: 
           <TeacherHomeClassSelector classes={classes} />
         </div>
       </header>
+
+      {analyticsLoadFailed ? (
+        <div className="td-home-section-alert px-4 sm:px-6">
+          <StaffAnalyticsRetryBanner message="Class analytics did not load — shortcuts below still work." />
+        </div>
+      ) : null}
 
       <section className="td-home-action-row" aria-label="Quick actions">
         <div className="td-home-action-card">

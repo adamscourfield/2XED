@@ -206,6 +206,7 @@ export default function StudentLivePage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [pollSlowSince, setPollSlowSince] = useState<number | null>(null);
 
   const lastPhaseIndexRef = useRef<number>(-1);
   const lastBroadcastAtRef = useRef<string | null>(null);
@@ -240,6 +241,7 @@ export default function StudentLivePage() {
   useEffect(() => {
     const isInSession = appState.phase !== 'join' && appState.phase !== 'done';
     if (!isInSession) {
+      setPollSlowSince(null);
       if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; }
       return;
     }
@@ -250,6 +252,7 @@ export default function StudentLivePage() {
     async function pollSession() {
       const sid = sessionRef.current?.sessionId;
       if (!sid) return;
+      const pollStartedAt = typeof performance !== 'undefined' ? performance.now() : Date.now();
       try {
         const res = await fetch(`/api/live-sessions/${sid}/student-state`);
         if (!res.ok) return;
@@ -349,6 +352,16 @@ export default function StudentLivePage() {
         }
       } catch {
         // silent
+      } finally {
+        const elapsed =
+          typeof performance !== 'undefined'
+            ? performance.now() - pollStartedAt
+            : Date.now() - pollStartedAt;
+        if (elapsed >= 1800) {
+          setPollSlowSince((prev) => prev ?? Date.now());
+        } else {
+          setPollSlowSince(null);
+        }
       }
     }
 
@@ -617,6 +630,9 @@ export default function StudentLivePage() {
         stripActive={shellStripActive(appState)}
         mode={shellChromeMode(appState)}
         phaseHint={shellPhaseHint(appState)}
+        phaseHintSuffix={
+          pollSlowSince != null ? 'Updating…' : undefined
+        }
         onLeave={
           appState.phase === 'done'
             ? undefined
