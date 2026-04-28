@@ -111,20 +111,6 @@ interface ActiveExplanation {
   stepIndex: number;
 }
 
-interface RouteWithSteps {
-  id: string;
-  routeType: 'A' | 'B' | 'C';
-  misconceptionSummary: string;
-  workedExample: string;
-  animationSchema: unknown;
-  steps: { title: string; explanation: string }[];
-}
-
-interface ActiveExplanation {
-  route: RouteWithSteps;
-  stepIndex: number;
-}
-
 interface Props {
   sessionId: string;
 }
@@ -251,9 +237,6 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
   const [latestVersion, setLatestVersion] = useState(0);
   const [canUndo, setCanUndo] = useState(false);
   const [canRedo, setCanRedo] = useState(false);
-
-  const [availableRoutes, setAvailableRoutes] = useState<Record<string, RouteWithSteps> | null>(null);
-  const [activeExplanation, setActiveExplanation] = useState<ActiveExplanation | null>(null);
 
   const [availableRoutes, setAvailableRoutes] = useState<Record<string, RouteWithSteps> | null>(null);
   const [activeExplanation, setActiveExplanation] = useState<ActiveExplanation | null>(null);
@@ -505,6 +488,19 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
     }
   }
 
+  // ── Suggested-move CTA ────────────────────────────────────────────────────
+  // Called when the teacher clicks "Send repair" / "Show example" in StudentSignalsPanel.
+  // Picks the most contextually appropriate explanation route and broadcasts it.
+  async function pushRecommendedModelExample() {
+    const hasLane3 = (snapshot?.laneCounts.LANE_3 ?? 0) > 0;
+    const hasMisconceptions = (snapshot?.misconceptionSignals?.length ?? 0) > 0;
+    // Misconception repair (C) for Lane 3 / tagged misconceptions; worked example (A) otherwise.
+    const option: Parameters<typeof handleExplainOption>[0] =
+      hasLane3 || hasMisconceptions ? 'misconception' : 'wrong-vs-right';
+    await handleExplainOption(option);
+    setMode('EXPLAIN');
+  }
+
   // ── Derived presentation ──────────────────────────────────────────────────
   const studentSignals = useMemo(() => deriveSignals(snapshot), [snapshot]);
 
@@ -666,8 +662,11 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
                 ? {
                     routeType: activeExplanation.route.routeType,
                     stepIndex: activeExplanation.stepIndex,
-                    totalSteps:
-                      (activeExplanation.route.animationSchema as { steps?: unknown[] } | null)?.steps?.length ?? 1,
+                    // For animation-schema routes: count schema steps.
+                    // For text-based routes (animationSchema null): use DB step count.
+                    totalSteps: activeExplanation.route.animationSchema
+                      ? ((activeExplanation.route.animationSchema as { steps?: unknown[] }).steps?.length ?? 1)
+                      : (activeExplanation.route.steps.length || 1),
                   }
                 : null
             }

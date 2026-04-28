@@ -5,8 +5,12 @@ import { authOptions } from '@/features/auth/authOptions';
 import { prisma } from '@/db/prisma';
 import { escalateLane } from '@/lib/live/lane-router';
 
+// failedExplanationId is required for explanation-escalation flows.
+// General student help requests ("I need help") omit it and send reason/message instead.
 const schema = z.object({
-  failedExplanationId: z.string().min(1),
+  failedExplanationId: z.string().min(1).optional(),
+  reason: z.string().optional(),
+  message: z.string().optional(),
 });
 
 interface Props {
@@ -27,6 +31,12 @@ export async function POST(req: NextRequest, { params }: Props) {
   if (!parsed.success) return NextResponse.json({ error: 'Invalid input' }, { status: 400 });
 
   const { failedExplanationId } = parsed.data;
+
+  // General help request (no failed explanation ID) — acknowledge without lane mutation.
+  // This covers "I need help" taps and student messages from the live UI.
+  if (!failedExplanationId) {
+    return NextResponse.json({ acknowledged: true });
+  }
 
   // Find the participant record for this student in this session
   const participant = await prisma.liveParticipant.findUnique({
