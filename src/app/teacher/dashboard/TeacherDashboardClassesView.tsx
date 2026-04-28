@@ -183,6 +183,10 @@ export function TeacherDashboardClassesView({
             });
 
             const requiringAction = studentRows.filter((s) => s.needsAction);
+            const noFollowUpFlags =
+              classStudents.length > 0 &&
+              studentRows.length > 0 &&
+              studentRows.every((s) => s.riskLevel === 'GREEN' && s.studentDurability !== 'AT_RISK');
 
             return (
               <section key={cls.id} id={`class-analytics-${cls.id}`} className="staff-dash-class-panel scroll-mt-24">
@@ -218,6 +222,9 @@ export function TeacherDashboardClassesView({
                   summary={
                     <>
                       Full student roster with risk and durability.{' '}
+                      {classAtRiskCount === 0 && classStudents.length > 0 ? (
+                        <span className="text-emerald-800">No at-risk students in this class for the last {days} days.</span>
+                      ) : null}{' '}
                       {requiringAction.length === 0 ? (
                         <>No students flagged for follow-up in this window.</>
                       ) : (
@@ -231,6 +238,18 @@ export function TeacherDashboardClassesView({
                     </>
                   }
                 >
+                {noFollowUpFlags ? (
+                  <p
+                    className="mb-3 rounded-lg border px-3 py-2 text-sm"
+                    style={{
+                      borderColor: 'var(--anx-outline-variant)',
+                      background: 'rgba(16, 185, 129, 0.08)',
+                      color: 'var(--anx-text-secondary)',
+                    }}
+                  >
+                    No at-risk students in the last {days} days — risk flags and durability look stable for this window.
+                  </p>
+                ) : null}
                 <div className="staff-dash-metric-grid staff-dash-metric-grid--5">
                   <div className="staff-dash-metric-tile staff-dash-metric-tile--accent">
                     <p className="staff-dash-metric-label">Question events</p>

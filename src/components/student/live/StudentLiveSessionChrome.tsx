@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import type { ReactNode } from 'react';
 
-export type StudentLiveChromeMode = 'live' | 'practice' | 'explanation';
+export type StudentLiveChromeMode = 'live' | 'practice' | 'explanation' | 'ended';
 
 type Props = {
   lessonTitle: string;
@@ -31,23 +31,32 @@ export function StudentLiveSessionChrome({
       style={{ borderColor: 'var(--anx-outline-variant)', background: 'var(--anx-surface-container-lowest)' }}
     >
       <Image src="/Ember_logo_icon.png" alt="Ember" width={512} height={512} className="h-7 w-7 shrink-0" priority />
-      <div className="student-live-chrome-pill-wrap flex shrink-0 items-center">
-        {mode === 'practice' ? (
-          <span className="anx-practice-pill">Practice</span>
-        ) : (
-          <span className="anx-live-pill">
-            <span className="anx-live-pill-dot" />
-            Live
-          </span>
-        )}
-        {mode === 'explanation' ? (
-          <span
-            className="ml-2 hidden rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide sm:inline"
-            style={{ background: 'var(--anx-primary-soft)', color: 'var(--anx-primary)' }}
-          >
-            Explanation
-          </span>
-        ) : null}
+      <div className="student-live-chrome-pill-slot relative min-h-[28px] min-w-[4.5rem] shrink-0">
+        <div
+          key={mode === 'practice' ? 'practice' : mode === 'ended' ? 'ended' : 'live'}
+          className="student-live-chrome-pill-wrap student-live-chrome-pill-morph flex items-center"
+        >
+          {mode === 'practice' ? (
+            <span className="anx-practice-pill">Practice</span>
+          ) : mode === 'ended' ? (
+            <span className="anx-live-pill" style={{ background: 'var(--anx-success-soft)', color: 'var(--anx-success)' }}>
+              Ended
+            </span>
+          ) : (
+            <span className="anx-live-pill">
+              <span className="anx-live-pill-dot" />
+              Live
+            </span>
+          )}
+          {mode === 'explanation' ? (
+            <span
+              className="ml-2 hidden rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide sm:inline"
+              style={{ background: 'var(--anx-primary-soft)', color: 'var(--anx-primary)' }}
+            >
+              Explanation
+            </span>
+          ) : null}
+        </div>
       </div>
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-semibold leading-none" style={{ color: 'var(--anx-text)' }}>

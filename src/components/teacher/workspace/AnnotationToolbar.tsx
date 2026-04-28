@@ -8,7 +8,6 @@ import {
   ImageIcon,
   PenIcon,
   RedoIcon,
-  SelectIcon,
   ShapeIcon,
   TextIcon,
   UndoIcon,
@@ -32,27 +31,31 @@ interface Props {
 function ToolButton({
   active,
   label,
+  title: titleProp,
   onClick,
   disabled,
   children,
 }: {
   active: boolean;
   label: string;
+  /** Optional longer tooltip; defaults to `label` */
+  title?: string;
   onClick: () => void;
   disabled?: boolean;
   children: React.ReactNode;
 }) {
+  const title = titleProp ?? label;
   return (
     <button
       type="button"
       className={`anx-tool-btn${active ? ' anx-tool-btn--active' : ''}`}
       aria-pressed={active}
       aria-label={label}
-      title={label}
+      title={title}
       disabled={disabled}
       onClick={onClick}
     >
-      {children}
+      <span className="anx-tool-icon-slot">{children}</span>
     </button>
   );
 }
@@ -96,17 +99,11 @@ export function AnnotationToolbar({
       </ToolButton>
       <ToolButton
         active={tool === 'pointer'}
-        label="Arrow"
+        label="Pointer"
+        title="Pointer — point and select on the board without drawing"
         onClick={() => onToolChange('pointer')}
       >
         <ArrowLineIcon />
-      </ToolButton>
-      <ToolButton
-        active={tool === 'pointer'}
-        label="Select"
-        onClick={() => onToolChange('pointer')}
-      >
-        <SelectIcon />
       </ToolButton>
 
       <div className="anx-tool-divider" aria-hidden />

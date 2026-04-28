@@ -59,6 +59,8 @@ interface Props {
   onStateChange?: (state: AnnotationCanvasState, version: number) => void;
   /** Fired when undo/redo availability changes (for toolbar controls). */
   onHistoryChange?: (canUndo: boolean, canRedo: boolean) => void;
+  /** Whether the board has strokes, text, shapes, or a background image. */
+  onBoardContentChange?: (hasContent: boolean) => void;
   /** Optional placeholder content drawn behind strokes. */
   watermark?: string;
   /** When true, the canvas background and dotted grid are omitted so content behind the canvas shows through. */
@@ -162,17 +164,28 @@ function emptyState(): AnnotationCanvasState {
   return { strokes: [], texts: [], shapes: [], bgImage: null };
 }
 
+export function annotationStateHasContent(s: AnnotationCanvasState): boolean {
+  if (s.strokes.length > 0 || s.texts.length > 0 || s.shapes.length > 0) return true;
+  if (s.bgImage?.src) return true;
+  return false;
+}
+
 export const AnnotationCanvas = forwardRef<AnnotationCanvasHandle, Props>(function AnnotationCanvas(
-  { tool, color, width, onStateChange, watermark, transparent },
+  { tool, color, width, onStateChange, onHistoryChange, onBoardContentChange, watermark, transparent },
   ref,
 ) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const hostRef = useRef<HTMLDivElement>(null);
+  const [ringPos, setRingPos] = useState<{ x: number; y: number } | null>(null);
   const [state, setState] = useState<AnnotationCanvasState>(emptyState);
   const versionRef = useRef(0);
   const historyRef = useRef<AnnotationCanvasState[]>([emptyState()]);
   const futureRef = useRef<AnnotationCanvasState[]>([]);
   const onHistoryChangeRef = useRef(onHistoryChange);
   onHistoryChangeRef.current = onHistoryChange;
+
+  const onBoardContentChangeRef = useRef(onBoardContentChange);
+  onBoardContentChangeRef.current = onBoardContentChange;
 
   const emitHistory = useCallback(() => {
     onHistoryChangeRef.current?.(
@@ -209,7 +222,7 @@ export const AnnotationCanvas = forwardRef<AnnotationCanvasHandle, Props>(functi
         ctx.restore();
       }
     },
-    [watermark],
+    [watermark, transparent],
   );
 
   useEffect(() => {
@@ -219,6 +232,10 @@ export const AnnotationCanvas = forwardRef<AnnotationCanvasHandle, Props>(functi
   useEffect(() => {
     emitHistory();
   }, [state, emitHistory]);
+
+  useEffect(() => {
+    onBoardContentChangeRef.current?.(annotationStateHasContent(state));
+  }, [state]);
 
   const commit = useCallback(
     (next: AnnotationCanvasState) => {
@@ -420,6 +437,37 @@ export const AnnotationCanvas = forwardRef<AnnotationCanvasHandle, Props>(functi
     dragOrigin.current = null;
   }
 
+  const ringRadiusPx = useMemo(() => {
+    switch (tool) {
+      case 'highlighter':
+        return Math.min(28, 14 + width * 3);
+      case 'pen':
+        return Math.min(22, 10 + width * 2.5);
+      case 'eraser':
+        return 22;
+      case 'shape':
+        return 14;
+      case 'text':
+        return 12;
+      default:
+        return 14;
+    }
+  }, [tool, width]);
+
+  function handleHostPointerMove(e: ReactPointerEvent<HTMLDivElement>) {
+    const host = hostRef.current;
+    if (!host) return;
+    const rect = host.getBoundingClientRect();
+    setRingPos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+  }
+
+  function handleHostPointerLeave() {
+    setRingPos(null);
+  }
+
+  const showToolRing =
+    ringPos !== null && tool !== 'pointer' && tool !== 'text';
+
   const cursor = useMemo(() => {
     switch (tool) {
       case 'pointer':
@@ -434,17 +482,44 @@ export const AnnotationCanvas = forwardRef<AnnotationCanvasHandle, Props>(functi
   }, [tool]);
 
   return (
-    <canvas
-      ref={canvasRef}
-      width={CANVAS_W}
-      height={CANVAS_H}
-      className="anx-canvas-surface"
-      style={{ cursor, background: transparent ? 'transparent' : undefined }}
-      onPointerDown={handlePointerDown}
-      onPointerMove={handlePointerMove}
-      onPointerUp={endStroke}
-      onPointerLeave={endStroke}
-      onPointerCancel={endStroke}
-    />
+    <div
+      ref={hostRef}
+      className="anx-canvas-host relative h-full w-full"
+      onPointerMove={handleHostPointerMove}
+      onPointerLeave={handleHostPointerLeave}
+    >
+      {showToolRing ? (
+        <span
+          className="anx-canvas-tool-ring pointer-events-none absolute z-[15]"
+          aria-hidden
+          style={{
+            left: ringPos!.x,
+            top: ringPos!.y,
+            width: ringRadiusPx * 2,
+            height: ringRadiusPx * 2,
+            marginLeft: -ringRadiusPx,
+            marginTop: -ringRadiusPx,
+            borderColor:
+              tool === 'highlighter'
+                ? withAlpha(color, 0.55)
+                : tool === 'eraser'
+                  ? 'rgba(239, 68, 68, 0.45)'
+                  : color,
+          }}
+        />
+      ) : null}
+      <canvas
+        ref={canvasRef}
+        width={CANVAS_W}
+        height={CANVAS_H}
+        className="anx-canvas-surface relative z-[10]"
+        style={{ cursor, background: transparent ? 'transparent' : undefined }}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={endStroke}
+        onPointerLeave={endStroke}
+        onPointerCancel={endStroke}
+      />
+    </div>
   );
 });

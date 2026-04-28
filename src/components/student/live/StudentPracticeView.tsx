@@ -41,6 +41,7 @@ interface Props {
   onLeave?: () => void;
   onNeedHelp?: () => void;
   onMessageTeacher?: (message: string) => void;
+  embedChromeless?: boolean;
 }
 
 function ProgressDots({ current, total }: { current: number; total: number }) {
@@ -84,6 +85,7 @@ export function StudentPracticeView({
   onLeave,
   onNeedHelp,
   onMessageTeacher,
+  embedChromeless = false,
 }: Props) {
   const [answer, setAnswer] = useState(initialAnswer);
   const [confidence, setConfidence] = useState<Confidence | null>(null);
@@ -110,16 +112,20 @@ export function StudentPracticeView({
   const canSubmitForm = !busy && (hasTextAnswer || hasCanvasAnswer);
 
   return (
-    <div className={`flex min-h-screen flex-col bg-[color:var(--anx-surface-bright)] ${className ?? ''}`}>
-      <StudentLiveSessionChrome
-        lessonTitle={lessonTitle}
-        classLabel={classLabel}
-        onLeave={onLeave}
-        mode="practice"
-        phaseHint="Practice · Your turn"
-      >
-        <StudentLivePhaseStrip active="Try" />
-      </StudentLiveSessionChrome>
+    <div
+      className={`flex flex-col bg-[color:var(--anx-surface-bright)] ${embedChromeless ? 'min-h-0 min-w-0 flex-1' : 'min-h-screen'} ${className ?? ''}`}
+    >
+      {!embedChromeless ? (
+        <StudentLiveSessionChrome
+          lessonTitle={lessonTitle}
+          classLabel={classLabel}
+          onLeave={onLeave}
+          mode="practice"
+          phaseHint="Practice · Your turn"
+        >
+          <StudentLivePhaseStrip active="Try" />
+        </StudentLiveSessionChrome>
+      ) : null}
 
       {/* ── Main grid ───────────────────────────────────────────────────── */}
       <main className="mx-auto grid w-full max-w-6xl flex-1 grid-cols-1 gap-6 px-4 py-6 sm:px-6 lg:grid-cols-[minmax(0,1fr),320px]">
@@ -222,7 +228,7 @@ export function StudentPracticeView({
               <button
                 type="submit"
                 disabled={!canSubmitForm}
-                className={`anx-btn-primary inline-flex items-center gap-2 px-6 py-3 text-sm transition ${canSubmitForm ? 'student-live-submit-ready' : 'opacity-50'}`}
+                className={`student-live-submit-press anx-btn-primary inline-flex items-center gap-2 px-6 py-3 text-sm transition ${canSubmitForm ? 'student-live-submit-ready' : 'opacity-50'}`}
               >
                 {busy ? 'Submitting…' : 'Submit answer'}
               </button>

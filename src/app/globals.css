@@ -90,20 +90,40 @@
     /* Primary button — soft elevated shadow (30% indigo) */
     --anx-btn-primary-shadow: 0 10px 28px rgba(74, 64, 224, 0.3);
 
-    /* ── Radius — design scale (xs / sm / lg / xl / full) ───────── */
-    --anx-radius-xs: 0.5rem;   /* 8px — tiny chips */
-    --anx-radius-sm: 0.75rem;  /* 12px — inputs, inner elements */
-    --anx-radius-lg: 1rem;     /* 16px — cards */
-    --anx-radius-xl: 1.5rem;   /* 24px — modals, floating panels */
-    /* Legacy alias: default “card” radius */
+    /* ── Radius — design scale (xs → xl). Use tokens; avoid one-off rem values on surfaces. ─ */
+    --anx-radius-xs: 0.5rem;    /* 8px — chips, tight UI */
+    --anx-radius-sm: 0.75rem;   /* 12px — inputs, inset tiles */
+    --anx-radius-md: 0.875rem;  /* 14px — medium inset (between sm / default card) */
+    --anx-radius-lg: 1rem;      /* 16px — default cards, lists */
+    --anx-radius-xl: 1.5rem;    /* 24px — hero tiles, staff panels, featured strips */
+    --anx-radius-glass: var(--anx-radius-xl); /* frosted panels — keep in sync with .anx-panel */
+    --anx-radius-full: 9999px;  /* pills — prefer over literal 999px in product chrome */
+    /* Default card corner — alias to lg */
     --anx-radius: var(--anx-radius-lg);
 
-    /* ── Shadows — floating elements only (extra-diffused) ───────── */
+    /* ── Shadows — tiered elevation (dashboard cards + live chrome share sm/md) ─ */
     --anx-shadow-float: 0 24px 56px rgba(36, 24, 92, 0.14), 0 8px 24px rgba(4, 14, 31, 0.06);
-    --anx-shadow-sm:    0 8px 32px rgba(4,14,31,0.04);
+    --anx-shadow-sm:    0 8px 32px rgba(4,14,31,0.04); /* base tier — prefer --anx-shadow-card on bordered UI */
     --anx-shadow-md:    0 12px 36px rgba(4,14,31,0.05);
     --anx-shadow-lg:    0 20px 40px rgba(4,14,31,0.06);
     --anx-shadow-xl:    0 24px 48px rgba(4,14,31,0.06);
+    /* Product surfaces: bordered cards (.anx-card, staff dash, student dash strips) */
+    --anx-shadow-card: var(--anx-shadow-sm);
+
+    /*
+      Motion catalog — live lesson + scene transitions (prefers-reduced-motion disables animations).
+      Enter easing is shared across anxLivePhaseIn, student live scenes, and chrome morph.
+      Durations: phase/content swaps use ~220–280ms; full page scene wrapper uses the longer token.
+    */
+    --anx-motion-ease-enter: cubic-bezier(0.22, 1, 0.36, 1);
+    --anx-motion-ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+    --anx-transition-calm: cubic-bezier(0.4, 0, 0.2, 1); /* UI chrome: tabs, toolbars */
+    --anx-motion-duration-live-phase-ms: 240;       /* inner phase blocks, chrome pill morph */
+    --anx-motion-duration-live-page-scene-ms: 260;   /* .anx-student-live-page-scene — route shell */
+    --anx-motion-duration-live-inner-scene-ms: 240;  /* .anx-student-live-scene — embedded scene */
+    --anx-motion-duration-live-phase-transition-ms: 220; /* .anx-live-phase-transition */
+    --anx-motion-duration-step-panel-ms: 280;       /* NewLiveSessionForm step panels */
+    --anx-motion-duration-micro-ms: 200;             /* skill flash, tiny pops */
 
     /* ── Spacing scale (numeric keys → px at 16px root) ───────────── */
     --anx-space-2:  0.5rem;   /* 8px  — scale 2 */
@@ -269,20 +289,25 @@
     }
   }
 
-  /* Regular cards — lifted via background color, no border, no shadow */
+  /* Regular cards — light boundary + soft lift (aligned with staff dash / student dash strips) */
   .anx-card {
     @apply transition-colors duration-200;
     border-radius: var(--anx-radius);
+    border: 1px solid var(--anx-outline-variant);
     background: var(--anx-surface-container-lowest);
+    box-shadow: var(--anx-shadow-card);
   }
 
   .anx-card:hover {
     background: var(--anx-surface-container-low);
+    box-shadow: var(--anx-shadow-md);
   }
 
   .anx-card-flat {
     border-radius: var(--anx-radius);
+    border: 1px solid var(--anx-outline-variant);
     background: var(--anx-surface-container-lowest);
+    box-shadow: none;
   }
 
   /* Teacher reports — reference palette + canvas (scoped via wrapper class) */
@@ -303,11 +328,9 @@
   }
 
   .anx-reports-card {
-    border-radius: 1rem;
+    border-radius: var(--anx-radius-lg);
     background: #ffffff;
-    box-shadow:
-      0 1px 2px rgba(15, 23, 42, 0.04),
-      0 6px 20px rgba(15, 23, 42, 0.06);
+    box-shadow: var(--anx-shadow-card);
     border: 1px solid rgba(15, 23, 42, 0.05);
   }
 
@@ -319,7 +342,7 @@
   .anx-dashboard-hero {
     border-radius: var(--anx-radius-xl);
     background: linear-gradient(90deg, var(--anx-dashboard-hero-from) 0%, var(--anx-dashboard-hero-to) 100%);
-    box-shadow: var(--anx-shadow-sm);
+    box-shadow: var(--anx-shadow-card);
   }
 
   .anx-dashboard-hero-cta {
@@ -1306,7 +1329,7 @@
     border-radius: var(--anx-radius-xl);
     padding: 1.35rem 1.35rem 1.5rem;
     background: var(--anx-surface-container-lowest);
-    box-shadow: var(--anx-shadow-sm);
+    box-shadow: var(--anx-shadow-card);
     transition: background 200ms ease;
   }
 
@@ -1497,7 +1520,7 @@
     border-radius: var(--anx-radius-xl);
     padding: 1.25rem 1.25rem 1.35rem;
     background: var(--anx-surface-container-lowest);
-    box-shadow: var(--anx-shadow-sm);
+    box-shadow: var(--anx-shadow-card);
   }
 
   .student-dash-live {
@@ -1552,7 +1575,7 @@
 
   .student-dash-subject-chip:hover {
     background: var(--anx-surface-container);
-    box-shadow: var(--anx-shadow-sm);
+    box-shadow: var(--anx-shadow-card);
   }
 
   .student-dash-reward-list {
@@ -1698,7 +1721,7 @@
     font-size: 0.875rem;
     font-weight: 600;
     color: var(--anx-text);
-    box-shadow: var(--anx-shadow-sm);
+    box-shadow: var(--anx-shadow-card);
   }
 
   .stu-top-subject {
@@ -1895,7 +1918,7 @@
     border-radius: var(--anx-radius-xl);
     background: linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(167, 139, 250, 0.14) 100%);
     border: 1px solid rgba(99, 102, 241, 0.2);
-    box-shadow: var(--anx-shadow-sm);
+    box-shadow: var(--anx-shadow-card);
     overflow: hidden;
   }
 
@@ -2055,13 +2078,13 @@
     background: var(--anx-surface-container-lowest);
     padding: 0.75rem 0.85rem;
     text-decoration: none;
-    box-shadow: var(--anx-shadow-sm);
+    box-shadow: var(--anx-shadow-card);
     transition: border-color 0.15s ease, box-shadow 0.15s ease;
   }
 
   .stu-dash-tile:hover {
     border-color: rgba(99, 102, 241, 0.35);
-    box-shadow: var(--anx-shadow-sm);
+    box-shadow: var(--anx-shadow-card);
   }
 
   .stu-dash-tile-icon {
@@ -2097,6 +2120,26 @@
     overflow: hidden;
   }
 
+  .stu-dash-tile-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-top: 0.35rem;
+  }
+
+  .stu-dash-tile-chip {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 9999px;
+    padding: 0.15rem 0.45rem;
+    font-size: 0.625rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--anx-text-secondary);
+    background: var(--anx-surface-container-high);
+    border: 1px solid var(--anx-outline-variant);
+  }
+
   .stu-dash-tile-bar-track {
     display: block;
     margin-top: 0.5rem;
@@ -2121,7 +2164,7 @@
     border: 1px solid var(--anx-outline-variant);
     background: var(--anx-surface-container-lowest);
     padding: 1rem 1.25rem;
-    box-shadow: var(--anx-shadow-sm);
+    box-shadow: var(--anx-shadow-card);
   }
 
   .stu-dash-achievement-icon {
@@ -2166,7 +2209,7 @@
     border: 1px solid var(--anx-outline-variant);
     background: var(--anx-surface-container-lowest);
     padding: 1.1rem 1.2rem 1.2rem;
-    box-shadow: var(--anx-shadow-sm);
+    box-shadow: var(--anx-shadow-card);
   }
 
   .stu-dash-card-title {
@@ -2614,7 +2657,8 @@
     border-radius: var(--anx-radius-xl);
     padding: 1.2rem 1.25rem 1.3rem;
     background: var(--anx-surface-container-lowest);
-    box-shadow: var(--anx-shadow-sm);
+    border: 1px solid var(--anx-outline-variant);
+    box-shadow: var(--anx-shadow-card);
   }
 
   .staff-dash-side-title {
@@ -2671,7 +2715,8 @@
     text-decoration: none;
     color: var(--anx-text-secondary);
     background: var(--anx-surface-container-lowest);
-    box-shadow: var(--anx-shadow-sm);
+    border: 1px solid var(--anx-outline-variant);
+    box-shadow: var(--anx-shadow-card);
     transition: background 160ms ease, color 160ms ease;
   }
 
@@ -2689,7 +2734,8 @@
     border-radius: var(--anx-radius-xl);
     overflow: hidden;
     background: var(--anx-surface-container-lowest);
-    box-shadow: var(--anx-shadow-sm);
+    box-shadow: var(--anx-shadow-card);
+    border: 1px solid var(--anx-outline-variant);
   }
 
   .staff-dash-class-head {
@@ -3024,6 +3070,10 @@
     gap: 0.75rem;
   }
 
+  .td-home-section-alert {
+    width: 100%;
+  }
+
   .td-home-bell {
     position: relative;
     display: flex;
@@ -3064,7 +3114,7 @@
     font-size: 0.875rem;
     font-weight: 600;
     color: var(--anx-text);
-    box-shadow: var(--anx-shadow-sm);
+    box-shadow: var(--anx-shadow-card);
   }
 
   .td-class-select {
@@ -3186,7 +3236,7 @@
     border: 1px solid var(--anx-outline-variant);
     background: var(--anx-surface-container-lowest);
     padding: 1.35rem 1.35rem 1.5rem;
-    box-shadow: var(--anx-shadow-sm);
+    box-shadow: var(--anx-shadow-card);
   }
 
   .td-home-action-icon {
@@ -3273,7 +3323,7 @@
     border: 1px solid var(--anx-outline-variant);
     background: var(--anx-surface-container-lowest);
     padding: 1.15rem 1.25rem 1.25rem;
-    box-shadow: var(--anx-shadow-sm);
+    box-shadow: var(--anx-shadow-card);
   }
 
   .td-home-card-head {
@@ -3555,7 +3605,7 @@
 
   .td-home-mini-card:hover {
     border-color: rgba(99, 102, 241, 0.35);
-    box-shadow: var(--anx-shadow-sm);
+    box-shadow: var(--anx-shadow-card);
   }
 
   .td-home-mini-card--new {
@@ -3646,6 +3696,10 @@
       transform: none;
     }
 
+    .anx-card:hover {
+      box-shadow: var(--anx-shadow-card);
+    }
+
     .student-dash-list-row:hover,
     .student-dash-next-card:hover {
       transform: none;
@@ -3734,7 +3788,7 @@
   .anx-conductor-topbar {
     background: var(--anx-surface-container-lowest);
     border-bottom: 1px solid var(--anx-border);
-    box-shadow: var(--anx-shadow-sm);
+    box-shadow: var(--anx-shadow-card);
     z-index: 10;
   }
 
@@ -4063,7 +4117,7 @@
     background: var(--anx-surface-container-lowest);
     border: 1px solid var(--anx-outline-variant);
     border-radius: 18px;
-    box-shadow: var(--anx-shadow-sm);
+    box-shadow: var(--anx-shadow-card);
     overflow: hidden;
     position: relative;
   }
@@ -4074,6 +4128,26 @@
     display: block;
     touch-action: none;
     cursor: crosshair;
+  }
+
+  .anx-canvas-host {
+    position: relative;
+    z-index: 10;
+    min-height: 0;
+  }
+
+  .anx-canvas-tool-ring {
+    border: 2px solid var(--anx-primary);
+    border-radius: 999px;
+    opacity: 0.85;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.7);
+    transition: opacity 80ms ease;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .anx-canvas-tool-ring {
+      display: none;
+    }
   }
 
   .anx-canvas-floating {
@@ -4088,7 +4162,7 @@
     background: var(--anx-surface-container-lowest);
     border: 1px solid var(--anx-outline-variant);
     border-radius: 999px;
-    box-shadow: var(--anx-shadow-sm);
+    box-shadow: var(--anx-shadow-card);
   }
 
   .anx-canvas-floating .anx-tool-btn {
@@ -4296,7 +4370,10 @@
     letter-spacing: 0.04em;
   }
 
-  /* Live lesson — phase transitions (student) */
+  /*
+    anxLivePhaseIn — canonical fade + 6px lift-in for live flows.
+    Motion tokens: --anx-motion-ease-enter, --anx-motion-duration-*-ms (see :root catalog).
+  */
   @keyframes anxLivePhaseIn {
     from {
       opacity: 0;
@@ -4309,7 +4386,7 @@
   }
 
   .anx-live-phase-transition {
-    animation: anxLivePhaseIn 220ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation: anxLivePhaseIn calc(var(--anx-motion-duration-live-phase-transition-ms) * 1ms) var(--anx-motion-ease-enter) both;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -4320,6 +4397,16 @@
 
   .student-live-chrome-pill-wrap {
     transition: transform 200ms var(--anx-transition-calm, ease);
+  }
+
+  .student-live-chrome-pill-morph {
+    animation: anxLivePhaseIn calc(var(--anx-motion-duration-live-phase-ms) * 1ms) var(--anx-motion-ease-enter) both;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .student-live-chrome-pill-morph {
+      animation: none;
+    }
   }
 
   .student-live-phase-hint {
@@ -4487,11 +4574,11 @@
   }
 
   .anx-signal-row-appear {
-    animation: anxLivePhaseIn 0.22s ease-out both;
+    animation: anxLivePhaseIn calc(var(--anx-motion-duration-live-phase-transition-ms) * 1ms) var(--anx-motion-ease-standard) both;
   }
 
   .anx-new-session-step-enter {
-    animation: anxLivePhaseIn 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation: anxLivePhaseIn calc(var(--anx-motion-duration-step-panel-ms) * 1ms) var(--anx-motion-ease-enter) both;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -4501,20 +4588,7 @@
   }
 
   .anx-skill-pickflash {
-    animation: anxLivePhaseIn 0.2s ease-out both;
-  }
-
-  /* Practice mode badge for student practice page */
-  .anx-practice-pill {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.25rem 0.625rem;
-    border-radius: 999px;
-    background: var(--anx-primary-soft);
-    color: var(--anx-primary);
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.04em;
+    animation: anxLivePhaseIn calc(var(--anx-motion-duration-micro-ms) * 1ms) ease-out both;
   }
 
   /* Student practice — progress dots */
@@ -4556,11 +4630,242 @@
     background: var(--anx-success);
   }
 
+  @keyframes studentLiveGuidanceTextIn {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 4px, 0);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  .student-live-guidance-text-in {
+    animation: studentLiveGuidanceTextIn 0.22s ease-out both;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .student-live-guidance-text-in {
+      animation: none;
+    }
+  }
+
+  .anx-student-live-page-scene {
+    animation: anxLivePhaseIn calc(var(--anx-motion-duration-live-page-scene-ms) * 1ms) var(--anx-motion-ease-enter) both;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .anx-student-live-page-scene {
+      animation: none;
+    }
+  }
+
+  .anx-student-live-scene {
+    animation: anxLivePhaseIn calc(var(--anx-motion-duration-live-inner-scene-ms) * 1ms) var(--anx-motion-ease-enter) both;
+    min-height: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .anx-student-live-scene {
+      animation: none;
+    }
+  }
+
+  /* MCQ rows — clearer keyboard focus + subtle selected lift */
+  .anx-option {
+    transition:
+      transform 180ms cubic-bezier(0.34, 1.56, 0.64, 1),
+      box-shadow 180ms ease,
+      border-color 180ms ease;
+  }
+
+  .anx-option:focus-within {
+    outline: 2px solid var(--anx-primary);
+    outline-offset: 2px;
+    border-radius: 12px;
+  }
+
+  .anx-option.anx-option-selected:not(:focus-within) {
+    transform: scale(1.01);
+    box-shadow: 0 4px 14px rgba(74, 64, 224, 0.12);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .anx-option {
+      transition: border-color 180ms ease, box-shadow 180ms ease;
+    }
+    .anx-option.anx-option-selected:not(:focus-within) {
+      transform: none;
+    }
+  }
+
+  .student-live-submit-press:not(:disabled):active {
+    transition: transform 80ms ease, box-shadow 80ms ease;
+    transform: translateY(1px) scale(0.985);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .student-live-submit-press:not(:disabled):active {
+      transform: none;
+    }
+  }
+
+  .student-join-code-ready {
+    box-shadow: 0 0 0 3px rgba(74, 64, 224, 0.35);
+  }
+
+  @keyframes studentFeedbackConfettiFall {
+    0% {
+      opacity: 1;
+      transform: translate3d(0, 0, 0) rotate(0deg);
+    }
+    100% {
+      opacity: 0;
+      transform: translate3d(var(--tx, 0px), 120px, 0) rotate(260deg);
+    }
+  }
+
+  .student-feedback-confetti-piece {
+    position: absolute;
+    left: calc(12% + var(--i, 0) * 6%);
+    top: 10%;
+    width: 6px;
+    height: 10px;
+    border-radius: 2px;
+    background: var(--anx-primary);
+    opacity: 0;
+    animation: studentFeedbackConfettiFall 720ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: calc(var(--i, 0) * 28ms);
+    --tx: calc((var(--i, 0) - 7) * 8px);
+  }
+
+  .student-feedback-confetti-piece:nth-child(odd) {
+    background: #22c55e;
+  }
+
+  .student-feedback-confetti-piece:nth-child(3n) {
+    background: #f59e0b;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .student-feedback-confetti {
+      display: none;
+    }
+  }
+
+  @keyframes anxNewSessionStepOutLtr {
+    from {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+    to {
+      opacity: 0;
+      transform: translate3d(-18px, 0, 0);
+    }
+  }
+
+  @keyframes anxNewSessionStepInLtr {
+    from {
+      opacity: 0;
+      transform: translate3d(18px, 0, 0);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  @keyframes anxNewSessionStepInRtl {
+    from {
+      opacity: 0;
+      transform: translate3d(-18px, 0, 0);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  .anx-new-session-step-leave {
+    animation: anxNewSessionStepOutLtr 200ms cubic-bezier(0.4, 0, 1, 1) both;
+  }
+
+  .anx-new-session-step-enter--ltr {
+    animation: anxNewSessionStepInLtr 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .anx-new-session-step-enter--rtl {
+    animation: anxNewSessionStepInRtl 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .anx-new-session-step-leave,
+    .anx-new-session-step-enter--ltr,
+    .anx-new-session-step-enter--rtl {
+      animation: none;
+    }
+  }
+
+  /* Teacher live workspace — first snapshot load */
+  @keyframes anxWorkspaceSkelPulse {
+    50% {
+      opacity: 0.55;
+    }
+  }
+
+  .anx-workspace-shell--loading .anx-workspace-skel-line,
+  .anx-workspace-shell--loading .anx-workspace-skel-canvas,
+  .anx-workspace-shell--loading .anx-workspace-skel-card {
+    animation: anxWorkspaceSkelPulse 1.1s ease-in-out infinite;
+    background: linear-gradient(
+      90deg,
+      var(--anx-surface-container-high) 0%,
+      var(--anx-surface-container-low) 50%,
+      var(--anx-surface-container-high) 100%
+    );
+    background-size: 200% 100%;
+  }
+
+  .anx-workspace-skel-canvas {
+    width: 100%;
+    min-height: min(52vh, 420px);
+    background: var(--anx-surface-container-low);
+  }
+
+  .anx-workspace-skel-card {
+    background: var(--anx-surface-container-lowest);
+    border: 1px solid var(--anx-outline-variant);
+  }
+
+  .anx-workspace-side-skel {
+    min-width: 0;
+  }
+
+  /* Annotation toolbar — icon swap micro-motion */
+  .anx-tool-btn .anx-tool-icon-slot {
+    display: inline-flex;
+    transition: opacity 140ms ease, transform 140ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .anx-tool-btn--active .anx-tool-icon-slot {
+    transform: scale(1.06);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .anx-tool-btn .anx-tool-icon-slot,
+    .anx-tool-btn--active .anx-tool-icon-slot {
+      transition: none;
+      transform: none;
+    }
+  }
+
   .anx-confidence-row {
     display: grid;
     grid-template-columns: 1fr;
     gap: 0.5rem;
   }
+
   .anx-confidence-btn {
     display: inline-flex;
     align-items: center;
@@ -4573,7 +4878,11 @@
     font-size: 0.875rem;
     font-weight: 600;
     cursor: pointer;
-    transition: background 160ms var(--anx-transition-calm), border-color 160ms var(--anx-transition-calm);
+    transition:
+      background 160ms var(--anx-transition-calm),
+      border-color 160ms var(--anx-transition-calm),
+      transform 220ms cubic-bezier(0.34, 1.56, 0.64, 1),
+      box-shadow 220ms ease;
   }
   .anx-confidence-btn:hover {
     background: var(--anx-surface-container-low);
@@ -4581,6 +4890,14 @@
   .anx-confidence-btn[aria-pressed='true'] {
     border-color: var(--anx-primary);
     background: var(--anx-primary-soft);
+    box-shadow: 0 2px 12px rgba(74, 64, 224, 0.15);
+    transform: scale(1.02);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .anx-confidence-btn[aria-pressed='true'] {
+      transform: none;
+    }
   }
   .anx-confidence-btn-icon {
     width: 28px;
@@ -4643,6 +4960,23 @@
     width: auto;
     padding: 0.25rem 0 0;
   }
+
+  /* Keep toolbar above thumb zone / bottom bar; enlarge touch targets */
+  .anx-workspace-toolbar {
+    bottom: calc(4.75rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  .anx-tool-btn {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .anx-workspace-bottombar-btn {
+    min-height: 44px;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
   .anx-workspace-side {
     border-left: none;
     border-top: 1px solid var(--anx-outline-variant);

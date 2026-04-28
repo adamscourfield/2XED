@@ -31,6 +31,36 @@ export function livePhaseToStripStep(
   }
 }
 
+/** Top-level student live page phases (join / practice / explanation / feedback) — approximate strip position */
+export function appShellPhaseToStripStep(
+  shell:
+    | 'join'
+    | 'waiting'
+    | 'message'
+    | 'watch'
+    | 'check'
+    | 'practice'
+    | 'model'
+    | 'feedback'
+    | 'done',
+): LiveStripStepId {
+  switch (shell) {
+    case 'practice':
+    case 'check':
+    case 'feedback':
+      return 'Try';
+    case 'model':
+      return 'Model';
+    case 'watch':
+    case 'message':
+      return 'Watch';
+    case 'done':
+      return 'Ready';
+    default:
+      return 'Ready';
+  }
+}
+
 export function StudentLivePhaseStrip({ active }: { active: LiveStripStepId }) {
   const activeIndex = STEPS.indexOf(active);
   return (

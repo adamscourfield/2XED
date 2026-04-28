@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   AnnotationCanvas,
+  annotationStateHasContent,
   type AnnotationCanvasHandle,
   type AnnotationCanvasState,
   CANVAS_W,
@@ -16,6 +17,7 @@ import { TeachingModePanel, type TeachingMode } from './TeachingModePanel';
 import { AnimationRenderer } from '@/components/explanation/AnimationRenderer';
 import { StudentSignalsPanel, type ClassOverview, type InterpretedSignal, type MisconceptionSignal, type StudentMessageSignal, type StudentResponseDetail, type RubricCriterionSignal } from './StudentSignalsPanel';
 import { TeacherBottomBar } from './TeacherBottomBar';
+import { EndSessionDialog } from './EndSessionDialog';
 import { InviteIcon, SettingsIcon } from './icons';
 import type { LiveStroke } from '@/lib/live/whiteboard-strokes';
 
@@ -232,6 +234,7 @@ function lessonTitle(snapshot: SessionSnapshot | null): string {
 
 export function TeacherLiveWorkspace({ sessionId }: Props) {
   const [snapshot, setSnapshot] = useState<SessionSnapshot | null>(null);
+  const [snapshotLoading, setSnapshotLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [tool, setTool] = useState<CanvasTool>('pen');
   const [color, setColor] = useState<string>('#1f1f23');
@@ -241,6 +244,7 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
   const [copied, setCopied] = useState(false);
   const [endingPrompt, setEndingPrompt] = useState(false);
   const [latestVersion, setLatestVersion] = useState(0);
+  const [canvasHasContent, setCanvasHasContent] = useState(false);
   const [canUndo, setCanUndo] = useState(false);
   const [canRedo, setCanRedo] = useState(false);
 
@@ -261,6 +265,7 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
       const res = await fetch(`/api/live-sessions/${sessionId}/state`);
       if (!res.ok) {
         setError('Failed to load session.');
+        setSnapshotLoading(false);
         return;
       }
       const data = await res.json();
@@ -268,6 +273,8 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
       setPaused(data.status === 'PAUSED');
     } catch {
       setError('Network error.');
+    } finally {
+      setSnapshotLoading(false);
     }
   }, [sessionId]);
 
@@ -311,6 +318,7 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
       .then((r) => r.json())
       .then((data: { routes: Record<string, RouteWithSteps> }) => setAvailableRoutes(data.routes))
       .catch(() => { /* soft fail */ });
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- only refetch routes when skill or phase index identity changes
   }, [sessionId, snapshot?.skill?.id, snapshot?.currentPhaseIndex]);
 
   // ── Canvas → student broadcast ─────────────────────────────────────────────
@@ -378,6 +386,7 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
       pendingStateRef.current = null;
       setLatestVersion(pending.version);
       void broadcastStrokes(pending.state.strokes, pending.version, 'show');
+      setCanvasHasContent(annotationStateHasContent(pending.state));
     }, BROADCAST_DEBOUNCE_MS);
   }
 
@@ -524,6 +533,48 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
     );
   }
 
+  if (snapshotLoading && !snapshot) {
+    return (
+      <div className="anx-workspace-shell anx-workspace-shell--loading">
+        <header className="anx-workspace-topbar anx-workspace-skeleton-bar">
+          <div className="anx-workspace-skel-line h-7 w-7 rounded-lg" />
+          <div className="anx-workspace-skel-line h-6 w-16 rounded-full" />
+          <div className="min-w-0 flex-1 space-y-2">
+            <div className="anx-workspace-skel-line h-3 w-24 rounded" />
+            <div className="anx-workspace-skel-line h-5 w-48 max-w-full rounded" />
+          </div>
+          <div className="ml-auto flex gap-2">
+            <div className="anx-workspace-skel-line h-8 w-24 rounded-full" />
+            <div className="anx-workspace-skel-line h-8 w-20 rounded-full" />
+          </div>
+        </header>
+        <div className="anx-workspace-body">
+          <div className="anx-canvas-stage">
+            <div className="anx-workspace-skel-canvas rounded-2xl" />
+          </div>
+          <aside className="anx-workspace-side anx-workspace-side-skel space-y-3">
+            <div className="anx-workspace-skel-card rounded-2xl p-4">
+              <div className="anx-workspace-skel-line mb-3 h-3 w-28 rounded" />
+              <div className="space-y-2">
+                <div className="anx-workspace-skel-line h-3 w-full rounded" />
+                <div className="anx-workspace-skel-line h-3 max-w-[83%] rounded" />
+              </div>
+            </div>
+            <div className="anx-workspace-skel-card rounded-2xl p-4">
+              <div className="anx-workspace-skel-line mb-2 h-3 w-32 rounded" />
+              <div className="anx-workspace-skel-line h-16 w-full rounded-xl" />
+            </div>
+          </aside>
+        </div>
+        <div className="anx-workspace-bottombar anx-workspace-skeleton-bar">
+          <div className="anx-workspace-skel-line h-9 w-24 rounded-lg" />
+          <div className="anx-workspace-skel-line h-9 w-28 rounded-lg" />
+          <div className="anx-workspace-skel-line ml-auto h-9 w-20 rounded-lg" />
+        </div>
+      </div>
+    );
+  }
+
   const sessionStatus = snapshot?.status ?? 'LOBBY';
 
   return (
@@ -614,6 +665,17 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
       <div className="anx-workspace-body">
         <div className="anx-canvas-stage">
           <div className="anx-canvas-board" style={{ position: 'relative' }}>
+            <AnnotationToolbar
+              tool={tool}
+              color={color}
+              canUndo={canUndo}
+              canRedo={canRedo}
+              onToolChange={setTool}
+              onColorChange={setColor}
+              onUndo={() => canvasRef.current?.undo()}
+              onRedo={() => canvasRef.current?.redo()}
+              onInsertImage={handleInsertImageRequest}
+            />
             {/* Explanation layer — AnimationRenderer sits behind the transparent canvas */}
             {!!activeExplanation?.route.animationSchema && (
               <div
@@ -633,11 +695,54 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
               color={color}
               width={3}
               onStateChange={scheduleBroadcast}
+              onHistoryChange={(u, r) => {
+                setCanUndo(u);
+                setCanRedo(r);
+              }}
+              onBoardContentChange={setCanvasHasContent}
               transparent={!!activeExplanation}
               watermark={
                 !activeExplanation && sessionStatus === 'LOBBY' ? 'Lesson starts when you click Start' : undefined
               }
             />
+            {sessionStatus === 'ACTIVE' && paused ? (
+              <div
+                className="pointer-events-none absolute inset-x-0 top-3 z-[18] flex justify-center px-4"
+                aria-live="polite"
+              >
+                <p
+                  className="max-w-lg rounded-full border px-4 py-2 text-center text-xs font-medium shadow-sm"
+                  style={{
+                    borderColor: 'var(--anx-outline-variant)',
+                    background: 'var(--anx-warning-soft)',
+                    color: 'var(--anx-text-secondary)',
+                  }}
+                >
+                  Paused — students keep seeing the last frame until you resume.
+                </p>
+              </div>
+            ) : null}
+            {sessionStatus === 'ACTIVE' &&
+            !paused &&
+            !activeExplanation &&
+            !canvasHasContent &&
+            latestVersion > 0 ? (
+              <div
+                className="pointer-events-none absolute inset-x-0 bottom-14 z-[18] flex justify-center px-4 sm:bottom-4"
+                aria-live="polite"
+              >
+                <p
+                  className="max-w-md rounded-xl border px-3 py-2 text-center text-[11px] leading-snug shadow-sm"
+                  style={{
+                    borderColor: 'var(--anx-outline-variant)',
+                    background: 'rgba(255, 255, 255, 0.92)',
+                    color: 'var(--anx-text-secondary)',
+                  }}
+                >
+                  Students still see your last board until you draw again — or they follow along when you push checks and explanations.
+                </p>
+              </div>
+            ) : null}
             <input
               ref={fileInputRef}
               type="file"
@@ -699,6 +804,7 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
             }
             studentMessages={snapshot?.studentMessages ?? null}
             studentResponses={snapshot?.studentResponses ?? null}
+            laneCounts={snapshot?.laneCounts ?? null}
           />
         </aside>
       </div>
@@ -717,36 +823,18 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
       />
 
       {/* End session confirmation */}
-      {endingPrompt && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 px-4">
-          <div className="anx-card max-w-sm space-y-4 p-6">
-            <div>
-              <h3 className="text-lg font-bold" style={{ color: 'var(--anx-text)' }}>
-                End the session?
-              </h3>
-              <p className="mt-1 text-sm" style={{ color: 'var(--anx-text-muted)' }}>
-                Students will be returned to their dashboard. You can review responses afterwards.
-              </p>
-            </div>
-            <div className="flex justify-end gap-2">
-              <button type="button" onClick={() => setEndingPrompt(false)} className="anx-btn-secondary px-4 py-2 text-sm">
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setEndingPrompt(false);
-                  void setStatus('COMPLETED');
-                }}
-                className="anx-btn-primary px-4 py-2 text-sm"
-                style={{ background: 'var(--anx-danger-text)' }}
-              >
-                End session
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <EndSessionDialog
+        open={endingPrompt}
+        title="End the session?"
+        description="Students will be returned to their dashboard. You can review responses afterwards."
+        cancelLabel="Cancel"
+        confirmLabel="End session"
+        onCancel={() => setEndingPrompt(false)}
+        onConfirm={() => {
+          setEndingPrompt(false);
+          void setStatus('COMPLETED');
+        }}
+      />
 
       {/* Hidden version readout for downstream tests / debug */}
       <span aria-hidden style={{ display: 'none' }} data-canvas-version={latestVersion} />

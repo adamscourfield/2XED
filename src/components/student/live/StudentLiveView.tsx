@@ -50,6 +50,8 @@ interface Props {
   onLeave?: () => void;
   onNeedHelp?: () => void;
   onMessageTeacher?: (message: string) => void;
+  /** When true, header chrome is omitted (parent renders unified shell). */
+  embedChromeless?: boolean;
 }
 
 function phaseHintFor(screen: StudentLiveScreen): string {
@@ -69,18 +71,20 @@ function phaseHintFor(screen: StudentLiveScreen): string {
   }
 }
 
-function GuidanceCard({ title, body }: { title: string; body: string }) {
+function GuidanceCard({ guidanceKey, title, body }: { guidanceKey: string; title: string; body: string }) {
   return (
-    <div className="student-live-guidance-enter anx-card p-5">
+    <div className="anx-card p-5">
       <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--anx-text-muted)' }}>
         What to do
       </p>
-      <h2 className="mt-2 text-base font-bold" style={{ color: 'var(--anx-text)' }}>
-        {title}
-      </h2>
-      <p className="mt-2 text-sm leading-relaxed" style={{ color: 'var(--anx-text-muted)' }}>
-        {body}
-      </p>
+      <div key={guidanceKey} className="student-live-guidance-text-in">
+        <h2 className="mt-2 text-base font-bold" style={{ color: 'var(--anx-text)' }}>
+          {title}
+        </h2>
+        <p className="mt-2 text-sm leading-relaxed" style={{ color: 'var(--anx-text-muted)' }}>
+          {body}
+        </p>
+      </div>
     </div>
   );
 }
@@ -109,7 +113,7 @@ function SidePanel({
 
   return (
     <aside className="flex flex-col gap-4">
-      <GuidanceCard key={guidanceSlotKey} title={title} body={body} />
+      <GuidanceCard guidanceKey={guidanceSlotKey} title={title} body={body} />
 
       {children}
 
@@ -278,7 +282,7 @@ function CheckAnswerCard({
           <button
             type="submit"
             disabled={!canSubmit}
-            className={`anx-btn-primary px-5 py-2.5 text-sm transition ${canSubmit ? 'student-live-submit-ready' : 'opacity-50'}`}
+            className={`student-live-submit-press anx-btn-primary px-5 py-2.5 text-sm transition ${canSubmit ? 'student-live-submit-ready' : 'opacity-50'}`}
           >
             {busy ? 'Submitting…' : 'Submit'}
           </button>
@@ -295,6 +299,7 @@ export function StudentLiveView({
   onLeave,
   onNeedHelp,
   onMessageTeacher,
+  embedChromeless = false,
 }: Props) {
   const stripActive = livePhaseToStripStep(screen.kind);
   const phaseHint = phaseHintFor(screen);
@@ -302,19 +307,27 @@ export function StudentLiveView({
   useLivePhasePrimaryFocus(transitionKey);
 
   return (
-    <div className="flex min-h-screen flex-col bg-[color:var(--anx-surface-bright)]">
-      <StudentLiveSessionChrome
-        lessonTitle={lessonTitle}
-        classLabel={classLabel}
-        onLeave={onLeave}
-        mode="live"
-        phaseHint={phaseHint}
-      >
-        <StudentLivePhaseStrip active={stripActive} />
-      </StudentLiveSessionChrome>
+    <div
+      className={
+        embedChromeless ? 'flex min-h-0 min-w-0 flex-1 flex-col' : 'flex min-h-screen flex-col bg-[color:var(--anx-surface-bright)]'
+      }
+    >
+      {!embedChromeless ? (
+        <StudentLiveSessionChrome
+          lessonTitle={lessonTitle}
+          classLabel={classLabel}
+          onLeave={onLeave}
+          mode="live"
+          phaseHint={phaseHint}
+        >
+          <StudentLivePhaseStrip active={stripActive} />
+        </StudentLiveSessionChrome>
+      ) : null}
 
       <LivePhaseTransition key={transitionKey}>
-        <main className="mx-auto grid w-full max-w-6xl flex-1 grid-cols-1 gap-5 px-4 py-5 sm:px-6 lg:grid-cols-[minmax(0,1fr),320px]">
+        <main
+          className={`mx-auto grid w-full max-w-6xl flex-1 grid-cols-1 gap-5 px-4 py-5 sm:px-6 lg:grid-cols-[minmax(0,1fr),320px] ${embedChromeless ? 'min-h-0' : ''}`}
+        >
           {screen.kind === 'waiting' && (
             <>
               <div className="anx-card student-live-waiting-card flex flex-1 flex-col items-center justify-center gap-4 p-10 text-center">
@@ -393,8 +406,9 @@ export function StudentLiveView({
                     Model explanation
                   </p>
                   {screen.explanation.animationSchema ? (
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    <AnimationRenderer schema={screen.explanation.animationSchema as any} />
+                    <AnimationRenderer
+                      schema={screen.explanation.animationSchema as Parameters<typeof AnimationRenderer>[0]['schema']}
+                    />
                   ) : (
                     <div className="space-y-4">
                       {sanitizeStudentCopy(screen.explanation.misconceptionSummary) && (

@@ -530,7 +530,6 @@ export function TeacherResourcesClient() {
               <article
                 key={item.id}
                 className="anx-card flex w-[min(100%,17rem)] shrink-0 flex-col overflow-hidden rounded-2xl"
-                style={{ boxShadow: 'var(--anx-shadow-sm)' }}
               >
                 <div className={`relative h-24 ${item.thumbClass}`} aria-hidden>
                   <div className="absolute inset-0 flex items-center justify-center opacity-40">
@@ -613,7 +612,7 @@ export function TeacherResourcesClient() {
           </h2>
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {AI_RESOURCES.map((item) => (
-              <article key={item.id} className="anx-card flex flex-col gap-3 rounded-2xl p-4" style={{ boxShadow: 'var(--anx-shadow-sm)' }}>
+              <article key={item.id} className="anx-card flex flex-col gap-3 rounded-2xl p-4">
                 <div className="flex items-start gap-2">
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[rgba(99,56,241,0.08)] text-[#6338f1]">
                     <SparkleIcon className="h-4 w-4" />
