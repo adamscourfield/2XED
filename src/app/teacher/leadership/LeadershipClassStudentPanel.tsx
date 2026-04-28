@@ -27,17 +27,18 @@ type ClassSummary = {
 
 type Props = {
   storageKey: string;
-  /** Open by default when head badges suggest attention (preference still persisted per browser). */
+  /** Used for deep links: `#leadership-class-<id>` opens this class panel */
+  classroomId: string;
   defaultOpen?: boolean;
   classSummary: ClassSummary;
   studentRows: LeadershipClassStudentRow[];
 };
 
-export function LeadershipClassStudentPanel({ storageKey, defaultOpen, classSummary, studentRows }: Props) {
+export function LeadershipClassStudentPanel({ storageKey, classroomId, defaultOpen, classSummary, studentRows }: Props) {
   const { name, yearGroup, teacherName, studentCount, avgMastery, clsTrendLabel, atRisk, amber } = classSummary;
 
   return (
-    <div className="staff-dash-class-panel">
+    <div id={`leadership-class-${classroomId}`} className="staff-dash-class-panel scroll-mt-24">
       <div className="staff-dash-class-head flex flex-wrap items-center justify-between gap-2">
         <div>
           <p className="staff-dash-class-title m-0">{name}</p>
@@ -56,6 +57,7 @@ export function LeadershipClassStudentPanel({ storageKey, defaultOpen, classSumm
 
       <StaffAnalyticsDisclosure
         storageKey={storageKey}
+        expandHashId={`leadership-class-${classroomId}`}
         defaultOpen={defaultOpen}
         summary={
           <>
