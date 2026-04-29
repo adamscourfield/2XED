@@ -164,12 +164,12 @@ export default async function AdminInterventionsPage() {
     <main className="anx-shell">
       <div className="mx-auto w-full max-w-6xl space-y-6">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Intervention Flags</h1>
+          <h1 className="text-2xl font-bold text-on-surface">Intervention Flags</h1>
           <div className="flex items-center gap-4">
-            <a href="/admin/knowledge-state" className="text-sm text-blue-600 hover:underline">
+            <a href="/admin/knowledge-state" className="text-sm text-primary hover:underline">
               → Knowledge State Debug
             </a>
-            <a href={`/admin/insight/${LEARNING_CONFIG.defaultSubjectSlug}`} className="text-sm text-blue-600 hover:underline">
+            <a href={`/admin/insight/${LEARNING_CONFIG.defaultSubjectSlug}`} className="text-sm text-primary hover:underline">
               → Insight Dashboard
             </a>
           </div>
@@ -179,22 +179,22 @@ export default async function AdminInterventionsPage() {
           <AdminReteachPolicyPanel />
         </div>
 
-        <div className="mb-6 rounded-xl border border-gray-200 bg-white overflow-hidden">
-          <div className="border-b border-gray-100 px-4 py-3">
-            <h2 className="text-sm font-semibold text-gray-900">Recent policy changes</h2>
-            <p className="mt-1 text-xs text-gray-600">Last 10 updates to Phase 9 thresholds (audit trail).</p>
+        <div className="anx-card mb-6 overflow-hidden rounded-xl">
+          <div className="border-b border-outline-variant px-4 py-3">
+            <h2 className="text-sm font-semibold text-on-surface">Recent policy changes</h2>
+            <p className="mt-1 text-xs text-on-surface-variant">Last 10 updates to Phase 9 thresholds (audit trail).</p>
           </div>
           {policyUpdates.length === 0 ? (
-            <div className="px-4 py-4 text-xs text-gray-500">No policy updates yet.</div>
+            <div className="px-4 py-4 text-xs text-muted">No policy updates yet.</div>
           ) : (
-            <div className="divide-y divide-gray-100">
+            <div className="divide-y divide-outline-variant">
               {policyUpdates.map((event, index) => (
-                <div key={event.id ?? `policy-update-${index}`} className="px-4 py-3 text-xs text-gray-700">
+                <div key={event.id ?? `policy-update-${index}`} className="px-4 py-3 text-xs text-on-surface-variant">
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                    <span className="font-medium text-gray-900">{event.actor?.name ?? event.actor?.email ?? 'Admin'}</span>
-                    <span className="text-gray-500">{event.createdAt ? event.createdAt.toISOString().replace('T', ' ').slice(0, 16) : 'Unknown time'}</span>
+                    <span className="font-medium text-on-surface">{event.actor?.name ?? event.actor?.email ?? 'Admin'}</span>
+                    <span className="text-muted">{event.createdAt ? event.createdAt.toISOString().replace('T', ' ').slice(0, 16) : 'Unknown time'}</span>
                   </div>
-                  <pre className="mt-2 overflow-x-auto rounded bg-gray-50 p-2 text-[11px] text-gray-600">{JSON.stringify(event.payload, null, 2)}</pre>
+                  <pre className="mt-2 overflow-x-auto rounded bg-surface-container-low p-2 text-[11px] text-on-surface-variant">{JSON.stringify(event.payload, null, 2)}</pre>
                 </div>
               ))}
             </div>
@@ -202,41 +202,41 @@ export default async function AdminInterventionsPage() {
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 mb-6">
-          <div className="rounded-xl border border-gray-200 bg-white p-4">
-            <div className="text-xs text-gray-500">Route recommendations (7d)</div>
-            <div className="mt-2 text-sm text-gray-700">A: {routeSummary.routeA} · B: {routeSummary.routeB} · C: {routeSummary.routeC}</div>
+          <div className="anx-card rounded-xl p-4">
+            <div className="text-xs text-muted">Route recommendations (7d)</div>
+            <div className="mt-2 text-sm text-on-surface-variant">A: {routeSummary.routeA} · B: {routeSummary.routeB} · C: {routeSummary.routeC}</div>
           </div>
-          <div className="rounded-xl border border-gray-200 bg-white p-4">
-            <div className="text-xs text-gray-500">Secure fast-pass (7d)</div>
+          <div className="anx-card rounded-xl p-4">
+            <div className="text-xs text-muted">Secure fast-pass (7d)</div>
             <div className="mt-2 text-2xl font-semibold text-emerald-600">{routeSummary.secureFastPass}</div>
           </div>
-          <div className="rounded-xl border border-gray-200 bg-white p-4">
-            <div className="text-xs text-gray-500">Shadow pairs (7d)</div>
-            <div className="mt-2 text-sm text-gray-700">Passed: {routeSummary.shadowPairPassed} · Failed: {routeSummary.shadowPairFailed}</div>
+          <div className="anx-card rounded-xl p-4">
+            <div className="text-xs text-muted">Shadow pairs (7d)</div>
+            <div className="mt-2 text-sm text-on-surface-variant">Passed: {routeSummary.shadowPairPassed} · Failed: {routeSummary.shadowPairFailed}</div>
           </div>
-          <div className="rounded-xl border border-gray-200 bg-white p-4">
-            <div className="text-xs text-gray-500">Interventions flagged (7d)</div>
+          <div className="anx-card rounded-xl p-4">
+            <div className="text-xs text-muted">Interventions flagged (7d)</div>
             <div className="mt-2 text-2xl font-semibold text-rose-600">{routeSummary.interventionFlagged}</div>
           </div>
         </div>
 
-        <div className="mb-6 rounded-xl border border-indigo-200 bg-white overflow-hidden">
-          <div className="border-b border-indigo-100 bg-indigo-50 px-4 py-3">
-            <h2 className="text-sm font-semibold text-indigo-900">Teacher Exceptions · Reteach Escalations (7d)</h2>
-            <p className="mt-1 text-xs text-indigo-700">Only students who did not recover through automated reteach loops appear here.</p>
+        <div className="anx-card mb-6 overflow-hidden rounded-xl">
+          <div className="border-b border-outline-variant bg-accentSurface px-4 py-3">
+            <h2 className="text-sm font-semibold text-on-surface">Teacher Exceptions · Reteach Escalations (7d)</h2>
+            <p className="mt-1 text-xs text-on-surface-variant">Only students who did not recover through automated reteach loops appear here.</p>
           </div>
           {reteachExceptions.length === 0 ? (
-            <div className="px-4 py-6 text-sm text-gray-500">No reteach escalations in the last 7 days.</div>
+            <div className="px-4 py-6 text-sm text-muted">No reteach escalations in the last 7 days.</div>
           ) : (
-            <div className="divide-y divide-gray-100">
+            <div className="divide-y divide-outline-variant">
               {reteachExceptions.map((ex) => (
                 <div key={ex.id} className="px-4 py-3">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div>
-                      <p className="text-sm font-semibold text-gray-900">
-                        {ex.studentName} <span className="text-gray-500">({ex.studentEmail})</span>
+                      <p className="text-sm font-semibold text-on-surface">
+                        {ex.studentName} <span className="text-muted">({ex.studentEmail})</span>
                       </p>
-                      <p className="text-xs text-gray-600">
+                      <p className="text-xs text-on-surface-variant">
                         {ex.subjectTitle} · {ex.skillCode} {ex.skillName} · {ex.strand}
                       </p>
                     </div>
@@ -244,15 +244,15 @@ export default async function AdminInterventionsPage() {
                       Escalated
                     </span>
                   </div>
-                  <div className="mt-2 grid gap-2 text-xs text-gray-700 sm:grid-cols-2 lg:grid-cols-4">
+                  <div className="mt-2 grid gap-2 text-xs text-on-surface-variant sm:grid-cols-2 lg:grid-cols-4">
                     <p>Attempts in loop: <span className="font-semibold">{ex.attemptCount}</span></p>
                     <p>Consecutive independent correct: <span className="font-semibold">{ex.checks?.consecutiveIndependentCorrect ?? 0}</span></p>
                     <p>Independent rate: <span className="font-semibold">{typeof ex.checks?.independentCorrectRate === 'number' ? `${Math.round(ex.checks.independentCorrectRate * 100)}%` : '—'}</span></p>
                     <p>Delayed retrieval: <span className="font-semibold">{ex.checks?.delayedRetrievalOk ? 'OK' : 'Not met'}</span></p>
                   </div>
-                  <p className="mt-2 text-xs text-gray-600">Reason: {ex.reason}</p>
-                  {ex.reasonCode && <p className="mt-1 text-xs text-gray-500">Decision code: {ex.reasonCode}</p>}
-                  <p className="mt-1 text-xs text-indigo-700">
+                  <p className="mt-2 text-xs text-on-surface-variant">Reason: {ex.reason}</p>
+                  {ex.reasonCode && <p className="mt-1 text-xs text-muted">Decision code: {ex.reasonCode}</p>}
+                  <p className="mt-1 text-xs text-primary">
                     Suggested teacher action:{' '}
                     {ex.suggestedActions.length > 0
                       ? ex.suggestedActions.join(' · ')
@@ -265,34 +265,34 @@ export default async function AdminInterventionsPage() {
         </div>
 
         {flagsWithStats.length === 0 ? (
-          <div className="text-center py-16 text-gray-400">No active intervention flags.</div>
+          <div className="text-center py-16 text-on-surface-variant">No active intervention flags.</div>
         ) : (
-          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+          <div className="anx-card rounded-xl overflow-hidden">
             <table className="w-full text-sm">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-surface-container-low border-b border-outline-variant">
                 <tr>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">Student</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">Skill</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">Strand</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">Mastery</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">Attempts (7d)</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">Recommended Action</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">Action</th>
+                  <th className="text-left px-4 py-3 font-medium text-on-surface-variant">Student</th>
+                  <th className="text-left px-4 py-3 font-medium text-on-surface-variant">Skill</th>
+                  <th className="text-left px-4 py-3 font-medium text-on-surface-variant">Strand</th>
+                  <th className="text-left px-4 py-3 font-medium text-on-surface-variant">Mastery</th>
+                  <th className="text-left px-4 py-3 font-medium text-on-surface-variant">Attempts (7d)</th>
+                  <th className="text-left px-4 py-3 font-medium text-on-surface-variant">Recommended Action</th>
+                  <th className="text-left px-4 py-3 font-medium text-on-surface-variant">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-outline-variant">
                 {flagsWithStats.map((flag) => (
-                  <tr key={flag.id} className="hover:bg-gray-50">
+                  <tr key={flag.id} className="hover:bg-surface-container-low">
                     <td className="px-4 py-3">
                       <div>{flag.user.name ?? '—'}</div>
-                      <div className="text-xs text-gray-400">{flag.user.email}</div>
+                      <div className="text-xs text-on-surface-variant">{flag.user.email}</div>
                     </td>
                     <td className="px-4 py-3">
-                      <div className="font-mono text-xs text-gray-500">{flag.skill.code}</div>
-                      <div className="text-gray-700">{flag.skill.name}</div>
+                      <div className="font-mono text-xs text-muted">{flag.skill.code}</div>
+                      <div className="text-on-surface-variant">{flag.skill.name}</div>
                     </td>
                     <td className="px-4 py-3">
-                      <span className="px-2 py-0.5 bg-gray-100 rounded text-xs">{flag.skill.strand}</span>
+                      <span className="px-2 py-0.5 bg-surface-container-high rounded text-xs">{flag.skill.strand}</span>
                     </td>
                     <td className="px-4 py-3">
                       <span className="text-red-600 font-semibold">
@@ -300,7 +300,7 @@ export default async function AdminInterventionsPage() {
                       </span>
                     </td>
                     <td className="px-4 py-3 text-center">{flag.recentAttempts}</td>
-                    <td className="px-4 py-3 text-gray-500 text-xs">
+                    <td className="px-4 py-3 text-muted text-xs">
                       Consider 1:1 support or worked examples for {flag.skill.name}
                     </td>
                     <td className="px-4 py-3">

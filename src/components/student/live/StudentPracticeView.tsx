@@ -129,7 +129,7 @@ export function StudentPracticeView({
 
       {/* ── Main grid ───────────────────────────────────────────────────── */}
       <main className="mx-auto grid w-full max-w-6xl flex-1 grid-cols-1 gap-6 px-4 py-6 sm:px-6 lg:grid-cols-[minmax(0,1fr),320px]">
-        <section className="relative anx-card flex flex-col gap-5 p-6 sm:p-8">
+        <section className="anx-card relative flex flex-col gap-5 p-6 sm:p-8">
           {busy ? <div className="student-live-busy-overlay" aria-hidden /> : null}
           <div className="flex items-center gap-2">
             <span

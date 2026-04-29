@@ -62,7 +62,7 @@ function renderEnglishVisual(visual: EnglishVisual, key: number): ReactNode {
                 {node.text}
               </span>
               {i < visual.nodes.length - 1 && (
-                <span className="self-stretch ml-4 text-gray-400 text-xs">↓</span>
+                <span className="self-stretch ml-4 text-on-surface-variant text-xs">↓</span>
               )}
             </div>
           ))}
@@ -127,7 +127,7 @@ function renderEnglishVisual(visual: EnglishVisual, key: number): ReactNode {
 
     case 'vocab_breakdown':
       return (
-        <div key={key} className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 space-y-2">
+        <div key={key} className="rounded-lg border border-outline-variant bg-surface-container-low px-4 py-3 space-y-2">
           <div className="flex items-baseline gap-2">
             <span className="text-xl font-bold" style={{ color: 'var(--anx-text)' }}>{visual.word}</span>
           </div>
@@ -232,8 +232,8 @@ function EnglishAnimationPlayer({ schema }: { schema: EnglishAnimationSchema }) 
   if (!current) return null;
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white overflow-hidden">
-      <div className="flex items-center justify-between border-b border-gray-100 px-4 py-2 text-xs" style={{ color: 'var(--anx-text-muted)' }}>
+    <div className="anx-card rounded-lg overflow-hidden">
+      <div className="flex items-center justify-between border-b border-outline-variant px-4 py-2 text-xs" style={{ color: 'var(--anx-text-muted)' }}>
         <span>{schema.skillName}</span>
         <span>
           {step + 1} / {schema.steps.length}
@@ -244,15 +244,15 @@ function EnglishAnimationPlayer({ schema }: { schema: EnglishAnimationSchema }) 
         {current.visuals.map((v, i) => renderEnglishVisual(v, i))}
       </div>
 
-      <div className="border-t border-gray-100 bg-gray-50 px-5 py-3">
+      <div className="border-t border-outline-variant bg-surface-container-low px-5 py-3">
         <p className="text-sm italic" style={{ color: 'var(--anx-text-muted)' }}>{current.narration}</p>
       </div>
 
-      <div className="flex items-center justify-between border-t border-gray-100 px-4 py-3">
+      <div className="flex items-center justify-between border-t border-outline-variant px-4 py-3">
         <button
           onClick={() => setStep((s) => Math.max(s - 1, 0))}
           disabled={step === 0}
-          className="rounded px-3 py-1.5 text-sm font-medium hover:bg-gray-100 disabled:opacity-30"
+          className="rounded px-3 py-1.5 text-sm font-medium hover:bg-surface-container-high disabled:opacity-30"
           style={{ color: 'var(--anx-text)' }}
         >
           ← Prev
@@ -273,7 +273,7 @@ function EnglishAnimationPlayer({ schema }: { schema: EnglishAnimationSchema }) 
             )
           }
           disabled={isLast && !schema.loopable}
-          className="rounded px-3 py-1.5 text-sm font-medium hover:bg-gray-100 disabled:opacity-30"
+          className="rounded px-3 py-1.5 text-sm font-medium hover:bg-surface-container-high disabled:opacity-30"
           style={{ color: 'var(--anx-text)' }}
         >
           Next →
@@ -360,7 +360,7 @@ function AnnotationPlayer({ data }: { data: AnnotationData }) {
         ref={canvasRef}
         width={600}
         height={300}
-        className="w-full rounded-lg border border-gray-200"
+        className="w-full rounded-lg border border-outline-variant"
       />
       <button
         type="button"
@@ -400,7 +400,7 @@ function renderBlock(block: ExplanationBlock): ReactNode {
       return (
         <figure className="my-2">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={src} alt={caption ?? ''} className="rounded-lg max-w-full border border-gray-200" />
+          <img src={src} alt={caption ?? ''} className="rounded-lg max-w-full border border-outline-variant" />
           {caption && (
             <figcaption className="mt-1 text-center text-xs" style={{ color: 'var(--anx-text-muted)' }}>
               {caption}
@@ -439,7 +439,7 @@ function renderBlock(block: ExplanationBlock): ReactNode {
         // plain text
       }
       return (
-        <blockquote className="border-l-4 border-gray-300 pl-4 py-1 italic text-base" style={{ color: 'var(--anx-text)' }}>
+        <blockquote className="border-l-4 border-outline pl-4 py-1 italic text-base" style={{ color: 'var(--anx-text)' }}>
           <p>"{quote}"</p>
           {source && (
             <footer className="mt-1 text-xs not-italic" style={{ color: 'var(--anx-text-muted)' }}>

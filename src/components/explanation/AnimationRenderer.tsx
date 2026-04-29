@@ -50,7 +50,7 @@ const highlightColors: Record<string, string> = {
   accent: 'text-orange-600 font-bold',
   blue: 'text-blue-600',
   green: 'text-green-600',
-  dim: 'text-gray-400',
+  dim: 'text-on-surface-variant',
 };
 
 function renderVisual(visual: VisualPrimitive, key: number) {
@@ -134,7 +134,7 @@ function renderVisual(visual: VisualPrimitive, key: number) {
               ))
             )}
           </svg>
-          {visual.label && <p className="text-sm text-gray-600 mt-2">{visual.label}</p>}
+          {visual.label && <p className="text-sm text-on-surface-variant mt-2">{visual.label}</p>}
         </div>
       );
     }
@@ -148,7 +148,7 @@ function renderVisual(visual: VisualPrimitive, key: number) {
             <rect x={1} y={1} width={barWidth} height={30} fill="white" stroke="#e8e3db" strokeWidth={1} />
             <rect x={1} y={1} width={filled} height={30} fill="#e8f0fd" stroke="#1a56d4" strokeWidth={1} />
           </svg>
-          <div className="flex gap-4 mt-2 text-sm text-gray-700">
+          <div className="flex gap-4 mt-2 text-sm text-on-surface-variant">
             <span>{visual.numerator}/{visual.denominator}</span>
             {visual.showDecimal && <span>= {(visual.numerator / visual.denominator).toFixed(2)}</span>}
             {visual.showPercent && <span>= {((visual.numerator / visual.denominator) * 100).toFixed(0)}%</span>}
@@ -223,9 +223,9 @@ export function AnimationRenderer({ schema, currentStep: controlledStep, onStepC
   if (!step) return null;
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white">
+    <div className="anx-card rounded-lg">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-gray-100 px-4 py-2 text-sm text-gray-500">
+      <div className="flex items-center justify-between border-b border-outline-variant px-4 py-2 text-sm text-muted">
         <span>{schema.skillName} — Route {schema.routeType} ({schema.routeLabel})</span>
         <span>Step {currentStep + 1} / {schema.steps.length}</span>
       </div>
@@ -236,20 +236,20 @@ export function AnimationRenderer({ schema, currentStep: controlledStep, onStepC
       </div>
 
       {/* Narration */}
-      <div className="border-t border-gray-100 bg-gray-50 px-6 py-3">
+      <div className="border-t border-outline-variant bg-surface-container-low px-6 py-3">
         <div className="flex items-start gap-2">
           {isSpeaking && <span className="text-indigo-500 animate-pulse">🔊</span>}
-          <p className="text-sm text-gray-700 italic">{step.narration}</p>
+          <p className="text-sm text-on-surface-variant italic">{step.narration}</p>
         </div>
       </div>
 
       {/* Controls — hidden in student-controlled mode (teacher advances steps) */}
       {(!isControlled || onStepChange) && (
-        <div className="flex items-center justify-between border-t border-gray-100 px-4 py-3">
+        <div className="flex items-center justify-between border-t border-outline-variant px-4 py-3">
           <button
             onClick={goPrev}
             disabled={isFirst}
-            className="rounded px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-100 disabled:opacity-30"
+            className="rounded px-3 py-1.5 text-sm font-medium text-on-surface-variant hover:bg-surface-container-high disabled:opacity-30"
           >
             ← Prev
           </button>
@@ -265,7 +265,7 @@ export function AnimationRenderer({ schema, currentStep: controlledStep, onStepC
           <button
             onClick={goNext}
             disabled={isLast && !schema.loopable}
-            className="rounded px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-100 disabled:opacity-30"
+            className="rounded px-3 py-1.5 text-sm font-medium text-on-surface-variant hover:bg-surface-container-high disabled:opacity-30"
           >
             Next →
           </button>

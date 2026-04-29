@@ -33,7 +33,7 @@ export function ExplanationRecommender({ recommendedExplanation }: Props) {
     );
   }
 
-  const badgeClass = routeTypeBadge[recommendedExplanation.routeType] ?? 'bg-gray-100 text-gray-800';
+  const badgeClass = routeTypeBadge[recommendedExplanation.routeType] ?? 'bg-surface-container-high text-on-surface';
 
   return (
     <div className="anx-card p-4">
@@ -42,7 +42,7 @@ export function ExplanationRecommender({ recommendedExplanation }: Props) {
           <span className={`inline-block rounded px-2 py-0.5 text-xs font-semibold ${badgeClass}`}>
             {recommendedExplanation.routeType.replace(/_/g, ' ')}
           </span>
-          <span className="ml-2 text-xs text-gray-400">DLE: {recommendedExplanation.dle.toFixed(3)}</span>
+          <span className="ml-2 text-xs text-on-surface-variant">DLE: {recommendedExplanation.dle.toFixed(3)}</span>
         </div>
         {!delivered && (
           <button
@@ -59,12 +59,12 @@ export function ExplanationRecommender({ recommendedExplanation }: Props) {
       <p className="mb-2 text-sm text-[color:var(--anx-text-secondary)]">{recommendedExplanation.misconceptionSummary}</p>
       <button
         onClick={() => setExampleOpen(!exampleOpen)}
-        className="text-xs text-blue-600 hover:underline"
+        className="text-xs text-primary hover:underline"
       >
         {exampleOpen ? 'Hide worked example ▲' : 'Show worked example ▼'}
       </button>
       {exampleOpen && (
-        <div className="mt-2 rounded bg-gray-50 p-3 text-sm text-[color:var(--anx-text-secondary)] whitespace-pre-wrap">
+        <div className="mt-2 rounded bg-surface-container-low p-3 text-sm text-[color:var(--anx-text-secondary)] whitespace-pre-wrap">
           {recommendedExplanation.workedExample}
         </div>
       )}

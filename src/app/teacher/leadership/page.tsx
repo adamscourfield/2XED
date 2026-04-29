@@ -460,6 +460,7 @@ export default async function LeadershipDashboardPage({ searchParams }: Props) {
                       <p className="text-sm text-[color:var(--anx-text-muted)]">No classrooms for this subject.</p>
                     )}
                   </div>
+                  </div>
                 </section>
               ))}
 

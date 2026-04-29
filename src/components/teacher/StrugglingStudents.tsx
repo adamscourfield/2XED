@@ -89,22 +89,22 @@ export function StrugglingStudents({ participants, sessionAttempts = [], skills 
   return (
     <div className="anx-card overflow-hidden">
       <table className="min-w-full text-sm">
-        <thead className="bg-gray-50">
+        <thead className="bg-surface-container-low">
           <tr>
-            <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">Student</th>
-            <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">Skill gap</th>
-            <th className="px-4 py-2 text-center text-xs font-semibold text-gray-600">Attempts</th>
-            <th className="px-4 py-2 text-center text-xs font-semibold text-gray-600">Accuracy</th>
-            <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">Reason</th>
+            <th className="px-4 py-2 text-left text-xs font-semibold text-on-surface-variant">Student</th>
+            <th className="px-4 py-2 text-left text-xs font-semibold text-on-surface-variant">Skill gap</th>
+            <th className="px-4 py-2 text-center text-xs font-semibold text-on-surface-variant">Attempts</th>
+            <th className="px-4 py-2 text-center text-xs font-semibold text-on-surface-variant">Accuracy</th>
+            <th className="px-4 py-2 text-left text-xs font-semibold text-on-surface-variant">Reason</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-100">
+        <tbody className="divide-y divide-outline-variant">
           {struggling.map((s) => (
             <tr key={s.studentId} className="hover:bg-red-50">
-              <td className="px-4 py-2 font-medium text-gray-800">{s.name}</td>
-              <td className="px-4 py-2 text-gray-600">{s.skillGap}</td>
-              <td className="px-4 py-2 text-center text-gray-600">{s.attempts}</td>
-              <td className="px-4 py-2 text-center text-gray-600">
+              <td className="px-4 py-2 font-medium text-on-surface">{s.name}</td>
+              <td className="px-4 py-2 text-on-surface-variant">{s.skillGap}</td>
+              <td className="px-4 py-2 text-center text-on-surface-variant">{s.attempts}</td>
+              <td className="px-4 py-2 text-center text-on-surface-variant">
                 {s.attempts > 0 ? `${Math.round(s.accuracy * 100)}%` : '—'}
               </td>
               <td className="px-4 py-2 text-red-600">{s.reason}</td>

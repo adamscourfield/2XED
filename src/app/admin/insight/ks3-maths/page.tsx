@@ -186,80 +186,80 @@ export default async function InsightDashboardPage() {
     <main className="anx-shell">
       <div className="mx-auto w-full max-w-5xl space-y-10">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-gray-900">Insight Dashboard — Maths</h1>
+          <h1 className="text-2xl font-bold text-on-surface">Insight Dashboard — Maths</h1>
           <div className="flex items-center gap-4 text-sm">
-            <a href="/admin/content/ks3-maths" className="text-blue-600 hover:underline">
+            <a href="/admin/content/ks3-maths" className="text-primary hover:underline">
               → Content Verification
             </a>
-            <a href="/admin/interventions" className="text-blue-600 hover:underline">
+            <a href="/admin/interventions" className="text-primary hover:underline">
               → Interventions
             </a>
           </div>
         </div>
 
         <section>
-          <h2 className="text-lg font-semibold text-gray-800 mb-3">Snapshot — Engagement & Route Quality</h2>
+          <h2 className="text-lg font-semibold text-on-surface mb-3">Snapshot — Engagement & Route Quality</h2>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <div className="rounded-xl border border-gray-200 bg-white p-4">
-              <p className="text-xs text-gray-500">Unique learners</p>
-              <p className="mt-1 text-2xl font-semibold text-gray-900">{uniqueLearners}</p>
+            <div className="anx-card rounded-xl p-4">
+              <p className="text-xs text-muted">Unique learners</p>
+              <p className="mt-1 text-2xl font-semibold text-on-surface">{uniqueLearners}</p>
             </div>
-            <div className="rounded-xl border border-gray-200 bg-white p-4">
-              <p className="text-xs text-gray-500">Question events</p>
-              <p className="mt-1 text-2xl font-semibold text-gray-900">{engagementEvents.length}</p>
+            <div className="anx-card rounded-xl p-4">
+              <p className="text-xs text-muted">Question events</p>
+              <p className="mt-1 text-2xl font-semibold text-on-surface">{engagementEvents.length}</p>
             </div>
-            <div className="rounded-xl border border-gray-200 bg-white p-4">
-              <p className="text-xs text-gray-500">Avg questions / learner</p>
-              <p className="mt-1 text-2xl font-semibold text-gray-900">{avgQuestionsPerLearner}</p>
+            <div className="anx-card rounded-xl p-4">
+              <p className="text-xs text-muted">Avg questions / learner</p>
+              <p className="mt-1 text-2xl font-semibold text-on-surface">{avgQuestionsPerLearner}</p>
             </div>
-            <div className="rounded-xl border border-gray-200 bg-white p-4">
-              <p className="text-xs text-gray-500">Strong routes (≥80%)</p>
-              <p className="mt-1 text-2xl font-semibold text-gray-900">
+            <div className="anx-card rounded-xl p-4">
+              <p className="text-xs text-muted">Strong routes (≥80%)</p>
+              <p className="mt-1 text-2xl font-semibold text-on-surface">
                 {routeStats.count > 0 ? `${Math.round((routeStats.strongRoutes / routeStats.count) * 100)}%` : '—'}
               </p>
             </div>
           </div>
-          <p className="mt-2 text-xs text-gray-500">
+          <p className="mt-2 text-xs text-muted">
             Active days observed: {activeDays} · Avg route accuracy:{' '}
             {routeStats.count > 0 ? `${Math.round((routeStats.sumAccuracy / routeStats.count) * 100)}%` : '—'}
           </p>
         </section>
 
         <section>
-          <h2 className="text-lg font-semibold text-gray-800 mb-3">Route Effectiveness (A/B/C) + Shadow Validation</h2>
+          <h2 className="text-lg font-semibold text-on-surface mb-3">Route Effectiveness (A/B/C) + Shadow Validation</h2>
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-            <div className="rounded-xl border border-gray-200 bg-white p-4">
-              <p className="mb-3 text-sm font-medium text-gray-700">Average Accuracy by Route</p>
+            <div className="anx-card rounded-xl p-4">
+              <p className="mb-3 text-sm font-medium text-on-surface-variant">Average Accuracy by Route</p>
               <div className="space-y-2 text-sm">
                 {(['A', 'B', 'C'] as const).map((route) => {
                   const row = routeStats.byRoute[route];
                   const avg = row.count > 0 ? Math.round((row.sumAccuracy / row.count) * 100) : null;
                   return (
-                    <div key={route} className="flex items-center justify-between rounded-md border border-gray-100 px-3 py-2">
+                    <div key={route} className="flex items-center justify-between rounded-md border border-outline-variant px-3 py-2">
                       <span className="font-mono text-xs">Route {route}</span>
-                      <span className="text-gray-700">{row.count > 0 ? `${avg}% (${row.count})` : '—'}</span>
+                      <span className="text-on-surface-variant">{row.count > 0 ? `${avg}% (${row.count})` : '—'}</span>
                     </div>
                   );
                 })}
               </div>
             </div>
-            <div className="rounded-xl border border-gray-200 bg-white p-4">
-              <p className="mb-3 text-sm font-medium text-gray-700">Shadow Pair Pass Rate</p>
-              <p className="text-2xl font-semibold text-gray-900">
+            <div className="anx-card rounded-xl p-4">
+              <p className="mb-3 text-sm font-medium text-on-surface-variant">Shadow Pair Pass Rate</p>
+              <p className="text-2xl font-semibold text-on-surface">
                 {shadowTotal > 0 ? `${Math.round((shadowPassed / shadowTotal) * 100)}%` : '—'}
               </p>
-              <p className="mt-1 text-xs text-gray-500">
+              <p className="mt-1 text-xs text-muted">
                 Passed: {shadowPassed} · Failed: {shadowFailed}
               </p>
             </div>
-            <div className="rounded-xl border border-gray-200 bg-white p-4">
-              <p className="mb-3 text-sm font-medium text-gray-700">Route Assignment Sources</p>
-              <div className="space-y-2 text-xs text-gray-600">
+            <div className="anx-card rounded-xl p-4">
+              <p className="mb-3 text-sm font-medium text-on-surface-variant">Route Assignment Sources</p>
+              <div className="space-y-2 text-xs text-on-surface-variant">
                 <div>Diagnostic signals: {assignmentStats.bySource.diagnostic_signals}</div>
                 <div>Fallback chain: {assignmentStats.bySource.fallback_chain}</div>
                 <div>History default: {assignmentStats.bySource.history_default}</div>
               </div>
-              <p className="mt-3 text-xs text-gray-500">
+              <p className="mt-3 text-xs text-muted">
                 Assigned route count — A:{assignmentStats.byRoute.A} · B:{assignmentStats.byRoute.B} · C:{assignmentStats.byRoute.C}
               </p>
             </div>
@@ -267,27 +267,27 @@ export default async function InsightDashboardPage() {
         </section>
 
         <section>
-          <h2 className="text-lg font-semibold text-gray-800 mb-3">Teacher Drilldown — Recent Routing & Rewards</h2>
-          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+          <h2 className="text-lg font-semibold text-on-surface mb-3">Teacher Drilldown — Recent Routing & Rewards</h2>
+          <div className="anx-card rounded-xl overflow-hidden">
             <table className="w-full text-sm">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-surface-container-low border-b border-outline-variant">
                 <tr>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">Time</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">Student</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">Event</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">Detail</th>
+                  <th className="text-left px-4 py-3 font-medium text-on-surface-variant">Time</th>
+                  <th className="text-left px-4 py-3 font-medium text-on-surface-variant">Student</th>
+                  <th className="text-left px-4 py-3 font-medium text-on-surface-variant">Event</th>
+                  <th className="text-left px-4 py-3 font-medium text-on-surface-variant">Detail</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-outline-variant">
                 {recentDrilldownEvents.map((e, idx) => {
                   const user = e.studentUserId ? userMap.get(e.studentUserId) : undefined;
                   const payload = e.payload as { routeType?: string; reason?: string; rewardEvent?: string; xp?: number; tokens?: number };
                   return (
-                    <tr key={`${e.name}-${idx}`} className="hover:bg-gray-50">
-                      <td className="px-4 py-3 text-xs text-gray-500">{e.createdAt.toISOString().replace('T', ' ').slice(0, 16)}</td>
-                      <td className="px-4 py-3 text-xs text-gray-700">{user?.name ?? user?.email ?? e.studentUserId ?? '—'}</td>
+                    <tr key={`${e.name}-${idx}`} className="hover:bg-surface-container-low">
+                      <td className="px-4 py-3 text-xs text-muted">{e.createdAt.toISOString().replace('T', ' ').slice(0, 16)}</td>
+                      <td className="px-4 py-3 text-xs text-on-surface-variant">{user?.name ?? user?.email ?? e.studentUserId ?? '—'}</td>
                       <td className="px-4 py-3 font-mono text-xs">{e.name}</td>
-                      <td className="px-4 py-3 text-xs text-gray-700">
+                      <td className="px-4 py-3 text-xs text-on-surface-variant">
                         {e.name === 'explanation_route_assigned' && `Route ${payload.routeType} · ${payload.reason ?? ''}`}
                         {e.name === 'reward_granted' && `${payload.rewardEvent ?? 'reward'} (+${payload.xp ?? 0} XP, +${payload.tokens ?? 0} tokens)`}
                         {e.name === 'intervention_flagged' && (payload.reason ?? 'Intervention flagged')}
@@ -297,7 +297,7 @@ export default async function InsightDashboardPage() {
                 })}
                 {recentDrilldownEvents.length === 0 && (
                   <tr>
-                    <td colSpan={4} className="px-4 py-8 text-center text-gray-400">No routing/reward events yet.</td>
+                    <td colSpan={4} className="px-4 py-8 text-center text-on-surface-variant">No routing/reward events yet.</td>
                   </tr>
                 )}
               </tbody>
@@ -306,24 +306,24 @@ export default async function InsightDashboardPage() {
         </section>
 
         <section>
-          <h2 className="text-lg font-semibold text-gray-800 mb-3">Reteach Step Hotspots</h2>
-          <p className="mb-2 text-xs text-gray-500">Low-confidence checkpoint signals: {lowConfidenceSignals}</p>
-          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+          <h2 className="text-lg font-semibold text-on-surface mb-3">Reteach Step Hotspots</h2>
+          <p className="mb-2 text-xs text-muted">Low-confidence checkpoint signals: {lowConfidenceSignals}</p>
+          <div className="anx-card rounded-xl overflow-hidden">
             <table className="w-full text-sm">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-surface-container-low border-b border-outline-variant">
                 <tr>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">Route</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">Step</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">Attempts</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">Fails</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">2+ Retry signals</th>
+                  <th className="text-left px-4 py-3 font-medium text-on-surface-variant">Route</th>
+                  <th className="text-left px-4 py-3 font-medium text-on-surface-variant">Step</th>
+                  <th className="text-left px-4 py-3 font-medium text-on-surface-variant">Attempts</th>
+                  <th className="text-left px-4 py-3 font-medium text-on-surface-variant">Fails</th>
+                  <th className="text-left px-4 py-3 font-medium text-on-surface-variant">2+ Retry signals</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-outline-variant">
                 {topStepHotspots.map((row, idx) => (
-                  <tr key={`${row.routeType}-${idx}`} className="hover:bg-gray-50">
+                  <tr key={`${row.routeType}-${idx}`} className="hover:bg-surface-container-low">
                     <td className="px-4 py-3 font-mono text-xs">{row.routeType}</td>
-                    <td className="px-4 py-3 text-xs text-gray-700">{row.stepTitle}</td>
+                    <td className="px-4 py-3 text-xs text-on-surface-variant">{row.stepTitle}</td>
                     <td className="px-4 py-3">{row.attempts}</td>
                     <td className="px-4 py-3 text-rose-600">{row.fails}</td>
                     <td className="px-4 py-3 text-amber-700">{row.retries2Plus}</td>
@@ -331,7 +331,7 @@ export default async function InsightDashboardPage() {
                 ))}
                 {topStepHotspots.length === 0 && (
                   <tr>
-                    <td colSpan={5} className="px-4 py-8 text-center text-gray-400">No step checkpoint data yet.</td>
+                    <td colSpan={5} className="px-4 py-8 text-center text-on-surface-variant">No step checkpoint data yet.</td>
                   </tr>
                 )}
               </tbody>
@@ -341,18 +341,18 @@ export default async function InsightDashboardPage() {
 
         {/* A) Coverage by strand */}
         <section>
-          <h2 className="text-lg font-semibold text-gray-800 mb-3">A) Coverage &amp; Progress by Strand</h2>
-          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+          <h2 className="text-lg font-semibold text-on-surface mb-3">A) Coverage &amp; Progress by Strand</h2>
+          <div className="anx-card rounded-xl overflow-hidden">
             <table className="w-full text-sm">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-surface-container-low border-b border-outline-variant">
                 <tr>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">Strand</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">Avg Mastery</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">% Stable (confirmedCount ≥ 2)</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">Total Entries</th>
+                  <th className="text-left px-4 py-3 font-medium text-on-surface-variant">Strand</th>
+                  <th className="text-left px-4 py-3 font-medium text-on-surface-variant">Avg Mastery</th>
+                  <th className="text-left px-4 py-3 font-medium text-on-surface-variant">% Stable (confirmedCount ≥ 2)</th>
+                  <th className="text-left px-4 py-3 font-medium text-on-surface-variant">Total Entries</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-outline-variant">
                 {strandEntries.map(([strand, data]) => {
                   const avgMastery = data.masteries.length > 0
                     ? data.masteries.reduce((s, v) => s + v, 0) / data.masteries.length
@@ -361,17 +361,17 @@ export default async function InsightDashboardPage() {
                     ? Math.round((data.stableStudents / data.totalStudents) * 100)
                     : 0;
                   return (
-                    <tr key={strand} className="hover:bg-gray-50">
-                      <td className="px-4 py-3 font-mono text-xs font-semibold text-gray-700">{strand}</td>
+                    <tr key={strand} className="hover:bg-surface-container-low">
+                      <td className="px-4 py-3 font-mono text-xs font-semibold text-on-surface-variant">{strand}</td>
                       <td className="px-4 py-3">{Math.round(avgMastery * 100)}%</td>
                       <td className="px-4 py-3">{stablePct}%</td>
-                      <td className="px-4 py-3 text-gray-400">{data.totalStudents}</td>
+                      <td className="px-4 py-3 text-on-surface-variant">{data.totalStudents}</td>
                     </tr>
                   );
                 })}
                 {strandEntries.length === 0 && (
                   <tr>
-                    <td colSpan={4} className="px-4 py-8 text-center text-gray-400">No mastery data yet.</td>
+                    <td colSpan={4} className="px-4 py-8 text-center text-on-surface-variant">No mastery data yet.</td>
                   </tr>
                 )}
               </tbody>
@@ -381,23 +381,23 @@ export default async function InsightDashboardPage() {
 
         {/* B) Review success by bucket */}
         <section>
-          <h2 className="text-lg font-semibold text-gray-800 mb-3">B) Retention Proxy — Review Success Rate</h2>
-          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+          <h2 className="text-lg font-semibold text-on-surface mb-3">B) Retention Proxy — Review Success Rate</h2>
+          <div className="anx-card rounded-xl overflow-hidden">
             <table className="w-full text-sm">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-surface-container-low border-b border-outline-variant">
                 <tr>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">Interval Bucket</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">Pass</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">Fail</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">Success Rate</th>
+                  <th className="text-left px-4 py-3 font-medium text-on-surface-variant">Interval Bucket</th>
+                  <th className="text-left px-4 py-3 font-medium text-on-surface-variant">Pass</th>
+                  <th className="text-left px-4 py-3 font-medium text-on-surface-variant">Fail</th>
+                  <th className="text-left px-4 py-3 font-medium text-on-surface-variant">Success Rate</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-outline-variant">
                 {Object.entries(buckets).map(([bucket, counts]) => {
                   const total = counts.pass + counts.fail;
                   const rate = total > 0 ? Math.round((counts.pass / total) * 100) : 0;
                   return (
-                    <tr key={bucket} className="hover:bg-gray-50">
+                    <tr key={bucket} className="hover:bg-surface-container-low">
                       <td className="px-4 py-3 font-mono text-xs">{bucket}</td>
                       <td className="px-4 py-3 text-green-600">{counts.pass}</td>
                       <td className="px-4 py-3 text-red-500">{counts.fail}</td>
@@ -412,15 +412,15 @@ export default async function InsightDashboardPage() {
 
         {/* C) Time to stable mastery */}
         <section>
-          <h2 className="text-lg font-semibold text-gray-800 mb-3">C) Time to Stable Mastery</h2>
-          <div className="bg-white rounded-xl border border-gray-200 p-4">
-            <p className="text-gray-700">
+          <h2 className="text-lg font-semibold text-on-surface mb-3">C) Time to Stable Mastery</h2>
+          <div className="anx-card rounded-xl p-4">
+            <p className="text-on-surface-variant">
               Median days from first attempt to stable mastery (confirmedCount ≥ 2):{' '}
               <span className="font-bold">
                 {stableSkillMasteries.length > 0 ? `${medianDays.toFixed(1)} days` : 'No data yet'}
               </span>
             </p>
-            <p className="text-xs text-gray-400 mt-1">
+            <p className="text-xs text-on-surface-variant mt-1">
               Based on {stableSkillMasteries.length} stable skill mastery entr{stableSkillMasteries.length !== 1 ? 'ies' : 'y'}.
             </p>
           </div>
@@ -428,36 +428,36 @@ export default async function InsightDashboardPage() {
 
         {/* D) Fragile skills */}
         <section>
-          <h2 className="text-lg font-semibold text-gray-800 mb-3">D) Top Fragile Skills (mastery &lt; 60%)</h2>
-          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+          <h2 className="text-lg font-semibold text-on-surface mb-3">D) Top Fragile Skills (mastery &lt; 60%)</h2>
+          <div className="anx-card rounded-xl overflow-hidden">
             <table className="w-full text-sm">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-surface-container-low border-b border-outline-variant">
                 <tr>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">Skill</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">Strand</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">% Students Fragile</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">Total Students</th>
+                  <th className="text-left px-4 py-3 font-medium text-on-surface-variant">Skill</th>
+                  <th className="text-left px-4 py-3 font-medium text-on-surface-variant">Strand</th>
+                  <th className="text-left px-4 py-3 font-medium text-on-surface-variant">% Students Fragile</th>
+                  <th className="text-left px-4 py-3 font-medium text-on-surface-variant">Total Students</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-outline-variant">
                 {fragileSkills.map(({ skill, fragileShare }) => (
-                  <tr key={skill.id} className="hover:bg-gray-50">
+                  <tr key={skill.id} className="hover:bg-surface-container-low">
                     <td className="px-4 py-3">
-                      <span className="font-mono text-xs text-gray-400">{skill.code}</span>{' '}
+                      <span className="font-mono text-xs text-on-surface-variant">{skill.code}</span>{' '}
                       {skill.name}
                     </td>
                     <td className="px-4 py-3">
-                      <span className="px-2 py-0.5 bg-gray-100 rounded text-xs">{skill.strand}</span>
+                      <span className="px-2 py-0.5 bg-surface-container-high rounded text-xs">{skill.strand}</span>
                     </td>
                     <td className="px-4 py-3 text-red-600 font-semibold">
                       {Math.round(fragileShare * 100)}%
                     </td>
-                    <td className="px-4 py-3 text-gray-400">{skill.masteries.length}</td>
+                    <td className="px-4 py-3 text-on-surface-variant">{skill.masteries.length}</td>
                   </tr>
                 ))}
                 {fragileSkills.length === 0 && (
                   <tr>
-                    <td colSpan={4} className="px-4 py-8 text-center text-gray-400">No fragile skills detected.</td>
+                    <td colSpan={4} className="px-4 py-8 text-center text-on-surface-variant">No fragile skills detected.</td>
                   </tr>
                 )}
               </tbody>

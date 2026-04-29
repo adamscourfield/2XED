@@ -142,7 +142,7 @@ function SubQuestionView({
               className={`flex cursor-pointer items-center gap-3 rounded-lg border px-4 py-3 text-sm transition-colors ${
                 state.answer === opt
                   ? 'border-indigo-400 bg-indigo-50'
-                  : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                  : 'border-outline-variant hover:border-outline hover:bg-surface-container-low'
               } ${state.result ? 'pointer-events-none' : ''}`}
             >
               <input
@@ -167,7 +167,7 @@ function SubQuestionView({
           disabled={!!state.result}
           rows={4}
           placeholder="Write your answer here…"
-          className="w-full rounded-lg border border-gray-200 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 disabled:bg-gray-50 resize-none"
+          className="w-full rounded-lg border border-outline-variant p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/35 disabled:bg-surface-container-low resize-none"
           style={{ color: 'var(--anx-text)' }}
         />
       )}
@@ -179,7 +179,7 @@ function SubQuestionView({
           onChange={(e) => onStateChange({ answer: e.target.value })}
           disabled={!!state.result}
           placeholder="Enter a number…"
-          className="w-40 rounded-lg border border-gray-200 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 disabled:bg-gray-50"
+          className="w-40 rounded-lg border border-outline-variant p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/35 disabled:bg-surface-container-low"
           style={{ color: 'var(--anx-text)' }}
         />
       )}
@@ -397,11 +397,11 @@ export function QuestionBlock({
             const isOpen = openIndex === i;
             const isDone = !!states[i].result;
             return (
-              <div key={i} className="rounded-lg border border-gray-200 overflow-hidden">
+              <div key={i} className="rounded-lg border border-outline-variant overflow-hidden">
                 <button
                   type="button"
                   onClick={() => setOpenIndex(isOpen ? null : i)}
-                  className="flex w-full items-center justify-between px-4 py-3 text-sm font-medium text-left hover:bg-gray-50 transition-colors"
+                  className="flex w-full items-center justify-between px-4 py-3 text-sm font-medium text-left hover:bg-surface-container-low transition-colors"
                   style={{ color: 'var(--anx-text)' }}
                 >
                   <span>
@@ -421,7 +421,7 @@ export function QuestionBlock({
                   </span>
                 </button>
                 {isOpen && (
-                  <div className="border-t border-gray-100 px-4 py-4">{renderQuestion(i)}</div>
+                  <div className="border-t border-outline-variant px-4 py-4">{renderQuestion(i)}</div>
                 )}
               </div>
             );
