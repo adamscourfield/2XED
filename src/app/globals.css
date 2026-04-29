@@ -310,32 +310,76 @@
     box-shadow: none;
   }
 
-  /* Teacher reports — reference palette + canvas (scoped via wrapper class) */
+  /* Teacher reports — aligned to brand primary + semantic status hues */
   .anx-reports-page {
-    --report-purple: #5e35b1;
-    --report-purple-dark: #4527a0;
-    --report-purple-soft: rgba(94, 53, 177, 0.1);
-    --report-purple-tint: rgba(94, 53, 177, 0.14);
-    --report-purple-line: rgba(94, 53, 177, 0.35);
-    --report-canvas: #eceef1;
-    --report-green: #22c55e;
-    --report-green-dark: #15803d;
-    --report-green-soft: #dcfce7;
-    --report-orange: #ea580c;
-    --report-red: #ef4444;
-    --report-red-soft: #fee2e2;
-    --report-amber-bar: #f97316;
+    --report-purple: var(--anx-primary);
+    --report-purple-dark: var(--anx-primary-hover);
+    --report-purple-soft: var(--anx-primary-soft);
+    --report-purple-tint: rgba(74, 64, 224, 0.09);
+    --report-purple-line: rgba(74, 64, 224, 0.32);
+    --report-canvas: var(--anx-surface-container-low);
+    --report-green: var(--anx-tertiary);
+    --report-green-dark: var(--anx-on-tertiary-container);
+    --report-green-soft: var(--anx-success-soft);
+    --report-orange: var(--anx-warning);
+    --report-red: var(--anx-danger);
+    --report-red-soft: var(--anx-danger-soft);
+    --report-amber-bar: var(--anx-warning);
   }
 
   .anx-reports-card {
     border-radius: var(--anx-radius-lg);
-    background: #ffffff;
+    background: var(--anx-surface-container-lowest);
     box-shadow: var(--anx-shadow-card);
-    border: 1px solid rgba(15, 23, 42, 0.05);
+    border: 1px solid var(--anx-outline-variant);
+    transition:
+      box-shadow 220ms cubic-bezier(0.4, 0, 0.2, 1),
+      border-color 220ms cubic-bezier(0.4, 0, 0.2, 1),
+      transform 220ms cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .anx-reports-card:hover {
-    background: #ffffff;
+    background: var(--anx-surface-container-lowest);
+    box-shadow: var(--anx-shadow-md);
+    border-color: rgba(74, 64, 224, 0.16);
+    transform: translateY(-1px);
+  }
+
+  .anx-reports-card--hero {
+    box-shadow: var(--anx-shadow-md);
+    border-color: rgba(74, 64, 224, 0.12);
+  }
+
+  .anx-reports-card--hero:hover {
+    box-shadow: var(--anx-shadow-lg);
+    border-color: rgba(74, 64, 224, 0.2);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .anx-reports-card:hover {
+      transform: none;
+    }
+  }
+
+  @keyframes anxReportsTabIn {
+    from {
+      opacity: 0.92;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .anx-reports-tab-panel {
+    animation: anxReportsTabIn 220ms cubic-bezier(0.4, 0, 0.2, 1) both;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .anx-reports-tab-panel {
+      animation: none;
+    }
   }
 
   /* Student dashboard — gradient hero (not a tonal .anx-card surface) */

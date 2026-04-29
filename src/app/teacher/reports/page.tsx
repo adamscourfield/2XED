@@ -15,9 +15,14 @@ export default async function TeacherReportsPage() {
   return (
     <LearningPageShell
       title="Reports"
-      titleClassName="text-2xl font-bold tracking-tight text-[#111827] sm:text-3xl"
+      titleClassName="text-2xl font-bold tracking-tight text-on-surface sm:text-3xl"
       subtitle="Understand the impact of your teaching and drive durable learning."
-      subtitleClassName="max-w-2xl text-sm text-[#64748b] sm:text-base"
+      subtitleClassName="max-w-2xl text-sm text-muted sm:text-base"
+      meta={
+        <p className="m-0 text-xs text-muted">
+          Figures reflect your selected cohort and reporting period. Demo preview — live sync coming soon.
+        </p>
+      }
       appChrome="teacher"
       appChromeShowLeadershipNav={showLeadership}
       maxWidthClassName="max-w-[min(100%,1600px)]"
