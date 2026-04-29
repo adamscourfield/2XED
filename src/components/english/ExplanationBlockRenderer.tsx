@@ -49,8 +49,8 @@ function renderEnglishVisual(visual: EnglishVisual, key: number): ReactNode {
               <span
                 className={`rounded px-2 py-0.5 text-xs font-semibold uppercase tracking-wide ${
                   visual.highlightNode === i
-                    ? 'bg-indigo-600 text-white'
-                    : 'bg-indigo-100 text-indigo-800'
+                    ? 'bg-primary text-on-primary'
+                    : 'border border-primary/15 bg-accentSurface text-primary'
                 }`}
               >
                 {node.label}
@@ -62,7 +62,7 @@ function renderEnglishVisual(visual: EnglishVisual, key: number): ReactNode {
                 {node.text}
               </span>
               {i < visual.nodes.length - 1 && (
-                <span className="self-stretch ml-4 text-gray-400 text-xs">↓</span>
+                <span className="self-stretch ml-4 text-on-surface-variant text-xs">↓</span>
               )}
             </div>
           ))}
@@ -91,10 +91,10 @@ function renderEnglishVisual(visual: EnglishVisual, key: number): ReactNode {
 
     case 'peel_reveal': {
       const peelColors: Record<string, string> = {
-        P: 'bg-blue-50 border-blue-300 text-blue-900',
-        E: 'bg-amber-50 border-amber-300 text-amber-900',
-        E2: 'bg-orange-50 border-orange-300 text-orange-900',
-        L: 'bg-green-50 border-green-300 text-green-900',
+        P: 'border-l-4 border-primary bg-accentSurface text-on-surface',
+        E: 'bg-amber-50 border-amber-300 text-amber-900 border-l-4 border-amber-400',
+        E2: 'bg-orange-50 border-orange-300 text-orange-900 border-l-4 border-orange-400',
+        L: 'bg-green-50 border-green-300 text-green-900 border-l-4 border-green-400',
       };
       const peelLabels: Record<string, string> = {
         P: 'Point',
@@ -105,7 +105,7 @@ function renderEnglishVisual(visual: EnglishVisual, key: number): ReactNode {
       return (
         <div key={key} className="space-y-2 py-2">
           {visual.elements.map((el, i) => (
-            <div key={i} className={`rounded-lg border-l-4 px-4 py-3 text-sm ${peelColors[el.role] ?? ''}`}>
+            <div key={i} className={`rounded-lg px-4 py-3 text-sm ${peelColors[el.role] ?? ''}`}>
               <span className="mr-2 text-xs font-bold uppercase tracking-wider opacity-70">
                 {peelLabels[el.role] ?? el.role}
               </span>
@@ -118,30 +118,33 @@ function renderEnglishVisual(visual: EnglishVisual, key: number): ReactNode {
 
     case 'persuasive_highlight':
       return (
-        <div key={key} className="rounded-lg border border-purple-200 bg-purple-50 px-4 py-3 space-y-1">
-          <p className="text-sm font-semibold text-purple-900">{visual.device}</p>
-          <p className="text-sm italic text-purple-800">"{visual.text}"</p>
-          <p className="text-sm text-purple-700">{visual.explanation}</p>
+        <div key={key} className="rounded-lg border border-primary/20 bg-accentSurface px-4 py-3 space-y-1">
+          <p className="text-sm font-semibold text-primary">{visual.device}</p>
+          <p className="text-sm italic text-on-surface">&ldquo;{visual.text}&rdquo;</p>
+          <p className="text-sm text-on-surface-variant">{visual.explanation}</p>
         </div>
       );
 
     case 'vocab_breakdown':
       return (
-        <div key={key} className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 space-y-2">
+        <div key={key} className="rounded-lg border border-outline-variant bg-surface-container-low px-4 py-3 space-y-2">
           <div className="flex items-baseline gap-2">
             <span className="text-xl font-bold" style={{ color: 'var(--anx-text)' }}>{visual.word}</span>
           </div>
           <div className="flex flex-wrap gap-2 text-xs">
             {visual.prefix && (
-              <span className="rounded bg-sky-100 text-sky-800 px-2 py-0.5 font-mono">
+              <span className="rounded bg-warning-soft text-warning px-2 py-0.5 font-mono">
                 prefix: {visual.prefix}
               </span>
             )}
-            <span className="rounded bg-indigo-100 text-indigo-800 px-2 py-0.5 font-mono">
+            <span className="rounded bg-accentSurface px-2 py-0.5 font-mono text-primary">
               root: {visual.root}
             </span>
             {visual.suffix && (
-              <span className="rounded bg-violet-100 text-violet-800 px-2 py-0.5 font-mono">
+              <span
+                className="rounded bg-secondary-container px-2 py-0.5 font-mono"
+                style={{ color: 'var(--anx-on-secondary-container)' }}
+              >
                 suffix: {visual.suffix}
               </span>
             )}
@@ -158,13 +161,13 @@ function renderEnglishVisual(visual: EnglishVisual, key: number): ReactNode {
       return (
         <div key={key} className="py-2 space-y-1">
           {visual.annotationSide === 'above' && (
-            <p className="text-xs italic text-indigo-700">{visual.annotation}</p>
+            <p className="text-xs italic text-primary">{visual.annotation}</p>
           )}
-          <blockquote className="border-l-4 border-indigo-400 pl-4 text-base italic" style={{ color: 'var(--anx-text)' }}>
-            "{visual.quote}"
+          <blockquote className="border-l-4 border-primary pl-4 text-base italic" style={{ color: 'var(--anx-text)' }}>
+            &ldquo;{visual.quote}&rdquo;
           </blockquote>
           {visual.annotationSide === 'below' && (
-            <p className="text-xs italic text-indigo-700">{visual.annotation}</p>
+            <p className="text-xs italic text-primary">{visual.annotation}</p>
           )}
         </div>
       );
@@ -188,9 +191,9 @@ function renderEnglishVisual(visual: EnglishVisual, key: number): ReactNode {
 
     case 'rule_callout':
       return (
-        <div key={key} className="rounded-lg border-2 border-indigo-200 bg-indigo-50 px-5 py-4 text-center my-2">
-          <p className="text-base font-bold text-indigo-900">{visual.ruleText}</p>
-          {visual.subText && <p className="text-sm text-indigo-600 mt-1">{visual.subText}</p>}
+        <div key={key} className="rounded-lg border-2 border-primary bg-accentSurface px-5 py-4 text-center my-2 shadow-md">
+          <p className="text-base font-bold text-primary">{visual.ruleText}</p>
+          {visual.subText && <p className="text-sm text-on-surface-variant mt-1">{visual.subText}</p>}
         </div>
       );
 
@@ -232,8 +235,8 @@ function EnglishAnimationPlayer({ schema }: { schema: EnglishAnimationSchema }) 
   if (!current) return null;
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white overflow-hidden">
-      <div className="flex items-center justify-between border-b border-gray-100 px-4 py-2 text-xs" style={{ color: 'var(--anx-text-muted)' }}>
+    <div className="anx-card rounded-lg overflow-hidden">
+      <div className="flex items-center justify-between border-b border-outline-variant px-4 py-2 text-xs" style={{ color: 'var(--anx-text-muted)' }}>
         <span>{schema.skillName}</span>
         <span>
           {step + 1} / {schema.steps.length}
@@ -244,15 +247,15 @@ function EnglishAnimationPlayer({ schema }: { schema: EnglishAnimationSchema }) 
         {current.visuals.map((v, i) => renderEnglishVisual(v, i))}
       </div>
 
-      <div className="border-t border-gray-100 bg-gray-50 px-5 py-3">
+      <div className="border-t border-outline-variant bg-surface-container-low px-5 py-3">
         <p className="text-sm italic" style={{ color: 'var(--anx-text-muted)' }}>{current.narration}</p>
       </div>
 
-      <div className="flex items-center justify-between border-t border-gray-100 px-4 py-3">
+      <div className="flex items-center justify-between border-t border-outline-variant px-4 py-3">
         <button
           onClick={() => setStep((s) => Math.max(s - 1, 0))}
           disabled={step === 0}
-          className="rounded px-3 py-1.5 text-sm font-medium hover:bg-gray-100 disabled:opacity-30"
+          className="rounded px-3 py-1.5 text-sm font-medium hover:bg-surface-container-high disabled:opacity-30"
           style={{ color: 'var(--anx-text)' }}
         >
           ← Prev
@@ -262,7 +265,7 @@ function EnglishAnimationPlayer({ schema }: { schema: EnglishAnimationSchema }) 
             <button
               key={i}
               onClick={() => setStep(i)}
-              className={`h-2 w-2 rounded-full transition-colors ${i === step ? 'bg-indigo-500' : 'bg-gray-300'}`}
+              className={`h-2 w-2 rounded-full transition-colors ${i === step ? 'bg-primary' : 'bg-surface-container-high'}`}
             />
           ))}
         </div>
@@ -273,7 +276,7 @@ function EnglishAnimationPlayer({ schema }: { schema: EnglishAnimationSchema }) 
             )
           }
           disabled={isLast && !schema.loopable}
-          className="rounded px-3 py-1.5 text-sm font-medium hover:bg-gray-100 disabled:opacity-30"
+          className="rounded px-3 py-1.5 text-sm font-medium hover:bg-surface-container-high disabled:opacity-30"
           style={{ color: 'var(--anx-text)' }}
         >
           Next →
@@ -360,7 +363,7 @@ function AnnotationPlayer({ data }: { data: AnnotationData }) {
         ref={canvasRef}
         width={600}
         height={300}
-        className="w-full rounded-lg border border-gray-200"
+        className="w-full rounded-lg border border-outline-variant"
       />
       <button
         type="button"
@@ -400,7 +403,7 @@ function renderBlock(block: ExplanationBlock): ReactNode {
       return (
         <figure className="my-2">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={src} alt={caption ?? ''} className="rounded-lg max-w-full border border-gray-200" />
+          <img src={src} alt={caption ?? ''} className="rounded-lg max-w-full border border-outline-variant" />
           {caption && (
             <figcaption className="mt-1 text-center text-xs" style={{ color: 'var(--anx-text-muted)' }}>
               {caption}
@@ -421,9 +424,9 @@ function renderBlock(block: ExplanationBlock): ReactNode {
         // plain text
       }
       return (
-        <div className="rounded-lg border-l-4 border-indigo-400 bg-indigo-50 px-4 py-3 space-y-0.5">
-          {title && <p className="text-xs font-bold uppercase tracking-wide text-indigo-700">{title}</p>}
-          <p className="text-sm text-indigo-900">{body}</p>
+        <div className="rounded-lg border border-primary/25 bg-accentSurface px-4 py-3 space-y-0.5 shadow-md">
+          {title && <p className="text-xs font-bold uppercase tracking-wide text-primary">{title}</p>}
+          <p className="text-sm text-on-surface">{body}</p>
         </div>
       );
     }
@@ -439,8 +442,8 @@ function renderBlock(block: ExplanationBlock): ReactNode {
         // plain text
       }
       return (
-        <blockquote className="border-l-4 border-gray-300 pl-4 py-1 italic text-base" style={{ color: 'var(--anx-text)' }}>
-          <p>"{quote}"</p>
+        <blockquote className="border-l-4 border-outline pl-4 py-1 italic text-base" style={{ color: 'var(--anx-text)' }}>
+          <p>&ldquo;{quote}&rdquo;</p>
           {source && (
             <footer className="mt-1 text-xs not-italic" style={{ color: 'var(--anx-text-muted)' }}>
               — {source}

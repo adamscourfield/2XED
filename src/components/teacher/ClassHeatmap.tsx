@@ -48,9 +48,9 @@ export function ClassHeatmap({ participants, skills }: Props) {
       <table className="min-w-full">
         <thead>
           <tr>
-            <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">Student</th>
+            <th className="px-4 py-2 text-left text-xs font-semibold text-on-surface-variant">Student</th>
             {skills.map((skill) => (
-              <th key={skill.id} className="px-4 py-2 text-center text-xs font-semibold text-gray-600">
+              <th key={skill.id} className="px-4 py-2 text-center text-xs font-semibold text-on-surface-variant">
                 {skill.code}
               </th>
             ))}
@@ -60,9 +60,9 @@ export function ClassHeatmap({ participants, skills }: Props) {
           {participants.map((p) => (
             <tr
               key={p.studentId}
-              className={p.hasOpenFlag ? 'bg-red-50' : 'hover:bg-gray-50'}
+              className={p.hasOpenFlag ? 'bg-red-50' : 'hover:bg-surface-container-low'}
             >
-              <td className="whitespace-nowrap px-4 py-2 text-sm font-medium text-gray-800">
+              <td className="whitespace-nowrap px-4 py-2 text-sm font-medium text-on-surface">
                 {p.name ?? p.email}
                 {p.hasOpenFlag && (
                   <span className="ml-2 inline-block rounded bg-red-200 px-1 py-0.5 text-xs text-red-800">
@@ -77,10 +77,10 @@ export function ClassHeatmap({ participants, skills }: Props) {
                   <td key={skill.id} className="px-2 py-1 text-center">
                     <div className="group relative inline-block">
                       <div
-                        className={`h-8 w-16 rounded ${band ? bandClasses[band] : 'bg-gray-100 border border-gray-200'}`}
+                        className={`h-8 w-16 rounded ${band ? bandClasses[band] : 'bg-surface-container-high border border-outline-variant'}`}
                       />
                       {state && (
-                        <div className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-1 hidden w-44 -translate-x-1/2 rounded bg-gray-800 px-2 py-1 text-xs text-white group-hover:block">
+                        <div className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-1 hidden w-44 -translate-x-1/2 rounded bg-on-surface px-2 py-1 text-xs text-on-primary group-hover:block">
                           <div>Mastery: {Math.round(state.masteryProbability * 100)}%</div>
                           <div>Retrieval: {Math.round(state.retrievalStrength * 100)}%</div>
                           <div>Transfer: {Math.round(state.transferAbility * 100)}%</div>

@@ -72,8 +72,8 @@ export default async function AdminKnowledgeStatePage({
     return (
       <main className="anx-shell">
         <div className="mx-auto w-full max-w-5xl">
-          <h1 className="mb-3 text-2xl font-bold text-gray-900">Knowledge State Debug</h1>
-          <p className="text-gray-500">No knowledge-state attempts yet.</p>
+          <h1 className="mb-3 text-2xl font-bold text-on-surface">Knowledge State Debug</h1>
+          <p className="text-muted">No knowledge-state attempts yet.</p>
         </div>
       </main>
     );
@@ -143,23 +143,23 @@ export default async function AdminKnowledgeStatePage({
     <main className="anx-shell">
       <div className="mx-auto max-w-6xl space-y-6 px-4">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-gray-900">Knowledge State Debug</h1>
-          <a href="/admin/interventions" className="text-sm text-blue-600 hover:underline">
+          <h1 className="text-2xl font-bold text-on-surface">Knowledge State Debug</h1>
+          <a href="/admin/interventions" className="text-sm text-primary hover:underline">
             ← Interventions
           </a>
         </div>
 
-        <div className="rounded-xl border border-gray-200 bg-white p-4">
-          <div className="mb-2 text-xs uppercase tracking-wide text-gray-500">Select learner + skill</div>
+        <div className="anx-card rounded-xl p-4">
+          <div className="mb-2 text-xs uppercase tracking-wide text-muted">Select learner + skill</div>
           <form className="mb-3" method="GET" action="/admin/knowledge-state">
             <input
               name="q"
               defaultValue={params.q ?? ''}
               placeholder="Filter by learner name, email, skill code or skill name"
-              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-800 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-lg border border-outline-variant px-3 py-2 text-sm text-on-surface outline-none focus:border-primary focus:ring-2 focus:ring-primary/30"
             />
           </form>
-          <div className="mb-2 text-xs text-gray-500">
+          <div className="mb-2 text-xs text-muted">
             Showing {filteredCombos.length} of {combos.length} combinations
           </div>
           <div className="flex flex-wrap gap-2">
@@ -171,7 +171,7 @@ export default async function AdminKnowledgeStatePage({
                   key={`${combo.userId}-${combo.skillId}`}
                   href={`/admin/knowledge-state?userId=${combo.userId}&skillId=${combo.skillId}${queryParam}`}
                   className={`rounded-lg border px-3 py-2 text-xs ${
-                    active ? 'border-blue-300 bg-blue-50 text-blue-700' : 'border-gray-200 bg-white text-gray-700'
+                    active ? 'border-primary bg-accentSurface text-primary' : 'border-outline-variant bg-surface-container-lowest text-on-surface-variant'
                   }`}
                 >
                   {(combo.user.name ?? combo.user.email ?? combo.user.id)} · {combo.skill.code}
@@ -185,35 +185,35 @@ export default async function AdminKnowledgeStatePage({
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="rounded-xl border border-gray-200 bg-white p-4">
-            <div className="text-xs text-gray-500">Mastery</div>
+          <div className="anx-card rounded-xl p-4">
+            <div className="text-xs text-muted">Mastery</div>
             <div className="mt-2 text-2xl font-semibold text-emerald-600">{state ? pct(state.masteryProbability) : '—'}</div>
           </div>
-          <div className="rounded-xl border border-gray-200 bg-white p-4">
-            <div className="text-xs text-gray-500">Retrieval / Transfer</div>
-            <div className="mt-2 text-sm text-gray-700">
+          <div className="anx-card rounded-xl p-4">
+            <div className="text-xs text-muted">Retrieval / Transfer</div>
+            <div className="mt-2 text-sm text-on-surface-variant">
               {state ? `${pct(state.retrievalStrength)} / ${pct(state.transferAbility)}` : '—'}
             </div>
           </div>
-          <div className="rounded-xl border border-gray-200 bg-white p-4">
-            <div className="text-xs text-gray-500">Half-life / Forgetting</div>
-            <div className="mt-2 text-sm text-gray-700">
+          <div className="anx-card rounded-xl p-4">
+            <div className="text-xs text-muted">Half-life / Forgetting</div>
+            <div className="mt-2 text-sm text-on-surface-variant">
               {state ? `${state.halfLifeDays.toFixed(1)}d / ${state.forgettingRate.toFixed(3)}` : '—'}
             </div>
           </div>
-          <div className="rounded-xl border border-gray-200 bg-white p-4">
-            <div className="text-xs text-gray-500">Evidence / Policy</div>
-            <div className="mt-2 text-sm text-gray-700">
+          <div className="anx-card rounded-xl p-4">
+            <div className="text-xs text-muted">Evidence / Policy</div>
+            <div className="mt-2 text-sm text-on-surface-variant">
               {state ? `${state.evidenceCount} attempts` : '—'} · {NEXT_QUESTION_POLICY_VERSION}
             </div>
           </div>
         </div>
 
-        <div className="rounded-xl border border-gray-200 bg-white p-4">
-          <h2 className="mb-3 text-sm font-semibold text-gray-900">Recent evidence + rule trace (latest 15 attempts)</h2>
+        <div className="anx-card rounded-xl p-4">
+          <h2 className="mb-3 text-sm font-semibold text-on-surface">Recent evidence + rule trace (latest 15 attempts)</h2>
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
-              <thead className="border-b border-gray-200 bg-gray-50 text-gray-600">
+              <thead className="border-b border-outline-variant bg-surface-container-low text-on-surface-variant">
                 <tr>
                   <th className="px-2 py-2 text-left">When</th>
                   <th className="px-2 py-2 text-left">Item</th>
@@ -228,34 +228,34 @@ export default async function AdminKnowledgeStatePage({
                   .slice()
                   .reverse()
                   .map((trace) => (
-                    <tr key={trace.attempt.id} className="border-b border-gray-100 align-top">
-                      <td className="px-2 py-2 text-gray-500">{fmtDate(trace.attempt.occurredAt)}</td>
-                      <td className="px-2 py-2 text-gray-700">
-                        <div className="font-mono text-[11px] text-gray-400">{trace.attempt.item.id}</div>
+                    <tr key={trace.attempt.id} className="border-b border-outline-variant align-top">
+                      <td className="px-2 py-2 text-muted">{fmtDate(trace.attempt.occurredAt)}</td>
+                      <td className="px-2 py-2 text-on-surface-variant">
+                        <div className="font-mono text-[11px] text-on-surface-variant">{trace.attempt.item.id}</div>
                         <div className="max-w-[220px] truncate">{trace.attempt.item.question}</div>
                       </td>
-                      <td className="px-2 py-2 text-gray-600">
+                      <td className="px-2 py-2 text-on-surface-variant">
                         <div>{trace.attempt.correct ? '✅ correct' : '❌ incorrect'}</div>
                         <div>{trace.attempt.questionType} · {trace.attempt.supportLevel}</div>
                         <div>
                           {trace.attempt.isTransferItem ? 'transfer' : 'non-transfer'} · {trace.attempt.isReviewItem ? 'review' : 'normal'}
                         </div>
                       </td>
-                      <td className="px-2 py-2 text-gray-600">
+                      <td className="px-2 py-2 text-on-surface-variant">
                         <div>M {trace.evidence.masterySignal.toFixed(2)}</div>
                         <div>R {trace.evidence.retrievalSignal.toFixed(2)}</div>
                         <div>T {trace.evidence.transferSignal.toFixed(2)}</div>
                         <div>F {trace.evidence.forgettingSignal.toFixed(2)}</div>
                         <div>Rel {trace.evidence.reliabilitySignal.toFixed(2)}</div>
                       </td>
-                      <td className="px-2 py-2 text-gray-600">
+                      <td className="px-2 py-2 text-on-surface-variant">
                         <div>M {trace.before.masteryProbability.toFixed(2)} → {trace.after.masteryProbability.toFixed(2)}</div>
                         <div>R {trace.before.retrievalStrength.toFixed(2)} → {trace.after.retrievalStrength.toFixed(2)}</div>
                         <div>T {trace.before.transferAbility.toFixed(2)} → {trace.after.transferAbility.toFixed(2)}</div>
                         <div>H {trace.before.halfLifeDays.toFixed(1)}d → {trace.after.halfLifeDays.toFixed(1)}d</div>
                       </td>
-                      <td className="px-2 py-2 text-gray-600">
-                        <div className="font-semibold text-gray-700">{trace.recommendation.questionType}</div>
+                      <td className="px-2 py-2 text-on-surface-variant">
+                        <div className="font-semibold text-on-surface-variant">{trace.recommendation.questionType}</div>
                         <div>{trace.recommendation.supportLevel}</div>
                         <div className="max-w-[220px]">{trace.recommendation.rationale}</div>
                       </td>
@@ -266,14 +266,14 @@ export default async function AdminKnowledgeStatePage({
           </div>
         </div>
 
-        <div className="rounded-xl border border-gray-200 bg-white p-4">
-          <h2 className="mb-3 text-sm font-semibold text-gray-900">Review schedule (latest 8)</h2>
-          <div className="space-y-2 text-xs text-gray-700">
+        <div className="anx-card rounded-xl p-4">
+          <h2 className="mb-3 text-sm font-semibold text-on-surface">Review schedule (latest 8)</h2>
+          <div className="space-y-2 text-xs text-on-surface-variant">
             {reviews.length === 0 ? (
-              <p className="text-gray-400">No review records yet.</p>
+              <p className="text-on-surface-variant">No review records yet.</p>
             ) : (
               reviews.map((review) => (
-                <div key={review.id} className="rounded-lg border border-gray-100 bg-gray-50 px-3 py-2">
+                <div key={review.id} className="rounded-lg border border-outline-variant bg-surface-container-low px-3 py-2">
                   <div>Scheduled: {fmtDate(review.scheduledFor)}</div>
                   <div>Completed: {fmtDate(review.completedAt)}</div>
                   <div>

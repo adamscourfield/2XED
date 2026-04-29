@@ -48,9 +48,9 @@ interface AnimationRendererProps {
 
 const highlightColors: Record<string, string> = {
   accent: 'text-orange-600 font-bold',
-  blue: 'text-blue-600',
+  blue: 'text-primary font-semibold',
   green: 'text-green-600',
-  dim: 'text-gray-400',
+  dim: 'text-on-surface-variant',
 };
 
 function renderVisual(visual: VisualPrimitive, key: number) {
@@ -79,9 +79,9 @@ function renderVisual(visual: VisualPrimitive, key: number) {
 
     case 'rule_callout':
       return (
-        <div key={key} className="rounded-lg border-2 border-indigo-200 bg-indigo-50 px-6 py-4 text-center my-4">
-          <p className="text-lg font-bold text-indigo-900">{visual.ruleText}</p>
-          {visual.subText && <p className="text-sm text-indigo-600 mt-1">{visual.subText}</p>}
+        <div key={key} className="rounded-lg border-2 border-primary bg-accentSurface px-6 py-4 text-center my-4 shadow-md">
+          <p className="text-lg font-bold text-primary">{visual.ruleText}</p>
+          {visual.subText && <p className="text-sm text-primary/80 mt-1">{visual.subText}</p>}
         </div>
       );
 
@@ -103,7 +103,7 @@ function renderVisual(visual: VisualPrimitive, key: number) {
         <svg key={key} width={width} height={70} viewBox={`0 0 ${width} 70`} className="block mx-auto my-4">
           <line x1={padding} y1={lineY} x2={width - padding} y2={lineY} stroke="#1a1814" strokeWidth={2} />
           {visual.highlightStart !== undefined && (
-            <circle cx={toX(visual.highlightStart)} cy={lineY} r={5} fill="#1a56d4" />
+            <circle cx={toX(visual.highlightStart)} cy={lineY} r={5} fill="var(--anx-primary)" />
           )}
           {visual.arrowFrom !== undefined && visual.arrowTo !== undefined && (
             <line x1={toX(visual.arrowFrom)} y1={lineY - 12} x2={toX(visual.arrowTo)} y2={lineY - 12} stroke="#1a9454" strokeWidth={2} />
@@ -127,14 +127,14 @@ function renderVisual(visual: VisualPrimitive, key: number) {
                   y={r * cellSize + 1}
                   width={cellSize}
                   height={cellSize}
-                  fill={visual.highlightRows?.includes(r) ? '#e8f0fd' : 'white'}
-                  stroke="#e8e3db"
+                  fill={visual.highlightRows?.includes(r) ? 'var(--anx-primary-soft)' : 'var(--anx-surface-container-lowest)'}
+                  stroke="var(--anx-outline-variant)"
                   strokeWidth={1}
                 />
               ))
             )}
           </svg>
-          {visual.label && <p className="text-sm text-gray-600 mt-2">{visual.label}</p>}
+          {visual.label && <p className="text-sm text-on-surface-variant mt-2">{visual.label}</p>}
         </div>
       );
     }
@@ -145,10 +145,10 @@ function renderVisual(visual: VisualPrimitive, key: number) {
       return (
         <div key={key} className="flex flex-col items-center my-4">
           <svg width={barWidth + 2} height={32}>
-            <rect x={1} y={1} width={barWidth} height={30} fill="white" stroke="#e8e3db" strokeWidth={1} />
-            <rect x={1} y={1} width={filled} height={30} fill="#e8f0fd" stroke="#1a56d4" strokeWidth={1} />
+            <rect x={1} y={1} width={barWidth} height={30} fill="var(--anx-surface-container-lowest)" stroke="var(--anx-outline-variant)" strokeWidth={1} />
+            <rect x={1} y={1} width={filled} height={30} fill="var(--anx-primary-soft)" stroke="var(--anx-primary)" strokeWidth={1} />
           </svg>
-          <div className="flex gap-4 mt-2 text-sm text-gray-700">
+          <div className="flex gap-4 mt-2 text-sm text-on-surface-variant">
             <span>{visual.numerator}/{visual.denominator}</span>
             {visual.showDecimal && <span>= {(visual.numerator / visual.denominator).toFixed(2)}</span>}
             {visual.showPercent && <span>= {((visual.numerator / visual.denominator) * 100).toFixed(0)}%</span>}
@@ -223,9 +223,9 @@ export function AnimationRenderer({ schema, currentStep: controlledStep, onStepC
   if (!step) return null;
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white">
+    <div className="anx-card rounded-lg">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-gray-100 px-4 py-2 text-sm text-gray-500">
+      <div className="flex items-center justify-between border-b border-outline-variant px-4 py-2 text-sm text-muted">
         <span>{schema.skillName} — Route {schema.routeType} ({schema.routeLabel})</span>
         <span>Step {currentStep + 1} / {schema.steps.length}</span>
       </div>
@@ -236,20 +236,20 @@ export function AnimationRenderer({ schema, currentStep: controlledStep, onStepC
       </div>
 
       {/* Narration */}
-      <div className="border-t border-gray-100 bg-gray-50 px-6 py-3">
+      <div className="border-t border-outline-variant bg-surface-container-low px-6 py-3">
         <div className="flex items-start gap-2">
-          {isSpeaking && <span className="text-indigo-500 animate-pulse">🔊</span>}
-          <p className="text-sm text-gray-700 italic">{step.narration}</p>
+          {isSpeaking && <span className="text-primary animate-pulse">🔊</span>}
+          <p className="text-sm text-on-surface-variant italic">{step.narration}</p>
         </div>
       </div>
 
       {/* Controls — hidden in student-controlled mode (teacher advances steps) */}
       {(!isControlled || onStepChange) && (
-        <div className="flex items-center justify-between border-t border-gray-100 px-4 py-3">
+        <div className="flex items-center justify-between border-t border-outline-variant px-4 py-3">
           <button
             onClick={goPrev}
             disabled={isFirst}
-            className="rounded px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-100 disabled:opacity-30"
+            className="rounded px-3 py-1.5 text-sm font-medium text-on-surface-variant hover:bg-surface-container-high disabled:opacity-30"
           >
             ← Prev
           </button>
@@ -258,14 +258,14 @@ export function AnimationRenderer({ schema, currentStep: controlledStep, onStepC
               <button
                 key={i}
                 onClick={() => isControlled ? onStepChange?.(i) : setInternalStep(i)}
-                className={`h-2 w-2 rounded-full ${i === currentStep ? 'bg-indigo-500' : 'bg-gray-300'}`}
+                className={`h-2 w-2 rounded-full transition-colors ${i === currentStep ? 'bg-primary' : 'bg-surface-container-high'}`}
               />
             ))}
           </div>
           <button
             onClick={goNext}
             disabled={isLast && !schema.loopable}
-            className="rounded px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-100 disabled:opacity-30"
+            className="rounded px-3 py-1.5 text-sm font-medium text-on-surface-variant hover:bg-surface-container-high disabled:opacity-30"
           >
             Next →
           </button>

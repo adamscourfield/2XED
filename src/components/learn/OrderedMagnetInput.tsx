@@ -104,28 +104,28 @@ export function OrderedMagnetInput({ choices, value, onChange, emptyPrompt, help
           event.preventDefault();
           handleDropToTray(index);
         }}
-        className={`h-3 rounded-full transition-colors ${active ? 'bg-blue-300' : 'bg-transparent'}`}
+        className={`h-3 rounded-full transition-colors ${active ? 'bg-primary-container/70' : 'bg-transparent'}`}
       />
     );
   }
 
   return (
     <div className="space-y-4">
-      <div className="rounded-2xl border border-blue-200 bg-blue-50/70 p-4">
+      <div className="rounded-2xl border border-primary/20 bg-accentSurface p-4">
         <div className="flex items-center justify-between gap-3">
-          <p className="text-sm font-semibold text-blue-900">Arrange the fridge magnets into the correct order</p>
+          <p className="text-sm font-semibold text-on-surface">Arrange the fridge magnets into the correct order</p>
           {orderedChoices.length > 0 && (
             <button
               type="button"
               onClick={() => updateOrderedChoices([])}
-              className="text-xs font-medium text-blue-700 underline decoration-blue-300 underline-offset-2"
+              className="text-xs font-medium text-primary underline decoration-primary/35 underline-offset-2"
             >
               Clear order
             </button>
           )}
         </div>
-        {helperText && <p className="mt-1 text-xs text-blue-700">{helperText}</p>}
-        <div className="mt-4 rounded-2xl border border-dashed border-blue-300 bg-white p-4">
+        {helperText && <p className="mt-1 text-xs text-primary">{helperText}</p>}
+        <div className="mt-4 rounded-2xl border border-dashed border-outline-variant bg-surface-container-lowest p-4">
           {orderedChoices.length === 0 ? (
             <div
               onDragOver={(event) => {
@@ -152,7 +152,7 @@ export function OrderedMagnetInput({ choices, value, onChange, emptyPrompt, help
                       setDragState(null);
                       setDropIndex(null);
                     }}
-                    className="flex items-center justify-between gap-3 rounded-xl border border-outline-variant bg-surface-container-lowest px-4 py-3 shadow-md transition-colors duration-200"
+                    className="flex items-center justify-between gap-3 rounded-xl border border-outline-variant bg-surface-container-lowest px-4 py-3 shadow-md"
                   >
                     <div className="flex items-center gap-3">
                       <span className="rounded-full bg-primary px-2 py-1 text-xs font-semibold text-on-primary">
@@ -163,7 +163,7 @@ export function OrderedMagnetInput({ choices, value, onChange, emptyPrompt, help
                     <button
                       type="button"
                       onClick={() => removeChoice(choice)}
-                      className="rounded-full border border-outline-variant px-2 py-1 text-xs font-medium text-on-surface-variant transition-colors duration-200 hover:bg-surface-container-low"
+                      className="rounded-full border border-outline-variant px-2 py-1 text-xs font-medium text-on-surface-variant hover:bg-surface-container-low"
                     >
                       Remove
                     </button>
@@ -185,7 +185,7 @@ export function OrderedMagnetInput({ choices, value, onChange, emptyPrompt, help
           event.preventDefault();
           handleDropToBank();
         }}
-        className="anx-card p-4"
+        className="anx-card rounded-2xl p-4"
       >
         <p className="text-sm font-semibold text-on-surface">Available magnets</p>
         <p className="mt-1 text-xs text-muted">Drag a magnet up into the answer tray or tap to add it.</p>
