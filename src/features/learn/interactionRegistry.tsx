@@ -91,9 +91,9 @@ const placeValueRenderer: InteractionRenderer = {
     const labels = ['Thousands', 'Hundreds', 'Tens', 'Ones'];
 
     return (
-      <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-base text-slate-700">
-        <p className="mb-2 text-lg font-bold text-slate-900">🔢 Tap a place-value column</p>
-        <p className="mb-2 text-sm text-slate-600">Pick the column you want to focus on before answering.</p>
+      <div className="anx-card rounded-xl p-4 text-base text-on-surface-variant">
+        <p className="mb-2 text-lg font-bold text-on-surface">🔢 Tap a place-value column</p>
+        <p className="mb-2 text-sm text-muted">Pick the column you want to focus on before answering.</p>
         <div className="grid grid-cols-4 gap-2">
           {labels.map((h, i) => {
             const active = state.placeValueSelection === h;
@@ -101,10 +101,10 @@ const placeValueRenderer: InteractionRenderer = {
               <button
                 key={h}
                 onClick={() => markInteraction({ placeValueSelection: h, completedAt: Date.now() })}
-                className={`rounded border px-2 py-2 text-center ${active ? 'border-blue-300 bg-blue-100' : 'border-slate-200 bg-white'}`}
+                className={`rounded border px-2 py-2 text-center transition-colors duration-200 ${active ? 'border-primary bg-accentSurface' : 'border-outline-variant bg-surface-container-lowest'}`}
               >
-                <p className="text-[10px] uppercase tracking-wide text-slate-500">{h}</p>
-                <p className="mt-1 text-base font-bold text-slate-900">{digits[i] ?? '0'}</p>
+                <p className="text-[10px] uppercase tracking-wide text-muted">{h}</p>
+                <p className="mt-1 text-base font-bold text-on-surface">{digits[i] ?? '0'}</p>
               </button>
             );
           })}
@@ -152,13 +152,13 @@ const compareRenderer: InteractionRenderer = {
     const picked = state.compareColumnIndex;
 
     return (
-      <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-base text-slate-700">
-        <p className="font-bold text-slate-900">🧠 Tap the first different column</p>
-        <p className="mt-1 text-sm text-slate-600">Compare from left to right and stop at the first difference.</p>
+      <div className="anx-card rounded-xl p-4 text-base text-on-surface-variant">
+        <p className="font-bold text-on-surface">🧠 Tap the first different column</p>
+        <p className="mt-1 text-sm text-muted">Compare from left to right and stop at the first difference.</p>
         <div className="mt-2 grid grid-cols-2 gap-3">
           {[{ name: 'A', d: l }, { name: 'B', d: r }].map((row) => (
-            <div key={row.name} className="rounded border border-slate-200 bg-white p-2">
-              <p className="text-[10px] uppercase tracking-wide text-slate-500">{row.name}</p>
+            <div key={row.name} className="rounded border border-outline-variant bg-surface-container-lowest p-2">
+              <p className="text-[10px] uppercase tracking-wide text-muted">{row.name}</p>
               <div className="mt-1 flex gap-1">
                 {row.d.map((x, i) => {
                   const active = picked === i;
@@ -166,7 +166,7 @@ const compareRenderer: InteractionRenderer = {
                     <button
                       key={`${row.name}-${i}`}
                       onClick={() => markInteraction({ compareColumnIndex: i, completedAt: Date.now() })}
-                      className={`inline-flex h-10 w-10 items-center justify-center rounded text-base font-semibold ${active ? (picked === firstDiff ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-800') : 'bg-slate-100 text-slate-700'}`}
+                      className={`inline-flex h-10 w-10 items-center justify-center rounded text-base font-semibold transition-colors duration-200 ${active ? (picked === firstDiff ? 'bg-tertiary-container text-on-tertiary-container' : 'bg-accentSurface text-primary') : 'bg-surface-container-high text-on-surface-variant'}`}
                     >
                       {x}
                     </button>
@@ -176,7 +176,7 @@ const compareRenderer: InteractionRenderer = {
             </div>
           ))}
         </div>
-        <p className="mt-2 text-sm text-slate-700">
+        <p className="mt-2 text-sm text-on-surface-variant">
           {picked == null
             ? 'Tap a column to choose where the numbers first change.'
             : picked === firstDiff
@@ -210,9 +210,9 @@ const decomposeRenderer: InteractionRenderer = {
     const selectedParts = state.decompositionParts;
 
     return (
-      <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-base text-slate-700">
-        <p className="text-lg font-bold text-slate-900">🧩 Build the decomposition</p>
-        <p className="mt-1 text-xl font-semibold tabular-nums text-slate-900">{formatted} = ?</p>
+      <div className="anx-card rounded-xl p-4 text-base text-on-surface-variant">
+        <p className="text-lg font-bold text-on-surface">🧩 Build the decomposition</p>
+        <p className="mt-1 text-xl font-semibold tabular-nums text-on-surface">{formatted} = ?</p>
         <div className="mt-3 grid grid-cols-2 gap-2.5 sm:grid-cols-3">
           {options.map((p) => {
             const on = selectedParts.includes(p);
@@ -223,17 +223,17 @@ const decomposeRenderer: InteractionRenderer = {
                   const next = on ? selectedParts.filter((x) => x !== p) : [...selectedParts, p];
                   markInteraction({ decompositionParts: next, completedAt: Date.now() });
                 }}
-                className={`w-full rounded-lg border px-3 py-3 text-center text-base font-semibold ${on ? 'border-blue-300 bg-blue-100 text-blue-900' : 'border-slate-300 bg-white text-slate-700'}`}
+                className={`w-full rounded-lg border px-3 py-3 text-center text-base font-semibold transition-colors duration-200 ${on ? 'border-primary bg-accentSurface text-primary' : 'border-outline bg-surface-container-lowest text-on-surface-variant'}`}
               >
                 {p}
               </button>
             );
           })}
         </div>
-        <p className="mt-3 rounded-lg bg-white px-3 py-2 text-sm text-slate-700">
+        <p className="mt-3 rounded-lg bg-surface-container-low px-3 py-2 text-sm text-on-surface-variant">
           {selectedParts.length > 0 ? selectedParts.join(' + ') : 'Tap parts to build your answer'}
         </p>
-        <p className="mt-2 text-sm text-slate-600">Tip: choose all correct parts only — the extra options are there to test your thinking.</p>
+        <p className="mt-2 text-sm text-muted">Tip: choose all correct parts only — the extra options are there to test your thinking.</p>
       </div>
     );
   },

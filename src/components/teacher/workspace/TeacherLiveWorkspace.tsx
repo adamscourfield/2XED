@@ -711,7 +711,7 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
                 aria-live="polite"
               >
                 <p
-                  className="max-w-lg rounded-full border px-4 py-2 text-center text-xs font-medium shadow-sm"
+                  className="max-w-lg rounded-full border border-outline-variant px-4 py-2 text-center text-xs font-medium shadow-md"
                   style={{
                     borderColor: 'var(--anx-outline-variant)',
                     background: 'var(--anx-warning-soft)',
@@ -732,7 +732,7 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
                 aria-live="polite"
               >
                 <p
-                  className="max-w-md rounded-xl border px-3 py-2 text-center text-[11px] leading-snug shadow-sm"
+                  className="max-w-md rounded-xl border border-outline-variant px-3 py-2 text-center text-[11px] leading-snug shadow-md"
                   style={{
                     borderColor: 'var(--anx-outline-variant)',
                     background: 'rgba(255, 255, 255, 0.92)',

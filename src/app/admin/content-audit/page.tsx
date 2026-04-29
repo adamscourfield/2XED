@@ -139,12 +139,12 @@ export default async function ContentAuditPage() {
     <main className="anx-shell">
       <div className="mx-auto w-full max-w-7xl space-y-10">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-gray-900">Content Audit — {subject.title}</h1>
+          <h1 className="text-2xl font-bold text-on-surface">Content Audit — {subject.title}</h1>
           <div className="flex items-center gap-4 text-sm">
-            <a href={`/admin/content/${subject.slug}`} className="text-blue-600 hover:underline">
+            <a href={`/admin/content/${subject.slug}`} className="text-primary hover:underline">
               → QA Workbench
             </a>
-            <a href={`/admin/insight/${subject.slug}`} className="text-blue-600 hover:underline">
+            <a href={`/admin/insight/${subject.slug}`} className="text-primary hover:underline">
               → Insight Dashboard
             </a>
           </div>
@@ -152,30 +152,30 @@ export default async function ContentAuditPage() {
 
         {/* Global Summary Cards */}
         <section>
-          <h2 className="text-lg font-semibold text-gray-800 mb-3">Global Summary</h2>
+          <h2 className="text-lg font-semibold text-on-surface mb-3">Global Summary</h2>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-5">
-            <div className="rounded-xl border border-gray-200 bg-white p-4">
-              <p className="text-xs text-gray-500">Total skills</p>
-              <p className="mt-1 text-2xl font-semibold text-gray-900">{totals.skills}</p>
+            <div className="anx-card rounded-xl p-4">
+              <p className="text-xs text-muted">Total skills</p>
+              <p className="mt-1 text-2xl font-semibold text-on-surface">{totals.skills}</p>
             </div>
-            <div className="rounded-xl border border-gray-200 bg-white p-4">
-              <p className="text-xs text-gray-500">Real questions</p>
-              <p className="mt-1 text-2xl font-semibold text-gray-900">{totals.realItems}</p>
+            <div className="anx-card rounded-xl p-4">
+              <p className="text-xs text-muted">Real questions</p>
+              <p className="mt-1 text-2xl font-semibold text-on-surface">{totals.realItems}</p>
               {totals.placeholderItems > 0 && (
                 <p className="mt-0.5 text-xs text-amber-600">+ {totals.placeholderItems} placeholders</p>
               )}
             </div>
-            <div className="rounded-xl border border-gray-200 bg-white p-4">
-              <p className="text-xs text-gray-500">Explanation routes</p>
-              <p className="mt-1 text-2xl font-semibold text-gray-900">{totals.totalRoutes}</p>
+            <div className="anx-card rounded-xl p-4">
+              <p className="text-xs text-muted">Explanation routes</p>
+              <p className="mt-1 text-2xl font-semibold text-on-surface">{totals.totalRoutes}</p>
             </div>
-            <div className="rounded-xl border border-gray-200 bg-white p-4">
-              <p className="text-xs text-gray-500">Explanation steps</p>
-              <p className="mt-1 text-2xl font-semibold text-gray-900">{totals.totalSteps}</p>
+            <div className="anx-card rounded-xl p-4">
+              <p className="text-xs text-muted">Explanation steps</p>
+              <p className="mt-1 text-2xl font-semibold text-on-surface">{totals.totalSteps}</p>
             </div>
-            <div className="rounded-xl border border-gray-200 bg-white p-4">
-              <p className="text-xs text-gray-500">Full route coverage (A+B+C)</p>
-              <p className="mt-1 text-2xl font-semibold text-gray-900">
+            <div className="anx-card rounded-xl p-4">
+              <p className="text-xs text-muted">Full route coverage (A+B+C)</p>
+              <p className="mt-1 text-2xl font-semibold text-on-surface">
                 {totals.fullRouteCoverage}/{totals.skills}
               </p>
             </div>
@@ -199,11 +199,11 @@ export default async function ContentAuditPage() {
 
         {/* Strand-by-strand breakdown */}
         <section>
-          <h2 className="text-lg font-semibold text-gray-800 mb-3">Breakdown by Strand</h2>
-          <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white">
+          <h2 className="text-lg font-semibold text-on-surface mb-3">Breakdown by Strand</h2>
+          <div className="anx-card overflow-x-auto rounded-xl">
             <table className="w-full text-sm text-left">
               <thead>
-                <tr className="border-b border-gray-200 bg-gray-50 text-xs text-gray-500 uppercase tracking-wider">
+                <tr className="border-b border-outline-variant bg-surface-container-low text-xs text-muted uppercase tracking-wider">
                   <th className="px-4 py-3">Strand</th>
                   <th className="px-4 py-3 text-center">Skills</th>
                   <th className="px-4 py-3 text-center">Real Qs</th>
@@ -215,17 +215,17 @@ export default async function ContentAuditPage() {
               </thead>
               <tbody>
                 {strandSummaries.map((s) => (
-                  <tr key={s.strand} className="border-b border-gray-100 hover:bg-gray-50">
-                    <td className="px-4 py-3 font-medium text-gray-900">{s.strand}</td>
-                    <td className="px-4 py-3 text-center text-gray-700">{s.skillCount}</td>
-                    <td className="px-4 py-3 text-center text-gray-700">{s.realItems}</td>
+                  <tr key={s.strand} className="border-b border-outline-variant hover:bg-surface-container-low">
+                    <td className="px-4 py-3 font-medium text-on-surface">{s.strand}</td>
+                    <td className="px-4 py-3 text-center text-on-surface-variant">{s.skillCount}</td>
+                    <td className="px-4 py-3 text-center text-on-surface-variant">{s.realItems}</td>
                     <td className="px-4 py-3 text-center">
-                      <span className={s.placeholderItems > 0 ? 'text-amber-600' : 'text-gray-400'}>
+                      <span className={s.placeholderItems > 0 ? 'text-amber-600' : 'text-on-surface-variant'}>
                         {s.placeholderItems}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-center text-gray-700">{s.totalRoutes}</td>
-                    <td className="px-4 py-3 text-center text-gray-700">{s.totalSteps}</td>
+                    <td className="px-4 py-3 text-center text-on-surface-variant">{s.totalRoutes}</td>
+                    <td className="px-4 py-3 text-center text-on-surface-variant">{s.totalSteps}</td>
                     <td className="px-4 py-3 text-center">
                       <span className={s.fullRouteCoverage === s.skillCount ? 'text-emerald-600' : 'text-amber-600'}>
                         {s.fullRouteCoverage}/{s.skillCount}
@@ -241,11 +241,11 @@ export default async function ContentAuditPage() {
         {/* Detailed skill-by-skill breakdown */}
         {strandSummaries.map((s) => (
           <section key={s.strand}>
-            <h2 className="text-lg font-semibold text-gray-800 mb-3">{s.strand}</h2>
-            <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white">
+            <h2 className="text-lg font-semibold text-on-surface mb-3">{s.strand}</h2>
+            <div className="anx-card overflow-x-auto rounded-xl">
               <table className="w-full text-sm text-left">
                 <thead>
-                  <tr className="border-b border-gray-200 bg-gray-50 text-xs text-gray-500 uppercase tracking-wider">
+                  <tr className="border-b border-outline-variant bg-surface-container-low text-xs text-muted uppercase tracking-wider">
                     <th className="px-4 py-3">Skill Code</th>
                     <th className="px-4 py-3">Name</th>
                     <th className="px-4 py-3 text-center">Real Qs</th>
@@ -263,21 +263,21 @@ export default async function ContentAuditPage() {
                     return (
                       <tr
                         key={skill.code}
-                        className={`border-b border-gray-100 ${hasGap ? 'bg-amber-50' : 'hover:bg-gray-50'}`}
+                        className={`border-b border-outline-variant ${hasGap ? 'bg-amber-50' : 'hover:bg-surface-container-low'}`}
                       >
-                        <td className="px-4 py-3 font-mono text-xs text-gray-900">{skill.code}</td>
-                        <td className="px-4 py-3 text-gray-700">{skill.name}</td>
+                        <td className="px-4 py-3 font-mono text-xs text-on-surface">{skill.code}</td>
+                        <td className="px-4 py-3 text-on-surface-variant">{skill.name}</td>
                         <td className="px-4 py-3 text-center">
-                          <span className={skill.realItems === 0 ? 'font-medium text-red-600' : 'text-gray-700'}>
+                          <span className={skill.realItems === 0 ? 'font-medium text-red-600' : 'text-on-surface-variant'}>
                             {skill.realItems}
                           </span>
                         </td>
                         <td className="px-4 py-3 text-center">
-                          <span className={skill.placeholderItems > 0 ? 'text-amber-600' : 'text-gray-400'}>
+                          <span className={skill.placeholderItems > 0 ? 'text-amber-600' : 'text-on-surface-variant'}>
                             {skill.placeholderItems}
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-center text-xs text-gray-500">
+                        <td className="px-4 py-3 text-center text-xs text-muted">
                           {Object.entries(skill.itemTypes).map(([type, count]) => (
                             <span key={type} className="mr-1">
                               {type}:{count}
@@ -312,7 +312,7 @@ export default async function ContentAuditPage() {
                             <span className="text-red-400">✗</span>
                           )}
                         </td>
-                        <td className="px-4 py-3 text-center text-gray-700">{skill.totalSteps}</td>
+                        <td className="px-4 py-3 text-center text-on-surface-variant">{skill.totalSteps}</td>
                       </tr>
                     );
                   })}
@@ -322,7 +322,7 @@ export default async function ContentAuditPage() {
           </section>
         ))}
 
-        <p className="text-xs text-gray-400 text-center pb-6">
+        <p className="text-xs text-on-surface-variant text-center pb-6">
           Generated at {new Date().toISOString()} · Subject: {subject.slug}
         </p>
       </div>

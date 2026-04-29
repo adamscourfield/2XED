@@ -43,7 +43,7 @@ export function TeacherDashboardClassesView({
       <div className="staff-dash-bento-main">
         {!compactLayout && (
           <DashboardLessonCalendar
-            className="student-dash-calendar anx-card overflow-hidden"
+            className="anx-card student-dash-calendar overflow-hidden"
             hint="Class timetables you maintain, your live sessions, and student reviews."
           />
         )}

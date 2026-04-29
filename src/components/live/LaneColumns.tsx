@@ -32,7 +32,7 @@ interface LaneColumnsProps {
 }
 
 function WaitingBadge({ minutes }: { minutes: number }) {
-  const color = minutes > 6 ? 'text-red-700 bg-red-50' : minutes > 3 ? 'text-amber-700 bg-amber-50' : 'text-gray-600 bg-gray-100';
+  const color = minutes > 6 ? 'text-red-700 bg-red-50' : minutes > 3 ? 'text-amber-700 bg-amber-50' : 'text-on-surface-variant bg-surface-container-high';
   return (
     <span className={`inline-block rounded px-2 py-0.5 text-xs font-medium ${color}`}>
       {minutes} min
@@ -51,7 +51,7 @@ export function LaneColumns({ lane1, lane2, lane3, onHandback }: LaneColumnsProp
             {lane1.count}
           </span>
         </div>
-        <p className="text-sm text-gray-500">Moving forward independently</p>
+        <p className="text-sm text-muted">Moving forward independently</p>
       </div>
 
       {/* Lane 2 — Nearly there */}
@@ -62,7 +62,7 @@ export function LaneColumns({ lane1, lane2, lane3, onHandback }: LaneColumnsProp
             {lane2.count}
           </span>
         </div>
-        <p className="text-sm text-gray-500">App is working with them</p>
+        <p className="text-sm text-muted">App is working with them</p>
       </div>
 
       {/* Lane 3 — Needs teacher */}
@@ -74,16 +74,16 @@ export function LaneColumns({ lane1, lane2, lane3, onHandback }: LaneColumnsProp
           </span>
         </div>
         {lane3.students.length === 0 ? (
-          <p className="text-sm text-gray-500">No students need attention</p>
+          <p className="text-sm text-muted">No students need attention</p>
         ) : (
           <div className="space-y-2">
             {lane3.students.map((student) => (
               <div
                 key={student.studentUserId}
-                className="rounded-md border border-gray-200 bg-gray-50 p-3"
+                className="rounded-md border border-outline-variant bg-surface-container-low p-3"
               >
                 <div className="flex items-start justify-between gap-2">
-                  <span className="text-base font-semibold text-gray-900">
+                  <span className="text-base font-semibold text-on-surface">
                     {student.studentName}
                   </span>
                   <WaitingBadge minutes={student.waitingMinutes} />

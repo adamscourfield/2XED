@@ -65,7 +65,7 @@ export function SessionControls({
   }
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-4 anx-card p-4">
+    <div className="anx-card flex flex-wrap items-center justify-between gap-4 p-4">
       <div className="flex flex-wrap items-center gap-4">
         <div>
           <span className="block text-xs text-[color:var(--anx-text-muted)]">Join Code</span>

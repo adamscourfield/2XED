@@ -36,31 +36,31 @@ export function ContentIngestionReviewClient({ batches, entriesByBatch }: Props)
   return (
     <div className="grid gap-6 lg:grid-cols-[320px,1fr]">
       <aside className="space-y-4">
-        <div className="rounded-xl border border-gray-200 bg-white p-4">
-          <h2 className="text-sm font-semibold text-gray-900">Staged batches</h2>
+        <div className="anx-card rounded-xl p-4">
+          <h2 className="text-sm font-semibold text-on-surface">Staged batches</h2>
           <div className="mt-4 space-y-2">
             {batches.map((batch) => (
               <button
                 key={batch.id}
                 onClick={() => setSelectedBatch(batch.id)}
-                className={`block w-full rounded-lg border px-3 py-3 text-left ${
-                  batch.id === selectedBatch ? 'border-blue-500 bg-blue-50' : 'border-gray-200 bg-white'
+                className={`block w-full rounded-lg border px-3 py-3 text-left transition-colors duration-200 ${
+                  batch.id === selectedBatch ? 'border-primary bg-accentSurface' : 'border-outline-variant bg-surface-container-lowest'
                 }`}
               >
-                <div className="text-sm font-medium text-gray-900">{batch.batchLabel}</div>
-                <div className="mt-1 text-xs text-gray-500">{batch.itemCount} staged items</div>
+                <div className="text-sm font-medium text-on-surface">{batch.batchLabel}</div>
+                <div className="mt-1 text-xs text-muted">{batch.itemCount} staged items</div>
               </button>
             ))}
           </div>
         </div>
 
-        <div className="rounded-xl border border-gray-200 bg-white p-4">
+        <div className="anx-card rounded-xl p-4">
           <label className="block text-sm">
-            <span className="mb-1 block text-gray-600">Issue severity</span>
+            <span className="mb-1 block text-on-surface-variant">Issue severity</span>
             <select
               value={severityFilter}
               onChange={(event) => setSeverityFilter(event.target.value as 'ALL' | 'ERROR' | 'WARNING')}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2"
+              className="w-full rounded-lg border border-outline px-3 py-2"
             >
               <option value="ALL">All</option>
               <option value="ERROR">Errors only</option>
@@ -69,7 +69,7 @@ export function ContentIngestionReviewClient({ batches, entriesByBatch }: Props)
           </label>
           <button
             onClick={() => void publishValidItems()}
-            className="mt-4 w-full rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
+            className="anx-btn-primary mt-4 w-full py-2.5 text-sm disabled:opacity-60"
             disabled={!selectedBatch || publishState === 'saving'}
           >
             {publishState === 'saving' ? 'Publishing…' : 'Publish valid items from batch'}
@@ -80,16 +80,16 @@ export function ContentIngestionReviewClient({ batches, entriesByBatch }: Props)
       </aside>
 
       <section className="space-y-4">
-        <div className="rounded-xl border border-gray-200 bg-white p-4 text-sm text-gray-600">
+        <div className="anx-card rounded-xl p-4 text-sm text-on-surface-variant">
           Showing {filteredEntries.length} of {currentEntries.length} staged items.
         </div>
         {filteredEntries.map((entry, index) => (
-          <article key={`${selectedBatch}-${index}`} className="rounded-xl border border-gray-200 bg-white p-5 space-y-3">
+          <article key={`${selectedBatch}-${index}`} className="anx-card rounded-xl p-5 space-y-3">
             <div className="flex flex-wrap gap-2">
-              <span className="rounded-full bg-gray-100 px-2 py-1 text-xs font-medium text-gray-700">
+              <span className="rounded-full bg-surface-container-high px-2 py-1 text-xs font-medium text-on-surface-variant">
                 {entry.question.provenance.slideOrPageRef}
               </span>
-              <span className="rounded-full bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700">
+              <span className="rounded-full bg-accentSurface px-2 py-1 text-xs font-medium text-primary">
                 {entry.question.curriculum.objectiveId ?? 'Unmapped objective'}
               </span>
               {entry.question.adaptive.answerModeAllowed.map((mode) => (
@@ -98,17 +98,17 @@ export function ContentIngestionReviewClient({ batches, entriesByBatch }: Props)
                 </span>
               ))}
             </div>
-            <h3 className="text-lg font-semibold text-gray-900">{entry.question.stem}</h3>
+            <h3 className="text-lg font-semibold text-on-surface">{entry.question.stem}</h3>
             <div className="grid gap-4 md:grid-cols-2 text-sm">
               <div>
-                <div className="font-medium text-gray-700">Curriculum</div>
-                <div className="mt-1 text-gray-600">{entry.question.curriculum.subtopic}</div>
-                <div className="text-gray-500">{entry.question.curriculum.yearBand} · {entry.question.curriculum.strand}</div>
+                <div className="font-medium text-on-surface-variant">Curriculum</div>
+                <div className="mt-1 text-on-surface-variant">{entry.question.curriculum.subtopic}</div>
+                <div className="text-muted">{entry.question.curriculum.yearBand} · {entry.question.curriculum.strand}</div>
               </div>
               <div>
-                <div className="font-medium text-gray-700">Marking</div>
-                <div className="mt-1 text-gray-600">{entry.question.marking.markingMethod}</div>
-                <div className="text-gray-500">Answer: {entry.question.marking.correctAnswer || 'Unclear'}</div>
+                <div className="font-medium text-on-surface-variant">Marking</div>
+                <div className="mt-1 text-on-surface-variant">{entry.question.marking.markingMethod}</div>
+                <div className="text-muted">Answer: {entry.question.marking.correctAnswer || 'Unclear'}</div>
               </div>
             </div>
             <div className="rounded-lg border border-amber-200 bg-amber-50 p-3">

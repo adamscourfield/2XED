@@ -288,7 +288,7 @@ export function CanvasInput({
   const showTypeTab = mode === 'draw+type' || mode === 'type-first';
 
   return (
-    <div className="flex flex-col gap-2 rounded border border-gray-200 bg-white p-3">
+    <div className="anx-card flex flex-col gap-2 p-3">
       {/* Toolbar */}
       <div className="flex items-center gap-2">
         {showDrawTab && (
@@ -296,7 +296,7 @@ export function CanvasInput({
             type="button"
             onClick={() => setActiveTab('draw')}
             className={`rounded px-3 py-1 text-sm font-medium transition-colors ${
-              activeTab === 'draw' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              activeTab === 'draw' ? 'bg-primary text-on-primary' : 'bg-surface-container-high text-on-surface-variant hover:bg-surface-bright'
             }`}
             disabled={disabled}
           >
@@ -308,7 +308,7 @@ export function CanvasInput({
             type="button"
             onClick={() => setActiveTab('type')}
             className={`rounded px-3 py-1 text-sm font-medium transition-colors ${
-              activeTab === 'type' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              activeTab === 'type' ? 'bg-primary text-on-primary' : 'bg-surface-container-high text-on-surface-variant hover:bg-surface-bright'
             }`}
             disabled={disabled}
           >
@@ -320,7 +320,7 @@ export function CanvasInput({
           <button
             type="button"
             onClick={undo}
-            className="rounded px-3 py-1 text-sm text-gray-600 hover:bg-gray-100 disabled:opacity-40"
+            className="rounded px-3 py-1 text-sm text-on-surface-variant hover:bg-surface-container-high disabled:opacity-40"
             disabled={disabled || undoStack.current.length === 0}
           >
             ↩ Undo
@@ -344,7 +344,7 @@ export function CanvasInput({
           height={300}
           tabIndex={markPrimaryFocus ? 0 : undefined}
           data-live-primary-focus={markPrimaryFocus ? '' : undefined}
-          className="touch-none rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="touch-none rounded border border-outline focus:outline-none focus:ring-2 focus:ring-primary/30"
           style={{ cursor: disabled ? 'not-allowed' : 'crosshair' }}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
@@ -361,7 +361,7 @@ export function CanvasInput({
           disabled={disabled}
           placeholder="Type your answer here…"
           data-live-primary-focus={markPrimaryFocus ? '' : undefined}
-          className="min-h-24 rounded border border-gray-300 p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
+          className="min-h-24 rounded border border-outline p-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 disabled:bg-surface-container-low"
         />
       )}
 
