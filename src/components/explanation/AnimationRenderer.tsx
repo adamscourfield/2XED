@@ -48,7 +48,7 @@ interface AnimationRendererProps {
 
 const highlightColors: Record<string, string> = {
   accent: 'text-orange-600 font-bold',
-  blue: 'text-blue-600',
+  blue: 'text-primary font-semibold',
   green: 'text-green-600',
   dim: 'text-on-surface-variant',
 };
@@ -79,9 +79,9 @@ function renderVisual(visual: VisualPrimitive, key: number) {
 
     case 'rule_callout':
       return (
-        <div key={key} className="rounded-lg border-2 border-indigo-200 bg-indigo-50 px-6 py-4 text-center my-4">
-          <p className="text-lg font-bold text-indigo-900">{visual.ruleText}</p>
-          {visual.subText && <p className="text-sm text-indigo-600 mt-1">{visual.subText}</p>}
+        <div key={key} className="rounded-lg border-2 border-primary bg-accentSurface px-6 py-4 text-center my-4 shadow-md">
+          <p className="text-lg font-bold text-primary">{visual.ruleText}</p>
+          {visual.subText && <p className="text-sm text-primary/80 mt-1">{visual.subText}</p>}
         </div>
       );
 
@@ -103,7 +103,7 @@ function renderVisual(visual: VisualPrimitive, key: number) {
         <svg key={key} width={width} height={70} viewBox={`0 0 ${width} 70`} className="block mx-auto my-4">
           <line x1={padding} y1={lineY} x2={width - padding} y2={lineY} stroke="#1a1814" strokeWidth={2} />
           {visual.highlightStart !== undefined && (
-            <circle cx={toX(visual.highlightStart)} cy={lineY} r={5} fill="#1a56d4" />
+            <circle cx={toX(visual.highlightStart)} cy={lineY} r={5} fill="var(--anx-primary)" />
           )}
           {visual.arrowFrom !== undefined && visual.arrowTo !== undefined && (
             <line x1={toX(visual.arrowFrom)} y1={lineY - 12} x2={toX(visual.arrowTo)} y2={lineY - 12} stroke="#1a9454" strokeWidth={2} />
@@ -127,8 +127,8 @@ function renderVisual(visual: VisualPrimitive, key: number) {
                   y={r * cellSize + 1}
                   width={cellSize}
                   height={cellSize}
-                  fill={visual.highlightRows?.includes(r) ? '#e8f0fd' : 'white'}
-                  stroke="#e8e3db"
+                  fill={visual.highlightRows?.includes(r) ? 'var(--anx-primary-soft)' : 'var(--anx-surface-container-lowest)'}
+                  stroke="var(--anx-outline-variant)"
                   strokeWidth={1}
                 />
               ))
@@ -145,8 +145,8 @@ function renderVisual(visual: VisualPrimitive, key: number) {
       return (
         <div key={key} className="flex flex-col items-center my-4">
           <svg width={barWidth + 2} height={32}>
-            <rect x={1} y={1} width={barWidth} height={30} fill="white" stroke="#e8e3db" strokeWidth={1} />
-            <rect x={1} y={1} width={filled} height={30} fill="#e8f0fd" stroke="#1a56d4" strokeWidth={1} />
+            <rect x={1} y={1} width={barWidth} height={30} fill="var(--anx-surface-container-lowest)" stroke="var(--anx-outline-variant)" strokeWidth={1} />
+            <rect x={1} y={1} width={filled} height={30} fill="var(--anx-primary-soft)" stroke="var(--anx-primary)" strokeWidth={1} />
           </svg>
           <div className="flex gap-4 mt-2 text-sm text-on-surface-variant">
             <span>{visual.numerator}/{visual.denominator}</span>
@@ -238,7 +238,7 @@ export function AnimationRenderer({ schema, currentStep: controlledStep, onStepC
       {/* Narration */}
       <div className="border-t border-outline-variant bg-surface-container-low px-6 py-3">
         <div className="flex items-start gap-2">
-          {isSpeaking && <span className="text-indigo-500 animate-pulse">🔊</span>}
+          {isSpeaking && <span className="text-primary animate-pulse">🔊</span>}
           <p className="text-sm text-on-surface-variant italic">{step.narration}</p>
         </div>
       </div>
@@ -258,7 +258,7 @@ export function AnimationRenderer({ schema, currentStep: controlledStep, onStepC
               <button
                 key={i}
                 onClick={() => isControlled ? onStepChange?.(i) : setInternalStep(i)}
-                className={`h-2 w-2 rounded-full ${i === currentStep ? 'bg-indigo-500' : 'bg-gray-300'}`}
+                className={`h-2 w-2 rounded-full transition-colors ${i === currentStep ? 'bg-primary' : 'bg-surface-container-high'}`}
               />
             ))}
           </div>
