@@ -487,12 +487,11 @@ export function QuestionBankClient() {
         </nav>
 
         <aside
-          className="flex flex-col gap-3 rounded-2xl border border-[rgba(99,56,241,0.12)] p-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4"
-          style={{ background: '#f5f3ff' }}
+          className="flex flex-col gap-3 rounded-2xl border border-primary/15 bg-primary/5 p-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4"
           aria-labelledby="question-bank-ai-heading"
         >
           <div className="flex min-w-0 flex-1 items-start gap-3">
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white text-[#6338f1] shadow-sm">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-surface-container-lowest text-primary shadow-md">
               <SparkleIcon className="h-6 w-6" />
             </span>
             <div className="min-w-0 space-y-1">
@@ -506,7 +505,7 @@ export function QuestionBankClient() {
           </div>
           <Link
             href="/teacher/question-bank/generate"
-            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border-2 border-[#6338f1] bg-white px-4 py-2.5 text-sm font-semibold text-[#6338f1] shadow-sm transition hover:bg-[rgba(99,56,241,0.06)] no-underline"
+            className="anx-btn-secondary shrink-0 gap-2 px-4 py-2.5 text-sm no-underline"
           >
             <SparkleIcon className="h-4 w-4" />
             Generate with AI
