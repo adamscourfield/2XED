@@ -57,7 +57,7 @@ export default function HomePage() {
         <div className="anx-landing-device__sun-core" aria-hidden />
         <div className="anx-landing-device__sparkles" aria-hidden />
 
-        <div className="relative z-[2] flex min-h-0 flex-1 flex-col justify-between px-7 pb-9 pt-14 sm:px-8 sm:pb-10 sm:pt-16">
+        <div className="relative z-[2] flex min-h-0 flex-col gap-8 px-7 pb-8 pt-10 sm:gap-9 sm:px-8 sm:pb-9 sm:pt-12">
           <div className="flex flex-col items-center">
             <div className="flex flex-col items-center gap-3">
               <Image
@@ -81,7 +81,7 @@ export default function HomePage() {
               />
             </div>
 
-            <div className="mt-11 space-y-1 text-center text-[0.95rem] font-medium leading-snug tracking-tight sm:mt-12 sm:text-base">
+            <div className="mt-6 space-y-1 text-center text-[0.95rem] font-medium leading-snug tracking-tight sm:mt-7 sm:text-base">
               <p style={{ color: 'var(--anx-landing-ink)' }}>Teach the room.</p>
               <p style={{ color: 'var(--anx-landing-tagline-2)' }}>Not the average.</p>
             </div>
@@ -96,7 +96,7 @@ export default function HomePage() {
             </Link>
 
             <p
-              className="mt-7 text-center text-[0.9375rem] font-normal leading-snug"
+              className="mt-5 text-center text-[0.9375rem] font-normal leading-snug"
               style={{ color: 'var(--anx-landing-muted)' }}
             >
               New here?{' '}

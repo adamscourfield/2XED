@@ -320,8 +320,8 @@
     position: relative;
     width: 100%;
     max-width: 22.5rem;
-    height: min(calc(100dvh - 1.5rem), 52rem);
-    min-height: min(calc(100dvh - 1.5rem), 52rem);
+    height: auto;
+    max-height: min(calc(100dvh - 1.5rem), 52rem);
     border-radius: 2.75rem;
     background: var(--anx-landing-bg);
     box-shadow:
