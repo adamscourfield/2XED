@@ -378,8 +378,7 @@ export function AppChrome({
   }, [variant, role, sessionStatus, studentLayout]);
 
   const homeHref = variant === "teacher" ? "/teacher/dashboard" : "/dashboard";
-  const tagline =
-    variant === "teacher" ? "Teaching workspace" : "Your learning hub";
+  const tagline = variant === "teacher" ? "Teach the Room" : "Your learning hub";
 
   const teacherNavPrimary: NavItem[] = [
     { href: "/teacher/dashboard", label: "Home", icon: "home" },
@@ -638,12 +637,14 @@ export function AppChrome({
       }`}
       onClick={() => setMenuOpen(false)}
     >
-      <LogoImage className="h-7 w-auto shrink-0 sm:h-8" />
+      <LogoImage className="h-8 w-auto shrink-0 sm:h-9" />
       <div className="min-w-0 text-left">
         <p
-          className={`truncate text-xs font-medium ${
-            variant === "teacher" ? "text-[#6b7280]" : "text-[color:var(--anx-text-muted)]"
-          }`}
+          className={
+            variant === "teacher"
+              ? "truncate text-base font-bold leading-tight tracking-tight text-[#111827]"
+              : "truncate text-xs font-medium text-[color:var(--anx-text-muted)]"
+          }
         >
           {tagline}
         </p>
