@@ -9,7 +9,7 @@ const phaseSchema = z.object({
   skillId: z.string().min(1),
   skillCode: z.string(),
   skillName: z.string(),
-  type: z.enum(['PRACTICE', 'EXPLANATION']),
+  type: z.enum(['PRACTICE', 'EXPLANATION', 'CHECK']),
   label: z.string(),
 });
 
