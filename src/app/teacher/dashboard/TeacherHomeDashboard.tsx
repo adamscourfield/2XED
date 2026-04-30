@@ -33,6 +33,14 @@ function sessionStatusLabel(status: string): { label: string; live: boolean; com
   return { label: status, live: false, completed: false };
 }
 
+function BadgeCheckIcon() {
+  return (
+    <svg className="td-home-badge-check" width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 function lessonIconSymbol(skillCode: string | null | undefined, subjectTitle: string): string {
   const code = skillCode?.trim();
   if (code) return code.slice(0, 2).toUpperCase();
@@ -134,9 +142,10 @@ export function TeacherHomeDashboard({ data, displayName, greeting, userRole }: 
       ) : null}
 
       <section className="td-home-action-row" aria-label="Quick actions">
-        <div className="td-home-action-card">
-          <div className="td-home-action-icon td-home-action-icon--primary" aria-hidden>
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+        <div className="td-home-action-card td-home-action-card--lesson">
+          <div className="td-home-action-card-deco td-home-action-card-deco--waves" aria-hidden />
+          <div className="td-home-action-icon td-home-action-icon--tile" aria-hidden>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
               <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" />
             </svg>
           </div>
@@ -144,18 +153,24 @@ export function TeacherHomeDashboard({ data, displayName, greeting, userRole }: 
           <p className="td-home-action-desc">Launch a live session and invite your class with a join code.</p>
           <Link href="/teacher/live/new" className="td-home-btn td-home-btn--primary">
             Start lesson
+            <span className="td-home-btn-arrow" aria-hidden>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M5 12h14m0 0l-4-4m4 4l-4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </span>
           </Link>
         </div>
-        <div className="td-home-action-card">
-          <div className="td-home-action-icon td-home-action-icon--soft" aria-hidden>
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+        <div className="td-home-action-card td-home-action-card--ai">
+          <div className="td-home-action-card-deco td-home-action-card-deco--sparkle" aria-hidden />
+          <div className="td-home-action-icon td-home-action-icon--tile" aria-hidden>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
               <path
-                d="M12 3l1.09 3.36L16.5 5.5l-2.86 2.08L15.18 11 12 9.27 8.82 11l1.54-3.42L7.5 5.5l3.41-.14L12 3Z"
+                d="M15 4l1.09 2.82L19 8l-2.91 1.18L15 12l-1.09-2.82L11 8l2.91-1.18L15 4Z"
                 stroke="currentColor"
-                strokeWidth="1.5"
+                strokeWidth="1.6"
                 strokeLinejoin="round"
               />
-              <path d="M5 14h14l-1 8H6l-1-8Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+              <path d="M5 19l2-1 1-2 1 2 2 1-2 1-1 2-1-2-2-1Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
             </svg>
           </div>
           <h2 className="td-home-action-title">Let Ember build for you</h2>
@@ -164,52 +179,106 @@ export function TeacherHomeDashboard({ data, displayName, greeting, userRole }: 
           </p>
           <Link href="/teacher/question-bank/generate" className="td-home-btn td-home-btn--outline">
             Generate with AI
+            <span className="td-home-btn-wand" aria-hidden>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M15 4l1.09 2.82L19 8l-2.91 1.18L15 12l-1.09-2.82L11 8l2.91-1.18L15 4Z"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </span>
           </Link>
         </div>
       </section>
 
       <div className="td-home-mid">
-        <section className="td-home-card td-home-recent">
-          <div className="td-home-card-head">
-            <h2 className="td-home-card-title">Recent lessons</h2>
-            <Link href="/teacher/lessons" className="td-home-link-more">
-              View all lessons
-              <span aria-hidden> ›</span>
-            </Link>
-          </div>
-          {recentForList.length === 0 ? (
-            <p className="td-home-empty">No lessons yet. Start your first live session above.</p>
-          ) : (
-            <ul className="td-home-lesson-list">
-              {recentForList.map((ls) => {
-                const cls = ls.classroom;
-                const meta = cls ? `${cls.name} · ${classCodeLabel(cls.externalClassId, cls.subjectSlug)}` : ls.subject.title;
+        <div className="td-home-main-col">
+          <section className="td-home-card td-home-recent">
+            <div className="td-home-card-head">
+              <h2 className="td-home-card-title">Recent lessons</h2>
+              <Link href="/teacher/lessons" className="td-home-link-more">
+                View all lessons
+                <span aria-hidden> &gt;</span>
+              </Link>
+            </div>
+            {recentForList.length === 0 ? (
+              <p className="td-home-empty">No lessons yet. Start your first live session above.</p>
+            ) : (
+              <ul className="td-home-lesson-list">
+                {recentForList.map((ls) => {
+                  const cls = ls.classroom;
+                  const meta = cls ? `${cls.name} • ${classCodeLabel(cls.externalClassId, cls.subjectSlug)}` : ls.subject.title;
+                  const title = ls.skill?.name ?? ls.subject.title;
+                  const sym = lessonIconSymbol(ls.skill?.code, ls.subject.title);
+                  const bg = iconHue(ls.id);
+                  const st = sessionStatusLabel(ls.status);
+                  return (
+                    <li key={ls.id} className="td-home-lesson-row">
+                      <div className="td-home-lesson-icon" style={{ background: bg }} aria-hidden>
+                        <span>{sym}</span>
+                      </div>
+                      <div className="td-home-lesson-main">
+                        <p className="td-home-lesson-title">{title}</p>
+                        <p className="td-home-lesson-meta">{meta}</p>
+                      </div>
+                      <div className="td-home-lesson-side">
+                        <span
+                          className={
+                            st.live
+                              ? 'td-home-badge td-home-badge--live'
+                              : st.completed
+                                ? 'td-home-badge td-home-badge--completed'
+                                : 'td-home-badge td-home-badge--neutral'
+                          }
+                        >
+                          {st.live ? <span className="td-home-dot" aria-hidden /> : null}
+                          {st.completed ? <BadgeCheckIcon /> : null}
+                          {st.label}
+                        </span>
+                        <span className="td-home-lesson-time">{formatSessionTime(ls.createdAt)}</span>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </section>
+
+          <section className="td-home-continue td-home-card" aria-label="Continue working">
+            <div className="td-home-card-head">
+              <h2 className="td-home-card-title">Continue where you left off</h2>
+              <Link href="/teacher/dashboard/classes" className="td-home-link-more">
+                View all
+                <span aria-hidden> &gt;</span>
+              </Link>
+            </div>
+            <div className="td-home-continue-row">
+              {continueSessions.map((ls) => {
                 const title = ls.skill?.name ?? ls.subject.title;
-                const sym = lessonIconSymbol(ls.skill?.code, ls.subject.title);
-                const bg = iconHue(ls.id);
-                const st = sessionStatusLabel(ls.status);
+                const mins = Math.max(0, Math.round((Date.now() - ls.updatedAt.getTime()) / 60000));
+                const edited = mins < 1 ? 'just now' : mins < 60 ? `${mins}m ago` : `${Math.round(mins / 60)}h ago`;
                 return (
-                  <li key={ls.id} className="td-home-lesson-row">
-                    <div className="td-home-lesson-icon" style={{ background: bg }} aria-hidden>
-                      <span>{sym}</span>
-                    </div>
-                    <div className="td-home-lesson-main">
-                      <p className="td-home-lesson-title">{title}</p>
-                      <p className="td-home-lesson-meta">{meta}</p>
-                    </div>
-                    <div className="td-home-lesson-side">
-                      <span className={st.live ? 'td-home-badge td-home-badge--live' : 'td-home-badge td-home-badge--done'}>
-                        {st.live ? <span className="td-home-dot" aria-hidden /> : null}
-                        {st.label}
-                      </span>
-                      <span className="td-home-lesson-time">{formatSessionTime(ls.createdAt)}</span>
-                    </div>
-                  </li>
+                  <Link key={ls.id} href={`/teacher/live/${ls.id}`} className="td-home-mini-card">
+                    <span className="td-home-mini-label">Live lesson</span>
+                    <p className="td-home-mini-title">{title}</p>
+                    <p className="td-home-mini-foot">Edited {edited}</p>
+                  </Link>
                 );
               })}
-            </ul>
-          )}
-        </section>
+              <Link href="/teacher/live/new" className="td-home-mini-card td-home-mini-card--new">
+                <span className="td-home-mini-plus" aria-hidden>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" />
+                  </svg>
+                </span>
+                <p className="td-home-mini-title">New from blank</p>
+                <p className="td-home-mini-foot">Start a fresh session</p>
+              </Link>
+            </div>
+          </section>
+        </div>
 
         <div className="td-home-side-stack">
           <section className="td-home-card">
@@ -238,7 +307,7 @@ export function TeacherHomeDashboard({ data, displayName, greeting, userRole }: 
                 </ul>
                 <Link href="/teacher/dashboard/classes" className="td-home-footer-link">
                   View all classes
-                  <span aria-hidden> ›</span>
+                  <span aria-hidden> &gt;</span>
                 </Link>
               </>
             )}
@@ -255,7 +324,7 @@ export function TeacherHomeDashboard({ data, displayName, greeting, userRole }: 
                     </span>
                     <span className="td-home-quick-label">{item.label}</span>
                     <span className="td-home-quick-chevron" aria-hidden>
-                      ›
+                      &gt;
                     </span>
                   </Link>
                 </li>
@@ -264,37 +333,6 @@ export function TeacherHomeDashboard({ data, displayName, greeting, userRole }: 
           </section>
         </div>
       </div>
-
-      <section className="td-home-continue" aria-label="Continue working">
-        <div className="td-home-card-head">
-          <h2 className="td-home-card-title">Continue where you left off</h2>
-          <Link href="/teacher/dashboard/classes" className="td-home-link-more">
-            View all
-            <span aria-hidden> ›</span>
-          </Link>
-        </div>
-        <div className="td-home-continue-row">
-          {continueSessions.map((ls) => {
-            const title = ls.skill?.name ?? ls.subject.title;
-            const mins = Math.max(0, Math.round((Date.now() - ls.updatedAt.getTime()) / 60000));
-            const edited = mins < 1 ? 'just now' : mins < 60 ? `${mins}m ago` : `${Math.round(mins / 60)}h ago`;
-            return (
-              <Link key={ls.id} href={`/teacher/live/${ls.id}`} className="td-home-mini-card">
-                <span className="td-home-mini-label">Live lesson</span>
-                <p className="td-home-mini-title">{title}</p>
-                <p className="td-home-mini-foot">Edited {edited}</p>
-              </Link>
-            );
-          })}
-          <Link href="/teacher/live/new" className="td-home-mini-card td-home-mini-card--new">
-            <span className="td-home-mini-plus" aria-hidden>
-              +
-            </span>
-            <p className="td-home-mini-title">New from blank</p>
-            <p className="td-home-mini-foot">Start a fresh session</p>
-          </Link>
-        </div>
-      </section>
 
       {userRole === 'ADMIN' || userRole === 'LEADERSHIP' ? (
         <p className="td-home-admin-hint">

@@ -47,6 +47,7 @@ export default async function TeacherDashboardPage() {
       appChrome="teacher"
       appChromeShowLeadershipNav={user.role === 'ADMIN' || user.role === 'LEADERSHIP'}
       hideHeader
+      childrenClassName="td-home-page-canvas"
     >
       <TeacherHomeDashboard data={data} displayName={displayName} greeting={greeting} userRole={user.role ?? 'TEACHER'} />
     </LearningPageShell>
