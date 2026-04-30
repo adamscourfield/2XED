@@ -12,6 +12,7 @@ const config: Config = {
       fontFamily: {
         sans:      ['var(--font-manrope)', 'Manrope', 'system-ui', '-apple-system', 'sans-serif'],
         display:   ['var(--font-jakarta)', 'Plus Jakarta Sans', 'system-ui', '-apple-system', 'sans-serif'],
+        landing:   ['var(--font-inter)', 'Inter', 'system-ui', '-apple-system', 'sans-serif'],
       },
       colors: {
         /* Surface hierarchy — 2XED */
