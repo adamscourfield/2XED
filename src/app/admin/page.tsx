@@ -125,7 +125,7 @@ export default async function AdminHomePage() {
   const coverageGaps = totalSkills - skillsWithItems;
 
   return (
-    <div className="min-h-screen" style={{ background: 'var(--anx-surface-bright)' }}>
+    <div className="anx-app-canvas min-h-screen">
       <header className="border-b px-8 py-5" style={{ borderColor: 'var(--anx-border)', background: 'var(--anx-surface-container-lowest)' }}>
         <div className="mx-auto flex max-w-6xl items-center justify-between">
           <div>
