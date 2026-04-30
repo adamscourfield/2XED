@@ -8,6 +8,10 @@ const inter = Inter({
 
 export default function LoginLayout({ children }: { children: ReactNode }) {
   return (
-    <div className={`${inter.className} min-h-[100dvh] bg-[#F8F9FD] text-[#2D236E] antialiased`}>{children}</div>
+    <div
+      className={`${inter.className} anx-app-canvas min-h-[100dvh] text-[#2D236E] antialiased`}
+    >
+      {children}
+    </div>
   );
 }

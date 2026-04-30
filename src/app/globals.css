@@ -137,6 +137,10 @@
     /* ── Brand blue — kept for legacy references ─────────────────── */
     --anx-brand-blue: #4a40e0;
 
+    /* Full-page canvas — marketing home, auth, signed-in main column (see .anx-app-canvas) */
+    --anx-app-canvas-gradient: linear-gradient(160deg, #ebe8f4 0%, #e0dce8 45%, #d4cfe3 100%);
+    --anx-scene-gradient: var(--anx-app-canvas-gradient);
+
     /* Dashboard hero + XP badge (marketing accents) */
     --anx-dashboard-hero-from: #5058d7;
     --anx-dashboard-hero-to: #818cf8;
@@ -225,6 +229,11 @@
     box-shadow: var(--anx-shadow-float);
   }
 
+  /* Marketing home + auth + dashboard main column — same wash as .anx-landing-page */
+  .anx-app-canvas {
+    background: var(--anx-app-canvas-gradient);
+  }
+
   /* Hero / auth backdrop — purple gradient + soft blobs (glass reads on top) */
   .anx-scene {
     position: relative;
@@ -276,7 +285,7 @@
     align-items: center;
     justify-content: center;
     padding: 0.75rem;
-    background: linear-gradient(160deg, #ebe8f4 0%, #e0dce8 45%, #d4cfe3 100%);
+    background: var(--anx-app-canvas-gradient);
   }
 
   @media (min-width: 640px) {
