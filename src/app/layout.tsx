@@ -1,7 +1,13 @@
 import type { Metadata } from 'next';
-import { Plus_Jakarta_Sans, Manrope } from 'next/font/google';
+import { Inter, Plus_Jakarta_Sans, Manrope } from 'next/font/google';
 import './globals.css';
 import { Providers } from './providers';
+
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-inter',
+});
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
@@ -41,7 +47,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${plusJakarta.variable} ${manrope.variable}`}>
+    <html lang="en" className={`${inter.variable} ${plusJakarta.variable} ${manrope.variable}`}>
       <body className={`${manrope.className} bg-surface text-on-surface antialiased`}>
         <Providers>{children}</Providers>
       </body>
