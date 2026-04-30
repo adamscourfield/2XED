@@ -58,30 +58,6 @@ function LogoImage({ className }: { className?: string }) {
   );
 }
 
-/** Reference sidebar mark: orange → purple gradient flame/drop shape */
-function TeachTheRoomMark({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className ?? "h-9 w-9 shrink-0"}
-      viewBox="0 0 40 40"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      aria-hidden
-    >
-      <defs>
-        <linearGradient id="ember-mark-grad" x1="20" y1="27.4" x2="20" y2="6" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="#f97316" />
-          <stop offset="100%" stopColor="#7c3aed" />
-        </linearGradient>
-      </defs>
-      <path
-        d="M20 6c-1.2 2.8-5 6.2-5 11.2 0 4.1 2.2 7.4 5 8.2 2.8-.8 5-4.1 5-8.2 0-5-3.8-8.4-5-11.2Zm0 3.2c.9 2.5 3.5 5.3 3.5 9 0 2.6-1.2 4.7-3.5 5.5-2.3-.8-3.5-2.9-3.5-5.5 0-3.7 2.6-6.5 3.5-9Z"
-        fill="url(#ember-mark-grad)"
-      />
-    </svg>
-  );
-}
-
 type NavIconChrome = "default" | "teacher";
 
 function NavIconBox({
@@ -652,30 +628,28 @@ export function AppChrome({
     );
   }
 
-  const brandBlock =
-    variant === "teacher" ? (
-      <Link
-        href={homeHref}
-        className="flex items-center gap-3 rounded-2xl p-2 outline-none transition-colors hover:bg-[#f9fafb] focus-visible:ring-2 focus-visible:ring-[#5850ec]/25"
-        onClick={() => setMenuOpen(false)}
-      >
-        <TeachTheRoomMark />
-        <div className="min-w-0 text-left">
-          <p className="truncate text-base font-bold leading-tight tracking-tight text-[#111827]">Teach the Room</p>
-        </div>
-      </Link>
-    ) : (
-      <Link
-        href={homeHref}
-        className="flex items-center gap-3 rounded-2xl p-2 outline-none transition-colors hover:bg-[var(--anx-surface-hover)] focus-visible:ring-2 focus-visible:ring-[var(--anx-primary-glow)]"
-        onClick={() => setMenuOpen(false)}
-      >
-        <LogoImage className="h-7 w-auto shrink-0 sm:h-8" />
-        <div className="min-w-0 text-left">
-          <p className="truncate text-xs font-medium text-[color:var(--anx-text-muted)]">{tagline}</p>
-        </div>
-      </Link>
-    );
+  const brandBlock = (
+    <Link
+      href={homeHref}
+      className={`flex items-center gap-3 rounded-2xl p-2 outline-none transition-colors focus-visible:ring-2 ${
+        variant === "teacher"
+          ? "hover:bg-[#f9fafb] focus-visible:ring-[#5850ec]/25"
+          : "hover:bg-[var(--anx-surface-hover)] focus-visible:ring-[var(--anx-primary-glow)]"
+      }`}
+      onClick={() => setMenuOpen(false)}
+    >
+      <LogoImage className="h-7 w-auto shrink-0 sm:h-8" />
+      <div className="min-w-0 text-left">
+        <p
+          className={`truncate text-xs font-medium ${
+            variant === "teacher" ? "text-[#6b7280]" : "text-[color:var(--anx-text-muted)]"
+          }`}
+        >
+          {tagline}
+        </p>
+      </div>
+    </Link>
+  );
 
   const logoOnly = (
     <Link
