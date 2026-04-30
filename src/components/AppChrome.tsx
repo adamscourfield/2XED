@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect, useState, useId } from "react";
 import { StudentTopBarSubjectSelector, type StudentTopBarSubjectOption } from "@/components/student/StudentTopBarSubjectSelector";
 import { StudentTopBarUserMenu } from "@/components/student/StudentTopBarUserMenu";
 
@@ -58,6 +58,33 @@ function LogoImage({ className }: { className?: string }) {
   );
 }
 
+/** Reference sidebar mark: orange → purple gradient flame/drop shape */
+function TeachTheRoomMark({ className }: { className?: string }) {
+  const uid = useId().replace(/:/g, "");
+  const gradId = `ttr-mark-grad-${uid}`;
+  return (
+    <svg
+      className={className ?? "h-9 w-9 shrink-0"}
+      viewBox="0 0 40 40"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden
+    >
+      <defs>
+        <linearGradient id={gradId} x1="6" y1="34" x2="34" y2="6" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#f97316" />
+          <stop offset="0.5" stopColor="#c084fc" />
+          <stop offset="1" stopColor="#5850ec" />
+        </linearGradient>
+      </defs>
+      <path
+        d="M20 6c-1.2 2.8-5 6.2-5 11.2 0 4.1 2.2 7.4 5 8.2 2.8-.8 5-4.1 5-8.2 0-5-3.8-8.4-5-11.2Zm0 3.2c.9 2.5 3.5 5.3 3.5 9 0 2.6-1.2 4.7-3.5 5.5-2.3-.8-3.5-2.9-3.5-5.5 0-3.7 2.6-6.5 3.5-9Z"
+        fill={`url(#${gradId})`}
+      />
+    </svg>
+  );
+}
+
 type NavIconChrome = "default" | "teacher";
 
 function NavIconBox({
@@ -72,10 +99,10 @@ function NavIconBox({
   const isTeacher = chrome === "teacher";
   const box = active
     ? isTeacher
-      ? "bg-[#ede9fe] text-[#5b21b6] ring-1 ring-inset ring-[#c4b5fd]/90"
+      ? "bg-[#f5f3ff] text-[#5850ec] ring-1 ring-inset ring-[#e9e5ff]"
       : "bg-[rgba(99,102,241,0.18)] text-[#4338ca]"
     : isTeacher
-      ? "bg-[#f4f4f5] text-[#52525b]"
+      ? "bg-white text-[#6b7280] ring-1 ring-inset ring-[#e5e7eb]"
       : "bg-[#f0f1f4] text-[#374151]";
   const stroke = "currentColor";
   const icon = (() => {
@@ -459,8 +486,8 @@ export function AppChrome({
           teacher
             ? `group relative flex items-center gap-3 rounded-xl py-2.5 pl-3 pr-2.5 transition-colors duration-150 ${
                 active
-                  ? "bg-[#f5f3ff] before:absolute before:left-0 before:top-1/2 before:h-[2.125rem] before:w-[4px] before:-translate-y-1/2 before:rounded-full before:bg-[#6366f1] before:content-['']"
-                  : "text-[#3f3f46] hover:bg-[#fafafa]"
+                  ? "bg-[#f5f3ff] before:absolute before:left-0 before:top-1/2 before:h-[2.125rem] before:w-[4px] before:-translate-y-1/2 before:rounded-full before:bg-[#2563eb] before:content-['']"
+                  : "text-[#374151] hover:bg-[#f9fafb]"
               }`
             : `group relative flex items-center gap-3 rounded-2xl px-3 py-2.5 pl-3 transition-colors duration-150 ${
                 active
@@ -481,8 +508,8 @@ export function AppChrome({
             className={`block text-[0.9375rem] font-semibold leading-snug tracking-tight ${
               teacher
                 ? active
-                  ? "text-[#312e81]"
-                  : "text-[#27272a]"
+                  ? "text-[#111827]"
+                  : "text-[#374151]"
                 : active
                   ? "text-[#312e81]"
                   : "text-[color:var(--anx-text)]"
@@ -495,8 +522,8 @@ export function AppChrome({
               className={`mt-0.5 block text-xs leading-relaxed ${
                 teacher
                   ? active
-                    ? "text-[#5b21b6]/85"
-                    : "text-[#71717a]"
+                    ? "text-[#5850ec]"
+                    : "text-[#6b7280]"
                   : active
                     ? "text-[#4f46e5]/90"
                     : "text-[color:var(--anx-text-muted)]"
@@ -606,7 +633,7 @@ export function AppChrome({
             );
           })}
         </nav>
-        <div className="mx-2 border-t border-[#e4e4e7]" />
+        <div className="mx-2 border-t border-[#e5e7eb]" />
         <nav className="flex flex-col gap-0.5" aria-label="Secondary">
           {teacherNavSecondary.map((item) => {
             const active = isNavActive(pathname, item.href);
@@ -628,28 +655,30 @@ export function AppChrome({
     );
   }
 
-  const brandBlock = (
-    <Link
-      href={homeHref}
-      className={`flex items-center gap-3 rounded-2xl p-2 outline-none focus-visible:ring-2 focus-visible:ring-[var(--anx-primary-glow)] ${
-        variant === "teacher"
-          ? "transition-colors hover:bg-[#f4f4f5]"
-          : "transition-colors hover:bg-[var(--anx-surface-hover)]"
-      }`}
-      onClick={() => setMenuOpen(false)}
-    >
-      <LogoImage className="h-7 w-auto shrink-0 sm:h-8" />
-      <div className="min-w-0 text-left">
-        <p
-          className={`truncate text-xs font-medium ${
-            variant === "teacher" ? "text-[#71717a]" : "text-[color:var(--anx-text-muted)]"
-          }`}
-        >
-          {tagline}
-        </p>
-      </div>
-    </Link>
-  );
+  const brandBlock =
+    variant === "teacher" ? (
+      <Link
+        href={homeHref}
+        className="flex items-center gap-3 rounded-2xl p-2 outline-none transition-colors hover:bg-[#f9fafb] focus-visible:ring-2 focus-visible:ring-[#5850ec]/25"
+        onClick={() => setMenuOpen(false)}
+      >
+        <TeachTheRoomMark />
+        <div className="min-w-0 text-left">
+          <p className="truncate text-base font-bold leading-tight tracking-tight text-[#111827]">Teach the Room</p>
+        </div>
+      </Link>
+    ) : (
+      <Link
+        href={homeHref}
+        className="flex items-center gap-3 rounded-2xl p-2 outline-none transition-colors hover:bg-[var(--anx-surface-hover)] focus-visible:ring-2 focus-visible:ring-[var(--anx-primary-glow)]"
+        onClick={() => setMenuOpen(false)}
+      >
+        <LogoImage className="h-7 w-auto shrink-0 sm:h-8" />
+        <div className="min-w-0 text-left">
+          <p className="truncate text-xs font-medium text-[color:var(--anx-text-muted)]">{tagline}</p>
+        </div>
+      </Link>
+    );
 
   const logoOnly = (
     <Link
@@ -749,22 +778,22 @@ export function AppChrome({
 
       <aside
         id="app-chrome-drawer"
-        className={`fixed inset-y-0 left-0 z-50 flex w-[min(18rem,88vw)] flex-col border-r shadow-[var(--anx-shadow-lg)] transition-transform duration-200 ease-out lg:static lg:z-0 lg:w-[min(17.5rem,19vw)] lg:translate-x-0 lg:shadow-none ${
+        className={`fixed inset-y-0 left-0 z-50 flex w-[min(18rem,88vw)] flex-col border-r shadow-[var(--anx-shadow-lg)] transition-transform duration-200 ease-out lg:static lg:z-0 lg:w-[min(17.5rem,20vw)] lg:max-w-[280px] lg:translate-x-0 lg:shadow-none ${
           variant === "teacher"
-            ? "border-[#e4e4e7] bg-white lg:border-[#e4e4e7] lg:shadow-[1px_0_0_rgba(0,0,0,0.04)]"
+            ? "border-[#e5e7eb] bg-[#fafafa] lg:border-[#e5e7eb] lg:shadow-[1px_0_0_rgba(0,0,0,0.04)]"
             : "border-[var(--anx-outline-variant)] bg-[color:var(--anx-surface-raised)] lg:shadow-none"
         } ${menuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
       >
         <div
           className={`hidden p-4 lg:block ${
-            variant === "teacher" ? "border-b border-[#f4f4f5]" : "border-b border-[var(--anx-outline-variant)]"
+            variant === "teacher" ? "border-b border-[#e5e7eb]" : "border-b border-[var(--anx-outline-variant)]"
           }`}
         >
           {brandBlock}
         </div>
         <div
           className={`p-3 lg:hidden ${
-            variant === "teacher" ? "border-b border-[#f4f4f5]" : "border-b border-[var(--anx-outline-variant)]"
+            variant === "teacher" ? "border-b border-[#e5e7eb]" : "border-b border-[var(--anx-outline-variant)]"
           }`}
         >
           {brandBlock}
@@ -781,49 +810,57 @@ export function AppChrome({
 
         <div
           className={`p-4 ${
-            variant === "teacher" ? "border-t border-[#f4f4f5] bg-[#fafafa]" : "border-t border-[var(--anx-outline-variant)]"
+            variant === "teacher" ? "border-t border-[#e5e7eb] bg-[#fafafa]" : "border-t border-[var(--anx-outline-variant)]"
           }`}
         >
-          <div
-            className={`flex items-center gap-3 rounded-xl border px-3 py-2.5 shadow-[var(--anx-shadow-card)] ${
-              variant === "teacher"
-                ? "border-[#e4e4e7] bg-white"
-                : "border-[var(--anx-outline-variant)] bg-[color:var(--anx-surface-bright)]"
-            }`}
-          >
-            <div
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white"
-              style={{
-                background:
-                  "linear-gradient(145deg, var(--anx-primary) 0%, #6366f1 55%, #8b7bff 100%)",
-              }}
-              aria-hidden
+          {variant === "teacher" ? (
+            <Link
+              href="/teacher/settings"
+              className="flex items-center gap-3 rounded-xl border border-[#e5e7eb] bg-white px-3 py-2.5 shadow-sm transition hover:border-[#d1d5db] hover:shadow-md"
+              onClick={() => setMenuOpen(false)}
             >
-              {variant === "teacher" ? teacherInitials : initial}
-            </div>
-            <div className="min-w-0 flex-1">
-              <p
-                className={`truncate text-sm font-semibold ${
-                  variant === "teacher" ? "text-[#18181b]" : "text-[color:var(--anx-text)]"
-                }`}
+              <div
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white"
+                style={{ background: "linear-gradient(145deg, #5850ec 0%, #7c3aed 100%)" }}
+                aria-hidden
               >
-                {userName}
-              </p>
-              <p
-                className={`truncate text-xs ${
-                  variant === "teacher" ? "text-[#71717a]" : "text-[color:var(--anx-text-muted)]"
-                }`}
+                {teacherInitials}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-semibold text-[#111827]">{userName}</p>
+              </div>
+              <span className="shrink-0 text-[#9ca3af]" aria-hidden>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                  <path d="M9 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </span>
+            </Link>
+          ) : (
+            <div
+              className="flex items-center gap-3 rounded-xl border border-[var(--anx-outline-variant)] bg-[color:var(--anx-surface-bright)] px-3 py-2.5 shadow-[var(--anx-shadow-card)]"
+            >
+              <div
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white"
+                style={{
+                  background:
+                    "linear-gradient(145deg, var(--anx-primary) 0%, #6366f1 55%, #8b7bff 100%)",
+                }}
+                aria-hidden
               >
-                {roleFooterLabel()}
-              </p>
+                {initial}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-semibold text-[color:var(--anx-text)]">{userName}</p>
+                <p className="truncate text-xs text-[color:var(--anx-text-muted)]">{roleFooterLabel()}</p>
+              </div>
             </div>
-          </div>
+          )}
           <button
             type="button"
             onClick={() => signOut({ callbackUrl: "/login" })}
             className={`mt-3 w-full text-center text-xs font-medium transition ${
               variant === "teacher"
-                ? "text-[#71717a] hover:text-[#6366f1]"
+                ? "text-[#6b7280] hover:text-[#5850ec]"
                 : "text-[color:var(--anx-text-muted)] hover:text-[color:var(--anx-text)]"
             }`}
           >
@@ -832,7 +869,15 @@ export function AppChrome({
         </div>
       </aside>
 
-      <div className="flex min-h-0 min-w-0 flex-1 flex-col">{children}</div>
+      <div
+        className={
+          variant === "teacher"
+            ? "flex min-h-0 min-w-0 flex-1 flex-col bg-[#f9fafb]"
+            : "flex min-h-0 min-w-0 flex-1 flex-col"
+        }
+      >
+        {children}
+      </div>
     </div>
   );
 }

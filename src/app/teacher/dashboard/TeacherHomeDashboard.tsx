@@ -63,21 +63,25 @@ export function classCodeLabel(externalClassId: string, subjectSlug: string | nu
 }
 
 const QUICK_LINKS = [
-  { href: '/teacher/question-bank', label: 'Question bank', icon: 'bank' as const },
+  { href: '/teacher/question-bank', label: 'Question bank', icon: 'bookOpen' as const },
   { href: '/teacher/reports', label: 'Reports', icon: 'chart' as const },
   { href: '/teacher/resources', label: 'Resources', icon: 'folder' as const },
 ];
 
-function QuickIcon({ kind }: { kind: 'bank' | 'chart' | 'folder' }) {
+const LESSON_TILE_BG = '#5850ec';
+const CLASS_ORB_BG = '#5850ec';
+
+function QuickIcon({ kind }: { kind: 'bookOpen' | 'chart' | 'folder' }) {
   const stroke = 'currentColor';
-  if (kind === 'bank') {
+  if (kind === 'bookOpen') {
     return (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
         <path
-          d="M4 10h16M6 10V6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v4M6 10v10h12V10M9 14h6"
+          d="M12 6.5v11M12 6.5c-1.2-.67-2.75-1-4.5-1-1.4 0-2.6.22-3.5.6V18c.9-.38 2.1-.6 3.5-.6 1.75 0 3.3.33 4.5 1M12 6.5c1.2-.67 2.75-1 4.5-1 1.4 0 2.6.22 3.5.6V18c-.9-.38-2.1-.6-3.5-.6-1.75 0-3.3.33-4.5 1"
           stroke={stroke}
           strokeWidth="1.75"
           strokeLinecap="round"
+          strokeLinejoin="round"
         />
       </svg>
     );
@@ -193,145 +197,140 @@ export function TeacherHomeDashboard({ data, displayName, greeting, userRole }: 
         </div>
       </section>
 
-      <div className="td-home-mid">
-        <div className="td-home-main-col">
-          <section className="td-home-card td-home-recent">
-            <div className="td-home-card-head">
-              <h2 className="td-home-card-title">Recent lessons</h2>
-              <Link href="/teacher/lessons" className="td-home-link-more">
-                View all lessons
-                <span aria-hidden> &gt;</span>
-              </Link>
-            </div>
-            {recentForList.length === 0 ? (
-              <p className="td-home-empty">No lessons yet. Start your first live session above.</p>
-            ) : (
-              <ul className="td-home-lesson-list">
-                {recentForList.map((ls) => {
-                  const cls = ls.classroom;
-                  const meta = cls ? `${cls.name} • ${classCodeLabel(cls.externalClassId, cls.subjectSlug)}` : ls.subject.title;
-                  const title = ls.skill?.name ?? ls.subject.title;
-                  const sym = lessonIconSymbol(ls.skill?.code, ls.subject.title);
-                  const bg = iconHue(ls.id);
-                  const st = sessionStatusLabel(ls.status);
-                  return (
-                    <li key={ls.id} className="td-home-lesson-row">
-                      <div className="td-home-lesson-icon" style={{ background: bg }} aria-hidden>
-                        <span>{sym}</span>
-                      </div>
-                      <div className="td-home-lesson-main">
-                        <p className="td-home-lesson-title">{title}</p>
-                        <p className="td-home-lesson-meta">{meta}</p>
-                      </div>
-                      <div className="td-home-lesson-side">
-                        <span
-                          className={
-                            st.live
-                              ? 'td-home-badge td-home-badge--live'
-                              : st.completed
-                                ? 'td-home-badge td-home-badge--completed'
-                                : 'td-home-badge td-home-badge--neutral'
-                          }
-                        >
-                          {st.live ? <span className="td-home-dot" aria-hidden /> : null}
-                          {st.completed ? <BadgeCheckIcon /> : null}
-                          {st.label}
-                        </span>
-                        <span className="td-home-lesson-time">{formatSessionTime(ls.createdAt)}</span>
-                      </div>
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
-          </section>
-
-          <section className="td-home-continue td-home-card" aria-label="Continue working">
-            <div className="td-home-card-head">
-              <h2 className="td-home-card-title">Continue where you left off</h2>
-              <Link href="/teacher/dashboard/classes" className="td-home-link-more">
-                View all
-                <span aria-hidden> &gt;</span>
-              </Link>
-            </div>
-            <div className="td-home-continue-row">
-              {continueSessions.map((ls) => {
+      <div className="td-home-grid">
+        <section className="td-home-card td-home-recent td-home-grid-recent">
+          <div className="td-home-card-head">
+            <h2 className="td-home-card-title">Recent lessons</h2>
+            <Link href="/teacher/lessons" className="td-home-link-more">
+              View all lessons
+              <span aria-hidden> →</span>
+            </Link>
+          </div>
+          {recentForList.length === 0 ? (
+            <p className="td-home-empty">No lessons yet. Start your first live session above.</p>
+          ) : (
+            <ul className="td-home-lesson-list">
+              {recentForList.map((ls) => {
+                const cls = ls.classroom;
+                const meta = cls ? `${cls.name} • ${classCodeLabel(cls.externalClassId, cls.subjectSlug)}` : ls.subject.title;
                 const title = ls.skill?.name ?? ls.subject.title;
-                const mins = Math.max(0, Math.round((Date.now() - ls.updatedAt.getTime()) / 60000));
-                const edited = mins < 1 ? 'just now' : mins < 60 ? `${mins}m ago` : `${Math.round(mins / 60)}h ago`;
+                const sym = lessonIconSymbol(ls.skill?.code, ls.subject.title);
+                const st = sessionStatusLabel(ls.status);
                 return (
-                  <Link key={ls.id} href={`/teacher/live/${ls.id}`} className="td-home-mini-card">
-                    <span className="td-home-mini-label">Live lesson</span>
-                    <p className="td-home-mini-title">{title}</p>
-                    <p className="td-home-mini-foot">Edited {edited}</p>
-                  </Link>
+                  <li key={ls.id} className="td-home-lesson-row">
+                    <div className="td-home-lesson-icon" style={{ background: LESSON_TILE_BG }} aria-hidden>
+                      <span>{sym}</span>
+                    </div>
+                    <div className="td-home-lesson-main">
+                      <p className="td-home-lesson-title">{title}</p>
+                      <p className="td-home-lesson-meta">{meta}</p>
+                    </div>
+                    <div className="td-home-lesson-side">
+                      <span
+                        className={
+                          st.live
+                            ? 'td-home-badge td-home-badge--live'
+                            : st.completed
+                              ? 'td-home-badge td-home-badge--completed'
+                              : 'td-home-badge td-home-badge--neutral'
+                        }
+                      >
+                        {st.live ? <span className="td-home-dot" aria-hidden /> : null}
+                        {st.completed ? <BadgeCheckIcon /> : null}
+                        {st.label}
+                      </span>
+                      <span className="td-home-lesson-time">{formatSessionTime(ls.createdAt)}</span>
+                    </div>
+                  </li>
                 );
               })}
-              <Link href="/teacher/live/new" className="td-home-mini-card td-home-mini-card--new">
-                <span className="td-home-mini-plus" aria-hidden>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                    <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" />
-                  </svg>
-                </span>
-                <p className="td-home-mini-title">New from blank</p>
-                <p className="td-home-mini-foot">Start a fresh session</p>
-              </Link>
-            </div>
-          </section>
-        </div>
-
-        <div className="td-home-side-stack">
-          <section className="td-home-card">
-            <div className="td-home-card-head">
-              <h2 className="td-home-card-title">Your classes</h2>
-              <Link href="/teacher/timetable" className="td-home-link-muted">
-                Manage classes
-              </Link>
-            </div>
-            {classes.length === 0 ? (
-              <p className="td-home-empty">No classes linked yet.</p>
-            ) : (
-              <>
-                <ul className="td-home-class-list">
-                  {classes.slice(0, 5).map((c) => (
-                    <li key={c.id} className="td-home-class-row">
-                      <span className="td-home-class-orb" style={{ background: c.hue }} aria-hidden>
-                        {c.code.slice(0, 3)}
-                      </span>
-                      <div className="td-home-class-text">
-                        <p className="td-home-class-name">{c.name}</p>
-                        <p className="td-home-class-count">{c.studentCount} student{c.studentCount !== 1 ? 's' : ''}</p>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-                <Link href="/teacher/dashboard/classes" className="td-home-footer-link">
-                  View all classes
-                  <span aria-hidden> &gt;</span>
-                </Link>
-              </>
-            )}
-          </section>
-
-          <section className="td-home-card">
-            <h2 className="td-home-card-title td-home-card-title--solo">Quick access</h2>
-            <ul className="td-home-quick-list">
-              {QUICK_LINKS.map((item) => (
-                <li key={item.href}>
-                  <Link href={item.href} className="td-home-quick-row">
-                    <span className="td-home-quick-icon">
-                      <QuickIcon kind={item.icon} />
-                    </span>
-                    <span className="td-home-quick-label">{item.label}</span>
-                    <span className="td-home-quick-chevron" aria-hidden>
-                      &gt;
-                    </span>
-                  </Link>
-                </li>
-              ))}
             </ul>
-          </section>
-        </div>
+          )}
+        </section>
+
+        <section className="td-home-card td-home-grid-classes">
+          <div className="td-home-card-head">
+            <h2 className="td-home-card-title">Your classes</h2>
+            <Link href="/teacher/timetable" className="td-home-link-muted">
+              Manage classes
+            </Link>
+          </div>
+          {classes.length === 0 ? (
+            <p className="td-home-empty">No classes linked yet.</p>
+          ) : (
+            <>
+              <ul className="td-home-class-list">
+                {classes.slice(0, 5).map((c) => (
+                  <li key={c.id} className="td-home-class-row">
+                    <span className="td-home-class-orb" style={{ background: CLASS_ORB_BG }} aria-hidden>
+                      {c.code.slice(0, 3)}
+                    </span>
+                    <div className="td-home-class-text">
+                      <p className="td-home-class-name">{c.name}</p>
+                      <p className="td-home-class-count">{c.studentCount} student{c.studentCount !== 1 ? 's' : ''}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+              <Link href="/teacher/dashboard/classes" className="td-home-footer-link">
+                View all classes
+                <span aria-hidden> →</span>
+              </Link>
+            </>
+          )}
+        </section>
+
+        <section className="td-home-continue td-home-card td-home-grid-continue" aria-label="Continue working">
+          <div className="td-home-card-head">
+            <h2 className="td-home-card-title">Continue where you left off</h2>
+            <Link href="/teacher/dashboard/classes" className="td-home-link-more">
+              View all
+              <span aria-hidden> →</span>
+            </Link>
+          </div>
+          <div className="td-home-continue-row">
+            {continueSessions.map((ls) => {
+              const title = ls.skill?.name ?? ls.subject.title;
+              const mins = Math.max(0, Math.round((Date.now() - ls.updatedAt.getTime()) / 60000));
+              const edited = mins < 1 ? 'just now' : mins < 60 ? `${mins}m ago` : `${Math.round(mins / 60)}h ago`;
+              return (
+                <Link key={ls.id} href={`/teacher/live/${ls.id}`} className="td-home-mini-card">
+                  <span className="td-home-mini-label">Live lesson</span>
+                  <p className="td-home-mini-title">{title}</p>
+                  <p className="td-home-mini-foot">Edited {edited}</p>
+                </Link>
+              );
+            })}
+            <Link href="/teacher/live/new" className="td-home-mini-card td-home-mini-card--new">
+              <span className="td-home-mini-plus" aria-hidden>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" />
+                </svg>
+              </span>
+              <p className="td-home-mini-title">New from blank</p>
+              <p className="td-home-mini-foot">Start a fresh session</p>
+            </Link>
+          </div>
+        </section>
+
+        <section className="td-home-card td-home-grid-quick">
+          <h2 className="td-home-card-title td-home-card-title--solo">Quick access</h2>
+          <ul className="td-home-quick-list">
+            {QUICK_LINKS.map((item) => (
+              <li key={item.href}>
+                <Link href={item.href} className="td-home-quick-row">
+                  <span className="td-home-quick-icon">
+                    <QuickIcon kind={item.icon} />
+                  </span>
+                  <span className="td-home-quick-label">{item.label}</span>
+                  <span className="td-home-quick-chevron" aria-hidden>
+                    ›
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
       </div>
 
       {userRole === 'ADMIN' || userRole === 'LEADERSHIP' ? (

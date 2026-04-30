@@ -3161,7 +3161,7 @@
     margin-left: -1rem;
     margin-right: -1rem;
     padding: 0 1rem 2.5rem;
-    background: #eef0f4;
+    background: #f9fafb;
     min-height: min(100vh, 100%);
   }
 
@@ -3200,7 +3200,7 @@
     font-weight: 800;
     letter-spacing: -0.03em;
     line-height: 1.2;
-    color: #3d2b7a;
+    color: #111827;
   }
 
   .td-home-wave {
@@ -3210,7 +3210,7 @@
   .td-home-tagline {
     margin: 0.35rem 0 0;
     font-size: 0.9375rem;
-    color: var(--anx-text-muted);
+    color: #6b7280;
   }
 
   .td-home-header-controls {
@@ -3263,7 +3263,7 @@
     padding: 0.5rem 0.9rem 0.5rem 0.65rem;
     font-size: 0.875rem;
     font-weight: 600;
-    color: #3d2b7a;
+    color: #111827;
     box-shadow: 0 4px 20px rgba(45, 35, 90, 0.06);
   }
 
@@ -3279,7 +3279,7 @@
 
   .td-class-select-cal {
     display: flex;
-    color: #8b87a8;
+    color: #6b7280;
   }
 
   .td-class-select-label {
@@ -3385,10 +3385,10 @@
     align-items: flex-start;
     gap: 0.65rem;
     border-radius: 1rem;
-    border: 1px solid rgba(194, 199, 207, 0.35);
+    border: 1px solid #e5e7eb;
     background: #fff;
     padding: 1.35rem 1.35rem 1.5rem;
-    box-shadow: 0 8px 32px rgba(45, 35, 90, 0.06);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
     isolation: isolate;
   }
 
@@ -3404,14 +3404,13 @@
   }
 
   .td-home-action-card-deco--waves {
-    right: -8%;
-    top: -10%;
-    bottom: -10%;
-    width: 58%;
+    right: -5%;
+    bottom: -18%;
+    left: 35%;
+    height: 75%;
     background:
-      radial-gradient(ellipse 90% 85% at 92% 45%, rgba(199, 195, 255, 0.5) 0%, transparent 58%),
-      radial-gradient(ellipse 70% 70% at 100% 20%, rgba(237, 233, 255, 0.95) 0%, transparent 52%),
-      radial-gradient(ellipse 55% 50% at 78% 88%, rgba(224, 219, 255, 0.45) 0%, transparent 45%);
+      radial-gradient(ellipse 100% 90% at 100% 100%, rgba(199, 195, 255, 0.55) 0%, transparent 55%),
+      radial-gradient(ellipse 80% 70% at 95% 85%, rgba(237, 233, 255, 0.9) 0%, transparent 50%);
     opacity: 0.95;
   }
 
@@ -3442,15 +3441,15 @@
   }
 
   .td-home-action-icon--tile {
-    background: rgba(139, 92, 246, 0.14);
-    color: #5b21b6;
+    background: rgba(88, 80, 236, 0.12);
+    color: #5850ec;
   }
 
   .td-home-action-title {
     margin: 0;
     font-size: 1.0625rem;
     font-weight: 700;
-    color: #3d2b7a;
+    color: #111827;
   }
 
   .td-home-action-desc {
@@ -3458,7 +3457,7 @@
     flex: 1;
     font-size: 0.8125rem;
     line-height: 1.5;
-    color: var(--anx-text-muted);
+    color: #6b7280;
   }
 
   .td-home-btn {
@@ -3483,53 +3482,65 @@
 
   .td-home-btn--primary {
     border: 1px solid transparent;
-    background: linear-gradient(135deg, #5b3fff 0%, #6d4dff 55%, #7c5cff 100%);
+    background: #5850ec;
     color: #fff;
-    box-shadow: 0 10px 28px rgba(91, 63, 255, 0.32);
+    box-shadow: 0 8px 24px rgba(88, 80, 236, 0.28);
   }
 
   .td-home-btn--primary:hover {
-    background: linear-gradient(135deg, #4f36e8 0%, #5b3fff 100%);
-    box-shadow: 0 12px 32px rgba(91, 63, 255, 0.38);
+    background: #4f46e5;
+    box-shadow: 0 10px 28px rgba(88, 80, 236, 0.35);
   }
 
   .td-home-btn--outline {
-    border: 1px solid rgba(194, 199, 207, 0.55);
+    border: 1px solid #e5e7eb;
     background: #fff;
-    color: #5b21b6;
+    color: #5850ec;
   }
 
   .td-home-btn--outline:hover {
-    border-color: rgba(99, 102, 241, 0.45);
-    background: rgba(99, 102, 241, 0.05);
-    color: #4c1d95;
+    border-color: #d1d5db;
+    background: #f9fafb;
+    color: #4f46e5;
   }
 
-  .td-home-mid {
+  .td-home-grid {
     display: grid;
     gap: 1.25rem;
     align-items: start;
   }
 
   @media (min-width: 1024px) {
-    .td-home-mid {
-      grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr);
+    .td-home-grid {
+      grid-template-columns: minmax(0, 1.86fr) minmax(0, 1fr);
+      grid-template-areas:
+        'recent classes'
+        'continue quick';
     }
-  }
 
-  .td-home-main-col {
-    display: flex;
-    min-width: 0;
-    flex-direction: column;
-    gap: 1.25rem;
+    .td-home-grid-recent {
+      grid-area: recent;
+    }
+
+    .td-home-grid-classes {
+      grid-area: classes;
+    }
+
+    .td-home-grid-continue {
+      grid-area: continue;
+    }
+
+    .td-home-grid-quick {
+      grid-area: quick;
+    }
   }
 
   .td-home-card {
     border-radius: 1rem;
-    border: 1px solid rgba(194, 199, 207, 0.35);
+    border: 1px solid #e5e7eb;
     background: #fff;
     padding: 1.15rem 1.25rem 1.25rem;
-    box-shadow: 0 8px 28px rgba(45, 35, 90, 0.05);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
   }
 
   .td-home-card-head {
@@ -3545,7 +3556,7 @@
     margin: 0;
     font-size: 1rem;
     font-weight: 700;
-    color: #3d2b7a;
+    color: #111827;
   }
 
   .td-home-card-title--solo {
@@ -3555,7 +3566,7 @@
   .td-home-link-more {
     font-size: 0.8125rem;
     font-weight: 600;
-    color: #2563eb;
+    color: #5850ec;
     text-decoration: none;
   }
 
@@ -3566,18 +3577,18 @@
   .td-home-link-muted {
     font-size: 0.8125rem;
     font-weight: 600;
-    color: var(--anx-text-muted);
+    color: #6b7280;
     text-decoration: none;
   }
 
   .td-home-link-muted:hover {
-    color: var(--anx-primary);
+    color: #5850ec;
   }
 
   .td-home-empty {
     margin: 0;
     font-size: 0.875rem;
-    color: var(--anx-text-muted);
+    color: #6b7280;
   }
 
   .td-home-lesson-list {
@@ -3630,7 +3641,7 @@
   .td-home-lesson-meta {
     margin: 0.15rem 0 0;
     font-size: 0.75rem;
-    color: var(--anx-text-muted);
+    color: #6b7280;
   }
 
   .td-home-lesson-side {
@@ -3642,7 +3653,7 @@
 
   .td-home-lesson-time {
     font-size: 0.6875rem;
-    color: var(--anx-text-muted);
+    color: #6b7280;
     white-space: nowrap;
   }
 
@@ -3670,8 +3681,8 @@
   }
 
   .td-home-badge--completed {
-    background: rgba(34, 197, 94, 0.12);
-    color: #15803d;
+    background: #ecfdf5;
+    color: #059669;
   }
 
   .td-home-badge--neutral {
@@ -3747,7 +3758,7 @@
     margin-top: 0.85rem;
     font-size: 0.8125rem;
     font-weight: 600;
-    color: #2563eb;
+    color: #5850ec;
     text-decoration: none;
   }
 
@@ -3775,7 +3786,7 @@
     border-radius: var(--anx-radius-md);
     font-size: 0.875rem;
     font-weight: 600;
-    color: #3d2b7a;
+    color: #111827;
     text-decoration: none;
     transition: background 0.12s ease;
   }
