@@ -128,19 +128,8 @@ export default function LoginPage() {
   return (
     <main
       className="relative isolate flex min-h-[100dvh] w-full flex-col items-center justify-center overflow-x-hidden px-5 py-10 sm:px-6"
-      style={{ backgroundColor: '#F8F9FD', color: ink }}
+      style={{ color: ink }}
     >
-      {/* Large soft lavender shapes (visible circles, not only heavy blur) */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
-        <div
-          className="absolute left-[-20%] top-[-10%] h-[min(420px,85vw)] w-[min(420px,85vw)] rounded-full bg-[#E8E4F5]/90 blur-[2px]"
-          style={{ opacity: 0.95 }}
-        />
-        <div className="absolute right-[-15%] top-[18%] h-[min(380px,78vw)] w-[min(380px,78vw)] rounded-full bg-[#DDD6FE]/80 blur-[3px]" />
-        <div className="absolute bottom-[-12%] left-[20%] h-[min(440px,90vw)] w-[min(440px,90vw)] rounded-full bg-[#E4E1F7]/85 blur-[2px]" />
-        <div className="absolute left-[40%] top-[45%] h-[min(280px,55vw)] w-[min(280px,55vw)] -translate-x-1/2 rounded-full bg-[#EDE9FE]/70 blur-[4px]" />
-      </div>
-
       <div className="relative z-[1] w-full max-w-[420px]">
         <header className="flex flex-col items-center text-center">
           <div className="relative flex h-[4.25rem] w-[4.25rem] items-center justify-center sm:h-[4.75rem] sm:w-[4.75rem]">

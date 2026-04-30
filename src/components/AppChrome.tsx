@@ -696,7 +696,7 @@ export function AppChrome({
 
   if (studentTopBar) {
     return (
-      <div className="flex min-h-screen flex-col bg-[color:var(--anx-surface-bright)]">
+      <div className="anx-app-canvas flex min-h-screen flex-col">
         {studentTopBar}
         <div className="flex min-h-0 min-w-0 flex-1 flex-col">{children}</div>
       </div>
@@ -704,7 +704,7 @@ export function AppChrome({
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-[color:var(--anx-surface-bright)] lg:flex-row">
+    <div className="anx-app-canvas flex min-h-screen flex-col lg:flex-row">
       <header
         className="sticky top-0 z-40 flex items-center justify-between gap-3 border-b border-[var(--anx-outline-variant)] bg-[color:var(--anx-surface-raised)]/95 px-4 py-3 backdrop-blur-md lg:hidden"
         style={{ WebkitBackdropFilter: "blur(12px)" }}
@@ -840,13 +840,7 @@ export function AppChrome({
         </div>
       </aside>
 
-      <div
-        className={
-          variant === "teacher"
-            ? "flex min-h-0 min-w-0 flex-1 flex-col bg-[#f9fafb]"
-            : "flex min-h-0 min-w-0 flex-1 flex-col"
-        }
-      >
+      <div className="anx-app-canvas flex min-h-0 min-w-0 flex-1 flex-col">
         {children}
       </div>
     </div>
