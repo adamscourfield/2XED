@@ -68,9 +68,15 @@ function TeachTheRoomMark({ className }: { className?: string }) {
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden
     >
+      <defs>
+        <linearGradient id="ember-mark-grad" x1="20" y1="27.4" x2="20" y2="6" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#f97316" />
+          <stop offset="100%" stopColor="#7c3aed" />
+        </linearGradient>
+      </defs>
       <path
         d="M20 6c-1.2 2.8-5 6.2-5 11.2 0 4.1 2.2 7.4 5 8.2 2.8-.8 5-4.1 5-8.2 0-5-3.8-8.4-5-11.2Zm0 3.2c.9 2.5 3.5 5.3 3.5 9 0 2.6-1.2 4.7-3.5 5.5-2.3-.8-3.5-2.9-3.5-5.5 0-3.7 2.6-6.5 3.5-9Z"
-        fill="#5850ec"
+        fill="url(#ember-mark-grad)"
       />
     </svg>
   );
