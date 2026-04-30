@@ -137,9 +137,23 @@
     /* ── Brand blue — kept for legacy references ─────────────────── */
     --anx-brand-blue: #4a40e0;
 
-    /* Full-page canvas — marketing home, auth, signed-in main column (see .anx-app-canvas) */
-    --anx-app-canvas-gradient: linear-gradient(160deg, #ebe8f4 0%, #e0dce8 45%, #d4cfe3 100%);
-    --anx-scene-gradient: var(--anx-app-canvas-gradient);
+    /* Full-page canvas — light mesh (landing, auth, dashboards; see .anx-app-canvas) */
+    --anx-app-canvas-base: #f8f9ff;
+    --anx-app-canvas-gradient: radial-gradient(
+        ellipse 95% 85% at 100% 0%,
+        rgba(224, 231, 255, 0.72) 0%,
+        transparent 58%
+      ),
+      radial-gradient(
+        ellipse 90% 80% at 0% 100%,
+        rgba(237, 233, 254, 0.62) 0%,
+        transparent 52%
+      ),
+      radial-gradient(
+        ellipse 70% 55% at 72% 42%,
+        rgba(199, 210, 254, 0.22) 0%,
+        transparent 55%
+      );
 
     /* Dashboard hero + XP badge (marketing accents) */
     --anx-dashboard-hero-from: #5058d7;
@@ -171,7 +185,10 @@
     @apply antialiased;
     font-family: var(--font-manrope), 'Manrope', system-ui, -apple-system, sans-serif;
     color: var(--anx-on-surface);
-    background: var(--anx-surface-bright);
+    background-color: var(--anx-app-canvas-base);
+    background-image: var(--anx-app-canvas-gradient);
+    background-repeat: no-repeat;
+    background-size: cover;
     background-attachment: fixed;
   }
 
@@ -229,17 +246,23 @@
     box-shadow: var(--anx-shadow-float);
   }
 
-  /* Marketing home + auth + dashboard main column — same wash as .anx-landing-page */
+  /* Marketing home + auth + app shell — soft mesh (blobs), not a heavy diagonal wash */
   .anx-app-canvas {
-    background: var(--anx-app-canvas-gradient);
+    background-color: var(--anx-app-canvas-base);
+    background-image: var(--anx-app-canvas-gradient);
+    background-repeat: no-repeat;
+    background-size: cover;
   }
 
-  /* Hero / auth backdrop — purple gradient + soft blobs (glass reads on top) */
+  /* Hero / auth backdrop — soft mesh + radial accents (glass reads on top) */
   .anx-scene {
     position: relative;
     isolation: isolate;
     overflow: hidden;
-    background: var(--anx-scene-gradient);
+    background-color: var(--anx-app-canvas-base);
+    background-image: var(--anx-app-canvas-gradient);
+    background-repeat: no-repeat;
+    background-size: cover;
   }
 
   .anx-scene::before,
@@ -285,7 +308,6 @@
     align-items: center;
     justify-content: center;
     padding: 0.75rem;
-    background: var(--anx-app-canvas-gradient);
   }
 
   @media (min-width: 640px) {
@@ -3207,7 +3229,7 @@
     margin-left: -1rem;
     margin-right: -1rem;
     padding: 0 1rem 2.5rem;
-    background: #f9fafb;
+    background: transparent;
     min-height: min(100vh, 100%);
   }
 

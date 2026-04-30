@@ -48,7 +48,7 @@ function LandingBottomArt() {
 
 export default function HomePage() {
   return (
-    <div className="anx-landing-page font-landing">
+    <div className="anx-landing-page anx-app-canvas font-landing">
       <main className="anx-landing-device flex min-h-0 flex-col">
         <div className="anx-landing-device__art" aria-hidden>
           <LandingBottomArt />
