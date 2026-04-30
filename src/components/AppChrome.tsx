@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
-import { ReactNode, useEffect, useState, useId } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { StudentTopBarSubjectSelector, type StudentTopBarSubjectOption } from "@/components/student/StudentTopBarSubjectSelector";
 import { StudentTopBarUserMenu } from "@/components/student/StudentTopBarUserMenu";
 
@@ -60,8 +60,6 @@ function LogoImage({ className }: { className?: string }) {
 
 /** Reference sidebar mark: orange → purple gradient flame/drop shape */
 function TeachTheRoomMark({ className }: { className?: string }) {
-  const uid = useId().replace(/:/g, "");
-  const gradId = `ttr-mark-grad-${uid}`;
   return (
     <svg
       className={className ?? "h-9 w-9 shrink-0"}
@@ -70,16 +68,9 @@ function TeachTheRoomMark({ className }: { className?: string }) {
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden
     >
-      <defs>
-        <linearGradient id={gradId} x1="6" y1="34" x2="34" y2="6" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#f97316" />
-          <stop offset="0.5" stopColor="#c084fc" />
-          <stop offset="1" stopColor="#5850ec" />
-        </linearGradient>
-      </defs>
       <path
         d="M20 6c-1.2 2.8-5 6.2-5 11.2 0 4.1 2.2 7.4 5 8.2 2.8-.8 5-4.1 5-8.2 0-5-3.8-8.4-5-11.2Zm0 3.2c.9 2.5 3.5 5.3 3.5 9 0 2.6-1.2 4.7-3.5 5.5-2.3-.8-3.5-2.9-3.5-5.5 0-3.7 2.6-6.5 3.5-9Z"
-        fill={`url(#${gradId})`}
+        fill="#5850ec"
       />
     </svg>
   );

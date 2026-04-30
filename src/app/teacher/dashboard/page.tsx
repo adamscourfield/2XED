@@ -5,12 +5,6 @@ import { LearningPageShell } from '@/components/LearningPageShell';
 import { loadTeacherDashboardData } from '@/app/teacher/dashboard/teacherDashboardData';
 import { TeacherHomeDashboard } from '@/app/teacher/dashboard/TeacherHomeDashboard';
 
-function greetingForHour(hour: number): string {
-  if (hour < 12) return 'Good morning';
-  if (hour < 17) return 'Good afternoon';
-  return 'Good evening';
-}
-
 export default async function TeacherDashboardPage() {
   const session = await getServerSession(authOptions);
   if (!session?.user) redirect('/login');
@@ -36,8 +30,7 @@ export default async function TeacherDashboardPage() {
   }
 
   const displayName = user.name?.trim() || user.email?.split('@')[0] || 'there';
-  const hour = new Date().getHours();
-  const greeting = greetingForHour(hour);
+  const greeting = 'Welcome back';
 
   return (
     <LearningPageShell

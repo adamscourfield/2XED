@@ -13,18 +13,13 @@ type Props = {
 };
 
 export function formatSessionTime(d: Date): string {
-  const now = new Date();
-  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const startOfYesterday = new Date(startOfToday);
-  startOfYesterday.setDate(startOfYesterday.getDate() - 1);
-  const t = d.getTime();
-  if (t >= startOfToday.getTime()) {
-    return `Today, ${d.toLocaleTimeString('en-GB', { hour: 'numeric', minute: '2-digit', hour12: true })}`;
-  }
-  if (t >= startOfYesterday.getTime()) {
-    return `Yesterday, ${d.toLocaleTimeString('en-GB', { hour: 'numeric', minute: '2-digit', hour12: true })}`;
-  }
-  return d.toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit', hour12: true });
+  return d.toLocaleString('en-GB', {
+    day: 'numeric',
+    month: 'short',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+  });
 }
 
 function sessionStatusLabel(status: string): { label: string; live: boolean; completed: boolean } {
@@ -244,18 +239,20 @@ export function TeacherHomeDashboard({ data, displayName, greeting, userRole }: 
                   </li>
                 );
               })}
-              <Link href="/teacher/live/new" className="td-home-mini-card td-home-mini-card--new">
-                <span className="td-home-mini-plus" aria-hidden>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                    <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" />
-                  </svg>
-                </span>
-                <p className="td-home-mini-title">New from blank</p>
-                <p className="td-home-mini-foot">Start a fresh session</p>
-              </Link>
-            </div>
-          </section>
-        </div>
+              <li className="td-home-lesson-row td-home-lesson-row--new">
+                <Link href="/teacher/live/new" className="td-home-mini-card td-home-mini-card--new">
+                  <span className="td-home-mini-plus" aria-hidden>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                      <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" />
+                    </svg>
+                  </span>
+                  <p className="td-home-mini-title">New from blank</p>
+                  <p className="td-home-mini-foot">Start a fresh session</p>
+                </Link>
+              </li>
+            </ul>
+          )}
+        </section>
 
         <section className="td-home-card td-home-grid-classes">
           <div className="td-home-card-head">
@@ -300,13 +297,11 @@ export function TeacherHomeDashboard({ data, displayName, greeting, userRole }: 
           <div className="td-home-continue-row">
             {continueSessions.map((ls) => {
               const title = ls.skill?.name ?? ls.subject.title;
-              const mins = Math.max(0, Math.round((Date.now() - ls.updatedAt.getTime()) / 60000));
-              const edited = mins < 1 ? 'just now' : mins < 60 ? `${mins}m ago` : `${Math.round(mins / 60)}h ago`;
               return (
                 <Link key={ls.id} href={`/teacher/live/${ls.id}`} className="td-home-mini-card">
                   <span className="td-home-mini-label">Live lesson</span>
                   <p className="td-home-mini-title">{title}</p>
-                  <p className="td-home-mini-foot">Edited {edited}</p>
+                  <p className="td-home-mini-foot">Edited {formatSessionTime(ls.updatedAt)}</p>
                 </Link>
               );
             })}
