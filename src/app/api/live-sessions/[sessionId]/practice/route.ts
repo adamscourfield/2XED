@@ -33,7 +33,6 @@ function buildPracticeItemPayload(item: NonNullable<Awaited<ReturnType<typeof se
   };
 }
 
-
 export async function POST(req: NextRequest, { params }: Props) {
   const session = await getServerSession(authOptions);
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
