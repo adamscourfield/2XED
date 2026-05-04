@@ -152,7 +152,9 @@ function scoreItem(params: {
     reasons.push('has misconception-tagged distractors');
   }
 
-  if (item.type === 'MCQ') {
+  // MCQ speeds up live dispatch, but for challenge/misconception work extended
+  // responses are pedagogically preferable — suppress the bonus there.
+  if (item.type === 'MCQ' && intent !== 'PRACTICE_CHALLENGE') {
     score += 8;
     reasons.push('MCQ is fast for live dispatch');
   }
@@ -281,7 +283,13 @@ export async function selectLiveItem(params: SelectLiveItemParams): Promise<Live
 
       return base;
     })
-    .sort((a, b) => b.score - a.score || a.item.question.length - b.item.question.length);
+    .sort((a, b) => {
+      if (b.score !== a.score) return b.score - a.score;
+      // For challenge intent, prefer longer stems on ties; prefer shorter otherwise.
+      return intent === 'PRACTICE_CHALLENGE'
+        ? b.item.question.length - a.item.question.length
+        : a.item.question.length - b.item.question.length;
+    });
 
   return toSelectionResult(scored, generated);
 }

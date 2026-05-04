@@ -33,6 +33,26 @@ function buildPracticeItemPayload(item: NonNullable<Awaited<ReturnType<typeof se
   };
 }
 
+async function resolveStudentMisconceptionId(
+  sessionId: string,
+  studentUserId: string,
+  skillId: string,
+  fallback: string | null
+): Promise<string | null> {
+  const row = await prisma.liveAttempt.findFirst({
+    where: {
+      liveSessionId: sessionId,
+      studentUserId,
+      skillId,
+      correct: false,
+      misconceptionId: { not: null },
+    },
+    orderBy: { createdAt: 'desc' },
+    select: { misconceptionId: true },
+  });
+  return row?.misconceptionId ?? fallback;
+}
+
 export async function POST(req: NextRequest, { params }: Props) {
   const session = await getServerSession(authOptions);
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -115,17 +135,7 @@ export async function POST(req: NextRequest, { params }: Props) {
     for (const studentUserId of targetStudentIds) {
       const individualMisconceptionId =
         kind === 'misconception'
-          ? await prisma.liveAttempt.findFirst({
-              where: {
-                liveSessionId: sessionId,
-                studentUserId,
-                skillId: targetSkillId,
-                correct: false,
-                misconceptionId: { not: null },
-              },
-              orderBy: { createdAt: 'desc' },
-              select: { misconceptionId: true },
-            }).then((row) => row?.misconceptionId ?? misconceptionId)
+          ? await resolveStudentMisconceptionId(sessionId, studentUserId, targetSkillId, misconceptionId)
           : misconceptionId;
 
       let selection = await selectLiveItem({

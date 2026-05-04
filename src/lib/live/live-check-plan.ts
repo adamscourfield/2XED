@@ -45,7 +45,11 @@ export async function resolveOpeningCheckQueueForParticipant(params: {
       id: { in: itemIds },
       OR: [{ subjectId }, { subjectId: null }],
     },
-    select: { id: true, skills: { select: { skillId: true } } },
+    select: {
+      id: true,
+      skills: { select: { skillId: true } },
+      liveMetadata: true,
+    },
   });
   const itemMap = new Map(items.map((i) => [i.id, i]));
 
@@ -53,12 +57,17 @@ export async function resolveOpeningCheckQueueForParticipant(params: {
   for (const slot of slots) {
     const item = itemMap.get(slot.itemId);
     if (!item) continue;
+
+    // Skip items explicitly rated as unsuitable for live delivery.
+    const metadata = item.liveMetadata as { liveSuitability?: string } | null;
+    if (metadata?.liveSuitability === 'LOW') continue;
+
     const skillIds = new Set(item.skills.map((x) => x.skillId));
     let skillId = slot.skillId;
     if (!skillIds.has(skillId)) {
-      const alt = [...skillIds][0];
-      if (!alt) continue;
-      skillId = alt;
+      const skillIdArray = [...skillIds];
+      if (skillIdArray.length === 0) continue;
+      skillId = skillIdArray[0]!;
     }
     out.push({ itemId: item.id, skillId });
   }
@@ -73,7 +82,7 @@ export async function fetchSampleItemsBySkillIds(
 ): Promise<
   Array<{
     skillId: string;
-    items: Array<{ id: string; question: string; type: string }>;
+    items: Array<{ id: string; question: string; type: string; liveMetadata: unknown }>;
   }>
 > {
   const uniqueSkills = [...new Set(skillIds)];
@@ -84,23 +93,23 @@ export async function fetchSampleItemsBySkillIds(
 
   for (const skillId of uniqueSkills) {
     const links = await prisma.itemSkill.findMany({
-      where: { skillId },
+      where: {
+        skillId,
+        item: { OR: [{ subjectId }, { subjectId: null }] },
+      },
       select: {
         item: {
           select: {
             id: true,
             question: true,
             type: true,
-            subjectId: true,
+            liveMetadata: true,
           },
         },
       },
-      take: 80,
+      take: takePerSkill,
     });
-    const items = links
-      .map((l) => l.item)
-      .filter((it) => it.subjectId === subjectId || it.subjectId === null)
-      .slice(0, takePerSkill);
+    const items = links.map((l) => l.item);
     result.push({ skillId, items });
   }
   return result;

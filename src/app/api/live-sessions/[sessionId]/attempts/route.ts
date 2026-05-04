@@ -187,8 +187,7 @@ export async function POST(req: NextRequest, { params }: Props) {
           pendingRecheckItemId: null,
         },
       });
-      const failedExplanationId = participant.currentExplanationId ?? '';
-      const escalation = await escalateLane(participant.id, sessionId, failedExplanationId, weaknessTags);
+      const escalation = await escalateLane(participant.id, sessionId, participant.currentExplanationId, weaknessTags);
       recheckOutcome = 'escalated_lane_3';
       laneAfterAttempt = escalation.newLane;
     }
@@ -268,6 +267,7 @@ export async function POST(req: NextRequest, { params }: Props) {
     });
 
     // Pool exhausted — generate fresh AI questions and serve the first one.
+    let poolExhausted = false;
     if (!poolItem) {
       try {
         const skill = await prisma.skill.findUnique({
@@ -284,9 +284,9 @@ export async function POST(req: NextRequest, { params }: Props) {
           }
         }
       } catch (err) {
-        // Generation failure is non-fatal — student simply gets no next item.
         console.warn('[attempts] AI generation fallback failed:', (err as Error).message);
       }
+      if (!poolItem) poolExhausted = true;
     }
 
     if (poolItem) {
@@ -306,6 +306,7 @@ export async function POST(req: NextRequest, { params }: Props) {
           skillId: nextItem.skillId,
         }
       : null,
+    poolExhausted: nextItem === null,
     recheckOutcome,
     laneAfterAttempt,
   });
