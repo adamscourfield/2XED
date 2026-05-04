@@ -82,6 +82,12 @@ interface RecommendedExplanation {
   animationSchema?: unknown | null;
 }
 
+export interface LaneSummaryEntry {
+  answeredCount: number;
+  correctCount: number;
+  incorrectCount: number;
+}
+
 interface SessionSnapshot {
   sessionId: string;
   status: 'LOBBY' | 'ACTIVE' | 'PAUSED' | 'COMPLETED';
@@ -94,6 +100,8 @@ interface SessionSnapshot {
   laneCounts: { LANE_1: number; LANE_2: number; LANE_3: number };
   laneStudents: { LANE_1: LaneStudent[]; LANE_2: LaneStudent[]; LANE_3: LaneStudent[] };
   responseSummary: ResponseSummary[];
+  /** Per-lane attempt tally for the current skill (shadow-check progress). */
+  laneSummary?: { LANE_1: LaneSummaryEntry; LANE_2: LaneSummaryEntry; LANE_3: LaneSummaryEntry } | null;
   rubricCriteria?: RubricCriterionSignal[] | null;
   supportSummary?: SupportSummary;
   studentMessages?: StudentMessageSignal[] | null;
@@ -123,6 +131,64 @@ interface Props {
 }
 
 const BROADCAST_DEBOUNCE_MS = 350;
+
+const LANE_LABELS: Record<string, string> = {
+  LANE_1: 'Got it',
+  LANE_2: 'Nearly there',
+  LANE_3: 'Needs teacher',
+};
+const LANE_COLORS: Record<string, string> = {
+  LANE_1: 'var(--anx-success)',
+  LANE_2: 'var(--anx-warning-text)',
+  LANE_3: 'var(--anx-danger-text)',
+};
+
+function LaneSummaryBar({
+  laneCounts,
+  laneSummary,
+}: {
+  laneCounts: SessionSnapshot['laneCounts'];
+  laneSummary: SessionSnapshot['laneSummary'];
+}) {
+  const lanes = ['LANE_1', 'LANE_2', 'LANE_3'] as const;
+  const hasActivity = lanes.some((l) => (laneSummary?.[l]?.answeredCount ?? 0) > 0);
+  if (!hasActivity) return null;
+
+  return (
+    <div className="mt-4 space-y-2">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: 'var(--anx-text-muted)' }}>
+        Lane progress
+      </p>
+      {lanes.map((lane) => {
+        const total = laneCounts[lane];
+        const summary = laneSummary?.[lane];
+        const answered = summary?.answeredCount ?? 0;
+        const correct = summary?.correctCount ?? 0;
+        if (total === 0) return null;
+        const correctPct = answered > 0 ? (correct / answered) * 100 : 0;
+        const incorrectPct = answered > 0 ? ((answered - correct) / answered) * 100 : 0;
+        return (
+          <div key={lane}>
+            <div className="flex items-center justify-between text-xs mb-1">
+              <span className="font-medium" style={{ color: LANE_COLORS[lane] }}>
+                {LANE_LABELS[lane]}
+              </span>
+              <span style={{ color: 'var(--anx-text-muted)' }}>
+                {answered}/{total} replied · {correct} correct
+              </span>
+            </div>
+            <div className="h-1.5 w-full overflow-hidden rounded-full" style={{ background: 'var(--anx-outline-variant)' }}>
+              <div className="flex h-full">
+                <span style={{ width: `${correctPct}%`, background: 'var(--anx-success)', transition: 'width 0.4s ease' }} />
+                <span style={{ width: `${incorrectPct}%`, background: LANE_COLORS[lane], opacity: 0.45, transition: 'width 0.4s ease' }} />
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
 
 function deriveSignals(snapshot: SessionSnapshot | null): {
   overview: ClassOverview;
@@ -806,6 +872,12 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
             studentResponses={snapshot?.studentResponses ?? null}
             laneCounts={snapshot?.laneCounts ?? null}
           />
+          {snapshot?.laneCounts && (
+            <LaneSummaryBar
+              laneCounts={snapshot.laneCounts}
+              laneSummary={snapshot.laneSummary ?? null}
+            />
+          )}
         </aside>
       </div>
 

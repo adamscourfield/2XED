@@ -108,6 +108,27 @@ export function TeacherLessonsHub({ rows, classOptions }: Props) {
   const [page, setPage] = useState(1);
   const [folderFilter, setFolderFilter] = useState<string | null>(null);
 
+  // Custom folders: created by the teacher, persisted in localStorage.
+  const [customFolders, setCustomFolders] = useState<string[]>(() => {
+    if (typeof window === 'undefined') return [];
+    try { return JSON.parse(localStorage.getItem('ember-lesson-folders') ?? '[]') as string[]; }
+    catch { return []; }
+  });
+  const [newFolderName, setNewFolderName] = useState('');
+  const [showNewFolderInput, setShowNewFolderInput] = useState(false);
+
+  function createFolder() {
+    const name = newFolderName.trim();
+    if (!name) return;
+    const updated = [...new Set([...customFolders, name])];
+    setCustomFolders(updated);
+    try { localStorage.setItem('ember-lesson-folders', JSON.stringify(updated)); } catch { /* non-fatal */ }
+    setNewFolderName('');
+    setShowNewFolderInput(false);
+    setFolderFilter(name);
+    setPage(1);
+  }
+
   const yearOptions = useMemo(() => {
     const set = new Set<string>();
     rows.forEach((r) => {
@@ -128,18 +149,21 @@ export function TeacherLessonsHub({ rows, classOptions }: Props) {
   const folderCounts = useMemo(() => {
     const counts: Record<string, number> = {};
     for (const name of DEFAULT_FOLDERS) counts[name] = 0;
+    for (const name of customFolders) if (!(name in counts)) counts[name] = 0;
     rows.forEach((r) => {
       const f = folderForRow(r);
       counts[f] = (counts[f] ?? 0) + 1;
     });
     return counts;
-  }, [rows]);
+  }, [rows, customFolders]);
 
   const folderList = useMemo(() => {
-    const extras = Object.keys(folderCounts).filter((k) => !DEFAULT_FOLDERS.includes(k));
+    const extras = Object.keys(folderCounts).filter(
+      (k) => !DEFAULT_FOLDERS.includes(k) && !customFolders.includes(k),
+    );
     extras.sort();
-    return [...DEFAULT_FOLDERS, ...extras];
-  }, [folderCounts]);
+    return [...DEFAULT_FOLDERS, ...customFolders, ...extras];
+  }, [folderCounts, customFolders]);
 
   const filtered = useMemo(() => {
     let list = rows;
@@ -546,12 +570,40 @@ export function TeacherLessonsHub({ rows, classOptions }: Props) {
               Group sessions by topic. Click a folder to filter the table.
             </p>
           </div>
-          <button
-            type="button"
-            className="anx-btn-secondary w-full"
-          >
-            + New folder
-          </button>
+          {showNewFolderInput ? (
+            <form
+              onSubmit={(e) => { e.preventDefault(); createFolder(); }}
+              className="flex gap-2"
+            >
+              <input
+                autoFocus
+                type="text"
+                value={newFolderName}
+                onChange={(e) => setNewFolderName(e.target.value)}
+                placeholder="Folder name…"
+                className="min-w-0 flex-1 rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-sm text-on-surface outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+                maxLength={40}
+              />
+              <button type="submit" className="anx-btn-primary px-3 py-2 text-sm">
+                Create
+              </button>
+              <button
+                type="button"
+                onClick={() => { setShowNewFolderInput(false); setNewFolderName(''); }}
+                className="anx-btn-secondary px-3 py-2 text-sm"
+              >
+                ✕
+              </button>
+            </form>
+          ) : (
+            <button
+              type="button"
+              className="anx-btn-secondary w-full"
+              onClick={() => setShowNewFolderInput(true)}
+            >
+              + New folder
+            </button>
+          )}
           <ul className="flex list-none flex-col gap-1 p-0">
             {folderList.map((name) => {
               const count = folderCounts[name] ?? 0;

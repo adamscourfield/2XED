@@ -83,15 +83,29 @@ export function updateSkillState(input: KnowledgeStateUpdateInput): KnowledgeSta
   const masteryProbability = updateToward(state.masteryProbability, evidence.masterySignal, alpha);
   const retrievalStrength = updateToward(state.retrievalStrength, evidence.retrievalSignal, delta);
 
+  // Apply forgetting-curve decay to transferAbility using elapsed time since the
+  // last attempt. Transfer decays at 1.3× the general forgetting rate (it is harder
+  // to retain than routine mastery). After decay, update toward the transfer signal
+  // if this is a transfer item.
+  const daysSinceLastAttempt = state.lastAttemptAt
+    ? Math.max(0, (attempt.timestamp.getTime() - state.lastAttemptAt.getTime()) / (1000 * 60 * 60 * 24))
+    : 0;
+  const transferDecay = Math.exp(-state.forgettingRate * 1.3 * daysSinceLastAttempt);
+  const decayedTransfer = clamp01(state.transferAbility * transferDecay);
   const transferAbility = attempt.isTransferItem
-    ? updateToward(state.transferAbility, evidence.transferSignal, eta)
-    : state.transferAbility;
+    ? updateToward(decayedTransfer, evidence.transferSignal, eta)
+    : decayedTransfer;
+
+  // For review items, derive observedRetention from the marking score when available
+  // (rubric-marked items give a continuous 0–1 score which is more informative than binary).
+  const observedRetention = attempt.observedRetention
+    ?? (attempt.correct ? 1 : 0);
 
   const forgettingRate = attempt.isReviewItem
     ? updateForgettingRate(
         state.forgettingRate,
         attempt.expectedRetention ?? evidence.retrievalSignal,
-        attempt.observedRetention ?? (attempt.correct ? 1 : 0)
+        observedRetention
       )
     : state.forgettingRate;
 

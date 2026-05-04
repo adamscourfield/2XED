@@ -1,5 +1,6 @@
 import { prisma } from '@/db/prisma';
 import { emitEvent } from '@/features/telemetry/eventService';
+import { RETEACH_THRESHOLD_ALL_EXPECTED, RETEACH_THRESHOLD_HAS_UNEXPECTED } from '@/lib/live/reteach-thresholds';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -14,7 +15,7 @@ export type DiagnosticAttempt = {
 
 export type LaneAssignmentResult = {
   lane: 'LANE_1' | 'LANE_2' | 'LANE_3';
-  reason: 'SHADOW_CHECK_FAILED' | 'ANCHOR_FAILED' | 'MISCONCEPTION_FAILED' | 'SCAFFOLDED_CORRECT' | 'MANUAL_TEACHER';
+  reason: 'SHADOW_CHECK_FAILED' | 'ANCHOR_FAILED' | 'MISCONCEPTION_FAILED' | 'SCAFFOLDED_CORRECT' | 'MANUAL_TEACHER' | 'HINTS_USED' | null;
   isUnexpectedFailure: boolean;
   recommendedExplanationId: string | null;
 };
@@ -75,7 +76,7 @@ export async function assignLane(
       (anchorAttempt.hintsUsed > 0 || (miscAttempt && !miscAttempt.correct))
     ) {
       lane = 'LANE_2';
-      reason = miscAttempt && !miscAttempt.correct ? 'MISCONCEPTION_FAILED' : 'ANCHOR_FAILED';
+      reason = miscAttempt && !miscAttempt.correct ? 'MISCONCEPTION_FAILED' : 'HINTS_USED';
     }
     // LANE 1 (default if all checks pass)
     else if (
@@ -85,69 +86,29 @@ export async function assignLane(
       (!miscAttempt || miscAttempt.correct)
     ) {
       lane = 'LANE_1';
-      reason = 'ANCHOR_FAILED'; // Not actually a failure, just the reason type
+      reason = null;
     }
   }
 
+  // Fetch participant once for all subsequent steps
+  const participant = await prisma.liveParticipant.findUnique({
+    where: { id: participantId },
+    include: { session: { select: { skillId: true } } },
+  });
+
   // Step 4 — Check for unexpected failure (Lane 3 only)
   let isUnexpectedFailure = false;
-  if (lane === 'LANE_3') {
-    const participant = await prisma.liveParticipant.findUnique({
-      where: { id: participantId },
-      include: { session: { select: { skillId: true } } },
-    });
-    if (participant?.session.skillId) {
-      const skillState = await prisma.studentSkillState.findUnique({
-        where: {
-          userId_skillId: {
-            userId: participant.studentUserId,
-            skillId: participant.session.skillId,
-          },
-        },
-      });
-      if (skillState) {
-        // Get historical average for this strand
-        const skill = await prisma.skill.findUnique({
-          where: { id: participant.session.skillId },
-          select: { strand: true, subjectId: true },
-        });
-        if (skill) {
-          const strandSkills = await prisma.skill.findMany({
-            where: { subjectId: skill.subjectId, strand: skill.strand },
-            select: { id: true },
-          });
-          const strandSkillIds = strandSkills.map(s => s.id);
-          const historicalStates = await prisma.studentSkillState.findMany({
-            where: {
-              userId: participant.studentUserId,
-              skillId: { in: strandSkillIds },
-            },
-            select: { masteryProbability: true },
-          });
-          if (historicalStates.length > 0) {
-            const historicalAverage =
-              historicalStates.reduce((sum, s) => sum + s.masteryProbability, 0) /
-              historicalStates.length;
-            isUnexpectedFailure = skillState.masteryProbability < historicalAverage - 0.25;
-          }
-        }
-      }
-    }
+  if (lane === 'LANE_3' && participant?.session.skillId) {
+    isUnexpectedFailure = await isUnexpectedLane3Failure(
+      participant.studentUserId,
+      participant.session.skillId
+    );
   }
 
   // Step 5 — For Lane 2: select recommended explanation
   let recommendedExplanationId: string | null = null;
-  if (lane === 'LANE_2') {
-    const participant = await prisma.liveParticipant.findUnique({
-      where: { id: participantId },
-      include: { session: { select: { skillId: true } } },
-    });
-    if (participant?.session.skillId) {
-      recommendedExplanationId = await selectExplanationRoute(
-        participant.session.skillId,
-        null
-      );
-    }
+  if (lane === 'LANE_2' && participant?.session.skillId) {
+    recommendedExplanationId = await selectExplanationRoute(participant.session.skillId, null);
   }
 
   // Update LiveParticipant
@@ -164,10 +125,6 @@ export async function assignLane(
   });
 
   // Create LaneTransition record
-  const participant = await prisma.liveParticipant.findUnique({
-    where: { id: participantId },
-    select: { studentUserId: true },
-  });
   await prisma.laneTransition.create({
     data: {
       liveSessionId: sessionId,
@@ -188,12 +145,37 @@ export async function assignLane(
   return { lane, reason, isUnexpectedFailure, recommendedExplanationId };
 }
 
+// ─── isUnexpectedLane3Failure ─────────────────────────────────────────────────
+
+async function isUnexpectedLane3Failure(userId: string, skillId: string): Promise<boolean> {
+  const skill = await prisma.skill.findUnique({
+    where: { id: skillId },
+    select: { strand: true, subjectId: true },
+  });
+  if (!skill) return false;
+
+  const [skillState, strandAvg] = await Promise.all([
+    prisma.studentSkillState.findUnique({
+      where: { userId_skillId: { userId, skillId } },
+      select: { masteryProbability: true },
+    }),
+    prisma.studentSkillState.aggregate({
+      where: { userId, skill: { subjectId: skill.subjectId, strand: skill.strand } },
+      _avg: { masteryProbability: true },
+    }),
+  ]);
+
+  const avg = strandAvg._avg.masteryProbability;
+  if (!skillState || avg === null) return false;
+  return skillState.masteryProbability < avg - 0.25;
+}
+
 // ─── escalateLane ────────────────────────────────────────────────────────────
 
 export async function escalateLane(
   participantId: string,
   sessionId: string,
-  failedExplanationId: string,
+  failedExplanationId: string | null,
   weaknessTags?: string[]
 ): Promise<EscalationResult> {
   const participant = await prisma.liveParticipant.findUnique({
@@ -397,7 +379,7 @@ export async function checkReteachThreshold(sessionId: string): Promise<void> {
   const allExpected = lane3.every(p => !p.isUnexpectedFailure);
 
   // Apply threshold
-  const threshold = allExpected ? 0.50 : 0.35;
+  const threshold = allExpected ? RETEACH_THRESHOLD_ALL_EXPECTED : RETEACH_THRESHOLD_HAS_UNEXPECTED;
   const reteachAlert = lane3Count / total >= threshold;
 
   await prisma.liveSession.update({
@@ -412,7 +394,7 @@ async function selectExplanationRoute(
   skillId: string,
   misconceptionTag: string | null,
   weaknessTags?: string[] | null
-): Promise<string> {
+): Promise<string | null> {
   const tags = normalizeTags([misconceptionTag ?? '', ...(weaknessTags ?? [])]);
 
   // Fetch ExplanationPerformance records for this skill, ordered by dle DESC
@@ -453,5 +435,5 @@ async function selectExplanationRoute(
     select: { id: true },
   });
 
-  return anyRoute?.id ?? '';
+  return anyRoute?.id ?? null;
 }

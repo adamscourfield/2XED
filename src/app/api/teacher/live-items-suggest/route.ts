@@ -176,7 +176,7 @@ export async function GET(req: NextRequest) {
         .slice(0, 16)
         .map((s) => s.itemId);
       const recapDisplay = await fetchItemsForDisplay(recapStruggleIds, subjectId);
-      const recapPriority = new Map<string, Array<{ id: string; question: string; type: string }>>();
+      const recapPriority = new Map<string, Array<{ id: string; question: string; type: string; liveMetadata: unknown }>>();
       for (const sid of recapSkillIds) recapPriority.set(sid, []);
       for (const st of lastSessionItemStats) {
         if (!recapSet.has(st.skillId)) continue;
@@ -186,6 +186,7 @@ export async function GET(req: NextRequest) {
           id: row.id,
           question: row.question,
           type: row.type,
+          liveMetadata: null,
         });
       }
       recapItemsBySkill = recapItemsBySkill.map((row) => ({

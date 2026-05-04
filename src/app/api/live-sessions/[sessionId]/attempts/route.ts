@@ -9,6 +9,7 @@ import { emitEvent } from '@/features/telemetry/eventService';
 import { escalateLane } from '@/lib/live/lane-router';
 import { generateQuestionsForSkill } from '@/lib/ai/questionGenerator';
 import { aiMarkingService, markSchema } from '@/features/qa/AIMarkingService';
+import { parseOpeningCheckQueue } from '@/lib/live/live-check-plan';
 
 const schema = z.object({
   itemId: z.string().min(1),
@@ -34,6 +35,7 @@ interface Props {
 }
 
 const RUBRIC_MARKING_CORRECT_THRESHOLD = 0.6;
+const AI_MARKING_TIMEOUT_MS = 8_000;
 
 function hasRubricPayload(options: unknown): boolean {
   return !!options && typeof options === 'object' && 'rubric' in options;
@@ -74,47 +76,73 @@ export async function POST(req: NextRequest, { params }: Props) {
 
   const { itemId, skillId, answer, canvasData, responseTimeMs, confidence } = parsed.data;
 
-  // Verify student is a participant in this session
-  const participant = await prisma.liveParticipant.findUnique({
-    where: {
-      liveSessionId_studentUserId: {
-        liveSessionId: sessionId,
-        studentUserId: userId,
+  // Fetch participant, session, and item in parallel — avoids three sequential round-trips.
+  const [participant, liveSession, item] = await Promise.all([
+    prisma.liveParticipant.findUnique({
+      where: {
+        liveSessionId_studentUserId: {
+          liveSessionId: sessionId,
+          studentUserId: userId,
+        },
       },
-    },
-    select: {
-      id: true,
-      currentLane: true,
-      currentExplanationId: true,
-      pendingRecheckItemId: true,
-      openingCheckQueue: true,
-      openingCheckIndex: true,
-    },
-  });
+      select: {
+        id: true,
+        currentLane: true,
+        currentExplanationId: true,
+        pendingRecheckItemId: true,
+        openingCheckQueue: true,
+        openingCheckIndex: true,
+      },
+    }),
+    prisma.liveSession.findUnique({ where: { id: sessionId } }),
+    prisma.item.findUnique({ where: { id: itemId } }),
+  ]);
 
   if (!participant) return NextResponse.json({ error: 'Not a participant in this session' }, { status: 403 });
-
-  const liveSession = await prisma.liveSession.findUnique({ where: { id: sessionId } });
   if (!liveSession || liveSession.status !== 'ACTIVE') {
     return NextResponse.json({ error: 'Session is not active' }, { status: 400 });
   }
-
-  // Look up the item and check correctness
-  const item = await prisma.item.findUnique({ where: { id: itemId } });
   if (!item) return NextResponse.json({ error: 'Item not found' }, { status: 404 });
+
+  // Idempotency guard — if this exact item was already submitted in this session
+  // (e.g. rapid double-tap), return the earlier result rather than creating a duplicate.
+  const existing = await prisma.liveAttempt.findFirst({
+    where: { liveSessionId: sessionId, studentUserId: userId, itemId },
+    select: { correct: true, markingResult: true },
+    orderBy: { createdAt: 'asc' },
+  });
+  if (existing) {
+    return NextResponse.json({
+      correct: existing.correct,
+      markingResult: existing.markingResult,
+      nextItem: null,
+      poolExhausted: false,
+      recheckOutcome: null,
+      laneAfterAttempt: participant.currentLane,
+    });
+  }
 
   let markingResult: ReturnType<typeof markSchema.parse> | null = null;
   let correct = item.answer.trim().toLowerCase() === answer.trim().toLowerCase();
 
   if (shouldUseRichMarking(item)) {
-    const marked = await aiMarkingService.mark({
-      questionId: itemId,
-      answer,
-      canvasData: canvasData ?? null,
-      mode: 'DRAFT',
-    });
-    markingResult = markSchema.parse(marked);
-    correct = markingResult.score >= RUBRIC_MARKING_CORRECT_THRESHOLD;
+    try {
+      const markPromise = aiMarkingService.mark({
+        questionId: itemId,
+        answer,
+        canvasData: canvasData ?? null,
+        mode: 'DRAFT',
+      });
+      const timeoutPromise = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error('AI marking timed out')), AI_MARKING_TIMEOUT_MS),
+      );
+      const marked = await Promise.race([markPromise, timeoutPromise]);
+      markingResult = markSchema.parse(marked);
+      correct = markingResult.score >= RUBRIC_MARKING_CORRECT_THRESHOLD;
+    } catch (err) {
+      console.warn('[attempts] AI marking failed, falling back to string match:', (err as Error).message);
+      // Fall back to exact string match already set above.
+    }
   }
 
   // If wrong, look up which misconception the chosen distractor signals.
@@ -187,8 +215,7 @@ export async function POST(req: NextRequest, { params }: Props) {
           pendingRecheckItemId: null,
         },
       });
-      const failedExplanationId = participant.currentExplanationId ?? '';
-      const escalation = await escalateLane(participant.id, sessionId, failedExplanationId, weaknessTags);
+      const escalation = await escalateLane(participant.id, sessionId, participant.currentExplanationId, weaknessTags);
       recheckOutcome = 'escalated_lane_3';
       laneAfterAttempt = escalation.newLane;
     }
@@ -214,13 +241,13 @@ export async function POST(req: NextRequest, { params }: Props) {
       },
     });
   } else {
-    const queue = (participant.openingCheckQueue as Array<{ itemId: string; skillId: string }> | null) ?? [];
+    const queue = parseOpeningCheckQueue(participant.openingCheckQueue);
     const idx = participant.openingCheckIndex ?? 0;
     const cur = queue[idx];
     if (cur?.itemId === itemId) {
       await prisma.liveParticipant.update({
         where: { id: participant.id },
-        data: { openingCheckIndex: idx + 1 },
+        data: { openingCheckIndex: { increment: 1 } },
       });
     }
   }
@@ -235,7 +262,7 @@ export async function POST(req: NextRequest, { params }: Props) {
     where: { id: participant.id },
     select: { openingCheckQueue: true, openingCheckIndex: true },
   });
-  const queueAfter = (participantAfter?.openingCheckQueue as Array<{ itemId: string; skillId: string }> | null) ?? [];
+  const queueAfter = parseOpeningCheckQueue(participantAfter?.openingCheckQueue);
   const idxAfter = participantAfter?.openingCheckIndex ?? 0;
   const nextOpening = queueAfter[idxAfter];
 
@@ -268,6 +295,7 @@ export async function POST(req: NextRequest, { params }: Props) {
     });
 
     // Pool exhausted — generate fresh AI questions and serve the first one.
+    let poolExhausted = false;
     if (!poolItem) {
       try {
         const skill = await prisma.skill.findUnique({
@@ -284,9 +312,9 @@ export async function POST(req: NextRequest, { params }: Props) {
           }
         }
       } catch (err) {
-        // Generation failure is non-fatal — student simply gets no next item.
         console.warn('[attempts] AI generation fallback failed:', (err as Error).message);
       }
+      if (!poolItem) poolExhausted = true;
     }
 
     if (poolItem) {
@@ -306,6 +334,7 @@ export async function POST(req: NextRequest, { params }: Props) {
           skillId: nextItem.skillId,
         }
       : null,
+    poolExhausted: nextItem === null,
     recheckOutcome,
     laneAfterAttempt,
   });

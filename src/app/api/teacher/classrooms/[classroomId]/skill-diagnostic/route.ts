@@ -28,6 +28,30 @@ export type SkillDiagnosticRow = {
 
 const WRONG_HISTORY_DAYS = 60;
 
+/**
+ * Average mastery (0–1) at or above which the class is considered to have
+ * securely acquired this skill, provided the at-risk rate is also low.
+ */
+const MASTERY_THRESHOLD_STRONG = 0.72;
+
+/**
+ * Proportion of at-risk students below which a high-mastery class is
+ * confirmed as "mastered" rather than "in_progress".
+ */
+const AT_RISK_RATE_LOW = 0.25;
+
+/**
+ * Proportion of at-risk students above which the skill is flagged for
+ * immediate recap regardless of average mastery.
+ */
+const AT_RISK_RATE_HIGH = 0.4;
+
+/**
+ * Average mastery below which the skill always triggers a recap recommendation,
+ * regardless of the at-risk rate.
+ */
+const MASTERY_THRESHOLD_WEAK = 0.45;
+
 function computeRecommendation(params: {
   totalStudents: number;
   studentsWithData: number;
@@ -43,8 +67,8 @@ function computeRecommendation(params: {
   const m = avgMastery ?? 0;
   const atRiskRate = studentsWithData > 0 ? atRisk / studentsWithData : 0;
 
-  if (m >= 0.72 && atRiskRate < 0.25) return 'mastered';
-  if (atRiskRate > 0.4 || m < 0.45) return 'recap_needed';
+  if (m >= MASTERY_THRESHOLD_STRONG && atRiskRate < AT_RISK_RATE_LOW) return 'mastered';
+  if (atRiskRate > AT_RISK_RATE_HIGH || m < MASTERY_THRESHOLD_WEAK) return 'recap_needed';
   return 'in_progress';
 }
 
