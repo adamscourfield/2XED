@@ -9,6 +9,7 @@ import { emitEvent } from '@/features/telemetry/eventService';
 import { escalateLane } from '@/lib/live/lane-router';
 import { generateQuestionsForSkill } from '@/lib/ai/questionGenerator';
 import { aiMarkingService, markSchema } from '@/features/qa/AIMarkingService';
+import { parseOpeningCheckQueue } from '@/lib/live/live-check-plan';
 
 const schema = z.object({
   itemId: z.string().min(1),
@@ -213,7 +214,7 @@ export async function POST(req: NextRequest, { params }: Props) {
       },
     });
   } else {
-    const queue = (participant.openingCheckQueue as Array<{ itemId: string; skillId: string }> | null) ?? [];
+    const queue = parseOpeningCheckQueue(participant.openingCheckQueue);
     const idx = participant.openingCheckIndex ?? 0;
     const cur = queue[idx];
     if (cur?.itemId === itemId) {
@@ -234,7 +235,7 @@ export async function POST(req: NextRequest, { params }: Props) {
     where: { id: participant.id },
     select: { openingCheckQueue: true, openingCheckIndex: true },
   });
-  const queueAfter = (participantAfter?.openingCheckQueue as Array<{ itemId: string; skillId: string }> | null) ?? [];
+  const queueAfter = parseOpeningCheckQueue(participantAfter?.openingCheckQueue);
   const idxAfter = participantAfter?.openingCheckIndex ?? 0;
   const nextOpening = queueAfter[idxAfter];
 

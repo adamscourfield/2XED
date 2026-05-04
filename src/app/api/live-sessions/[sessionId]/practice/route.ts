@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth';
 import { z } from 'zod';
 import { authOptions } from '@/features/auth/authOptions';
 import { prisma } from '@/db/prisma';
-import { selectLiveItem } from '@/lib/live/selectLiveItem';
+import { selectLiveItem, batchSelectLiveItems } from '@/lib/live/selectLiveItem';
 import type { LiveItemIntent } from '@/lib/live/liveItemTypes';
 
 const schema = z.object({
@@ -33,25 +33,6 @@ function buildPracticeItemPayload(item: NonNullable<Awaited<ReturnType<typeof se
   };
 }
 
-async function resolveStudentMisconceptionId(
-  sessionId: string,
-  studentUserId: string,
-  skillId: string,
-  fallback: string | null
-): Promise<string | null> {
-  const row = await prisma.liveAttempt.findFirst({
-    where: {
-      liveSessionId: sessionId,
-      studentUserId,
-      skillId,
-      correct: false,
-      misconceptionId: { not: null },
-    },
-    orderBy: { createdAt: 'desc' },
-    select: { misconceptionId: true },
-  });
-  return row?.misconceptionId ?? fallback;
-}
 
 export async function POST(req: NextRequest, { params }: Props) {
   const session = await getServerSession(authOptions);
@@ -129,80 +110,50 @@ export async function POST(req: NextRequest, { params }: Props) {
       : null;
 
   if (audience === 'individual') {
-    const usedItemIds = new Set<string>();
-    const resolvedAssignments: Array<[string, Awaited<ReturnType<typeof selectLiveItem>>]> = [];
-
-    for (const studentUserId of targetStudentIds) {
-      const individualMisconceptionId =
-        kind === 'misconception'
-          ? await resolveStudentMisconceptionId(sessionId, studentUserId, targetSkillId, misconceptionId)
-          : misconceptionId;
-
-      let selection = await selectLiveItem({
-        sessionId,
-        subjectId: liveSession.subjectId,
-        skillId: targetSkillId,
-        intent: PRACTICE_INTENT_MAP[kind],
-        audience,
-        targetStudentIds: [studentUserId],
-        misconceptionId: individualMisconceptionId,
-        excludeItemIds: [...usedItemIds],
-      });
-
-      if (!selection.item) {
-        selection = await selectLiveItem({
-          sessionId,
-          subjectId: liveSession.subjectId,
+    // Batch-fetch the most recent misconception per student in one query
+    const studentMisconceptionIds = new Map<string, string | null>();
+    if (kind === 'misconception') {
+      const recentRows = await prisma.liveAttempt.findMany({
+        where: {
+          liveSessionId: sessionId,
+          studentUserId: { in: targetStudentIds },
           skillId: targetSkillId,
-          intent: PRACTICE_INTENT_MAP[kind],
-          audience: 'lane',
-          targetStudentIds,
-          misconceptionId,
-          excludeItemIds: [...usedItemIds],
-        });
-      }
-
-      if (!selection.item && usedItemIds.size > 0) {
-        selection = await selectLiveItem({
-          sessionId,
-          subjectId: liveSession.subjectId,
-          skillId: targetSkillId,
-          intent: PRACTICE_INTENT_MAP[kind],
-          audience: 'lane',
-          targetStudentIds,
-          misconceptionId,
-        });
-      }
-
-      if (!selection.item) continue;
-      usedItemIds.add(selection.item.id);
-      resolvedAssignments.push([studentUserId, selection]);
-    }
-
-    if (resolvedAssignments.length === 0) {
-      return NextResponse.json({ error: 'Unable to select practice items for the targeted students.' }, { status: 404 });
-    }
-
-    const unassignedStudentIds = targetStudentIds.filter(
-      (studentUserId) => !resolvedAssignments.some(([assignedId]) => assignedId === studentUserId)
-    );
-
-    if (unassignedStudentIds.length > 0) {
-      const fallbackSelection = await selectLiveItem({
-        sessionId,
-        subjectId: liveSession.subjectId,
-        skillId: targetSkillId,
-        intent: PRACTICE_INTENT_MAP[kind],
-        audience: 'lane',
-        targetStudentIds,
-        misconceptionId,
+          correct: false,
+          misconceptionId: { not: null },
+        },
+        orderBy: { createdAt: 'desc' },
+        select: { studentUserId: true, misconceptionId: true },
+        take: targetStudentIds.length * 5,
       });
-      if (fallbackSelection.item) {
-        for (const studentUserId of unassignedStudentIds) {
-          resolvedAssignments.push([studentUserId, fallbackSelection]);
+      for (const row of recentRows) {
+        if (!studentMisconceptionIds.has(row.studentUserId)) {
+          studentMisconceptionIds.set(row.studentUserId, row.misconceptionId);
+        }
+      }
+      // Fill in group-level fallback for students with no individual signal
+      for (const studentUserId of targetStudentIds) {
+        if (!studentMisconceptionIds.has(studentUserId)) {
+          studentMisconceptionIds.set(studentUserId, misconceptionId);
         }
       }
     }
+
+    // Single pool fetch + in-memory per-student scoring
+    const batchResults = await batchSelectLiveItems({
+      sessionId,
+      subjectId: liveSession.subjectId,
+      skillId: targetSkillId,
+      intent: PRACTICE_INTENT_MAP[kind],
+      studentIds: targetStudentIds,
+      studentMisconceptionIds: kind === 'misconception' ? studentMisconceptionIds : undefined,
+    });
+
+    if (batchResults.length === 0) {
+      return NextResponse.json({ error: 'Unable to select practice items for the targeted students.' }, { status: 404 });
+    }
+
+    const resolvedAssignments: Array<[string, Awaited<ReturnType<typeof selectLiveItem>>]> =
+      batchResults.map(({ studentUserId, selection }) => [studentUserId, selection]);
 
     const individualAssignments = Object.fromEntries(
       resolvedAssignments.map(([studentUserId, selection]) => [

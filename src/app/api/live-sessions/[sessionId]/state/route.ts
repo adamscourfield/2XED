@@ -335,6 +335,43 @@ export async function GET(_req: NextRequest, { params }: Props) {
     }))
     .sort((a, b) => (a.averageScore / Math.max(a.averageMaxScore, 1)) - (b.averageScore / Math.max(b.averageMaxScore, 1)));
 
+  // ── Per-lane attempt summary for the current skill ───────────────────────
+  // Gives the teacher a live correct/incorrect tally per lane so they can see
+  // how each group is responding during the shadow-check phase.
+  const currentSkillId =
+    Array.isArray(liveSession.phases) && liveSession.phases.length > 0
+      ? ((liveSession.phases[liveSession.currentPhaseIndex] as { skillId?: string } | undefined)?.skillId ?? liveSession.skillId)
+      : liveSession.skillId;
+
+  const laneAttemptAcc: Record<string, { answered: Set<string>; correct: number; incorrect: number }> = {
+    LANE_1: { answered: new Set(), correct: 0, incorrect: 0 },
+    LANE_2: { answered: new Set(), correct: 0, incorrect: 0 },
+    LANE_3: { answered: new Set(), correct: 0, incorrect: 0 },
+  };
+
+  const participantLaneMap = new Map(
+    liveSession.participants.filter((p) => p.isActive).map((p) => [p.studentUserId, p.currentLane])
+  );
+
+  for (const attempt of liveSession.liveAttempts) {
+    if (attempt.skillId !== currentSkillId) continue;
+    const lane = participantLaneMap.get(attempt.studentUserId);
+    if (!lane || !(lane in laneAttemptAcc)) continue;
+    const acc = laneAttemptAcc[lane]!;
+    acc.answered.add(attempt.studentUserId);
+    if (getAttemptOutcome(attempt) === 'correct') acc.correct++;
+    else acc.incorrect++;
+  }
+
+  const laneSummary: Record<string, { answeredCount: number; correctCount: number; incorrectCount: number }> = {};
+  for (const [lane, acc] of Object.entries(laneAttemptAcc)) {
+    laneSummary[lane] = {
+      answeredCount: acc.answered.size,
+      correctCount: acc.correct,
+      incorrectCount: acc.incorrect,
+    };
+  }
+
   // ── Per-student response breakdown ────────────────────────────────────────
   // Build attempt counts per student from the already-fetched liveAttempts.
   const studentAttemptMap = new Map<string, { total: number; correct: number; partial: number; lastOutcome: 'correct' | 'partial' | 'incorrect' | null }>();
@@ -386,6 +423,7 @@ export async function GET(_req: NextRequest, { params }: Props) {
     laneCounts,
     laneStudents,
     responseSummary,
+    laneSummary,
     recommendedExplanation,
     supportSummary,
     studentMessages,

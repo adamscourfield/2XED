@@ -8,7 +8,25 @@ export type LiveCheckPlan = {
   perStudent?: Record<string, CheckPlanSlot[]>;
 };
 
-export type OpeningCheckQueueEntry = { itemId: string; skillId: string };
+/** v=1 entries carry an explicit schema version so future migrations can detect old rows. */
+export type OpeningCheckQueueEntry = { v: 1; itemId: string; skillId: string };
+
+/**
+ * Safely parse the JSON blob stored in LiveParticipant.openingCheckQueue.
+ * Accepts both the legacy schema (no `v` field) and the current v=1 schema so
+ * in-flight sessions created before the versioning change continue to work.
+ */
+export function parseOpeningCheckQueue(raw: unknown): OpeningCheckQueueEntry[] {
+  if (!Array.isArray(raw)) return [];
+  const out: OpeningCheckQueueEntry[] = [];
+  for (const entry of raw) {
+    if (!entry || typeof entry !== 'object') continue;
+    const e = entry as Record<string, unknown>;
+    if (typeof e.itemId !== 'string' || typeof e.skillId !== 'string') continue;
+    out.push({ v: 1, itemId: e.itemId, skillId: e.skillId });
+  }
+  return out;
+}
 
 function dedupeSequential(slots: CheckPlanSlot[]): CheckPlanSlot[] {
   const seen = new Set<string>();
@@ -69,7 +87,7 @@ export async function resolveOpeningCheckQueueForParticipant(params: {
       if (skillIdArray.length === 0) continue;
       skillId = skillIdArray[0]!;
     }
-    out.push({ itemId: item.id, skillId });
+    out.push({ v: 1, itemId: item.id, skillId });
   }
   return out;
 }
@@ -88,7 +106,7 @@ export async function fetchSampleItemsBySkillIds(
   const uniqueSkills = [...new Set(skillIds)];
   const result: Array<{
     skillId: string;
-    items: Array<{ id: string; question: string; type: string }>;
+    items: Array<{ id: string; question: string; type: string; liveMetadata: unknown }>;
   }> = [];
 
   for (const skillId of uniqueSkills) {

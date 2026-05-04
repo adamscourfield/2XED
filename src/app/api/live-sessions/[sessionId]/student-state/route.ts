@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/features/auth/authOptions';
 import { prisma } from '@/db/prisma';
+import { parseOpeningCheckQueue } from '@/lib/live/live-check-plan';
 
 interface Props {
   params: Promise<{ sessionId: string }>;
@@ -90,7 +91,7 @@ export async function GET(_req: NextRequest, { params }: Props) {
 
   let openingCheckItem: typeof pendingRecheckItem = null;
   if (liveSession.status === 'ACTIVE' && participant.currentLane === 'LANE_1' && !participant.pendingRecheckItemId) {
-    const queue = (participant.openingCheckQueue as Array<{ itemId: string; skillId: string }> | null) ?? [];
+    const queue = parseOpeningCheckQueue(participant.openingCheckQueue);
     const idx = participant.openingCheckIndex ?? 0;
     const slot = queue[idx];
     if (slot) {

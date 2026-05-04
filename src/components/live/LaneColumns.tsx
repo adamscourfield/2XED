@@ -5,7 +5,8 @@ type EscalationReason =
   | 'ANCHOR_FAILED'
   | 'MISCONCEPTION_FAILED'
   | 'SCAFFOLDED_CORRECT'
-  | 'MANUAL_TEACHER';
+  | 'MANUAL_TEACHER'
+  | 'HINTS_USED';
 
 interface LaneStudent {
   participantId: string;
