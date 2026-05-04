@@ -72,9 +72,11 @@ export function useLiveLanes(sessionId: string, pollIntervalMs = 4000) {
         `/api/live-sessions/${sessionId}/participants/${participantId}/handback`,
         { method: 'POST' }
       );
-      if (res.ok) {
-        await fetchLanes();
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error((body as { error?: string }).error ?? 'Handback failed');
       }
+      await fetchLanes();
     },
     [sessionId, fetchLanes]
   );

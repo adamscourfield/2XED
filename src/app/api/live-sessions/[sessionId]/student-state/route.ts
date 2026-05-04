@@ -31,36 +31,36 @@ export async function GET(_req: NextRequest, { params }: Props) {
   const userId = (session.user as { id: string }).id;
   const { sessionId } = await params;
 
-  // Verify student is a participant
-  const participant = await prisma.liveParticipant.findUnique({
-    where: {
-      liveSessionId_studentUserId: {
-        liveSessionId: sessionId,
-        studentUserId: userId,
+  // Verify student is a participant — fetch participant and session in parallel.
+  const [participant, liveSession] = await Promise.all([
+    prisma.liveParticipant.findUnique({
+      where: {
+        liveSessionId_studentUserId: {
+          liveSessionId: sessionId,
+          studentUserId: userId,
+        },
       },
-    },
-    select: {
-      id: true,
-      currentLane: true,
-      currentExplanationId: true,
-      pendingRecheckItemId: true,
-      openingCheckQueue: true,
-      openingCheckIndex: true,
-    },
-  });
+      select: {
+        id: true,
+        currentLane: true,
+        currentExplanationId: true,
+        pendingRecheckItemId: true,
+        openingCheckQueue: true,
+        openingCheckIndex: true,
+      },
+    }),
+    prisma.liveSession.findUnique({
+      where: { id: sessionId },
+      select: {
+        status: true,
+        currentPhaseIndex: true,
+        currentContent: true,
+        skillId: true,
+      },
+    }),
+  ]);
 
   if (!participant) return NextResponse.json({ error: 'Not a participant' }, { status: 403 });
-
-  const liveSession = await prisma.liveSession.findUnique({
-    where: { id: sessionId },
-    select: {
-      status: true,
-      currentPhaseIndex: true,
-      currentContent: true,
-      skillId: true,
-    },
-  });
-
   if (!liveSession) return NextResponse.json({ error: 'Session not found' }, { status: 404 });
 
   let pendingRecheckItem: { id: string; question: string; type: string; options: unknown; skillId?: string } | null =

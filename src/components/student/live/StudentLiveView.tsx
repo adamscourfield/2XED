@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type FormEvent } from 'react';
+import { useState, useEffect, useRef, type FormEvent } from 'react';
 import { LiveWhiteboardViewer } from '@/components/student/LiveWhiteboardViewer';
 import { AnimationRenderer } from '@/components/explanation/AnimationRenderer';
 import { sanitizeStudentCopy } from '@/features/learn/studentCopy';
@@ -110,6 +110,13 @@ function SidePanel({
   const [messageOpen, setMessageOpen] = useState(false);
   const [draft, setDraft] = useState('');
   const [sentFlash, setSentFlash] = useState(false);
+  const sentFlashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (sentFlashTimerRef.current !== null) clearTimeout(sentFlashTimerRef.current);
+    };
+  }, []);
 
   return (
     <aside className="flex flex-col gap-4">
@@ -157,7 +164,8 @@ function SidePanel({
                     onMessageTeacher(draft.trim());
                     setDraft('');
                     setSentFlash(true);
-                    window.setTimeout(() => setSentFlash(false), 1800);
+                    if (sentFlashTimerRef.current !== null) clearTimeout(sentFlashTimerRef.current);
+                    sentFlashTimerRef.current = setTimeout(() => setSentFlash(false), 1800);
                   }
                 }}
                 className="anx-btn-primary shrink-0 px-3 py-2 text-xs transition-transform active:scale-[0.97]"

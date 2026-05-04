@@ -1,5 +1,6 @@
 import { prisma } from '@/db/prisma';
 import type { LaneViewResponse, LaneStudent } from '@/lib/validators/live-session';
+import { RETEACH_THRESHOLD_ALL_EXPECTED, RETEACH_THRESHOLD_HAS_UNEXPECTED } from '@/lib/live/reteach-thresholds';
 
 export async function getLaneView(sessionId: string): Promise<LaneViewResponse> {
   // Fetch all participants for the session
@@ -84,7 +85,11 @@ export async function getLaneView(sessionId: string): Promise<LaneViewResponse> 
     }
   }
 
-  // Sort Lane 3 students by masteryProbability ASC
+  // Lane 1: highest mastery first (teacher can scan quickly for students ready to extend)
+  lane1Students.sort((a, b) => b.masteryProbability - a.masteryProbability);
+  // Lane 2: longest-waiting first (teacher prioritises who to check in on)
+  lane2Students.sort((a, b) => b.waitingMinutes - a.waitingMinutes);
+  // Lane 3: lowest mastery first (most urgent support need at the top)
   lane3Students.sort((a, b) => a.masteryProbability - b.masteryProbability);
 
   const totalParticipants = participants.length;
@@ -94,7 +99,7 @@ export async function getLaneView(sessionId: string): Promise<LaneViewResponse> 
   const assigned = participants.filter(p => p.laneAssignedAt !== null);
   const assignedTotal = assigned.length;
   const allExpected = lane3Students.every(s => !s.isUnexpectedFailure);
-  const threshold = allExpected ? 0.50 : 0.35;
+  const threshold = allExpected ? RETEACH_THRESHOLD_ALL_EXPECTED : RETEACH_THRESHOLD_HAS_UNEXPECTED;
   const reteachAlert = assignedTotal > 0 && lane3Count / assignedTotal >= threshold;
 
   // Build reteach message

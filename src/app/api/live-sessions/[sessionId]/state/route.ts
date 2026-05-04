@@ -75,6 +75,7 @@ export async function GET(_req: NextRequest, { params }: Props) {
               interventionFlags: {
                 where: { isResolved: false },
                 select: { id: true, skillId: true, reason: true },
+                take: 5,
               },
             },
           },

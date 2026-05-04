@@ -73,7 +73,11 @@ export async function POST(req: NextRequest, { params }: Props) {
     return NextResponse.json({ acknowledged: true });
   }
 
-  const result = await escalateLane(participant.id, sessionId, failedExplanationId);
-
-  return NextResponse.json(result);
+  try {
+    const result = await escalateLane(participant.id, sessionId, failedExplanationId);
+    return NextResponse.json(result);
+  } catch (err) {
+    console.error('[escalate] escalateLane failed:', (err as Error).message);
+    return NextResponse.json({ error: 'Failed to escalate lane' }, { status: 500 });
+  }
 }

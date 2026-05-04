@@ -1,5 +1,6 @@
 import { prisma } from '@/db/prisma';
 import { emitEvent } from '@/features/telemetry/eventService';
+import { RETEACH_THRESHOLD_ALL_EXPECTED, RETEACH_THRESHOLD_HAS_UNEXPECTED } from '@/lib/live/reteach-thresholds';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -378,7 +379,7 @@ export async function checkReteachThreshold(sessionId: string): Promise<void> {
   const allExpected = lane3.every(p => !p.isUnexpectedFailure);
 
   // Apply threshold
-  const threshold = allExpected ? 0.50 : 0.35;
+  const threshold = allExpected ? RETEACH_THRESHOLD_ALL_EXPECTED : RETEACH_THRESHOLD_HAS_UNEXPECTED;
   const reteachAlert = lane3Count / total >= threshold;
 
   await prisma.liveSession.update({
