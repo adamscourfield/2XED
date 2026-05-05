@@ -10,6 +10,7 @@ import { escalateLane } from '@/lib/live/lane-router';
 import { generateQuestionsForSkill } from '@/lib/ai/questionGenerator';
 import { aiMarkingService, markSchema } from '@/features/qa/AIMarkingService';
 import { parseOpeningCheckQueue } from '@/lib/live/live-check-plan';
+import { RUBRIC_CORRECT_THRESHOLD } from '@/lib/live/markingConstants';
 
 const schema = z.object({
   itemId: z.string().min(1),
@@ -34,7 +35,6 @@ interface Props {
   params: Promise<{ sessionId: string }>;
 }
 
-const RUBRIC_MARKING_CORRECT_THRESHOLD = 0.6;
 const AI_MARKING_TIMEOUT_MS = 8_000;
 
 function hasRubricPayload(options: unknown): boolean {
@@ -138,7 +138,7 @@ export async function POST(req: NextRequest, { params }: Props) {
       );
       const marked = await Promise.race([markPromise, timeoutPromise]);
       markingResult = markSchema.parse(marked);
-      correct = markingResult.score >= RUBRIC_MARKING_CORRECT_THRESHOLD;
+      correct = markingResult.score >= RUBRIC_CORRECT_THRESHOLD;
     } catch (err) {
       console.warn('[attempts] AI marking failed, falling back to string match:', (err as Error).message);
       // Fall back to exact string match already set above.

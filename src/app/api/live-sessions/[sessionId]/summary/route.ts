@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/features/auth/authOptions';
 import { prisma } from '@/db/prisma';
+import { RUBRIC_CORRECT_THRESHOLD } from '@/lib/live/markingConstants';
 
 interface Props {
   params: Promise<{ sessionId: string }>;
@@ -15,7 +16,7 @@ interface StoredMarkingResult {
 function getAttemptOutcome(attempt: { correct: boolean; markingResult: unknown }): 'correct' | 'partial' | 'incorrect' {
   const marking = (attempt.markingResult as StoredMarkingResult | null) ?? null;
   if (marking && typeof marking.score === 'number') {
-    if (marking.score >= 0.6) return 'correct';
+    if (marking.score >= RUBRIC_CORRECT_THRESHOLD) return 'correct';
     if (marking.score > 0) return 'partial';
     return 'incorrect';
   }

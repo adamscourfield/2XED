@@ -180,7 +180,7 @@ async function callAnthropic(systemPrompt: string, prompt: string): Promise<RawG
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': apiKey,
+        'x-api-key': apiKey!,
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
