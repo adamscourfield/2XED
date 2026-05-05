@@ -29,36 +29,37 @@ export async function GET() {
     },
   });
 
-  const subjectsPayload = [];
-  for (const subject of subjects) {
-    const onboardingComplete = await hasCompletedOnboardingDiagnostic(userId, subject.id);
-    const dueSkills = subject.skills.filter((skill) => {
-      const mastery = skill.masteries[0];
-      if (!mastery) return true;
-      if (!mastery.nextReviewAt) return true;
-      return mastery.nextReviewAt <= now;
-    });
-    const averageMastery = subject.skills.length
-      ? Math.round(
-          (subject.skills.reduce(
-            (sum, skill) => sum + (skill.masteries[0]?.mastery ?? 0),
-            0
-          ) /
-            subject.skills.length) *
-            100
-        )
-      : 0;
+  const subjectsPayload = await Promise.all(
+    subjects.map(async (subject) => {
+      const onboardingComplete = await hasCompletedOnboardingDiagnostic(userId, subject.id);
+      const dueSkills = subject.skills.filter((skill) => {
+        const mastery = skill.masteries[0];
+        if (!mastery) return true;
+        if (!mastery.nextReviewAt) return true;
+        return mastery.nextReviewAt <= now;
+      });
+      const averageMastery = subject.skills.length
+        ? Math.round(
+            (subject.skills.reduce(
+              (sum, skill) => sum + (skill.masteries[0]?.mastery ?? 0),
+              0
+            ) /
+              subject.skills.length) *
+              100
+          )
+        : 0;
 
-    subjectsPayload.push({
-      id: subject.id,
-      title: subject.title,
-      slug: subject.slug,
-      href: onboardingComplete ? `/learn/${subject.slug}` : `/diagnostic/${subject.slug}`,
-      averageMastery,
-      dueNowCount: dueSkills.length,
-      onboardingComplete,
-    });
-  }
+      return {
+        id: subject.id,
+        title: subject.title,
+        slug: subject.slug,
+        href: onboardingComplete ? `/learn/${subject.slug}` : `/diagnostic/${subject.slug}`,
+        averageMastery,
+        dueNowCount: dueSkills.length,
+        onboardingComplete,
+      };
+    })
+  );
 
   return NextResponse.json({ subjects: subjectsPayload });
 }
