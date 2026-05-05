@@ -56,6 +56,34 @@ describe('knowledge-state/scoreAttempt', () => {
     expect(evidence.masterySignal).toBeCloseTo(0.15);
   });
 
+  it('scores case B only for medium-speed responses — slow independent correct falls to case C', () => {
+    const mediumSpeed = scoreAttempt({
+      correct: true,
+      responseTimeMs: 10000,
+      hintsUsed: 0,
+      supportLevel: 'INDEPENDENT',
+      questionType: 'ROUTINE',
+      isTransferItem: false,
+      isMixedItem: false,
+      isReviewItem: false,
+    });
+
+    const slowSpeed = scoreAttempt({
+      correct: true,
+      responseTimeMs: 20000,
+      hintsUsed: 0,
+      supportLevel: 'INDEPENDENT',
+      questionType: 'ROUTINE',
+      isTransferItem: false,
+      isMixedItem: false,
+      isReviewItem: false,
+    });
+
+    expect(mediumSpeed.masterySignal).toBeCloseTo(0.8);   // Case B
+    expect(slowSpeed.masterySignal).toBeCloseTo(0.65);    // Case C — not Case B
+    expect(slowSpeed.masterySignal).toBeLessThan(mediumSpeed.masterySignal);
+  });
+
   it('computes forgetting signal from expected vs observed retention on review items', () => {
     const evidence = scoreAttempt({
       correct: true,

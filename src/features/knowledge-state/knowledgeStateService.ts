@@ -1,4 +1,5 @@
 import { prisma } from '@/db/prisma';
+import type { DelayBucket } from '@prisma/client';
 import {
   scoreAttempt,
   type KnowledgeQuestionType,
@@ -32,10 +33,11 @@ export interface RecordKnowledgeAttemptInput {
   isReviewItem?: boolean;
 }
 
+const DEFAULT_FORGETTING_RATE = 0.12;
 const DEFAULT_STATE: KnowledgeState = {
   masteryProbability: 0.35,
-  forgettingRate: 0.12,
-  halfLifeDays: 5.776226504666211,
+  forgettingRate: DEFAULT_FORGETTING_RATE,
+  halfLifeDays: Math.log(2) / DEFAULT_FORGETTING_RATE,
   retrievalStrength: 0.3,
   transferAbility: 0.2,
   confidence: 0.1,
@@ -81,30 +83,6 @@ export async function recordKnowledgeAttempt(input: RecordKnowledgeAttemptInput)
 
   const occurredAt = input.occurredAt ?? new Date();
 
-  const existingState = await prisma.studentSkillState.findUnique({
-    where: {
-      userId_skillId: {
-        userId: input.userId,
-        skillId: input.skillId,
-      },
-    },
-  });
-
-  const state: KnowledgeState = existingState
-    ? {
-        masteryProbability: existingState.masteryProbability,
-        forgettingRate: existingState.forgettingRate,
-        halfLifeDays: existingState.halfLifeDays,
-        retrievalStrength: existingState.retrievalStrength,
-        transferAbility: existingState.transferAbility,
-        confidence: existingState.confidence,
-        evidenceCount: existingState.evidenceCount,
-        lastAttemptAt: existingState.lastAttemptAt,
-        lastSuccessAt: existingState.lastSuccessAt,
-        lastReviewAt: existingState.lastReviewAt,
-      }
-    : DEFAULT_STATE;
-
   const scoreInput: KnowledgeAttemptInput = {
     correct: input.correct,
     responseTimeMs: input.responseTimeMs ?? 12000,
@@ -116,35 +94,66 @@ export async function recordKnowledgeAttempt(input: RecordKnowledgeAttemptInput)
     isReviewItem: input.isReviewItem ?? false,
   };
 
-  const evidence = scoreAttempt(scoreInput);
-  const nextState = updateSkillState({
-    state,
-    evidence,
-    attempt: {
-      timestamp: occurredAt,
-      correct: input.correct,
-      isTransferItem: input.isTransferItem ?? false,
-      isReviewItem: input.isReviewItem ?? false,
-      expectedRetention: state.retrievalStrength,
-      observedRetention: input.correct ? 1 : 0,
-    },
-  });
-
-  const learningGain = computeLearningGain(state, nextState);
-  const knowledgeStability = computeKnowledgeStability(nextState);
   const instructionalTimeMs = computeInstructionalTimeMs(input);
-  const dle = computeDLE({ learningGain, knowledgeStability, instructionalTimeMs });
-  const durabilityBand = dle.durabilityBand;
-
   const contextType = input.isTransferItem ? 'TRANSFER' : input.isMixedItem ? 'MIXED' : 'ROUTINE';
-  const daysSinceLastAttempt = state.lastAttemptAt
-    ? (occurredAt.getTime() - state.lastAttemptAt.getTime()) / (1000 * 60 * 60 * 24)
-    : 0;
-  const delayBucket = daysSinceLastAttempt >= 7 ? 'D7_PLUS' : daysSinceLastAttempt >= 3 ? 'D3' : daysSinceLastAttempt >= 1 ? 'D1' : input.isReviewItem ? 'SAME_DAY' : 'IMMEDIATE';
 
-  const nextReviewAt = new Date(occurredAt.getTime() + Math.max(1, nextState.halfLifeDays * 0.9) * 24 * 60 * 60 * 1000);
+  // State read is inside the transaction to reduce the window for concurrent
+  // updates on the same (userId, skillId) from racing each other.
+  let state: KnowledgeState = DEFAULT_STATE;
+  let nextState: KnowledgeState = DEFAULT_STATE;
+  let learningGain = 0;
+  let knowledgeStability = 0;
+  let dle = computeDLE({ learningGain: 0, knowledgeStability: 0, instructionalTimeMs });
+  let durabilityBand = dle.durabilityBand;
+  let daysSinceLastAttempt = 0;
+  let delayBucket: DelayBucket = 'IMMEDIATE';
+  let nextReviewAt = new Date(occurredAt.getTime() + Math.max(1, DEFAULT_STATE.halfLifeDays * 0.9) * 24 * 60 * 60 * 1000);
 
   await prisma.$transaction(async (tx) => {
+    const existingState = await tx.studentSkillState.findUnique({
+      where: { userId_skillId: { userId: input.userId, skillId: input.skillId } },
+    });
+
+    state = existingState
+      ? {
+          masteryProbability: existingState.masteryProbability,
+          forgettingRate: existingState.forgettingRate,
+          halfLifeDays: existingState.halfLifeDays,
+          retrievalStrength: existingState.retrievalStrength,
+          transferAbility: existingState.transferAbility,
+          confidence: existingState.confidence,
+          evidenceCount: existingState.evidenceCount,
+          lastAttemptAt: existingState.lastAttemptAt,
+          lastSuccessAt: existingState.lastSuccessAt,
+          lastReviewAt: existingState.lastReviewAt,
+        }
+      : DEFAULT_STATE;
+
+    const evidence = scoreAttempt(scoreInput);
+    nextState = updateSkillState({
+      state,
+      evidence,
+      attempt: {
+        timestamp: occurredAt,
+        correct: input.correct,
+        isTransferItem: input.isTransferItem ?? false,
+        isReviewItem: input.isReviewItem ?? false,
+        expectedRetention: state.retrievalStrength,
+        observedRetention: input.correct ? 1 : 0,
+      },
+    });
+
+    learningGain = computeLearningGain(state, nextState);
+    knowledgeStability = computeKnowledgeStability(nextState);
+    dle = computeDLE({ learningGain, knowledgeStability, instructionalTimeMs });
+    durabilityBand = dle.durabilityBand;
+
+    daysSinceLastAttempt = state.lastAttemptAt
+      ? (occurredAt.getTime() - state.lastAttemptAt.getTime()) / (1000 * 60 * 60 * 24)
+      : 0;
+    delayBucket = daysSinceLastAttempt >= 7 ? 'D7_PLUS' : daysSinceLastAttempt >= 3 ? 'D3' : daysSinceLastAttempt >= 1 ? 'D1' : input.isReviewItem ? 'SAME_DAY' : 'IMMEDIATE';
+    nextReviewAt = new Date(occurredAt.getTime() + Math.max(1, nextState.halfLifeDays * 0.9) * 24 * 60 * 60 * 1000);
+
     await tx.questionAttempt.create({
       data: {
         userId: input.userId,

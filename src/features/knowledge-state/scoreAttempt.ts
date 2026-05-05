@@ -56,8 +56,8 @@ export function scoreAttempt(input: KnowledgeAttemptInput): AttemptEvidenceSigna
     masterySignal = 0.95; // Case A
     retrievalSignal = 0.95;
     reliabilitySignal = 0.9;
-  } else if (input.correct && independent && input.hintsUsed === 0) {
-    masterySignal = 0.8; // Case B
+  } else if (input.correct && independent && input.hintsUsed === 0 && !slow) {
+    masterySignal = 0.8; // Case B: correct, independent, no hints, medium speed
     retrievalSignal = 0.75;
     reliabilitySignal = 0.8;
   } else if (input.correct && (slow || input.hintsUsed >= 1)) {
