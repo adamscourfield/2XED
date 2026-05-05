@@ -295,6 +295,8 @@ export async function POST(req: NextRequest, { params }: Props) {
     });
 
     // Pool exhausted — generate fresh AI questions and serve the first one.
+    // Fix: wrap in a 5 s timeout so a slow generation call never blocks a student submission.
+    const AI_GENERATION_TIMEOUT_MS = 5_000;
     let poolExhausted = false;
     if (!poolItem) {
       try {
@@ -303,7 +305,11 @@ export async function POST(req: NextRequest, { params }: Props) {
           select: { code: true, masteryDefinition: true },
         });
         if (skill?.masteryDefinition) {
-          const generated = await generateQuestionsForSkill({ skillCode: skill.code, count: 5 });
+          const generatePromise = generateQuestionsForSkill({ skillCode: skill.code, count: 5 });
+          const timeoutPromise = new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error('AI generation timed out')), AI_GENERATION_TIMEOUT_MS),
+          );
+          const generated = await Promise.race([generatePromise, timeoutPromise]);
           if (generated.length > 0) {
             poolItem = await prisma.item.findUnique({
               where: { id: generated[0].id },
