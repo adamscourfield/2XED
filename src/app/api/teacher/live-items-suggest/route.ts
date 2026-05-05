@@ -99,10 +99,17 @@ export async function GET(req: NextRequest) {
     .map(s => ({ id: s.id, code: s.code }));
 
   void Promise.allSettled(
-    enrichedSkillIds.map(s =>
-      ensureItemPool({ skillCode: s.code, skillId: s.id, minItems: 3, generateCount: 5 })
-    )
-  );
+    enrichedSkillIds.map((s) =>
+      ensureItemPool({ skillCode: s.code, skillId: s.id, minItems: 3, generateCount: 5 }),
+    ),
+  ).then((results) => {
+    for (let i = 0; i < results.length; i++) {
+      const r = results[i];
+      if (r?.status === 'rejected') {
+        console.warn(`[live-items-suggest] ensureItemPool failed for ${enrichedSkillIds[i]?.code}:`, (r.reason as Error)?.message);
+      }
+    }
+  });
 
   const baseItemsBySkill = await fetchSampleItemsBySkillIds(skillIds, subjectId, 12);
 

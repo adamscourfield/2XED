@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   AnnotationCanvas,
   annotationStateHasContent,
@@ -299,6 +300,7 @@ function lessonTitle(snapshot: SessionSnapshot | null): string {
 }
 
 export function TeacherLiveWorkspace({ sessionId }: Props) {
+  const router = useRouter();
   const [snapshot, setSnapshot] = useState<SessionSnapshot | null>(null);
   const [snapshotLoading, setSnapshotLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -463,6 +465,10 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status: next }),
     });
+    if (next === 'COMPLETED') {
+      router.push(`/teacher/live/${sessionId}/review`);
+      return;
+    }
     fetchSnapshot();
   }
 
@@ -898,7 +904,7 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
       <EndSessionDialog
         open={endingPrompt}
         title="End the session?"
-        description="Students will be returned to their dashboard. You can review responses afterwards."
+        description="Students will be returned to their dashboard. You'll go straight to the session review."
         cancelLabel="Cancel"
         confirmLabel="End session"
         onCancel={() => setEndingPrompt(false)}

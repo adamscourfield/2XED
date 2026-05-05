@@ -236,8 +236,8 @@ export async function selectLiveItem(params: SelectLiveItemParams): Promise<Live
     try {
       await ensureItemPool({ skillCode: skill.code, skillId: skill.id, minItems: MIN_POOL_SIZE, generateCount: GENERATE_COUNT });
       generated = true;
-    } catch {
-      // Keep going with current pool if generation fails.
+    } catch (err) {
+      console.warn(`[selectLiveItem] ensureItemPool failed for ${skill.code}:`, (err as Error).message);
     }
   }
 
@@ -340,7 +340,9 @@ export async function batchSelectLiveItems(
     try {
       await ensureItemPool({ skillCode: skill.code, skillId: skill.id, minItems: MIN_POOL_SIZE, generateCount: GENERATE_COUNT });
       generated = true;
-    } catch { /* keep going with current pool */ }
+    } catch (err) {
+      console.warn(`[batchSelectLiveItems] ensureItemPool failed for ${skill.code}:`, (err as Error).message);
+    }
   }
 
   // 2. Fetch candidate items once
