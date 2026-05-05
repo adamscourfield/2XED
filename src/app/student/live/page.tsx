@@ -215,6 +215,9 @@ export default function StudentLivePage() {
   const sessionRef = useRef<JoinedSession | null>(null);
   const liveWhiteboardRef = useRef<LiveWhiteboardPayload | null>(null);
   const lastExplanationTelemetryIdRef = useRef<string | null>(null);
+  // Tracks when the current question was shown so responseTimeMs is accurate.
+  const questionStartRef = useRef<number>(Date.now());
+  const [pollErrorCount, setPollErrorCount] = useState(0);
 
   useEffect(() => {
     if (joinCode.length === 6) {
@@ -238,6 +241,16 @@ export default function StudentLivePage() {
     }
   }, [appState]);
 
+  // Reset question timer whenever a new item is shown so responseTimeMs
+  // measures the student's actual thinking time, not the fetch round-trip.
+  const currentItemId =
+    appState.phase === 'question' ? appState.item.id :
+    appState.phase === 'practice' ? appState.item.id :
+    null;
+  useEffect(() => {
+    if (currentItemId) questionStartRef.current = Date.now();
+  }, [currentItemId]);
+
   useEffect(() => {
     const isInSession = appState.phase !== 'join' && appState.phase !== 'done';
     if (!isInSession) {
@@ -257,6 +270,7 @@ export default function StudentLivePage() {
         const res = await fetch(`/api/live-sessions/${sid}/student-state`);
         if (!res.ok) return;
         const data: SessionPoll = await res.json();
+        setPollErrorCount(0);
 
         if (data.status === 'COMPLETED') {
           const sess = sessionRef.current;
@@ -351,7 +365,7 @@ export default function StudentLivePage() {
           lastBroadcastAtRef.current = data.currentContent.broadcastAt;
         }
       } catch {
-        // silent
+        setPollErrorCount((n) => n + 1);
       } finally {
         const elapsed =
           typeof performance !== 'undefined'
@@ -462,7 +476,7 @@ export default function StudentLivePage() {
 
     setLoading(true);
     try {
-      const start = Date.now();
+      const responseTimeMs = Date.now() - questionStartRef.current;
       const res = await fetch(`/api/live-sessions/${session.sessionId}/attempts`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -470,7 +484,7 @@ export default function StudentLivePage() {
           itemId: item.id,
           skillId,
           answer,
-          responseTimeMs: Date.now() - start,
+          responseTimeMs,
         }),
       });
       if (!res.ok) {
@@ -503,7 +517,7 @@ export default function StudentLivePage() {
 
     setLoading(true);
     try {
-      const start = Date.now();
+      const responseTimeMs = Date.now() - questionStartRef.current;
       const res = await fetch(`/api/live-sessions/${session.sessionId}/attempts`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -518,7 +532,7 @@ export default function StudentLivePage() {
                 strokes: canvasData.strokes,
               }
             : null,
-          responseTimeMs: Date.now() - start,
+          responseTimeMs,
           ...(confidence ? { confidence } : {}),
         }),
       });
@@ -631,7 +645,9 @@ export default function StudentLivePage() {
         mode={shellChromeMode(appState)}
         phaseHint={shellPhaseHint(appState)}
         phaseHintSuffix={
-          pollSlowSince != null ? 'Updating…' : undefined
+          pollErrorCount >= 2 ? 'Reconnecting…' :
+          pollSlowSince != null ? 'Updating…' :
+          undefined
         }
         onLeave={
           appState.phase === 'done'

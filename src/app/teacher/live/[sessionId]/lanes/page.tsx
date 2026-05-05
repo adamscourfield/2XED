@@ -14,7 +14,7 @@ interface Props {
 
 export default function TeacherLanesPage({ params }: Props) {
   const { sessionId } = use(params);
-  const { data, error, loading, handback } = useLiveLanes(sessionId);
+  const { data, error, loading, actingOnIds, handback } = useLiveLanes(sessionId);
 
   if (loading) {
     return (
@@ -72,6 +72,7 @@ export default function TeacherLanesPage({ params }: Props) {
         lane2={data.lane2}
         lane3={data.lane3}
         onHandback={handback}
+        actingOnIds={actingOnIds}
       />
 
       {data.unassigned > 0 ? (
