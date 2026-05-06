@@ -171,7 +171,7 @@ export function NewLiveSessionStep2({ skillsBySubject, data }: Props) {
     doNowShared, doNowSeeding, doNowDifferentiated, doNowPerStudent,
     setDoNowDifferentiated, addToDoNow, removeFromDoNow,
     recentSessions, lastSessionId, setLastSessionId,
-    bankBySkill, bankExpanded, bankLoading, bankError, setBankExpanded, loadFullBank,
+    bankBySkill, bankExpanded, bankLoading, setBankExpanded, loadFullBank,
     perStudentLoading, suggestPerStudent,
     subjectId,
   } = data;
@@ -217,22 +217,6 @@ export function NewLiveSessionStep2({ skillsBySubject, data }: Props) {
             <div className="shrink-0 h-4 w-4 animate-spin rounded-full border-2 border-[var(--anx-primary)] border-t-transparent" aria-hidden />
           )}
         </div>
-
-        {bankError && (
-          <div className="anx-callout-warning flex flex-col gap-2 text-sm sm:flex-row sm:items-center sm:justify-between">
-            <span>{bankError}</span>
-            <button
-              type="button"
-              onClick={() => {
-                setBankExpanded(true);
-                void loadFullBank();
-              }}
-              className="anx-btn-secondary shrink-0 px-3 py-1.5 text-xs"
-            >
-              Retry load
-            </button>
-          </div>
-        )}
 
         {doNowShared.length > 0 && (
           <ol className="m-0 list-decimal space-y-1.5 pl-5 text-sm" style={{ color: 'var(--anx-text)' }}>
@@ -285,15 +269,12 @@ export function NewLiveSessionStep2({ skillsBySubject, data }: Props) {
             </p>
           )}
 
-          <label className="flex cursor-pointer items-center gap-2 text-xs" style={{ color: 'var(--anx-text-secondary)' }}>
-            <input
-              type="checkbox"
-              checked={doNowDifferentiated}
-              onChange={(e) => setDoNowDifferentiated(e.target.checked)}
-              className="accent-[var(--anx-primary)]"
-            />
-            Use personalised Do Now lists after you run Personalise per student (those lists override the shared queue for students who have suggestions).
-          </label>
+          {doNowDifferentiated && (
+            <label className="flex cursor-pointer items-center gap-2 text-xs" style={{ color: 'var(--anx-text-secondary)' }}>
+              <input type="checkbox" checked={doNowDifferentiated} onChange={(e) => setDoNowDifferentiated(e.target.checked)} className="accent-[var(--anx-primary)]" />
+              Use personalised lists where available
+            </label>
+          )}
         </div>
 
         {bankExpanded && (

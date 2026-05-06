@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import type { SkillDiagnosticRow, SkillRecommendation } from '@/components/teacher/ClassSkillDiagnostic';
 import type { AiLessonPlanResponse } from '@/app/api/teacher/ai/lesson-plan/route';
 
@@ -102,7 +102,6 @@ export interface NewLiveSessionState {
   bankBySkill: Array<{ skillId: string; items: BankItem[] }>;
   bankExpanded: boolean;
   bankLoading: boolean;
-  bankError: string | null;
   perStudentLoading: boolean;
   lastSessionId: string;
   recentSessions: RecentSessionRow[];
@@ -133,6 +132,8 @@ export interface NewLiveSessionState {
 
 export function useNewLiveSession({ classrooms: _classrooms, subjects: _subjects, skillsBySubject }: HookParams): NewLiveSessionState {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const urlPrefillAppliedRef = useRef(false);
 
   // Step 1
   const [classroomId,      setClassroomId]      = useState('');
@@ -152,7 +153,6 @@ export function useNewLiveSession({ classrooms: _classrooms, subjects: _subjects
   const [bankBySkill,         setBankBySkill]         = useState<Array<{ skillId: string; items: BankItem[] }>>([]);
   const [bankExpanded,        setBankExpanded]        = useState(false);
   const [bankLoading,         setBankLoading]         = useState(false);
-  const [bankError,           setBankError]           = useState<string | null>(null);
   const [perStudentLoading,   setPerStudentLoading]   = useState(false);
   const [lastSessionId,       setLastSessionId]       = useState('');
   const [recentSessions,      setRecentSessions]      = useState<RecentSessionRow[]>([]);
@@ -179,6 +179,25 @@ export function useNewLiveSession({ classrooms: _classrooms, subjects: _subjects
   }, {});
 
   const hasInvalidPlan = skillPlans.some((p) => !p.hasExplanation && !p.hasCheck && !p.hasPractice);
+
+  // ── Optional URL prefill (e.g. from Resources → "Use in lesson") ─────────────
+
+  useEffect(() => {
+    if (urlPrefillAppliedRef.current) return;
+    const qpSubject = searchParams.get('subjectId');
+    const qpSkill = searchParams.get('skillId');
+    const skill = qpSkill ? skillsBySubject.find((s) => s.id === qpSkill) : undefined;
+    const subjectFromSkill = skill?.subjectId;
+    const subjectToUse =
+      qpSubject && _subjects.some((s) => s.id === qpSubject)
+        ? qpSubject
+        : subjectFromSkill && _subjects.some((s) => s.id === subjectFromSkill)
+          ? subjectFromSkill
+          : '';
+    if (subjectToUse) setSubjectIdRaw(subjectToUse);
+    if (skill) setSelectedSkillIds([skill.id]);
+    urlPrefillAppliedRef.current = true;
+  }, [searchParams, skillsBySubject, _subjects]);
 
   // ── Effects ────────────────────────────────────────────────────────────────
 
@@ -233,24 +252,14 @@ export function useNewLiveSession({ classrooms: _classrooms, subjects: _subjects
     );
   }
 
-  /**
-   * Fetches sample bank items for `bankSkillIds` (all skills in the lesson).
-   * Optionally seeds shared Do Now slots from `autoDoNowSkillIds` (e.g. recap skills)
-   * when the shared list is still empty.
-   */
-  async function autoSeedDoNow(bankSkillIds: string[], autoDoNowSkillIds: string[]) {
-    if (bankSkillIds.length === 0) return;
+  async function autoSeedDoNow(seedSkillIds: string[]) {
     setDoNowSeeding(true);
-    setBankError(null);
     try {
-      const qs = new URLSearchParams({ subjectId, skillIds: bankSkillIds.join(',') });
+      const qs = new URLSearchParams({ subjectId, skillIds: seedSkillIds.join(',') });
       if (classroomId) qs.set('classroomId', classroomId);
       if (lastSessionId) qs.set('lastSessionId', lastSessionId);
       const res = await fetch(`/api/teacher/live-items-suggest?${qs.toString()}`);
-      if (!res.ok) {
-        setBankError('Could not load question suggestions. Try again in a moment.');
-        return;
-      }
+      if (!res.ok) return;
       const data = (await res.json()) as {
         itemsBySkill: Array<{ skillId: string; items: BankItem[] }>;
         recapItemsBySkill?: Array<{ skillId: string; items: BankItem[] }>;
@@ -265,7 +274,7 @@ export function useNewLiveSession({ classrooms: _classrooms, subjects: _subjects
       }
       setBankBySkill([...merged.entries()].map(([sid, items]) => ({ skillId: sid, items: items.slice(0, 24) })));
       const autoSlots: CheckSlotDraft[] = [];
-      for (const sid of autoDoNowSkillIds) {
+      for (const sid of seedSkillIds) {
         const items = merged.get(sid);
         if (!items?.length) continue;
         const top = items[0]!;
@@ -276,9 +285,7 @@ export function useNewLiveSession({ classrooms: _classrooms, subjects: _subjects
         });
       }
       setDoNowShared((prev) => (prev.length === 0 ? autoSlots.slice(0, 12) : prev));
-    } catch {
-      setBankError('Could not load question suggestions. Check your connection and try again.');
-    } finally {
+    } catch { /* non-fatal */ } finally {
       setDoNowSeeding(false);
     }
   }
@@ -300,13 +307,11 @@ export function useNewLiveSession({ classrooms: _classrooms, subjects: _subjects
     setDoNowDifferentiated(false);
     setBankBySkill([]);
     setBankExpanded(false);
-    setBankError(null);
     setStep(2);
-    const allLessonSkillIds = plans.map((p) => p.skillId);
-    const autoDoNowSkillIds = plans
+    const seedSkillIds = plans
       .filter((p) => p.recommendation === 'recap_needed' || p.recommendation === 'in_progress')
       .map((p) => p.skillId);
-    void autoSeedDoNow(allLessonSkillIds, autoDoNowSkillIds);
+    if (seedSkillIds.length > 0) void autoSeedDoNow(seedSkillIds);
   }
 
   function handleAiPlanGenerated(plan: AiLessonPlanResponse) {
@@ -343,33 +348,25 @@ export function useNewLiveSession({ classrooms: _classrooms, subjects: _subjects
     setDoNowDifferentiated(false);
     setBankBySkill([]);
     setBankExpanded(false);
-    setBankError(null);
     setError(null);
     setStep(2);
-    void autoSeedDoNow(aiSkillIds, []);
   }
 
   async function loadFullBank() {
     const allSkillIds = skillPlans.map((p) => p.skillId);
     if (!subjectId || allSkillIds.length === 0) return;
     setBankLoading(true);
-    setBankError(null);
     try {
       const qs = new URLSearchParams({ subjectId, skillIds: allSkillIds.join(',') });
       if (classroomId) qs.set('classroomId', classroomId);
       if (lastSessionId) qs.set('lastSessionId', lastSessionId);
       const res = await fetch(`/api/teacher/live-items-suggest?${qs.toString()}`);
-      if (!res.ok) {
-        setBankError('Could not load the question bank. Try again.');
-        return;
-      }
+      if (!res.ok) return;
       const data = (await res.json()) as { itemsBySkill: Array<{ skillId: string; items: BankItem[] }> };
       const merged = new Map<string, BankItem[]>();
       for (const row of data.itemsBySkill ?? []) merged.set(row.skillId, row.items.slice(0, 24));
       setBankBySkill([...merged.entries()].map(([sid, items]) => ({ skillId: sid, items })));
-    } catch {
-      setBankError('Could not load the question bank. Check your connection and try again.');
-    } finally {
+    } catch { /* non-fatal */ } finally {
       setBankLoading(false);
     }
   }
@@ -488,7 +485,7 @@ export function useNewLiveSession({ classrooms: _classrooms, subjects: _subjects
     diagnosticSkills, diagnosticTotal, diagnosticLoading,
     aiBuilderOpen, skillsForSubject, strandGroups,
     skillPlans, doNowShared, doNowDifferentiated, doNowPerStudent,
-    doNowSeeding, bankBySkill, bankExpanded, bankLoading, bankError, perStudentLoading,
+    doNowSeeding, bankBySkill, bankExpanded, bankLoading, perStudentLoading,
     lastSessionId, recentSessions, hasInvalidPlan,
     loading, error,
     setClassroomId, setSubjectId, toggleSkill,
