@@ -2,7 +2,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/features/auth/authOptions';
 import { redirect } from 'next/navigation';
 import { LearningPageShell } from '@/components/LearningPageShell';
-import { loadTeacherDashboardData } from '@/app/teacher/dashboard/teacherDashboardData';
+import { loadTeacherHomeData } from '@/app/teacher/dashboard/teacherDashboardData';
 import { TeacherHomeDashboard } from '@/app/teacher/dashboard/TeacherHomeDashboard';
 
 export default async function TeacherDashboardPage() {
@@ -12,37 +12,26 @@ export default async function TeacherDashboardPage() {
   const user = session.user as { id: string; role?: string; name?: string | null; email?: string | null };
   if (user.role !== 'TEACHER' && user.role !== 'ADMIN' && user.role !== 'LEADERSHIP') redirect('/dashboard');
 
-  const data = await loadTeacherDashboardData(user.id, 30);
-
-  if (!data.teacherProfile) {
-    return (
-      <LearningPageShell
-        title="Teacher Dashboard"
-        subtitle={`Observe-linked analytics for ${user.name ?? user.email}`}
-        appChrome="teacher"
-        appChromeShowLeadershipNav={user.role === 'ADMIN' || user.role === 'LEADERSHIP'}
-      >
-        <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
-          No teacher profile linked yet. Add a TeacherProfile row mapped to your Observe teacher id.
-        </div>
-      </LearningPageShell>
-    );
-  }
+  const data = await loadTeacherHomeData(user.id);
 
   const displayName = user.name?.trim() || user.email?.split('@')[0] || 'there';
-  const greeting = 'Welcome back';
+  const hour = new Date().getHours();
+  const greeting =
+    hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
 
   return (
     <LearningPageShell
       title="Home"
       subtitle="Teacher workspace"
-      maxWidthClassName="max-w-6xl"
+      maxWidthClassName="max-w-5xl"
       appChrome="teacher"
-      appChromeShowLeadershipNav={user.role === 'ADMIN' || user.role === 'LEADERSHIP'}
       hideHeader
-      childrenClassName="td-home-page-canvas"
     >
-      <TeacherHomeDashboard data={data} displayName={displayName} greeting={greeting} userRole={user.role ?? 'TEACHER'} />
+      <TeacherHomeDashboard
+        data={data}
+        displayName={displayName}
+        greeting={greeting}
+      />
     </LearningPageShell>
   );
 }

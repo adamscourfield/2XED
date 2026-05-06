@@ -98,9 +98,9 @@ export default async function SessionReviewPage({ params }: Props) {
     },
   });
 
-  if (!liveSession) redirect('/teacher/recent-sessions');
+  if (!liveSession) redirect('/teacher/live');
   if (user.role === 'TEACHER' && liveSession.teacherUserId !== user.id) {
-    redirect('/teacher/recent-sessions');
+    redirect('/teacher/live');
   }
 
   // Duration
@@ -285,7 +285,7 @@ export default async function SessionReviewPage({ params }: Props) {
       appChrome="teacher"
       appChromeShowLeadershipNav={user.role === 'ADMIN' || user.role === 'LEADERSHIP'}
       actions={
-        <Link href="/teacher/recent-sessions" className="anx-btn-secondary text-sm no-underline">
+        <Link href="/teacher/live" className="anx-btn-secondary text-sm no-underline">
           ← All sessions
         </Link>
       }

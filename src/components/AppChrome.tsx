@@ -26,7 +26,8 @@ type NavIconKind =
   | "folder"
   | "clock"
   | "help"
-  | "gear";
+  | "gear"
+  | "layers";
 
 interface NavItem {
   href: string;
@@ -259,6 +260,31 @@ function NavIconBox({
             />
           </svg>
         );
+      case "layers":
+        return (
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
+            <path
+              d="M12 2L2 7l10 5 10-5-10-5Z"
+              stroke={stroke}
+              strokeWidth="1.75"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M2 17l10 5 10-5"
+              stroke={stroke}
+              strokeWidth="1.75"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M2 12l10 5 10-5"
+              stroke={stroke}
+              strokeWidth="1.75"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        );
       default:
         return null;
     }
@@ -282,14 +308,13 @@ function isNavActive(pathname: string | null, href: string) {
     return pathname === "/teacher/dashboard";
   }
   if (href === "/teacher/lessons") {
-    if (pathname === "/teacher/lessons" || pathname.startsWith("/teacher/lessons/")) return true;
-    if (pathname.startsWith("/teacher/live")) return true;
-    return false;
+    return pathname === "/teacher/lessons" || pathname.startsWith("/teacher/lessons/");
   }
-  if (href === "/teacher/question-bank") {
-    if (pathname === "/teacher/question-bank" || pathname.startsWith("/teacher/question-bank/")) return true;
-    if (pathname.startsWith("/teacher/content/review")) return true;
-    return false;
+  if (href === "/teacher/live") {
+    return pathname.startsWith("/teacher/live");
+  }
+  if (href === "/teacher/curriculum") {
+    return pathname === "/teacher/curriculum" || pathname.startsWith("/teacher/curriculum/");
   }
   return pathname === href || pathname.startsWith(`${href}/`);
 }
@@ -381,21 +406,15 @@ export function AppChrome({
   const tagline = variant === "teacher" ? "Teach the Room" : "Your learning hub";
 
   const teacherNavPrimary: NavItem[] = [
-    { href: "/teacher/dashboard", label: "Home", icon: "home" },
+    { href: "/teacher/curriculum", label: "Curriculum", icon: "layers" },
     { href: "/teacher/lessons", label: "Lessons", icon: "bookOpen" },
-    { href: "/teacher/question-bank", label: "Question bank", icon: "clipboardList" },
-    { href: "/teacher/dashboard/classes", label: "Classes", icon: "users" },
+    { href: "/teacher/live", label: "Live", icon: "bolt" },
     { href: "/teacher/reports", label: "Reports", icon: "chart" },
-    { href: "/teacher/resources", label: "Resources", icon: "folder" },
-    { href: "/teacher/recent-sessions", label: "Recent sessions", icon: "clock" },
-    ...(showLeadershipNav
-      ? ([{ href: "/teacher/leadership", label: "Leadership", icon: "dashboard" }] satisfies NavItem[])
-      : []),
+    { href: "/teacher/settings", label: "Settings", icon: "gear" },
   ];
 
   const teacherNavSecondary: NavItem[] = [
     { href: "/teacher/help", label: "Help centre", icon: "help" },
-    { href: "/teacher/settings", label: "Settings", icon: "gear" },
   ];
 
   const liveStudentItem: NavItem = {

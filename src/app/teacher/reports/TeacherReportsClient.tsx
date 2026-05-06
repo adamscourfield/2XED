@@ -512,8 +512,8 @@ function DLEOverview() {
         <section className={`${card} xl:col-span-4`}>
           <div className="flex items-center justify-between gap-2">
             <h2 className={sectionLabel}>DLE by topic</h2>
-            <Link href="/teacher/question-bank" className="text-xs font-semibold no-underline hover:underline" style={{ color: "var(--report-purple)" }}>
-              View all topics
+            <Link href="/teacher/lessons" className="text-xs font-semibold no-underline hover:underline" style={{ color: "var(--report-purple)" }}>
+              View lessons
             </Link>
           </div>
           <div className="mt-5">

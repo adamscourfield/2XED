@@ -78,15 +78,15 @@ function RowActionsMenu({ classroomId }: { classroomId: string }) {
             <Link
               role="menuitem"
               className="tc-row-menu-item"
-              href={`/teacher/live/new?classroomId=${encodeURIComponent(classroomId)}`}
+              href="/teacher/lessons"
               onClick={() => setOpen(false)}
             >
               Start live lesson
             </Link>
           </li>
           <li role="none">
-            <Link role="menuitem" className="tc-row-menu-item" href="/teacher/timetable" onClick={() => setOpen(false)}>
-              Timetable
+            <Link role="menuitem" className="tc-row-menu-item" href="/teacher/settings" onClick={() => setOpen(false)}>
+              Settings
             </Link>
           </li>
         </ul>

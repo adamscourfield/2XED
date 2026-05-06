@@ -30,6 +30,7 @@ const schema = z.object({
   classroomId: z.string().min(1),
   subjectId: z.string().min(1),
   skillId: z.string().min(1).optional(),
+  lessonId: z.string().optional(),
   phases: z.array(phaseSchema).optional(),
   checkPlan: checkPlanSchema,
 });
@@ -52,7 +53,7 @@ export async function POST(req: NextRequest) {
   const parsed = schema.safeParse(await req.json());
   if (!parsed.success) return NextResponse.json({ error: 'Invalid input', issues: parsed.error.issues }, { status: 400 });
 
-  const { classroomId, subjectId, skillId, phases, checkPlan } = parsed.data;
+  const { classroomId, subjectId, skillId, lessonId, phases, checkPlan } = parsed.data;
 
   // Validate teacher owns the classroom
   const teacherProfile = await prisma.teacherProfile.findUnique({
@@ -86,6 +87,7 @@ export async function POST(req: NextRequest) {
       teacherUserId: userId,
       subjectId,
       skillId: skillId ?? null,
+      lessonId: lessonId ?? null,
       joinCode,
       status: 'LOBBY',
       phases: phases ?? undefined,

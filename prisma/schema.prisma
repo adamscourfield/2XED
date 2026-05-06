@@ -77,6 +77,28 @@ enum LiveSessionStatus {
   COMPLETED
 }
 
+enum LessonBlockType {
+  DO_NOW
+  EXPLAIN
+  MODEL
+  CHECK
+  PRACTICE
+}
+
+enum LessonItemType {
+  SLIDE
+  QUESTION
+  IMAGE
+  CANVAS_FRAME
+}
+
+enum AnswerMode {
+  MCQ
+  ORDER
+  SHORT_ANSWER
+  PICK
+}
+
 enum LiveSessionPhase {
   DIAGNOSTIC
   EXPLANATION
@@ -154,6 +176,8 @@ model User {
   teacherLiveSessions    LiveSession[]          @relation("TeacherLiveSessions")
   liveParticipants       LiveParticipant[]
   liveAttempts           LiveAttempt[]
+  curriculumPlans        CurriculumPlan[]
+  lessons                Lesson[]
 }
 
 model Subject {
@@ -170,6 +194,8 @@ model Subject {
   interventionFlags  InterventionFlag[]
   rewardTransactions RewardTransaction[]
   liveSessions       LiveSession[]
+  curriculumPlans    CurriculumPlan[]
+  lessons            Lesson[]
 }
 
 model Skill {
@@ -223,6 +249,8 @@ model Skill {
   liveSessions             LiveSession[]
   liveAttempts             LiveAttempt[]
   englishContentBlocks     EnglishContentBlock[]
+  curriculumUnitSkills     CurriculumUnitSkill[]
+  lessonItems              LessonItem[]
 
   @@unique([subjectId, slug])
   @@unique([subjectId, code])
@@ -256,6 +284,7 @@ model Item {
   knowledgeQuestionAttempts QuestionAttempt[]
   reviewNotes               ItemReviewNote[]
   liveAttempts              LiveAttempt[]
+  lessonItems               LessonItem[]
 }
 
 model ItemReviewNote {
@@ -711,6 +740,8 @@ model LiveSession {
   teacherUserId     String
   subjectId         String
   skillId           String?
+  // Link to the Lesson template this session was launched from (nullable for legacy sessions)
+  lessonId          String?
   status            LiveSessionStatus @default(LOBBY)
   phase             LiveSessionPhase  @default(DIAGNOSTIC)
   reteachAlert      Boolean           @default(false)
@@ -731,6 +762,7 @@ model LiveSession {
   teacher       User              @relation("TeacherLiveSessions", fields: [teacherUserId], references: [id])
   subject       Subject           @relation(fields: [subjectId], references: [id])
   skill         Skill?            @relation(fields: [skillId], references: [id])
+  lesson        Lesson?           @relation(fields: [lessonId], references: [id])
   participants  LiveParticipant[]
   liveAttempts  LiveAttempt[]
   transitions   LaneTransition[]
@@ -851,5 +883,122 @@ model AnnotationLayer {
   block     EnglishContentBlock @relation(fields: [blockId], references: [id], onDelete: Cascade)
 
   @@index([blockId])
+}
+
+// ── Curriculum mapper ──────────────────────────────────────────────────────────
+
+model CurriculumPlan {
+  id            String           @id @default(cuid())
+  title         String
+  subjectId     String
+  teacherUserId String
+  academicYear  String?
+  termLabel     String?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  subject       Subject          @relation(fields: [subjectId], references: [id])
+  teacher       User             @relation(fields: [teacherUserId], references: [id])
+  units         CurriculumUnit[]
+
+  @@index([teacherUserId])
+}
+
+model CurriculumUnit {
+  id              String               @id @default(cuid())
+  planId          String
+  title           String
+  aims            String?
+  successMeasures String?
+  dateStart       DateTime?
+  dateEnd         DateTime?
+  sortOrder       Int                  @default(0)
+  aiReviewNotes   Json?
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+  plan            CurriculumPlan       @relation(fields: [planId], references: [id], onDelete: Cascade)
+  skills          CurriculumUnitSkill[]
+  lessons         Lesson[]
+
+  @@index([planId, sortOrder])
+}
+
+model CurriculumUnitSkill {
+  unitId  String
+  skillId String
+  unit    CurriculumUnit @relation(fields: [unitId], references: [id], onDelete: Cascade)
+  skill   Skill          @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@id([unitId, skillId])
+}
+
+// ── Lesson builder ─────────────────────────────────────────────────────────────
+
+model Lesson {
+  id                        String          @id @default(cuid())
+  title                     String
+  topic                     String
+  teacherUserId             String
+  subjectId                 String
+  curriculumUnitId          String?
+  // True once teacher has dismissed the "add to curriculum map?" prompt
+  curriculumPromptDismissed Boolean         @default(false)
+  isPublished               Boolean         @default(false)
+  // Provenance for copies
+  isCopy                    Boolean         @default(false)
+  sourceId                  String?
+  createdAt                 DateTime        @default(now())
+  updatedAt                 DateTime        @updatedAt
+
+  teacher        User            @relation(fields: [teacherUserId], references: [id])
+  subject        Subject         @relation(fields: [subjectId], references: [id])
+  curriculumUnit CurriculumUnit? @relation(fields: [curriculumUnitId], references: [id])
+  source         Lesson?         @relation("LessonCopies", fields: [sourceId], references: [id])
+  copies         Lesson[]        @relation("LessonCopies")
+  blocks         LessonBlock[]
+  liveSessions   LiveSession[]
+
+  @@index([teacherUserId])
+  @@index([subjectId])
+}
+
+model LessonBlock {
+  id        String          @id @default(cuid())
+  lessonId  String
+  type      LessonBlockType
+  sortOrder Int             @default(0)
+  title     String?
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  lesson    Lesson          @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  items     LessonItem[]
+
+  @@index([lessonId, sortOrder])
+}
+
+model LessonItem {
+  id           String         @id @default(cuid())
+  blockId      String
+  sortOrder    Int            @default(0)
+  itemType     LessonItemType
+  // Required when itemType = QUESTION, null otherwise
+  answerMode   AnswerMode?
+  // Content shape varies by itemType:
+  //   SLIDE:         { text, imageUrl?, notes? }
+  //   QUESTION:      { stem, options?, answer, misconceptionMap? }
+  //   IMAGE:         { url, caption? }
+  //   CANVAS_FRAME:  { prompt, backgroundUrl? }
+  content      Json
+  // Optional link to skill for DLE tracking
+  skillId      String?
+  // Optional link to Item bank if sourced from question bank
+  sourceItemId String?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  block      LessonBlock @relation(fields: [blockId], references: [id], onDelete: Cascade)
+  skill      Skill?      @relation(fields: [skillId], references: [id])
+  sourceItem Item?       @relation(fields: [sourceItemId], references: [id])
+
+  @@index([blockId, sortOrder])
 }
 

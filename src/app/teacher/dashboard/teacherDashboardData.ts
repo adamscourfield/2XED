@@ -147,6 +147,46 @@ export async function countLiveSessionsThisTermForClassrooms(teacherUserId: stri
   });
 }
 
+export async function loadTeacherHomeData(userId: string) {
+  const now = new Date();
+  const termStart = new Date(now.getFullYear(), Math.floor(now.getMonth() / 3) * 3, 1);
+
+  const [activeSessions, recentSessions, lessonCount, sessionsThisTerm] = await Promise.all([
+    prisma.liveSession.findMany({
+      where: { teacherUserId: userId, status: { in: ['ACTIVE', 'LOBBY', 'PAUSED'] } },
+      include: {
+        subject: { select: { title: true } },
+        skill: { select: { name: true } },
+        classroom: { select: { name: true } },
+      },
+      orderBy: { updatedAt: 'desc' },
+      take: 3,
+    }),
+    prisma.liveSession.findMany({
+      where: { teacherUserId: userId },
+      include: {
+        subject: { select: { title: true } },
+        skill: { select: { name: true, code: true } },
+        classroom: { select: { name: true, externalClassId: true, yearGroup: true, subjectSlug: true } },
+        _count: { select: { participants: true } },
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 5,
+    }),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ((prisma as any).lesson?.count({ where: { teacherUserId: userId } }) as Promise<number> | undefined) ?? Promise.resolve(0),
+    prisma.liveSession.count({
+      where: {
+        teacherUserId: userId,
+        createdAt: { gte: termStart },
+        status: { in: ['COMPLETED', 'ACTIVE', 'LOBBY', 'PAUSED'] },
+      },
+    }),
+  ]);
+
+  return { activeSessions, recentSessions, lessonCount, sessionsThisTerm };
+}
+
 export async function loadTeacherDashboardData(userId: string, days: number) {
   const teacherProfile = await prisma.teacherProfile.findUnique({
     where: { userId },
