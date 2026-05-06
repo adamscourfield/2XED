@@ -102,6 +102,7 @@ enum EscalationReason {
   MISCONCEPTION_FAILED
   SCAFFOLDED_CORRECT
   MANUAL_TEACHER
+  HINTS_USED
 }
 
 enum LaneTransitionType {

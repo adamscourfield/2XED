@@ -99,10 +99,17 @@ export async function GET(req: NextRequest) {
     .map(s => ({ id: s.id, code: s.code }));
 
   void Promise.allSettled(
-    enrichedSkillIds.map(s =>
-      ensureItemPool({ skillCode: s.code, skillId: s.id, minItems: 3, generateCount: 5 })
-    )
-  );
+    enrichedSkillIds.map((s) =>
+      ensureItemPool({ skillCode: s.code, skillId: s.id, minItems: 3, generateCount: 5 }),
+    ),
+  ).then((results) => {
+    for (let i = 0; i < results.length; i++) {
+      const r = results[i];
+      if (r?.status === 'rejected') {
+        console.warn(`[live-items-suggest] ensureItemPool failed for ${enrichedSkillIds[i]?.code}:`, (r.reason as Error)?.message);
+      }
+    }
+  });
 
   const baseItemsBySkill = await fetchSampleItemsBySkillIds(skillIds, subjectId, 12);
 
@@ -176,7 +183,7 @@ export async function GET(req: NextRequest) {
         .slice(0, 16)
         .map((s) => s.itemId);
       const recapDisplay = await fetchItemsForDisplay(recapStruggleIds, subjectId);
-      const recapPriority = new Map<string, Array<{ id: string; question: string; type: string }>>();
+      const recapPriority = new Map<string, Array<{ id: string; question: string; type: string; liveMetadata: unknown }>>();
       for (const sid of recapSkillIds) recapPriority.set(sid, []);
       for (const st of lastSessionItemStats) {
         if (!recapSet.has(st.skillId)) continue;
@@ -186,6 +193,7 @@ export async function GET(req: NextRequest) {
           id: row.id,
           question: row.question,
           type: row.type,
+          liveMetadata: null,
         });
       }
       recapItemsBySkill = recapItemsBySkill.map((row) => ({

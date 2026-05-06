@@ -76,7 +76,14 @@ export function StudentLiveSessionChrome({
       </div>
       <div className="ml-auto flex shrink-0 items-center gap-2">
         {onLeave && (
-          <button type="button" onClick={onLeave} className="anx-btn-secondary px-3 py-1.5 text-xs transition-transform active:scale-[0.98]">
+          <button
+            type="button"
+            onClick={() => {
+              if (mode === 'explanation' && !window.confirm('Leave mid-explanation? Your progress will be lost.')) return;
+              onLeave();
+            }}
+            className="anx-btn-secondary px-3 py-1.5 text-xs transition-transform active:scale-[0.98]"
+          >
             Leave
           </button>
         )}

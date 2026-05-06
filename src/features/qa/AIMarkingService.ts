@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { markSchema } from './schemas';
+import { markSchema, RubricSchema } from './schemas';
 
 export { markSchema } from './schemas';
 
@@ -113,8 +113,7 @@ class ConcurrencyLimiter {
     }
   }
 
-  private async attempt(req: PendingRequest): Promise<unknown> {
-    // Delegate — caller passes a factory so we can call it fresh on retry
+  private async attempt(_req: PendingRequest): Promise<unknown> {
     throw new Error('Override in subclass');
   }
 
@@ -130,6 +129,15 @@ export const markingLimiter = new (class extends ConcurrencyLimiter {
   }
 })();
 
+// ── Helpers ─────────────────────────────────────────────────────────────────────
+
+function extractJson(text: string): string {
+  const start = text.indexOf('{');
+  const end = text.lastIndexOf('}');
+  if (start === -1 || end === -1 || end <= start) return text.trim();
+  return text.slice(start, end + 1);
+}
+
 // ── Prompt builder ─────────────────────────────────────────────────────────────
 
 function buildSystemPrompt(rubric: unknown): string {
@@ -142,8 +150,13 @@ Use a warm but rigorous tone — the goal is growth, not praise or criticism for
 When marking, use the following rubric criteria:
 ${JSON.stringify(rubric, null, 2)}
 
-Return valid JSON only.
-Include criterion-level scoring using this shape:
+Scoring instructions:
+- For each criterion, find the descriptor that best matches the student's work and record that descriptor's score value.
+- maxScore for each criterion equals the highest descriptor score in that criterion.
+- The overall score (0–1) is: sum of (criterion_score / criterion_maxScore × weight) across all criteria.
+- Set "correct" to true when overall score ≥ 0.6.
+
+Return valid JSON only, matching this exact shape:
 {
   "correct": boolean,
   "score": number,
@@ -153,7 +166,7 @@ Include criterion-level scoring using this shape:
   "ebi": string,
   "flagged": boolean
 }
-Respond using the rubric criteria names where possible.`;
+Use the rubric criteria names exactly as written above.`;
 }
 
 function buildUserPrompt(
@@ -236,14 +249,14 @@ async function callLLM(
   };
 
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 30_000);
+  const timeout = setTimeout(() => controller.abort(), 10_000);
 
-  try {
+  async function attempt(): Promise<z.infer<typeof LLM_RESPONSE_SCHEMA>> {
     const res = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`,
+        Authorization: `Bearer ${apiKey!}`,
       },
       body: JSON.stringify(body),
       signal: controller.signal,
@@ -257,8 +270,18 @@ async function callLLM(
 
     const json = await res.json() as { choices: Array<{ message: { content: string } }> };
     const content_str = json.choices[0]?.message?.content ?? '';
-    const cleaned = content_str.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-    return LLM_RESPONSE_SCHEMA.parse(JSON.parse(cleaned));
+    return LLM_RESPONSE_SCHEMA.parse(JSON.parse(extractJson(content_str)));
+  }
+
+  try {
+    try {
+      return await attempt();
+    } catch (err) {
+      if (!(err instanceof SyntaxError) && !(err instanceof z.ZodError)) throw err;
+      // Retry once after 500ms for JSON parse or schema validation failures
+      await new Promise((r) => setTimeout(r, 500));
+      return await attempt();
+    }
   } finally {
     clearTimeout(timeout);
   }
@@ -280,6 +303,7 @@ export class AIMarkingService {
     if (!question) throw new Error(`Question ${req.questionId} not found`);
 
     const rubric = question.rubric ?? this.defaultRubric(question);
+    const rubricElements = question.rubricElements;
     const hasImage = !!req.canvasData?.snapshotBase64;
     const answer = req.canvasData
       ? '[Handwritten answer — see image]'
@@ -289,28 +313,59 @@ export class AIMarkingService {
       throw new Error('No answer provided');
     }
 
-    // 2. Build messages
+    // 2. Build messages and call LLM
     const systemMsg = { role: 'system' as const, content: buildSystemPrompt(rubric) };
     if (hasImage) {
       const userContent = buildImagePrompt(question.stem, rubric);
-      return this.callWithRetry([systemMsg, { role: 'user' as const, content: userContent }],
-        req.canvasData!.snapshotBase64, start);
+      return this.callWithRetry(
+        [systemMsg, { role: 'user' as const, content: userContent }],
+        req.canvasData!.snapshotBase64,
+        start,
+        rubricElements,
+      );
     } else {
       const userContent = buildUserPrompt(question.stem, answer, rubric);
-      return this.callWithRetry([systemMsg, { role: 'user' as const, content: userContent }], undefined, start);
+      return this.callWithRetry(
+        [systemMsg, { role: 'user' as const, content: userContent }],
+        undefined,
+        start,
+        rubricElements,
+      );
     }
   }
 
   private async callWithRetry(
     messages: Array<{ role: 'system' | 'user'; content: string | object }>,
     imageBase64: string | undefined,
-    start: number
+    start: number,
+    rubricElements: string[],
   ): Promise<MarkResult> {
     return markingLimiter.execute(async () => {
       const result = await callLLM(messages, imageBase64);
+
+      const knownSet = new Set(rubricElements);
+      let criteria = Array.isArray(result.criteria) ? result.criteria : [];
+
+      if (rubricElements.length > 0) {
+        criteria = criteria.filter((c) => {
+          if (knownSet.has(c.element)) return true;
+          console.warn(`[AIMarkingService] Ignoring unknown criterion element: "${c.element}"`);
+          return false;
+        });
+        if (criteria.length === 0) {
+          throw new Error('LLM returned no recognized criterion elements');
+        }
+      }
+
+      // Clamp each criterion score to its maxScore
+      criteria = criteria.map((c) => ({
+        ...c,
+        score: Math.min(c.score, c.maxScore),
+      }));
+
       return {
         ...result,
-        criteria: Array.isArray(result.criteria) ? result.criteria : [],
+        criteria,
         feedback: result.feedback ?? '',
         wtm: result.wtm ?? '',
         ebi: result.ebi ?? '',
@@ -322,6 +377,7 @@ export class AIMarkingService {
   private async fetchQuestion(questionId: string): Promise<{
     stem: string;
     rubric: unknown;
+    rubricElements: string[];
   } | null> {
     // Lazy import to avoid circular dependency issues
     const { PrismaClient } = await import('@prisma/client');
@@ -333,18 +389,25 @@ export class AIMarkingService {
       });
       if (!item) return null;
 
-      // Try to parse rubric from options
       const options = (item as unknown as { options?: { rubric?: unknown } }).options ?? {};
+      const rawRubric = options['rubric'] ?? null;
+
+      const parsed = RubricSchema.safeParse(rawRubric);
+      if (rawRubric && !parsed.success) {
+        console.warn(`[AIMarkingService] Rubric for item ${questionId} failed validation:`, parsed.error.message);
+      }
+
       return {
         stem: item.question,
-        rubric: options['rubric'] ?? null,
+        rubric: parsed.success ? rawRubric : null,
+        rubricElements: parsed.success ? parsed.data.criteria.map((c) => c.element) : [],
       };
     } finally {
       await prisma.$disconnect();
     }
   }
 
-  private defaultRubric(question: { stem: string }): object {
+  private defaultRubric(_question: { stem: string }): object {
     return {
       criteria: [
         {

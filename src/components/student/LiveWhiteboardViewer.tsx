@@ -83,7 +83,10 @@ export function LiveWhiteboardViewer({ logicalWidth, logicalHeight, strokes, cla
     const { cw, ch, dpr } = layoutRef.current;
     if (cw < 2 || ch < 2) return;
     const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    if (!ctx) {
+      console.warn('[LiveWhiteboardViewer] Could not acquire 2D rendering context');
+      return;
+    }
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, cw, ch);
     ctx.save();
@@ -98,7 +101,9 @@ export function LiveWhiteboardViewer({ logicalWidth, logicalHeight, strokes, cla
         ref={canvasRef}
         className="touch-none rounded-lg shadow-lg"
         style={{ maxWidth: '100%', maxHeight: '100%', background: transparent ? 'transparent' : undefined }}
-      />
+      >
+        Whiteboard unavailable
+      </canvas>
     </div>
   );
 }

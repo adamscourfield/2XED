@@ -17,6 +17,11 @@ export interface NextQuestionRecommendation {
 
 export const NEXT_QUESTION_POLICY_VERSION = 'v1';
 
+// Minimum attempts before the policy trusts state signals enough to route into
+// TRANSFER or MIXED. Below this count, thresholds are raised so the student
+// stays in ROUTINE / RETRIEVAL until there is sufficient evidence.
+const MIN_EVIDENCE_FOR_ADVANCED = 5;
+
 export function decideNextQuestion(input: NextQuestionPolicyInput): NextQuestionRecommendation {
   const state = input.state;
   const now = input.now ?? new Date();
@@ -37,14 +42,23 @@ export function decideNextQuestion(input: NextQuestionPolicyInput): NextQuestion
     };
   }
 
-  if (state.masteryProbability < 0.45) {
+  // Scale thresholds upward when evidence is sparse so the policy stays
+  // conservative until enough signals have been collected.
+  const evidenceWeight = Math.min(1, state.evidenceCount / MIN_EVIDENCE_FOR_ADVANCED);
+  const masteryThreshold = 0.45 + (1 - evidenceWeight) * 0.15; // 0.60 → 0.45 as evidence grows
+  const transferThreshold = 0.45 + (1 - evidenceWeight) * 0.10; // 0.55 → 0.45 as evidence grows
+
+  if (state.masteryProbability < masteryThreshold) {
     return {
       questionType: 'ROUTINE',
       supportLevel: state.confidence < 0.25 ? 'WORKED_EXAMPLE' : 'LIGHT_PROMPT',
       isReviewItem: false,
       isTransferItem: false,
       isMixedItem: false,
-      rationale: 'Low mastery: reinforce core routine fluency first',
+      rationale:
+        state.evidenceCount < MIN_EVIDENCE_FOR_ADVANCED
+          ? 'Insufficient evidence — building baseline before advancing'
+          : 'Low mastery: reinforce core routine fluency first',
     };
   }
 
@@ -59,7 +73,7 @@ export function decideNextQuestion(input: NextQuestionPolicyInput): NextQuestion
     };
   }
 
-  if (state.transferAbility < 0.45) {
+  if (state.transferAbility < transferThreshold) {
     return {
       questionType: 'TRANSFER',
       supportLevel: 'INDEPENDENT',

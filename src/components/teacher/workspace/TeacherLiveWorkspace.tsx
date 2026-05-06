@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   AnnotationCanvas,
   annotationStateHasContent,
@@ -82,6 +83,12 @@ interface RecommendedExplanation {
   animationSchema?: unknown | null;
 }
 
+export interface LaneSummaryEntry {
+  answeredCount: number;
+  correctCount: number;
+  incorrectCount: number;
+}
+
 interface SessionSnapshot {
   sessionId: string;
   status: 'LOBBY' | 'ACTIVE' | 'PAUSED' | 'COMPLETED';
@@ -94,6 +101,8 @@ interface SessionSnapshot {
   laneCounts: { LANE_1: number; LANE_2: number; LANE_3: number };
   laneStudents: { LANE_1: LaneStudent[]; LANE_2: LaneStudent[]; LANE_3: LaneStudent[] };
   responseSummary: ResponseSummary[];
+  /** Per-lane attempt tally for the current skill (shadow-check progress). */
+  laneSummary?: { LANE_1: LaneSummaryEntry; LANE_2: LaneSummaryEntry; LANE_3: LaneSummaryEntry } | null;
   rubricCriteria?: RubricCriterionSignal[] | null;
   supportSummary?: SupportSummary;
   studentMessages?: StudentMessageSignal[] | null;
@@ -123,6 +132,64 @@ interface Props {
 }
 
 const BROADCAST_DEBOUNCE_MS = 350;
+
+const LANE_LABELS: Record<string, string> = {
+  LANE_1: 'Got it',
+  LANE_2: 'Nearly there',
+  LANE_3: 'Needs teacher',
+};
+const LANE_COLORS: Record<string, string> = {
+  LANE_1: 'var(--anx-success)',
+  LANE_2: 'var(--anx-warning-text)',
+  LANE_3: 'var(--anx-danger-text)',
+};
+
+function LaneSummaryBar({
+  laneCounts,
+  laneSummary,
+}: {
+  laneCounts: SessionSnapshot['laneCounts'];
+  laneSummary: SessionSnapshot['laneSummary'];
+}) {
+  const lanes = ['LANE_1', 'LANE_2', 'LANE_3'] as const;
+  const hasActivity = lanes.some((l) => (laneSummary?.[l]?.answeredCount ?? 0) > 0);
+  if (!hasActivity) return null;
+
+  return (
+    <div className="mt-4 space-y-2">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: 'var(--anx-text-muted)' }}>
+        Lane progress
+      </p>
+      {lanes.map((lane) => {
+        const total = laneCounts[lane];
+        const summary = laneSummary?.[lane];
+        const answered = summary?.answeredCount ?? 0;
+        const correct = summary?.correctCount ?? 0;
+        if (total === 0) return null;
+        const correctPct = answered > 0 ? (correct / answered) * 100 : 0;
+        const incorrectPct = answered > 0 ? ((answered - correct) / answered) * 100 : 0;
+        return (
+          <div key={lane}>
+            <div className="flex items-center justify-between text-xs mb-1">
+              <span className="font-medium" style={{ color: LANE_COLORS[lane] }}>
+                {LANE_LABELS[lane]}
+              </span>
+              <span style={{ color: 'var(--anx-text-muted)' }}>
+                {answered}/{total} replied · {correct} correct
+              </span>
+            </div>
+            <div className="h-1.5 w-full overflow-hidden rounded-full" style={{ background: 'var(--anx-outline-variant)' }}>
+              <div className="flex h-full">
+                <span style={{ width: `${correctPct}%`, background: 'var(--anx-success)', transition: 'width 0.4s ease' }} />
+                <span style={{ width: `${incorrectPct}%`, background: LANE_COLORS[lane], opacity: 0.45, transition: 'width 0.4s ease' }} />
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
 
 function deriveSignals(snapshot: SessionSnapshot | null): {
   overview: ClassOverview;
@@ -233,6 +300,7 @@ function lessonTitle(snapshot: SessionSnapshot | null): string {
 }
 
 export function TeacherLiveWorkspace({ sessionId }: Props) {
+  const router = useRouter();
   const [snapshot, setSnapshot] = useState<SessionSnapshot | null>(null);
   const [snapshotLoading, setSnapshotLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -248,7 +316,9 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
   const [canUndo, setCanUndo] = useState(false);
   const [canRedo, setCanRedo] = useState(false);
 
-  const [availableRoutes, setAvailableRoutes] = useState<Record<string, RouteWithSteps> | null>(null);
+  const [availableRoutes, setAvailableRoutes] = useState<Record<string, RouteWithSteps | null> | null>(null);
+  const [explainRoutesLoading, setExplainRoutesLoading] = useState(false);
+  const [explainRoutesHint, setExplainRoutesHint] = useState<string | null>(null);
   const [activeExplanation, setActiveExplanation] = useState<ActiveExplanation | null>(null);
 
   const canvasRef = useRef<AnnotationCanvasHandle>(null);
@@ -313,11 +383,35 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
   // ── Explanation routes for current skill ──────────────────────────────────
   useEffect(() => {
     if (!snapshot) return;
-    setAvailableRoutes(null); // clear stale routes before fetching for the new phase
-    fetch(`/api/live-sessions/${sessionId}/explanation-routes`)
-      .then((r) => r.json())
-      .then((data: { routes: Record<string, RouteWithSteps> }) => setAvailableRoutes(data.routes))
-      .catch(() => { /* soft fail */ });
+    setAvailableRoutes(null);
+    setExplainRoutesLoading(true);
+    setExplainRoutesHint(null);
+    let cancelled = false;
+    void fetch(`/api/live-sessions/${sessionId}/explanation-routes`)
+      .then(async (r) => {
+        if (!r.ok) throw new Error('bad status');
+        return r.json() as Promise<{ routes: Record<string, RouteWithSteps | null> }>;
+      })
+      .then((data) => {
+        if (cancelled) return;
+        setAvailableRoutes(data.routes);
+        const r = data.routes;
+        const hasAny = Boolean(r?.A || r?.B || r?.C);
+        setExplainRoutesHint(
+          hasAny ? null : 'No scripted explanation models exist for this skill yet. Use Model to teach on the whiteboard, or choose another phase.',
+        );
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setExplainRoutesHint('Could not load explanation models. Check your connection and try changing phase or refreshing.');
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setExplainRoutesLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
   // eslint-disable-next-line react-hooks/exhaustive-deps -- only refetch routes when skill or phase index identity changes
   }, [sessionId, snapshot?.skill?.id, snapshot?.currentPhaseIndex]);
 
@@ -397,6 +491,10 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status: next }),
     });
+    if (next === 'COMPLETED') {
+      router.push(`/teacher/live/${sessionId}/review`);
+      return;
+    }
     fetchSnapshot();
   }
 
@@ -447,8 +545,27 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
       comparison: 'A',
       misconception: 'C',
     };
-    const route = availableRoutes?.[typeMap[option]];
-    if (!route) return;
+    const preferred = typeMap[option];
+    let route = availableRoutes?.[preferred];
+    if (!route) {
+      const order: Array<'A' | 'B' | 'C'> = [preferred, 'A', 'B', 'C'];
+      const seen = new Set<string>();
+      for (const key of order) {
+        if (seen.has(key)) continue;
+        seen.add(key);
+        const r = availableRoutes?.[key];
+        if (r) {
+          route = r;
+          break;
+        }
+      }
+    }
+    if (!route) {
+      setExplainRoutesHint(
+        'No explanation route is available for this skill. Use Model on the canvas, or add curriculum explanation content for this skill.',
+      );
+      return;
+    }
 
     setActiveExplanation({ route, stepIndex: 0 });
     canvasRef.current?.clear();
@@ -463,8 +580,9 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
           stepIndex: 0,
         }),
       });
+      setExplainRoutesHint(null);
     } catch {
-      // soft fail
+      setExplainRoutesHint('Could not send the explanation to students. Try again.');
     }
   }
 
@@ -771,6 +889,8 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
             onNewCheckQuestion={handleNewCheckQuestion}
             onExplainOption={handleExplainOption}
             onAssignPractice={handleAssignPractice}
+            explainRoutesLoading={explainRoutesLoading}
+            explainRoutesHint={explainRoutesHint}
             activeExplanation={
               activeExplanation
                 ? {
@@ -806,6 +926,12 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
             studentResponses={snapshot?.studentResponses ?? null}
             laneCounts={snapshot?.laneCounts ?? null}
           />
+          {snapshot?.laneCounts && (
+            <LaneSummaryBar
+              laneCounts={snapshot.laneCounts}
+              laneSummary={snapshot.laneSummary ?? null}
+            />
+          )}
         </aside>
       </div>
 
@@ -826,7 +952,7 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
       <EndSessionDialog
         open={endingPrompt}
         title="End the session?"
-        description="Students will be returned to their dashboard. You can review responses afterwards."
+        description="Students will be returned to their dashboard. You'll go straight to the session review."
         cancelLabel="Cancel"
         confirmLabel="End session"
         onCancel={() => setEndingPrompt(false)}

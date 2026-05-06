@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/features/auth/authOptions';
 import { prisma } from '@/db/prisma';
 import { getRecommendedExplanationForLiveSession } from '@/lib/live/live-session-explanation-bridge';
+import { RUBRIC_CORRECT_THRESHOLD } from '@/lib/live/markingConstants';
 
 interface LiveSupportEventSummary {
   shownCount: number;
@@ -40,7 +41,7 @@ interface StoredMarkingResult {
 function getAttemptOutcome(attempt: { correct: boolean; markingResult: unknown }): 'correct' | 'partial' | 'incorrect' {
   const marking = (attempt.markingResult as StoredMarkingResult | null) ?? null;
   if (marking && typeof marking.score === 'number') {
-    if (marking.score >= 0.6) return 'correct';
+    if (marking.score >= RUBRIC_CORRECT_THRESHOLD) return 'correct';
     if (marking.score > 0) return 'partial';
     return 'incorrect';
   }
@@ -75,6 +76,7 @@ export async function GET(_req: NextRequest, { params }: Props) {
               interventionFlags: {
                 where: { isResolved: false },
                 select: { id: true, skillId: true, reason: true },
+                take: 5,
               },
             },
           },
@@ -269,14 +271,21 @@ export async function GET(_req: NextRequest, { params }: Props) {
       })
     : [];
 
-  type McEntry = { id: string; label: string; description: string };
   const mcLabelMap = new Map<string, { label: string; description: string }>();
   for (const skill of skillsWithEnrichment) {
-    if (!skill.misconceptions) continue;
-    const entries = skill.misconceptions as unknown as McEntry[];
-    for (const entry of entries) {
-      if (entry.id && !mcLabelMap.has(entry.id)) {
-        mcLabelMap.set(entry.id, { label: entry.label, description: entry.description });
+    if (!Array.isArray(skill.misconceptions)) continue;
+    for (const entry of skill.misconceptions) {
+      if (
+        entry !== null &&
+        typeof entry === 'object' &&
+        typeof (entry as Record<string, unknown>).id === 'string' &&
+        typeof (entry as Record<string, unknown>).label === 'string' &&
+        typeof (entry as Record<string, unknown>).description === 'string'
+      ) {
+        const mc = entry as { id: string; label: string; description: string };
+        if (!mcLabelMap.has(mc.id)) {
+          mcLabelMap.set(mc.id, { label: mc.label, description: mc.description });
+        }
       }
     }
   }
@@ -335,6 +344,43 @@ export async function GET(_req: NextRequest, { params }: Props) {
     }))
     .sort((a, b) => (a.averageScore / Math.max(a.averageMaxScore, 1)) - (b.averageScore / Math.max(b.averageMaxScore, 1)));
 
+  // ── Per-lane attempt summary for the current skill ───────────────────────
+  // Gives the teacher a live correct/incorrect tally per lane so they can see
+  // how each group is responding during the shadow-check phase.
+  const currentSkillId =
+    Array.isArray(liveSession.phases) && liveSession.phases.length > 0
+      ? ((liveSession.phases[liveSession.currentPhaseIndex] as { skillId?: string } | undefined)?.skillId ?? liveSession.skillId)
+      : liveSession.skillId;
+
+  const laneAttemptAcc: Record<string, { answered: Set<string>; correct: number; incorrect: number }> = {
+    LANE_1: { answered: new Set(), correct: 0, incorrect: 0 },
+    LANE_2: { answered: new Set(), correct: 0, incorrect: 0 },
+    LANE_3: { answered: new Set(), correct: 0, incorrect: 0 },
+  };
+
+  const participantLaneMap = new Map(
+    liveSession.participants.filter((p) => p.isActive).map((p) => [p.studentUserId, p.currentLane])
+  );
+
+  for (const attempt of liveSession.liveAttempts) {
+    if (attempt.skillId !== currentSkillId) continue;
+    const lane = participantLaneMap.get(attempt.studentUserId);
+    if (!lane || !(lane in laneAttemptAcc)) continue;
+    const acc = laneAttemptAcc[lane]!;
+    acc.answered.add(attempt.studentUserId);
+    if (getAttemptOutcome(attempt) === 'correct') acc.correct++;
+    else acc.incorrect++;
+  }
+
+  const laneSummary: Record<string, { answeredCount: number; correctCount: number; incorrectCount: number }> = {};
+  for (const [lane, acc] of Object.entries(laneAttemptAcc)) {
+    laneSummary[lane] = {
+      answeredCount: acc.answered.size,
+      correctCount: acc.correct,
+      incorrectCount: acc.incorrect,
+    };
+  }
+
   // ── Per-student response breakdown ────────────────────────────────────────
   // Build attempt counts per student from the already-fetched liveAttempts.
   const studentAttemptMap = new Map<string, { total: number; correct: number; partial: number; lastOutcome: 'correct' | 'partial' | 'incorrect' | null }>();
@@ -386,6 +432,7 @@ export async function GET(_req: NextRequest, { params }: Props) {
     laneCounts,
     laneStudents,
     responseSummary,
+    laneSummary,
     recommendedExplanation,
     supportSummary,
     studentMessages,

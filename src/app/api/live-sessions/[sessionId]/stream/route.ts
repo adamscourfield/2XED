@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/features/auth/authOptions';
 import { prisma } from '@/db/prisma';
 import { getRecommendedExplanationForLiveSession } from '@/lib/live/live-session-explanation-bridge';
+import { RUBRIC_CORRECT_THRESHOLD } from '@/lib/live/markingConstants';
 
 interface MarkingCriterion {
   element?: string;
@@ -18,7 +19,7 @@ interface StoredMarkingResult {
 function getAttemptOutcome(attempt: { correct: boolean; markingResult: unknown }): 'correct' | 'partial' | 'incorrect' {
   const marking = (attempt.markingResult as StoredMarkingResult | null) ?? null;
   if (marking && typeof marking.score === 'number') {
-    if (marking.score >= 0.6) return 'correct';
+    if (marking.score >= RUBRIC_CORRECT_THRESHOLD) return 'correct';
     if (marking.score > 0) return 'partial';
     return 'incorrect';
   }
@@ -236,14 +237,21 @@ export async function GET(req: NextRequest, { params }: Props) {
         })
       : [];
 
-    type McEntry = { id: string; label: string; description: string };
     const mcLabelMap = new Map<string, { label: string; description: string }>();
     for (const skill of skillsWithEnrichment) {
-      if (!skill.misconceptions) continue;
-      const entries = skill.misconceptions as unknown as McEntry[];
-      for (const entry of entries) {
-        if (entry.id && !mcLabelMap.has(entry.id)) {
-          mcLabelMap.set(entry.id, { label: entry.label, description: entry.description });
+      if (!Array.isArray(skill.misconceptions)) continue;
+      for (const entry of skill.misconceptions) {
+        if (
+          entry !== null &&
+          typeof entry === 'object' &&
+          typeof (entry as Record<string, unknown>).id === 'string' &&
+          typeof (entry as Record<string, unknown>).label === 'string' &&
+          typeof (entry as Record<string, unknown>).description === 'string'
+        ) {
+          const mc = entry as { id: string; label: string; description: string };
+          if (!mcLabelMap.has(mc.id)) {
+            mcLabelMap.set(mc.id, { label: mc.label, description: mc.description });
+          }
         }
       }
     }

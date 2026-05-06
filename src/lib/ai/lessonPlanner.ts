@@ -131,13 +131,14 @@ ${JSON_SCHEMA}`;
 }
 
 function buildExtractPrompt(p: ExtractLessonParams): string {
+  const truncated = p.resourceText.length > RESOURCE_TEXT_LIMIT;
   return `A teacher has uploaded a teaching resource. Analyse it and generate a lesson plan.
 
 SUBJECT: ${p.subjectTitle}${p.topicHint ? `\nTOPIC HINT: ${p.topicHint}` : ''}
 
-RESOURCE CONTENT (first 6000 chars):
+RESOURCE CONTENT${truncated ? ` (first ${RESOURCE_TEXT_LIMIT.toLocaleString()} of ${p.resourceText.length.toLocaleString()} characters)` : ''}:
 ---
-${p.resourceText.slice(0, 6000)}
+${p.resourceText.slice(0, RESOURCE_TEXT_LIMIT)}
 ---
 
 AVAILABLE SKILLS (only use codes from this list):
@@ -156,7 +157,27 @@ Return JSON matching this schema exactly:
 ${JSON_SCHEMA}`;
 }
 
+// ── Constants ─────────────────────────────────────────────────────────────────
+
+/** Maximum characters of uploaded resource text sent to Claude. */
+export const RESOURCE_TEXT_LIMIT = 15_000;
+
 // ── Anthropic call ────────────────────────────────────────────────────────────
+
+function extractJson(raw: string): string {
+  // Prefer finding the outermost JSON object by brace position, which is
+  // robust against preamble text or trailing commentary Claude occasionally
+  // adds despite the system-prompt instruction.
+  const start = raw.indexOf('{');
+  const end = raw.lastIndexOf('}');
+  if (start !== -1 && end > start) return raw.slice(start, end + 1);
+  // Fall back to stripping markdown fences if no braces found.
+  return raw
+    .replace(/^```json\s*/im, '')
+    .replace(/^```\s*/im, '')
+    .replace(/```\s*$/im, '')
+    .trim();
+}
 
 async function callAnthropic(prompt: string): Promise<AiLessonPlanRaw> {
   const apiKey = process.env.ANTHROPIC_API_KEY;
@@ -187,14 +208,7 @@ async function callAnthropic(prompt: string): Promise<AiLessonPlanRaw> {
     (json.content as Array<{ type: string; text?: string }>).find((b) => b.type === 'text')
       ?.text ?? '';
 
-  // Strip any accidental markdown code fences
-  const text = raw
-    .replace(/^```json\s*/i, '')
-    .replace(/^```\s*/i, '')
-    .replace(/```\s*$/i, '')
-    .trim();
-
-  const parsed = JSON.parse(text) as AiLessonPlanRaw;
+  const parsed = JSON.parse(extractJson(raw)) as AiLessonPlanRaw;
 
   if (
     !parsed.title ||

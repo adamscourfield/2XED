@@ -1,0 +1,1 @@
+export const RUBRIC_CORRECT_THRESHOLD = 0.6;

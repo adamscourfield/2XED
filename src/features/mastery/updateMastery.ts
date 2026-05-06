@@ -147,11 +147,17 @@ export async function updateSkillMastery(
     });
 
     if (nextStatus === 'DEVELOPING') {
-      await grantReward(userId, subjectId, 'skill_to_developing', { skillId, skillCode, strand });
+      await grantReward(userId, subjectId, 'skill_to_developing', {
+        skillId, skillCode, strand,
+        rewardKey: `skill_milestone:${userId}:${skillId}:DEVELOPING`,
+      });
     }
 
     if (nextStatus === 'SECURE') {
-      await grantReward(userId, subjectId, 'skill_to_secure', { skillId, skillCode, strand });
+      await grantReward(userId, subjectId, 'skill_to_secure', {
+        skillId, skillCode, strand,
+        rewardKey: `skill_milestone:${userId}:${skillId}:SECURE`,
+      });
     }
   }
 

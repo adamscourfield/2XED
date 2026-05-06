@@ -25,6 +25,7 @@ import { prisma } from '@/db/prisma';
 import {
   generateLessonFromTopic,
   extractLessonFromResource,
+  RESOURCE_TEXT_LIMIT,
   type AiLessonPlanRaw,
   type AiDoNowQuestion,
   type SkillContext,
@@ -67,6 +68,16 @@ export type SseEvent =
 
 // ── Text extraction helpers ───────────────────────────────────────────────────
 
+function decodeXmlEntities(text: string): string {
+  return text
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&#(\d+);/g, (_, code: string) => String.fromCharCode(Number(code)));
+}
+
 function readZipEntry(filePath: string, entry: string): string {
   try {
     return execFileSync('unzip', ['-p', filePath, entry], { encoding: 'utf8' });
@@ -96,10 +107,10 @@ function extractTextFromPptx(filePath: string): string {
     .map((entry) => {
       const xml = readZipEntry(filePath, entry);
       const runs: string[] = [];
-      const re = /<a:t[^>]*>([^<]*)<\/a:t>/g;
+      const re = /<a:t[^>]*>([\s\S]*?)<\/a:t>/g;
       let m: RegExpExecArray | null;
       while ((m = re.exec(xml)) !== null) {
-        const t = m[1].trim();
+        const t = decodeXmlEntities(m[1]).trim();
         if (t) runs.push(t);
       }
       return runs.join(' ');
@@ -112,10 +123,10 @@ function extractTextFromDocx(filePath: string): string {
   const xml = readZipEntry(filePath, 'word/document.xml');
   if (!xml) return '';
   const runs: string[] = [];
-  const re = /<w:t[^>]*>([^<]*)<\/w:t>/g;
+  const re = /<w:t[^>]*>([\s\S]*?)<\/w:t>/g;
   let m: RegExpExecArray | null;
   while ((m = re.exec(xml)) !== null) {
-    const t = m[1];
+    const t = decodeXmlEntities(m[1]);
     if (t.trim()) runs.push(t);
   }
   return runs.join(' ').replace(/\s+/g, ' ').trim();
@@ -159,33 +170,6 @@ function matchSkillCodes(aiCodes: string[], dbSkills: DbSkill[]): DbSkill[] {
     if (skill && !matched.some((m) => m.id === skill.id)) matched.push(skill);
   }
   return matched;
-}
-
-// ── Do Now persistence ────────────────────────────────────────────────────────
-
-async function persistDoNowItem(
-  q: AiDoNowQuestion,
-  skillId: string,
-  subjectId: string,
-): Promise<string> {
-  const options =
-    q.type === 'MCQ' && Array.isArray(q.options) && q.options.length === 4
-      ? { choices: q.options, acceptedAnswers: q.answer ? [q.answer] : [] }
-      : { acceptedAnswers: q.answer ? [q.answer] : [], responseMode: 'write' };
-
-  const item = await prisma.item.create({
-    data: {
-      question: q.stem,
-      type: q.type === 'MCQ' ? 'MCQ' : 'EXTENDED_WRITING',
-      options: options as never,
-      answer: q.answer ?? '',
-      misconceptionMap: {} as never,
-      subjectId,
-      skills: { create: { skillId } },
-    },
-    select: { id: true },
-  });
-  return item.id;
 }
 
 // ── Route handler ─────────────────────────────────────────────────────────────
@@ -294,6 +278,12 @@ export async function POST(req: NextRequest) {
             controller.close();
             return;
           }
+          if (resourceText.length > RESOURCE_TEXT_LIMIT) {
+            send({
+              stage: 'extracting',
+              message: `Read ${uploadedFileName} — using first ${RESOURCE_TEXT_LIMIT.toLocaleString()} of ${resourceText.length.toLocaleString()} characters.`,
+            });
+          }
         }
 
         // ── Stage: ai_thinking ──────────────────────────────────────────────
@@ -334,6 +324,14 @@ export async function POST(req: NextRequest) {
         send({ stage: 'matching', message: 'Matching skills to your curriculum…' });
 
         const matchedDbSkills = matchSkillCodes(plan.suggestedSkillCodes, dbSkills);
+
+        if (matchedDbSkills.length === 0 && plan.suggestedSkillCodes.length > 0) {
+          send({
+            stage: 'matching',
+            message: `No curriculum skills matched the suggested codes (${plan.suggestedSkillCodes.join(', ')}). You can add skills manually in the next step.`,
+          });
+        }
+
         const phaseByCode = new Map(
           plan.phaseConfig.map((p) => [p.skillCode.toUpperCase(), p]),
         );
@@ -353,40 +351,65 @@ export async function POST(req: NextRequest) {
 
         // ── Stage: persisting ───────────────────────────────────────────────
         const doNowQuestions = plan.doNowQuestions.filter((q) => q.stem?.trim()).slice(0, 8);
-        send({
-          stage: 'persisting',
-          message: `Saving ${doNowQuestions.length} Do Now question${doNowQuestions.length !== 1 ? 's' : ''}…`,
-          total: doNowQuestions.length,
-          saved: 0,
-        });
-
         const firstSkillId = matchedDbSkills[0]?.id ?? '';
-        const doNowItems: AiDoNowItem[] = [];
 
-        for (const [i, q] of doNowQuestions.entries()) {
+        // Resolve skillId for each question before entering the transaction.
+        type ItemInput = { q: AiDoNowQuestion; resolvedSkillId: string };
+        const itemInputs: ItemInput[] = doNowQuestions.flatMap((q) => {
           const qSkillCode = q.skillCode?.toUpperCase() ?? '';
           const dbSkill =
             dbSkills.find((s) => s.code.toUpperCase() === qSkillCode) ?? matchedDbSkills[0];
           const resolvedSkillId = dbSkill?.id ?? firstSkillId;
-          if (!resolvedSkillId) continue;
+          return resolvedSkillId ? [{ q, resolvedSkillId }] : [];
+        });
 
+        send({
+          stage: 'persisting',
+          message: `Saving ${itemInputs.length} Do Now question${itemInputs.length !== 1 ? 's' : ''}…`,
+          total: itemInputs.length,
+          saved: 0,
+        });
+
+        let doNowItems: AiDoNowItem[] = [];
+        if (itemInputs.length > 0) {
           try {
-            const itemId = await persistDoNowItem(q, resolvedSkillId, subjectId);
-            doNowItems.push({
-              skillId: resolvedSkillId,
-              itemId,
-              stemPreview: q.stem.slice(0, 100) + (q.stem.length > 100 ? '…' : ''),
-            });
-            send({
-              stage: 'persisting',
-              message: `Saving questions… (${i + 1}/${doNowQuestions.length})`,
-              total: doNowQuestions.length,
-              saved: i + 1,
-            });
+            const created = await prisma.$transaction(
+              itemInputs.map(({ q, resolvedSkillId }) => {
+                const options =
+                  q.type === 'MCQ' && Array.isArray(q.options) && q.options.length === 4
+                    ? { choices: q.options, acceptedAnswers: q.answer ? [q.answer] : [] }
+                    : { acceptedAnswers: q.answer ? [q.answer] : [], responseMode: 'write' };
+                return prisma.item.create({
+                  data: {
+                    question: q.stem,
+                    type: q.type === 'MCQ' ? 'MCQ' : 'EXTENDED_WRITING',
+                    options: options as never,
+                    answer: q.answer ?? '',
+                    misconceptionMap: {} as never,
+                    subjectId,
+                    skills: { create: { skillId: resolvedSkillId } },
+                  },
+                  select: { id: true },
+                });
+              }),
+            );
+            doNowItems = created.map((item, i) => ({
+              skillId: itemInputs[i]!.resolvedSkillId,
+              itemId: item.id,
+              stemPreview:
+                itemInputs[i]!.q.stem.slice(0, 100) +
+                (itemInputs[i]!.q.stem.length > 100 ? '…' : ''),
+            }));
           } catch (err) {
-            console.warn('[lesson-plan/route] Failed to persist Do Now item:', err);
+            console.warn('[lesson-plan/route] Failed to persist Do Now items:', err);
           }
         }
+        send({
+          stage: 'persisting',
+          message: `Saved ${doNowItems.length} question${doNowItems.length !== 1 ? 's' : ''}`,
+          total: itemInputs.length,
+          saved: doNowItems.length,
+        });
 
         // ── Done ────────────────────────────────────────────────────────────
         const response: AiLessonPlanResponse = {

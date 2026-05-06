@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type FormEvent } from 'react';
+import { useState, useEffect, useRef, type FormEvent } from 'react';
 import { useLivePhasePrimaryFocus } from '@/components/student/live/useLivePhasePrimaryFocus';
 import { CanvasInput, type CanvasInputData } from '@/components/question/CanvasInput';
 import { StudentLiveSessionChrome } from '@/components/student/live/StudentLiveSessionChrome';
@@ -93,6 +93,13 @@ export function StudentPracticeView({
   const [draft, setDraft] = useState('');
   const [sentFlash, setSentFlash] = useState(false);
   const [canvasData, setCanvasData] = useState<CanvasInputData | null>(null);
+  const sentFlashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (sentFlashTimerRef.current !== null) clearTimeout(sentFlashTimerRef.current);
+    };
+  }, []);
 
   useLivePhasePrimaryFocus(`${question.id}-${questionNumber}`);
 
@@ -346,7 +353,8 @@ export function StudentPracticeView({
                     onMessageTeacher(draft.trim());
                     setDraft('');
                     setSentFlash(true);
-                    window.setTimeout(() => setSentFlash(false), 1800);
+                    if (sentFlashTimerRef.current !== null) clearTimeout(sentFlashTimerRef.current);
+                    sentFlashTimerRef.current = setTimeout(() => setSentFlash(false), 1800);
                   }
                 }}
                 className="anx-btn-primary shrink-0 px-4 py-2 text-sm transition-transform active:scale-[0.97]"

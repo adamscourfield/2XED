@@ -5,7 +5,8 @@ type EscalationReason =
   | 'ANCHOR_FAILED'
   | 'MISCONCEPTION_FAILED'
   | 'SCAFFOLDED_CORRECT'
-  | 'MANUAL_TEACHER';
+  | 'MANUAL_TEACHER'
+  | 'HINTS_USED';
 
 interface LaneStudent {
   participantId: string;
@@ -29,6 +30,7 @@ interface LaneColumnsProps {
   lane2: LaneGroup;
   lane3: LaneGroup;
   onHandback?: (participantId: string) => void;
+  actingOnIds?: Set<string>;
 }
 
 function WaitingBadge({ minutes }: { minutes: number }) {
@@ -40,7 +42,7 @@ function WaitingBadge({ minutes }: { minutes: number }) {
   );
 }
 
-export function LaneColumns({ lane1, lane2, lane3, onHandback }: LaneColumnsProps) {
+export function LaneColumns({ lane1, lane2, lane3, onHandback, actingOnIds }: LaneColumnsProps) {
   return (
     <div className="grid grid-cols-3 gap-4">
       {/* Lane 1 — Got it */}
@@ -103,9 +105,10 @@ export function LaneColumns({ lane1, lane2, lane3, onHandback }: LaneColumnsProp
                 {onHandback && (
                   <button
                     onClick={() => onHandback(student.participantId)}
-                    className="anx-btn-primary mt-2 w-full text-xs"
+                    disabled={actingOnIds?.has(student.participantId)}
+                    className="anx-btn-primary mt-2 w-full text-xs disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Hand back to app
+                    {actingOnIds?.has(student.participantId) ? 'Working…' : 'Hand back to app'}
                   </button>
                 )}
               </div>

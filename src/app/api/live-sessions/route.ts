@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
+import { randomBytes } from 'node:crypto';
 import { z } from 'zod';
 import { authOptions } from '@/features/auth/authOptions';
 import { prisma } from '@/db/prisma';
@@ -35,11 +36,8 @@ const schema = z.object({
 
 function generateJoinCode(): string {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  let code = '';
-  for (let i = 0; i < 6; i++) {
-    code += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return code;
+  const bytes = randomBytes(6);
+  return Array.from(bytes, (b) => chars[b % chars.length]).join('');
 }
 
 export async function POST(req: NextRequest) {
@@ -66,7 +64,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Classroom not found or not authorized' }, { status: 403 });
   }
 
-  // Generate unique join code (retry on collision)
+  // Generate unique join code (retry on collision, up to 5 attempts)
   let joinCode = generateJoinCode();
   let attempts = 0;
   while (attempts < 5) {
@@ -74,6 +72,12 @@ export async function POST(req: NextRequest) {
     if (!existing) break;
     joinCode = generateJoinCode();
     attempts++;
+  }
+  if (attempts >= 5) {
+    return NextResponse.json(
+      { error: 'Could not generate a unique join code. Please try again.' },
+      { status: 503 },
+    );
   }
 
   const liveSession = await prisma.liveSession.create({

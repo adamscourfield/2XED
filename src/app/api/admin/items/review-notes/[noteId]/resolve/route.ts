@@ -16,6 +16,12 @@ export async function POST(_req: NextRequest, { params }: Props) {
   const { noteId } = await params;
   if (!noteId) return NextResponse.json({ error: 'Missing noteId' }, { status: 400 });
 
+  const existing = await prisma.itemReviewNote.findUnique({
+    where: { id: noteId },
+    select: { id: true },
+  });
+  if (!existing) return NextResponse.json({ error: 'Note not found' }, { status: 404 });
+
   const note = await prisma.itemReviewNote.update({
     where: { id: noteId },
     data: {

@@ -57,11 +57,15 @@ export default async function TeacherRecentSessionsPage() {
                 </div>
                 <div className="staff-dash-live-actions">
                   <span className="anx-badge anx-badge-blue">{ls.status}</span>
-                  {(isLive || ls.status === 'PAUSED') && (
+                  {(isLive || ls.status === 'PAUSED') ? (
                     <Link href={`/teacher/live/${ls.id}`} className="anx-btn-secondary px-3 py-1.5 text-xs no-underline">
                       Open
                     </Link>
-                  )}
+                  ) : ls.status === 'COMPLETED' ? (
+                    <Link href={`/teacher/live/${ls.id}/review`} className="anx-btn-secondary px-3 py-1.5 text-xs no-underline">
+                      Review
+                    </Link>
+                  ) : null}
                 </div>
               </li>
             );

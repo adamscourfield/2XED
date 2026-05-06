@@ -36,6 +36,7 @@ export function useLiveLanes(sessionId: string, pollIntervalMs = 4000) {
   const [data, setData] = useState<LaneViewData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [actingOnIds, setActingOnIds] = useState<Set<string>>(new Set());
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const fetchLanes = useCallback(async () => {
@@ -68,16 +69,27 @@ export function useLiveLanes(sessionId: string, pollIntervalMs = 4000) {
 
   const handback = useCallback(
     async (participantId: string) => {
-      const res = await fetch(
-        `/api/live-sessions/${sessionId}/participants/${participantId}/handback`,
-        { method: 'POST' }
-      );
-      if (res.ok) {
+      setActingOnIds((s) => new Set(s).add(participantId));
+      try {
+        const res = await fetch(
+          `/api/live-sessions/${sessionId}/participants/${participantId}/handback`,
+          { method: 'POST' }
+        );
+        if (!res.ok) {
+          const body = await res.json().catch(() => ({}));
+          throw new Error((body as { error?: string }).error ?? 'Handback failed');
+        }
         await fetchLanes();
+      } finally {
+        setActingOnIds((s) => {
+          const next = new Set(s);
+          next.delete(participantId);
+          return next;
+        });
       }
     },
     [sessionId, fetchLanes]
   );
 
-  return { data, error, loading, refetch: fetchLanes, handback };
+  return { data, error, loading, actingOnIds, refetch: fetchLanes, handback };
 }
