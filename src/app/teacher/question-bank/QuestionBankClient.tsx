@@ -1,14 +1,19 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 type QuestionTab = 'all' | 'mine' | 'shared' | 'library';
 type ViewMode = 'list' | 'grid';
 
+type QuestionPool = 'mine' | 'shared' | 'library';
+type TopicFilter = 'algebra' | 'number' | 'geometry' | 'statistics';
+
 type DemoQuestion = {
   id: string;
   index: number;
+  yearGroup: string;
+  pool: QuestionPool;
   types: string[];
   cognitive: string[];
   usedCount: number;
@@ -16,10 +21,43 @@ type DemoQuestion = {
   trail: string[];
 };
 
+function topicKeyFromTrail(trail: string[]): TopicFilter {
+  const first = (trail[0] ?? '').toLowerCase();
+  if (first === 'number') return 'number';
+  if (first === 'geometry' || first === 'shape' || first === 'shape and space') return 'geometry';
+  if (first === 'statistics' || first === 'probability' || first === 'handling data') return 'statistics';
+  return 'algebra';
+}
+
+function isMultipleChoice(types: string[]): boolean {
+  return types.some((t) => t.toLowerCase().includes('multiple'));
+}
+
+function isShortAnswer(types: string[]): boolean {
+  return types.some((t) => t.toLowerCase().includes('short'));
+}
+
+function matchesQuestionTypeFilter(item: DemoQuestion, questionType: string): boolean {
+  if (questionType === 'all') return true;
+  if (questionType === 'mc') return isMultipleChoice(item.types);
+  if (questionType === 'short') return isShortAnswer(item.types);
+  return true;
+}
+
+function matchesTabFilter(item: DemoQuestion, tab: QuestionTab): boolean {
+  if (tab === 'all') return true;
+  if (tab === 'mine') return item.pool === 'mine';
+  if (tab === 'shared') return item.pool === 'shared';
+  if (tab === 'library') return item.pool === 'library';
+  return true;
+}
+
 const DEMO_QUESTIONS: DemoQuestion[] = [
   {
     id: '1',
     index: 1,
+    yearGroup: '8',
+    pool: 'mine',
     types: ['Multiple choice'],
     cognitive: ['Apply'],
     usedCount: 12,
@@ -29,6 +67,8 @@ const DEMO_QUESTIONS: DemoQuestion[] = [
   {
     id: '2',
     index: 2,
+    yearGroup: '9',
+    pool: 'mine',
     types: ['Short answer'],
     cognitive: ['Recall'],
     usedCount: 4,
@@ -38,15 +78,14 @@ const DEMO_QUESTIONS: DemoQuestion[] = [
   {
     id: '3',
     index: 3,
-    types: ['Multiple choice'],
-    cognitive: ['Reason'],
-    usedCount: 28,
-    stem: 'Which expression is equivalent to (2x)³?',
+    yearGroup: '8',
     trail: ['Algebra', 'Indices', 'Laws of indices'],
   },
   {
     id: '4',
     index: 4,
+    yearGroup: '7',
+    pool: 'shared',
     types: ['Short answer'],
     cognitive: ['Apply'],
     usedCount: 7,
@@ -56,11 +95,35 @@ const DEMO_QUESTIONS: DemoQuestion[] = [
   {
     id: '5',
     index: 5,
+    yearGroup: '8',
+    pool: 'library',
     types: ['Multiple choice'],
     cognitive: ['Recall'],
     usedCount: 19,
     stem: 'What is the value of (−2)⁴?',
     trail: ['Number', 'Directed numbers', 'Powers'],
+  },
+  {
+    id: '6',
+    index: 6,
+    yearGroup: '9',
+    pool: 'library',
+    types: ['Multiple choice'],
+    cognitive: ['Apply'],
+    usedCount: 3,
+    stem: 'Calculate the size of an exterior angle of a regular hexagon.',
+    trail: ['Geometry', 'Polygons', 'Interior and exterior angles'],
+  },
+  {
+    id: '7',
+    index: 7,
+    yearGroup: '10',
+    pool: 'mine',
+    types: ['Short answer'],
+    cognitive: ['Reason'],
+    usedCount: 11,
+    stem: 'The mean of five numbers is 12. Four of the numbers are 10, 11, 14, and 15. Find the fifth number.',
+    trail: ['Statistics', 'Averages', 'Mean from data'],
   },
 ];
 
@@ -194,14 +257,13 @@ function GridViewIcon({ active }: { active: boolean }) {
 export function QuestionBankClient() {
   const [tab, setTab] = useState<QuestionTab>('all');
   const [search, setSearch] = useState('');
-  const [yearGroup, setYearGroup] = useState('7');
+  const [yearGroup, setYearGroup] = useState('8');
   const [topic, setTopic] = useState('algebra');
   const [questionType, setQuestionType] = useState('all');
   const [sortBy, setSortBy] = useState('recent');
   const [view, setView] = useState<ViewMode>('list');
   const [page, setPage] = useState(1);
   const pageSize = 20;
-  const totalQuestions = 1247;
 
   const yearOptions = useMemo(
     () =>
@@ -242,13 +304,40 @@ export function QuestionBankClient() {
 
   const filteredDemo = useMemo(() => {
     const q = search.trim().toLowerCase();
-    if (!q) return DEMO_QUESTIONS;
-    return DEMO_QUESTIONS.filter((item) => item.stem.toLowerCase().includes(q) || item.trail.some((t) => t.toLowerCase().includes(q)));
-  }, [search]);
+    let rows = DEMO_QUESTIONS.filter((item) => matchesTabFilter(item, tab));
+    rows = rows.filter((item) => item.yearGroup === yearGroup);
+    rows = rows.filter((item) => topicKeyFromTrail(item.trail) === topic);
+    rows = rows.filter((item) => matchesQuestionTypeFilter(item, questionType));
+    if (q) {
+      rows = rows.filter(
+        (item) => item.stem.toLowerCase().includes(q) || item.trail.some((t) => t.toLowerCase().includes(q)),
+      );
+    }
+    const sorted = [...rows];
+    if (sortBy === 'used') {
+      sorted.sort((a, b) => b.usedCount - a.usedCount);
+    } else if (sortBy === 'az') {
+      sorted.sort((a, b) => a.stem.localeCompare(b.stem, undefined, { sensitivity: 'base' }));
+    } else {
+      sorted.sort((a, b) => b.index - a.index);
+    }
+    return sorted;
+  }, [search, yearGroup, topic, questionType, sortBy, tab]);
 
+  useEffect(() => {
+    setPage(1);
+  }, [search, yearGroup, topic, questionType, sortBy, tab]);
+
+  const totalQuestions = filteredDemo.length;
   const totalPages = Math.max(1, Math.ceil(totalQuestions / pageSize));
-  const from = (page - 1) * pageSize + 1;
-  const to = Math.min(page * pageSize, totalQuestions);
+  const effectivePage = Math.min(page, totalPages);
+  const pagedItems = useMemo(
+    () => filteredDemo.slice((effectivePage - 1) * pageSize, effectivePage * pageSize),
+    [filteredDemo, effectivePage, pageSize],
+  );
+
+  const from = totalQuestions === 0 ? 0 : (effectivePage - 1) * pageSize + 1;
+  const to = totalQuestions === 0 ? 0 : Math.min(effectivePage * pageSize, totalQuestions);
 
   return (
     <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:gap-8">
@@ -359,12 +448,12 @@ export function QuestionBankClient() {
         </div>
 
         <p className="text-sm" style={{ color: 'var(--anx-text-muted)' }}>
-          Previewing sample questions. Full bank and filters will connect to your library soon.
+          Previewing sample questions. The full bank will connect to your library soon.
           {tab !== 'all' ? ` Tab: ${TAB_LABELS.find((x) => x.id === tab)?.label}.` : ''}
         </p>
 
         <ul className={`${view === 'grid' ? 'grid gap-4 sm:grid-cols-2' : 'space-y-4'} list-none p-0`}>
-          {filteredDemo.map((item) => (
+          {pagedItems.map((item) => (
             <li key={item.id}>
               <article className="anx-card relative flex flex-col gap-3 p-4 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
                 <div className="flex min-w-0 flex-1 gap-3">
@@ -443,7 +532,7 @@ export function QuestionBankClient() {
             <button
               type="button"
               className="rounded-lg px-2 py-1 disabled:opacity-40"
-              disabled={page <= 1}
+              disabled={effectivePage <= 1}
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               aria-label="Previous page"
             >
@@ -454,8 +543,8 @@ export function QuestionBankClient() {
                 key={n}
                 type="button"
                 onClick={() => setPage(n)}
-                className={`min-w-[2rem] rounded-lg px-2 py-1 ${page === n ? 'bg-[var(--anx-primary)] font-semibold text-white' : 'hover:bg-[var(--anx-surface-hover)]'}`}
-                aria-current={page === n ? 'page' : undefined}
+                className={`min-w-[2rem] rounded-lg px-2 py-1 ${effectivePage === n ? 'bg-[var(--anx-primary)] font-semibold text-white' : 'hover:bg-[var(--anx-surface-hover)]'}`}
+                aria-current={effectivePage === n ? 'page' : undefined}
               >
                 {n}
               </button>
@@ -469,7 +558,7 @@ export function QuestionBankClient() {
               <button
                 type="button"
                 onClick={() => setPage(totalPages)}
-                className={`min-w-[2rem] rounded-lg px-2 py-1 ${page === totalPages ? 'bg-[var(--anx-primary)] font-semibold text-white' : 'hover:bg-[var(--anx-surface-hover)]'}`}
+                className={`min-w-[2rem] rounded-lg px-2 py-1 ${effectivePage === totalPages ? 'bg-[var(--anx-primary)] font-semibold text-white' : 'hover:bg-[var(--anx-surface-hover)]'}`}
               >
                 {totalPages}
               </button>
@@ -477,7 +566,7 @@ export function QuestionBankClient() {
             <button
               type="button"
               className="rounded-lg px-2 py-1 disabled:opacity-40"
-              disabled={page >= totalPages}
+              disabled={effectivePage >= totalPages}
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               aria-label="Next page"
             >
@@ -522,9 +611,11 @@ export function QuestionBankClient() {
             type="button"
             className="text-sm font-medium text-[color:var(--anx-primary)] hover:underline"
             onClick={() => {
-              setYearGroup('7');
+              setYearGroup('8');
               setTopic('algebra');
               setQuestionType('all');
+              setSearch('');
+              setSortBy('recent');
             }}
           >
             Clear all
