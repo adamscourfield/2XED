@@ -14,7 +14,7 @@
  */
 
 import { useRef, useState } from 'react';
-import type { AiLessonPlanResponse, SseEvent } from '@/app/api/teacher/ai/lesson-plan/route';
+import type { AiLessonPlanResponse, AiMatchedSkill, SseEvent } from '@/app/api/teacher/ai/lesson-plan/route';
 
 // ── Props ─────────────────────────────────────────────────────────────────────
 
@@ -130,6 +130,41 @@ function PipelineProgress({
 
 // ── Plan preview ──────────────────────────────────────────────────────────────
 
+const PREVIEW_PHASE_COLOURS: Record<string, { on: string; off: string }> = {
+  blue:    { on: 'bg-blue-100 border-blue-300 text-blue-800 shadow-sm',       off: 'border-[var(--anx-outline-variant)] bg-white text-[var(--anx-text-muted)]' },
+  violet:  { on: 'bg-violet-100 border-violet-300 text-violet-800 shadow-sm', off: 'border-[var(--anx-outline-variant)] bg-white text-[var(--anx-text-muted)]' },
+  emerald: { on: 'bg-emerald-100 border-emerald-300 text-emerald-800 shadow-sm', off: 'border-[var(--anx-outline-variant)] bg-white text-[var(--anx-text-muted)]' },
+};
+
+function PreviewPhaseToggle({
+  active,
+  label,
+  sub,
+  colour,
+  onClick,
+}: {
+  active: boolean;
+  label: string;
+  sub: string;
+  colour: string;
+  onClick: () => void;
+}) {
+  const c = PREVIEW_PHASE_COLOURS[colour]!;
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      className={`flex flex-col items-center rounded-lg border px-1.5 py-1.5 text-center text-[10px] transition-all ${
+        active ? `${c.on} font-semibold` : `${c.off} opacity-50 hover:opacity-80`
+      }`}
+    >
+      <span className="font-semibold leading-tight">{label}</span>
+      <span className={`mt-0.5 text-[9px] ${active ? 'opacity-60' : 'opacity-50'}`}>{sub}</span>
+    </button>
+  );
+}
+
 function PlanPreview({
   plan,
   onAccept,
@@ -137,10 +172,30 @@ function PlanPreview({
   accepting,
 }: {
   plan: AiLessonPlanResponse;
-  onAccept: () => void;
+  onAccept: (customised: AiLessonPlanResponse) => void;
   onReject: () => void;
   accepting: boolean;
 }) {
+  const [skills, setSkills] = useState<AiMatchedSkill[]>(() => plan.matchedSkills.map((s) => ({ ...s })));
+  const [includeDoNow, setIncludeDoNow] = useState<Record<string, boolean>>(() =>
+    Object.fromEntries(plan.doNowItems.map((i) => [i.itemId, true])),
+  );
+
+  const hasInvalidPlan = skills.some((p) => !p.hasExplanation && !p.hasCheck && !p.hasPractice);
+  const selectedDoNowCount = plan.doNowItems.filter((i) => includeDoNow[i.itemId]).length;
+
+  function updateSkill(skillId: string, patch: Partial<AiMatchedSkill>) {
+    setSkills((prev) => prev.map((x) => (x.skillId === skillId ? { ...x, ...patch } : x)));
+  }
+
+  function handleApply() {
+    onAccept({
+      ...plan,
+      matchedSkills: skills,
+      doNowItems: plan.doNowItems.filter((i) => includeDoNow[i.itemId]),
+    });
+  }
+
   return (
     <div className="space-y-5">
       <div>
@@ -158,61 +213,77 @@ function PlanPreview({
             {plan.topicSummary}
           </p>
         )}
+        <p className="mt-2 text-xs leading-relaxed" style={{ color: 'var(--anx-text-muted)' }}>
+          Toggle phases and Do Now questions below, then apply. You can still fine-tune everything on the next screen.
+        </p>
       </div>
 
-      {plan.matchedSkills.length > 0 ? (
+      {skills.length > 0 ? (
         <div>
           <p className="mb-2 text-xs font-semibold" style={{ color: 'var(--anx-text-secondary)' }}>
-            Lesson plan — {plan.matchedSkills.length} skill
-            {plan.matchedSkills.length !== 1 ? 's' : ''}
+            Lesson plan — {skills.length} skill{skills.length !== 1 ? 's' : ''}
           </p>
           <div className="space-y-2">
-            {plan.matchedSkills.map((s) => (
-              <div
-                key={s.skillId}
-                className="flex items-start justify-between gap-3 rounded-xl border px-3 py-2.5"
-                style={{
-                  borderColor: 'var(--anx-outline-variant)',
-                  background: 'var(--anx-surface-container-low)',
-                }}
-              >
-                <div className="min-w-0">
-                  <div className="flex items-baseline gap-2">
-                    <span
-                      className="shrink-0 font-mono text-xs font-bold"
-                      style={{ color: 'var(--anx-text-muted)' }}
-                    >
-                      {s.skillCode}
-                    </span>
-                    <span className="text-sm font-medium" style={{ color: 'var(--anx-text)' }}>
-                      {s.skillName}
-                    </span>
+            {skills.map((s) => {
+              const hasAny = s.hasExplanation || s.hasCheck || s.hasPractice;
+              return (
+                <div
+                  key={s.skillId}
+                  className={`rounded-xl border px-3 py-2.5 ${
+                    hasAny
+                      ? 'border-[var(--anx-outline-variant)] bg-[var(--anx-surface-container-low)]'
+                      : 'border-dashed border-red-200 bg-red-50/40'
+                  }`}
+                >
+                  <div className="min-w-0">
+                    <div className="flex items-baseline gap-2">
+                      <span
+                        className="shrink-0 font-mono text-xs font-bold"
+                        style={{ color: 'var(--anx-text-muted)' }}
+                      >
+                        {s.skillCode}
+                      </span>
+                      <span className="text-sm font-medium" style={{ color: 'var(--anx-text)' }}>
+                        {s.skillName}
+                      </span>
+                    </div>
+                    {s.rationale && (
+                      <p className="mt-0.5 text-[11px]" style={{ color: 'var(--anx-text-muted)' }}>
+                        {s.rationale}
+                      </p>
+                    )}
                   </div>
-                  {s.rationale && (
-                    <p className="mt-0.5 text-[11px]" style={{ color: 'var(--anx-text-muted)' }}>
-                      {s.rationale}
+                  <div className="mt-2 grid grid-cols-3 gap-1.5">
+                    <PreviewPhaseToggle
+                      active={s.hasExplanation}
+                      label="Explain"
+                      sub="I Do"
+                      colour="blue"
+                      onClick={() => updateSkill(s.skillId, { hasExplanation: !s.hasExplanation })}
+                    />
+                    <PreviewPhaseToggle
+                      active={s.hasCheck}
+                      label="Check"
+                      sub="We Do"
+                      colour="violet"
+                      onClick={() => updateSkill(s.skillId, { hasCheck: !s.hasCheck })}
+                    />
+                    <PreviewPhaseToggle
+                      active={s.hasPractice}
+                      label="Practice"
+                      sub="You Do"
+                      colour="emerald"
+                      onClick={() => updateSkill(s.skillId, { hasPractice: !s.hasPractice })}
+                    />
+                  </div>
+                  {!hasAny && (
+                    <p className="mt-1.5 text-center text-[10px]" style={{ color: 'var(--anx-danger-text)' }}>
+                      Enable at least one phase.
                     </p>
                   )}
                 </div>
-                <div className="flex shrink-0 flex-wrap gap-1">
-                  {s.hasExplanation && (
-                    <span className="rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-semibold text-blue-700">
-                      I Do
-                    </span>
-                  )}
-                  {s.hasCheck && (
-                    <span className="rounded-full bg-violet-100 px-2 py-0.5 text-[10px] font-semibold text-violet-700">
-                      We Do
-                    </span>
-                  )}
-                  {s.hasPractice && (
-                    <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">
-                      You Do
-                    </span>
-                  )}
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       ) : (
@@ -227,21 +298,38 @@ function PlanPreview({
       {plan.doNowItems.length > 0 && (
         <div>
           <p className="mb-2 text-xs font-semibold" style={{ color: 'var(--anx-text-secondary)' }}>
-            Do Now — {plan.doNowItems.length} question
-            {plan.doNowItems.length !== 1 ? 's' : ''} queued
+            Do Now — include {selectedDoNowCount} of {plan.doNowItems.length} question
+            {plan.doNowItems.length !== 1 ? 's' : ''}
           </p>
-          <ol className="m-0 list-decimal space-y-1 pl-5">
+          <ul className="m-0 list-none space-y-2 p-0">
             {plan.doNowItems.map((item) => (
               <li
                 key={item.itemId}
-                className="text-sm leading-snug"
-                style={{ color: 'var(--anx-text-secondary)' }}
+                className="flex items-start gap-2 rounded-lg border px-2.5 py-2"
+                style={{ borderColor: 'var(--anx-outline-variant)', background: 'var(--anx-surface-container-lowest)' }}
               >
-                {item.stemPreview}
+                <input
+                  type="checkbox"
+                  className="mt-0.5 accent-[var(--anx-primary)]"
+                  checked={includeDoNow[item.itemId] ?? true}
+                  onChange={() =>
+                    setIncludeDoNow((prev) => ({ ...prev, [item.itemId]: !(prev[item.itemId] ?? true) }))
+                  }
+                  aria-label={`Include Do Now: ${item.stemPreview}`}
+                />
+                <span className="min-w-0 flex-1 text-sm leading-snug" style={{ color: 'var(--anx-text-secondary)' }}>
+                  {item.stemPreview}
+                </span>
               </li>
             ))}
-          </ol>
+          </ul>
         </div>
+      )}
+
+      {hasInvalidPlan && (
+        <p className="text-xs" style={{ color: 'var(--anx-danger-text)' }}>
+          Each skill needs at least one of Explain, Check, or Practice before you can apply.
+        </p>
       )}
 
       <div className="flex gap-3">
@@ -255,8 +343,8 @@ function PlanPreview({
         </button>
         <button
           type="button"
-          onClick={onAccept}
-          disabled={accepting}
+          onClick={handleApply}
+          disabled={accepting || hasInvalidPlan}
           className="anx-btn-primary flex-1 py-2.5 text-sm disabled:opacity-40"
         >
           {accepting ? 'Applying…' : 'Apply to lesson →'}
@@ -476,10 +564,9 @@ export function AiLessonBuilder({ subjectId, subjectTitle, onPlanGenerated, onCl
     }
   }
 
-  function handleAccept() {
-    if (!plan) return;
+  function handleAccept(customised: AiLessonPlanResponse) {
     setAccepting(true);
-    onPlanGenerated(plan);
+    onPlanGenerated(customised);
   }
 
   // ── Describe step navigation ──────────────────────────────────────────────
