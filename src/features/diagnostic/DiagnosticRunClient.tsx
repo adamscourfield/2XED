@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { OrderedMagnetInput } from '@/components/learn/OrderedMagnetInput';
 import { NumberLineInput } from '@/components/learn/NumberLineInput';
@@ -26,6 +26,11 @@ export function DiagnosticRunClient({ subject, skill, item, sessionId, itemsSeen
   const router = useRouter();
   const itemContent = getItemContent(item);
   const questionText = useMemo(() => stripStudentQuestionLabel(item.question) || item.question, [item.question]);
+
+  useEffect(() => {
+    setSelectedAnswer('');
+    setSubmitError(null);
+  }, [item.id]);
 
   function renderAnswerInput(type: ItemInteractionType) {
     if (type === 'SHORT_TEXT' || type === 'SHORT_NUMERIC') {
@@ -109,6 +114,7 @@ export function DiagnosticRunClient({ subject, skill, item, sessionId, itemsSeen
       router.push(`/diagnostic/${subjectSlug}/run`);
     } catch (error) {
       setSubmitError(error instanceof Error ? error.message : 'Could not save this answer.');
+    } finally {
       setSubmitting(false);
     }
   }
