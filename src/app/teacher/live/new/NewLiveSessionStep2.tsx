@@ -37,10 +37,25 @@ function StepIndicator({ current }: { current: 1 | 2 }) {
 
 // ── Phase toggle button ───────────────────────────────────────────────────────
 
-const PHASE_COLOURS: Record<string, { on: string; off: string }> = {
-  blue:    { on: 'bg-blue-100 border-blue-300 text-blue-800 shadow-sm',       off: 'border-[var(--anx-outline-variant)] bg-white text-[var(--anx-text-muted)]' },
-  violet:  { on: 'bg-violet-100 border-violet-300 text-violet-800 shadow-sm', off: 'border-[var(--anx-outline-variant)] bg-white text-[var(--anx-text-muted)]' },
-  emerald: { on: 'bg-emerald-100 border-emerald-300 text-emerald-800 shadow-sm', off: 'border-[var(--anx-outline-variant)] bg-white text-[var(--anx-text-muted)]' },
+const PHASE_COLOURS: Record<string, { on: string; off: string; hover: string; indicator: string }> = {
+  blue:    {
+    on:        'bg-blue-100 border-blue-400 text-blue-800 shadow-sm',
+    off:       'border-slate-200 bg-white text-slate-500',
+    hover:     'hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700',
+    indicator: 'bg-blue-500 text-white',
+  },
+  violet:  {
+    on:        'bg-violet-100 border-violet-400 text-violet-800 shadow-sm',
+    off:       'border-slate-200 bg-white text-slate-500',
+    hover:     'hover:border-violet-300 hover:bg-violet-50 hover:text-violet-700',
+    indicator: 'bg-violet-500 text-white',
+  },
+  emerald: {
+    on:        'bg-emerald-100 border-emerald-400 text-emerald-800 shadow-sm',
+    off:       'border-slate-200 bg-white text-slate-500',
+    hover:     'hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700',
+    indicator: 'bg-emerald-500 text-white',
+  },
 };
 
 function PhaseToggle({ active, label, sub, colour, onClick }: {
@@ -52,12 +67,19 @@ function PhaseToggle({ active, label, sub, colour, onClick }: {
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={`flex flex-col items-center rounded-lg border px-2 py-2 text-center text-xs transition-all ${
-        active ? `${c.on} font-semibold` : `${c.off} opacity-50 hover:opacity-80`
+      title={active ? `${label} included — click to remove` : `${label} not included — click to add`}
+      className={`group relative flex cursor-pointer flex-col items-center rounded-lg border-2 px-2 py-2 text-center text-xs transition-all ${
+        active ? `${c.on} font-semibold` : `${c.off} ${c.hover}`
       }`}
     >
-      <span className="font-semibold">{label}</span>
-      <span className={`mt-0.5 text-[10px] ${active ? 'opacity-60' : 'opacity-50'}`}>{sub}</span>
+      {/* Active/inactive indicator dot */}
+      <span className={`mb-1 flex h-4 w-4 items-center justify-center rounded-full text-[9px] font-bold transition-all ${
+        active ? c.indicator : 'border border-slate-300 text-slate-300 group-hover:border-current group-hover:text-current'
+      }`}>
+        {active ? '✓' : '+'}
+      </span>
+      <span className="font-semibold leading-none">{label}</span>
+      <span className="mt-0.5 text-[10px] opacity-70">{sub}</span>
     </button>
   );
 }
@@ -281,8 +303,29 @@ export function NewLiveSessionStep2({ skillsBySubject, data }: Props) {
           <div className="rounded-lg border p-3 space-y-3" style={{ borderColor: 'var(--anx-outline-variant)', background: 'var(--anx-surface-container-low)' }}>
             {bankLoading ? (
               <p className="text-xs" style={{ color: 'var(--anx-text-muted)' }}>Loading questions…</p>
-            ) : bankBySkill.length === 0 ? (
-              <p className="text-xs" style={{ color: 'var(--anx-text-muted)' }}>No questions found for these skills yet.</p>
+            ) : bankBySkill.length === 0 || bankBySkill.every((r) => r.items.length === 0) ? (
+              doNowSeeding ? (
+                <div className="flex items-center gap-2">
+                  <div className="h-3 w-3 shrink-0 animate-spin rounded-full border-2 border-[var(--anx-primary)] border-t-transparent" />
+                  <p className="text-xs" style={{ color: 'var(--anx-text-muted)' }}>
+                    Generating questions for this skill — ready in a few seconds…
+                  </p>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-xs" style={{ color: 'var(--anx-text-muted)' }}>
+                    No questions yet — Ember is generating them in the background.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => void loadFullBank()}
+                    className="shrink-0 text-xs font-semibold underline underline-offset-2"
+                    style={{ color: 'var(--anx-primary)' }}
+                  >
+                    Refresh
+                  </button>
+                </div>
+              )
             ) : (
               <div className="max-h-48 space-y-3 overflow-y-auto pr-1">
                 {bankBySkill.map((row) => {
@@ -318,7 +361,7 @@ export function NewLiveSessionStep2({ skillsBySubject, data }: Props) {
           <div>
             <p className="text-sm font-semibold" style={{ color: 'var(--anx-text)' }}>Lesson plan</p>
             <p className="text-xs" style={{ color: 'var(--anx-text-muted)' }}>
-              Toggle phases for each skill. Explain → Check → Practice is the suggested sequence.
+              Click each phase button to include or exclude it. <strong className="font-semibold">Explain</strong> (I Do), <strong className="font-semibold">Check</strong> (We Do), <strong className="font-semibold">Practice</strong> (You Do).
             </p>
           </div>
           <div className="hidden flex-wrap items-center gap-3 sm:flex">

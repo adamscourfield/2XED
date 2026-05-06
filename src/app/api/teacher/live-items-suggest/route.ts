@@ -92,10 +92,12 @@ export async function GET(req: NextRequest) {
   // refresh the picker to see newly generated items.
   const skillRows = await prisma.skill.findMany({
     where: { id: { in: skillIds } },
-    select: { id: true, code: true, masteryDefinition: true },
+    select: { id: true, code: true },
   });
+  // Generate questions for all skills that have a code — not just those with a
+  // masteryDefinition, since many valid curriculum skills don't have one yet.
   const enrichedSkillIds = skillRows
-    .filter(s => s.masteryDefinition !== null)
+    .filter(s => s.code)
     .map(s => ({ id: s.id, code: s.code }));
 
   void Promise.allSettled(
