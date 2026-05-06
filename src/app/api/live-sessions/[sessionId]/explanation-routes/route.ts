@@ -59,7 +59,8 @@ export async function GET(_req: NextRequest, { params }: Props) {
 
   const routeMap: Record<string, typeof routes[number] | null> = { A: null, B: null, C: null };
   for (const route of routes) {
-    routeMap[route.routeType] = route;
+    const key = String(route.routeType).trim().toUpperCase();
+    if (key === 'A' || key === 'B' || key === 'C') routeMap[key] = route;
   }
 
   return NextResponse.json({ routes: routeMap });

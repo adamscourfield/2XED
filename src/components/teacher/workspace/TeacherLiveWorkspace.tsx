@@ -316,7 +316,9 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
   const [canUndo, setCanUndo] = useState(false);
   const [canRedo, setCanRedo] = useState(false);
 
-  const [availableRoutes, setAvailableRoutes] = useState<Record<string, RouteWithSteps> | null>(null);
+  const [availableRoutes, setAvailableRoutes] = useState<Record<string, RouteWithSteps | null> | null>(null);
+  const [explainRoutesLoading, setExplainRoutesLoading] = useState(false);
+  const [explainRoutesHint, setExplainRoutesHint] = useState<string | null>(null);
   const [activeExplanation, setActiveExplanation] = useState<ActiveExplanation | null>(null);
 
   const canvasRef = useRef<AnnotationCanvasHandle>(null);
@@ -381,11 +383,35 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
   // ── Explanation routes for current skill ──────────────────────────────────
   useEffect(() => {
     if (!snapshot) return;
-    setAvailableRoutes(null); // clear stale routes before fetching for the new phase
-    fetch(`/api/live-sessions/${sessionId}/explanation-routes`)
-      .then((r) => r.json())
-      .then((data: { routes: Record<string, RouteWithSteps> }) => setAvailableRoutes(data.routes))
-      .catch(() => { /* soft fail */ });
+    setAvailableRoutes(null);
+    setExplainRoutesLoading(true);
+    setExplainRoutesHint(null);
+    let cancelled = false;
+    void fetch(`/api/live-sessions/${sessionId}/explanation-routes`)
+      .then(async (r) => {
+        if (!r.ok) throw new Error('bad status');
+        return r.json() as Promise<{ routes: Record<string, RouteWithSteps | null> }>;
+      })
+      .then((data) => {
+        if (cancelled) return;
+        setAvailableRoutes(data.routes);
+        const r = data.routes;
+        const hasAny = Boolean(r?.A || r?.B || r?.C);
+        setExplainRoutesHint(
+          hasAny ? null : 'No scripted explanation models exist for this skill yet. Use Model to teach on the whiteboard, or choose another phase.',
+        );
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setExplainRoutesHint('Could not load explanation models. Check your connection and try changing phase or refreshing.');
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setExplainRoutesLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
   // eslint-disable-next-line react-hooks/exhaustive-deps -- only refetch routes when skill or phase index identity changes
   }, [sessionId, snapshot?.skill?.id, snapshot?.currentPhaseIndex]);
 
@@ -519,8 +545,27 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
       comparison: 'A',
       misconception: 'C',
     };
-    const route = availableRoutes?.[typeMap[option]];
-    if (!route) return;
+    const preferred = typeMap[option];
+    let route = availableRoutes?.[preferred];
+    if (!route) {
+      const order: Array<'A' | 'B' | 'C'> = [preferred, 'A', 'B', 'C'];
+      const seen = new Set<string>();
+      for (const key of order) {
+        if (seen.has(key)) continue;
+        seen.add(key);
+        const r = availableRoutes?.[key];
+        if (r) {
+          route = r;
+          break;
+        }
+      }
+    }
+    if (!route) {
+      setExplainRoutesHint(
+        'No explanation route is available for this skill. Use Model on the canvas, or add curriculum explanation content for this skill.',
+      );
+      return;
+    }
 
     setActiveExplanation({ route, stepIndex: 0 });
     canvasRef.current?.clear();
@@ -535,8 +580,9 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
           stepIndex: 0,
         }),
       });
+      setExplainRoutesHint(null);
     } catch {
-      // soft fail
+      setExplainRoutesHint('Could not send the explanation to students. Try again.');
     }
   }
 
@@ -843,6 +889,8 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
             onNewCheckQuestion={handleNewCheckQuestion}
             onExplainOption={handleExplainOption}
             onAssignPractice={handleAssignPractice}
+            explainRoutesLoading={explainRoutesLoading}
+            explainRoutesHint={explainRoutesHint}
             activeExplanation={
               activeExplanation
                 ? {

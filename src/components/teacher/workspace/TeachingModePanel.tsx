@@ -23,6 +23,10 @@ interface Props {
   onNewCheckQuestion?: () => void;
   /** Trigger inserting bridging examples / repairs into the canvas. */
   onExplainOption?: (option: 'easier' | 'wrong-vs-right' | 'misconception' | 'comparison') => void;
+  /** While true, explanation option buttons are disabled. */
+  explainRoutesLoading?: boolean;
+  /** Shown above explanation options (empty curriculum, load failure, or broadcast error). */
+  explainRoutesHint?: string | null;
   /** Active explanation route info — shown as step controls in EXPLAIN mode. */
   activeExplanation?: ActiveExplanationInfo | null;
   /** Called when teacher advances/retreats the explanation step. */
@@ -90,10 +94,14 @@ function ExplainMode({
   onExplainOption,
   activeExplanation,
   onStepChange,
+  explainRoutesLoading,
+  explainRoutesHint,
 }: {
   onExplainOption?: Props['onExplainOption'];
   activeExplanation?: ActiveExplanationInfo | null;
   onStepChange?: (step: number) => void;
+  explainRoutesLoading?: boolean;
+  explainRoutesHint?: string | null;
 }) {
   const options: Array<{ key: Parameters<NonNullable<Props['onExplainOption']>>[0]; label: string; helper: string }> = [
     { key: 'easier', label: 'Easier model', helper: 'Bridge with a simpler worked example.' },
@@ -114,6 +122,16 @@ function ExplainMode({
             : 'Pick a bridging move. The explanation displays on student devices.'}
         </p>
       </div>
+
+      {explainRoutesLoading && (
+        <p className="text-xs font-medium" style={{ color: 'var(--anx-text-muted)' }}>
+          Loading explanation models for this skill…
+        </p>
+      )}
+
+      {explainRoutesHint && !explainRoutesLoading && (
+        <div className="anx-callout-warning text-xs leading-snug">{explainRoutesHint}</div>
+      )}
 
       {activeExplanation && (
         <div
@@ -154,8 +172,9 @@ function ExplainMode({
           <button
             key={opt.key}
             type="button"
+            disabled={explainRoutesLoading}
             onClick={() => onExplainOption?.(opt.key)}
-            className="text-left rounded-2xl border bg-[var(--anx-surface-container-lowest)] px-3.5 py-2.5 transition hover:bg-[var(--anx-surface-container-low)]"
+            className="text-left rounded-2xl border bg-[var(--anx-surface-container-lowest)] px-3.5 py-2.5 transition hover:bg-[var(--anx-surface-container-low)] disabled:pointer-events-none disabled:opacity-40"
             style={{ borderColor: 'var(--anx-outline-variant)' }}
           >
             <p className="text-sm font-semibold" style={{ color: 'var(--anx-text)' }}>{opt.label}</p>
@@ -221,6 +240,8 @@ export function TeachingModePanel({
   activeExplanation,
   onStepChange,
   onAssignPractice,
+  explainRoutesLoading,
+  explainRoutesHint,
 }: Props) {
   return (
     <section className="anx-signals-card">
@@ -257,6 +278,8 @@ export function TeachingModePanel({
             onExplainOption={onExplainOption}
             activeExplanation={activeExplanation}
             onStepChange={onStepChange}
+            explainRoutesLoading={explainRoutesLoading}
+            explainRoutesHint={explainRoutesHint}
           />
         )}
         {mode === 'PRACTICE' && <PracticeMode onAssignPractice={onAssignPractice} />}

@@ -102,6 +102,7 @@ export interface NewLiveSessionState {
   bankBySkill: Array<{ skillId: string; items: BankItem[] }>;
   bankExpanded: boolean;
   bankLoading: boolean;
+  bankError: string | null;
   perStudentLoading: boolean;
   lastSessionId: string;
   recentSessions: RecentSessionRow[];
@@ -151,6 +152,7 @@ export function useNewLiveSession({ classrooms: _classrooms, subjects: _subjects
   const [bankBySkill,         setBankBySkill]         = useState<Array<{ skillId: string; items: BankItem[] }>>([]);
   const [bankExpanded,        setBankExpanded]        = useState(false);
   const [bankLoading,         setBankLoading]         = useState(false);
+  const [bankError,           setBankError]           = useState<string | null>(null);
   const [perStudentLoading,   setPerStudentLoading]   = useState(false);
   const [lastSessionId,       setLastSessionId]       = useState('');
   const [recentSessions,      setRecentSessions]      = useState<RecentSessionRow[]>([]);
@@ -231,14 +233,24 @@ export function useNewLiveSession({ classrooms: _classrooms, subjects: _subjects
     );
   }
 
-  async function autoSeedDoNow(seedSkillIds: string[]) {
+  /**
+   * Fetches sample bank items for `bankSkillIds` (all skills in the lesson).
+   * Optionally seeds shared Do Now slots from `autoDoNowSkillIds` (e.g. recap skills)
+   * when the shared list is still empty.
+   */
+  async function autoSeedDoNow(bankSkillIds: string[], autoDoNowSkillIds: string[]) {
+    if (bankSkillIds.length === 0) return;
     setDoNowSeeding(true);
+    setBankError(null);
     try {
-      const qs = new URLSearchParams({ subjectId, skillIds: seedSkillIds.join(',') });
+      const qs = new URLSearchParams({ subjectId, skillIds: bankSkillIds.join(',') });
       if (classroomId) qs.set('classroomId', classroomId);
       if (lastSessionId) qs.set('lastSessionId', lastSessionId);
       const res = await fetch(`/api/teacher/live-items-suggest?${qs.toString()}`);
-      if (!res.ok) return;
+      if (!res.ok) {
+        setBankError('Could not load question suggestions. Try again in a moment.');
+        return;
+      }
       const data = (await res.json()) as {
         itemsBySkill: Array<{ skillId: string; items: BankItem[] }>;
         recapItemsBySkill?: Array<{ skillId: string; items: BankItem[] }>;
@@ -253,7 +265,7 @@ export function useNewLiveSession({ classrooms: _classrooms, subjects: _subjects
       }
       setBankBySkill([...merged.entries()].map(([sid, items]) => ({ skillId: sid, items: items.slice(0, 24) })));
       const autoSlots: CheckSlotDraft[] = [];
-      for (const sid of seedSkillIds) {
+      for (const sid of autoDoNowSkillIds) {
         const items = merged.get(sid);
         if (!items?.length) continue;
         const top = items[0]!;
@@ -264,7 +276,9 @@ export function useNewLiveSession({ classrooms: _classrooms, subjects: _subjects
         });
       }
       setDoNowShared((prev) => (prev.length === 0 ? autoSlots.slice(0, 12) : prev));
-    } catch { /* non-fatal */ } finally {
+    } catch {
+      setBankError('Could not load question suggestions. Check your connection and try again.');
+    } finally {
       setDoNowSeeding(false);
     }
   }
@@ -286,11 +300,13 @@ export function useNewLiveSession({ classrooms: _classrooms, subjects: _subjects
     setDoNowDifferentiated(false);
     setBankBySkill([]);
     setBankExpanded(false);
+    setBankError(null);
     setStep(2);
-    const seedSkillIds = plans
+    const allLessonSkillIds = plans.map((p) => p.skillId);
+    const autoDoNowSkillIds = plans
       .filter((p) => p.recommendation === 'recap_needed' || p.recommendation === 'in_progress')
       .map((p) => p.skillId);
-    if (seedSkillIds.length > 0) void autoSeedDoNow(seedSkillIds);
+    void autoSeedDoNow(allLessonSkillIds, autoDoNowSkillIds);
   }
 
   function handleAiPlanGenerated(plan: AiLessonPlanResponse) {
@@ -327,25 +343,33 @@ export function useNewLiveSession({ classrooms: _classrooms, subjects: _subjects
     setDoNowDifferentiated(false);
     setBankBySkill([]);
     setBankExpanded(false);
+    setBankError(null);
     setError(null);
     setStep(2);
+    void autoSeedDoNow(aiSkillIds, []);
   }
 
   async function loadFullBank() {
     const allSkillIds = skillPlans.map((p) => p.skillId);
     if (!subjectId || allSkillIds.length === 0) return;
     setBankLoading(true);
+    setBankError(null);
     try {
       const qs = new URLSearchParams({ subjectId, skillIds: allSkillIds.join(',') });
       if (classroomId) qs.set('classroomId', classroomId);
       if (lastSessionId) qs.set('lastSessionId', lastSessionId);
       const res = await fetch(`/api/teacher/live-items-suggest?${qs.toString()}`);
-      if (!res.ok) return;
+      if (!res.ok) {
+        setBankError('Could not load the question bank. Try again.');
+        return;
+      }
       const data = (await res.json()) as { itemsBySkill: Array<{ skillId: string; items: BankItem[] }> };
       const merged = new Map<string, BankItem[]>();
       for (const row of data.itemsBySkill ?? []) merged.set(row.skillId, row.items.slice(0, 24));
       setBankBySkill([...merged.entries()].map(([sid, items]) => ({ skillId: sid, items })));
-    } catch { /* non-fatal */ } finally {
+    } catch {
+      setBankError('Could not load the question bank. Check your connection and try again.');
+    } finally {
       setBankLoading(false);
     }
   }
@@ -464,7 +488,7 @@ export function useNewLiveSession({ classrooms: _classrooms, subjects: _subjects
     diagnosticSkills, diagnosticTotal, diagnosticLoading,
     aiBuilderOpen, skillsForSubject, strandGroups,
     skillPlans, doNowShared, doNowDifferentiated, doNowPerStudent,
-    doNowSeeding, bankBySkill, bankExpanded, bankLoading, perStudentLoading,
+    doNowSeeding, bankBySkill, bankExpanded, bankLoading, bankError, perStudentLoading,
     lastSessionId, recentSessions, hasInvalidPlan,
     loading, error,
     setClassroomId, setSubjectId, toggleSkill,
