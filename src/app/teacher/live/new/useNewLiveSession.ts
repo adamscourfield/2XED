@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import type { SkillDiagnosticRow, SkillRecommendation } from '@/components/teacher/ClassSkillDiagnostic';
 import type { AiLessonPlanResponse } from '@/app/api/teacher/ai/lesson-plan/route';
 
@@ -132,6 +132,8 @@ export interface NewLiveSessionState {
 
 export function useNewLiveSession({ classrooms: _classrooms, subjects: _subjects, skillsBySubject }: HookParams): NewLiveSessionState {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const urlPrefillAppliedRef = useRef(false);
 
   // Step 1
   const [classroomId,      setClassroomId]      = useState('');
@@ -177,6 +179,25 @@ export function useNewLiveSession({ classrooms: _classrooms, subjects: _subjects
   }, {});
 
   const hasInvalidPlan = skillPlans.some((p) => !p.hasExplanation && !p.hasCheck && !p.hasPractice);
+
+  // ── Optional URL prefill (e.g. from Resources → "Use in lesson") ─────────────
+
+  useEffect(() => {
+    if (urlPrefillAppliedRef.current) return;
+    const qpSubject = searchParams.get('subjectId');
+    const qpSkill = searchParams.get('skillId');
+    const skill = qpSkill ? skillsBySubject.find((s) => s.id === qpSkill) : undefined;
+    const subjectFromSkill = skill?.subjectId;
+    const subjectToUse =
+      qpSubject && _subjects.some((s) => s.id === qpSubject)
+        ? qpSubject
+        : subjectFromSkill && _subjects.some((s) => s.id === subjectFromSkill)
+          ? subjectFromSkill
+          : '';
+    if (subjectToUse) setSubjectIdRaw(subjectToUse);
+    if (skill) setSelectedSkillIds([skill.id]);
+    urlPrefillAppliedRef.current = true;
+  }, [searchParams, skillsBySubject, _subjects]);
 
   // ── Effects ────────────────────────────────────────────────────────────────
 

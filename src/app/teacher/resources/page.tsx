@@ -3,23 +3,29 @@ import { redirect } from 'next/navigation';
 import { authOptions } from '@/features/auth/authOptions';
 import { LearningPageShell } from '@/components/LearningPageShell';
 import { TeacherResourcesClient } from '@/app/teacher/resources/TeacherResourcesClient';
+import { loadTeacherResourcesData } from '@/data/teacherResourcesCatalog';
 
 export default async function TeacherResourcesPage() {
   const session = await getServerSession(authOptions);
   if (!session?.user) redirect('/login');
-  const role = (session.user as { role?: string }).role;
-  if (role !== 'TEACHER' && role !== 'ADMIN' && role !== 'LEADERSHIP') redirect('/dashboard');
+  const user = session.user as { id: string; role?: string };
+  if (user.role !== 'TEACHER' && user.role !== 'ADMIN' && user.role !== 'LEADERSHIP') redirect('/dashboard');
+
+  const initialResources = await loadTeacherResourcesData({
+    teacherUserId: user.id,
+    subjectId: null,
+  });
 
   return (
     <LearningPageShell
       title=""
       subtitle=""
       appChrome="teacher"
-      appChromeShowLeadershipNav={role === 'ADMIN' || role === 'LEADERSHIP'}
+      appChromeShowLeadershipNav={user.role === 'ADMIN' || user.role === 'LEADERSHIP'}
       hideHeader
       maxWidthClassName="max-w-6xl"
     >
-      <TeacherResourcesClient />
+      <TeacherResourcesClient initialData={initialResources} />
     </LearningPageShell>
   );
 }

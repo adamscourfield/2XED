@@ -1,127 +1,52 @@
 'use client';
 
 import Link from 'next/link';
+import { formatDistanceToNow } from 'date-fns';
 import { useCallback, useMemo, useRef, useState } from 'react';
+import type { TeacherResourcesPayload } from '@/data/teacherResourcesCatalog';
 
-type ResourceCategory =
-  | 'all'
-  | 'model'
-  | 'check'
-  | 'practice'
-  | 'recap'
-  | 'reteach'
-  | 'discussion'
-  | 'worksheet';
+type RouteCategory = 'all' | 'A' | 'B' | 'C';
 
-type DemoResource = {
-  id: string;
-  title: string;
-  topic: string;
-  yearLabel: string;
-  typeLabel: string;
-  typeKey: Exclude<ResourceCategory, 'all'>;
-  usedAgo: string;
-  thumbClass: string;
+type CategoryRow = {
+  id: RouteCategory;
+  label: string;
+  count: number;
+  icon: string;
+  accent: string;
 };
 
-const CATEGORY_ROWS: { id: ResourceCategory; label: string; count: number; icon: string; accent: string }[] = [
-  { id: 'all', label: 'All resources', count: 312, icon: 'grid', accent: 'indigo' },
-  { id: 'model', label: 'Model', count: 48, icon: 'layers', accent: 'emerald' },
-  { id: 'check', label: 'Check', count: 56, icon: 'target', accent: 'amber' },
-  { id: 'practice', label: 'Practice', count: 82, icon: 'pen', accent: 'sky' },
-  { id: 'recap', label: 'Recap', count: 34, icon: 'cycle', accent: 'violet' },
-  { id: 'reteach', label: 'Reteach', count: 41, icon: 'bullseye', accent: 'rose' },
-  { id: 'discussion', label: 'Discussion', count: 22, icon: 'chat', accent: 'purple' },
-  { id: 'worksheet', label: 'Worksheet', count: 29, icon: 'doc', accent: 'teal' },
+const CATEGORY_META: Omit<CategoryRow, 'count'>[] = [
+  { id: 'all', label: 'All routes', icon: 'grid', accent: 'indigo' },
+  { id: 'A', label: 'Standard', icon: 'layers', accent: 'emerald' },
+  { id: 'B', label: 'Easier', icon: 'target', accent: 'amber' },
+  { id: 'C', label: 'Misconception repair', icon: 'bullseye', accent: 'rose' },
 ];
 
-const RECENT_RESOURCES: DemoResource[] = [
-  {
-    id: 'r1',
-    title: 'Solving equations: balancing both sides',
-    topic: 'Algebra',
-    yearLabel: 'Year 7',
-    typeLabel: 'Model',
-    typeKey: 'model',
-    usedAgo: '2 days',
-    thumbClass: 'bg-gradient-to-br from-violet-100 to-indigo-50',
-  },
-  {
-    id: 'r2',
-    title: 'Expanding single brackets',
-    topic: 'Algebra',
-    yearLabel: 'Year 7',
-    typeLabel: 'Check',
-    typeKey: 'check',
-    usedAgo: '4 days',
-    thumbClass: 'bg-gradient-to-br from-amber-50 to-orange-50',
-  },
-  {
-    id: 'r3',
-    title: 'Area of compound shapes',
-    topic: 'Geometry',
-    yearLabel: 'Year 7',
-    typeLabel: 'Practice',
-    typeKey: 'practice',
-    usedAgo: '1 week',
-    thumbClass: 'bg-gradient-to-br from-sky-100 to-blue-50',
-  },
-  {
-    id: 'r4',
-    title: 'Fractions: four operations recap',
-    topic: 'Number',
-    yearLabel: 'Year 7',
-    typeLabel: 'Recap',
-    typeKey: 'recap',
-    usedAgo: '1 week',
-    thumbClass: 'bg-gradient-to-br from-fuchsia-50 to-violet-50',
-  },
-];
-
-const TOPIC_FOLDERS: { id: string; label: string; count: number; accent: string }[] = [
-  { id: 'algebra', label: 'Algebra', count: 68, accent: 'from-violet-500/15 to-violet-600/5 text-violet-700' },
-  { id: 'number', label: 'Number', count: 54, accent: 'from-emerald-500/15 to-emerald-600/5 text-emerald-800' },
-  { id: 'geometry', label: 'Geometry', count: 45, accent: 'from-sky-500/15 to-sky-600/5 text-sky-800' },
-  { id: 'ratio', label: 'Ratio & Proportion', count: 32, accent: 'from-orange-500/15 to-amber-500/5 text-orange-900' },
-  { id: 'statistics', label: 'Statistics', count: 27, accent: 'from-pink-500/15 to-rose-500/5 text-rose-800' },
-];
-
-const AI_RESOURCES: { id: string; title: string; typeLabel: string; context: string }[] = [
-  {
-    id: 'a1',
-    title: 'Reteach: Sign errors when isolating x',
-    typeLabel: 'Reteach',
-    context: 'Generated from misconception insights in 7MA.',
-  },
-  {
-    id: 'a2',
-    title: 'Check: Expanding brackets',
-    typeLabel: 'Check',
-    context: 'Based on recent exit tickets in Year 7 Algebra.',
-  },
-  {
-    id: 'a3',
-    title: 'Practice: Ratio tables',
-    typeLabel: 'Practice',
-    context: 'Suggested from class performance on ratio unit.',
-  },
-];
-
-const SAVED_SEQUENCES: { title: string; count: number }[] = [
-  { title: 'Fractions reteach', count: 4 },
-  { title: 'Negative numbers recovery', count: 5 },
-  { title: 'Foundation recap', count: 3 },
-];
-
-const TYPE_TAG_STYLES: Record<DemoResource['typeKey'], string> = {
-  model: 'bg-emerald-100 text-emerald-900',
-  check: 'bg-amber-100 text-amber-950',
-  practice: 'bg-sky-100 text-sky-950',
-  recap: 'bg-violet-100 text-violet-900',
-  reteach: 'bg-rose-100 text-rose-900',
-  discussion: 'bg-purple-100 text-purple-900',
-  worksheet: 'bg-teal-100 text-teal-900',
+const ROUTE_TYPE_LABELS: Record<string, string> = {
+  A: 'Standard',
+  B: 'Easier',
+  C: 'Misconception repair',
 };
+
+const TYPE_TAG_STYLES: Record<string, string> = {
+  A: 'bg-emerald-100 text-emerald-900',
+  B: 'bg-amber-100 text-amber-950',
+  C: 'bg-rose-100 text-rose-900',
+};
+
+function thumbClassForId(id: string): string {
+  let h = 0;
+  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) | 0;
+  const gradients = [
+    'bg-gradient-to-br from-violet-100 to-indigo-50',
+    'bg-gradient-to-br from-amber-50 to-orange-50',
+    'bg-gradient-to-br from-sky-100 to-blue-50',
+    'bg-gradient-to-br from-fuchsia-50 to-violet-50',
+    'bg-gradient-to-br from-emerald-50 to-teal-50',
+    'bg-gradient-to-br from-rose-50 to-orange-50',
+  ];
+  return gradients[Math.abs(h) % gradients.length];
+}
 
 function SelectChevron() {
   return (
@@ -257,39 +182,12 @@ function CategoryIcon({ kind }: { kind: string }) {
           <circle cx="12" cy="12" r="1" fill={stroke} />
         </svg>
       );
-    case 'pen':
-      return (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
-          <path d="M12 19h7M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5Z" stroke={stroke} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      );
-    case 'cycle':
-      return (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
-          <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" stroke={stroke} strokeWidth="1.5" strokeLinecap="round" />
-          <path d="M3 3v5h5M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" stroke={stroke} strokeWidth="1.5" strokeLinecap="round" />
-          <path d="M21 21v-5h-5" stroke={stroke} strokeWidth="1.5" strokeLinecap="round" />
-        </svg>
-      );
     case 'bullseye':
       return (
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
           <circle cx="12" cy="12" r="10" stroke={stroke} strokeWidth="1.5" />
           <circle cx="12" cy="12" r="6" stroke={stroke} strokeWidth="1.5" />
           <circle cx="12" cy="12" r="2" fill={stroke} />
-        </svg>
-      );
-    case 'chat':
-      return (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
-          <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7H8l-5 3v-3H4.5a8.5 8.5 0 0 1-1.6-16.2A8.38 8.38 0 0 1 12.5 3a8.5 8.5 0 0 1 8.5 8.5Z" stroke={stroke} strokeWidth="1.5" strokeLinejoin="round" />
-        </svg>
-      );
-    case 'doc':
-      return (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6Z" stroke={stroke} strokeWidth="1.5" strokeLinejoin="round" />
-          <path d="M14 2v6h6M9 13h6M9 17h4" stroke={stroke} strokeWidth="1.5" strokeLinecap="round" />
         </svg>
       );
     default:
@@ -311,35 +209,28 @@ function categoryAccentClass(accent: string, active: boolean): string {
       idle: 'border-[var(--anx-border)] bg-[var(--anx-surface-raised)] text-amber-800',
       active: 'border-amber-400 bg-amber-50 text-amber-950',
     },
-    sky: {
-      idle: 'border-[var(--anx-border)] bg-[var(--anx-surface-raised)] text-sky-800',
-      active: 'border-sky-400 bg-sky-50 text-sky-950',
-    },
-    violet: {
-      idle: 'border-[var(--anx-border)] bg-[var(--anx-surface-raised)] text-violet-800',
-      active: 'border-violet-400 bg-violet-50 text-violet-950',
-    },
     rose: {
       idle: 'border-[var(--anx-border)] bg-[var(--anx-surface-raised)] text-rose-800',
       active: 'border-rose-400 bg-rose-50 text-rose-950',
-    },
-    purple: {
-      idle: 'border-[var(--anx-border)] bg-[var(--anx-surface-raised)] text-purple-800',
-      active: 'border-purple-400 bg-purple-50 text-purple-950',
-    },
-    teal: {
-      idle: 'border-[var(--anx-border)] bg-[var(--anx-surface-raised)] text-teal-800',
-      active: 'border-teal-400 bg-teal-50 text-teal-950',
     },
   };
   const pair = map[accent] ?? map.indigo;
   return active ? pair.active : pair.idle;
 }
 
-export function TeacherResourcesClient() {
-  const [category, setCategory] = useState<ResourceCategory>('all');
+interface Props {
+  initialData: TeacherResourcesPayload;
+}
+
+export function TeacherResourcesClient({ initialData }: Props) {
+  const [data, setData] = useState<TeacherResourcesPayload>(initialData);
+  const [selectedSubjectId, setSelectedSubjectId] = useState(() => initialData.subjectId ?? '');
+  const [loading, setLoading] = useState(false);
+  const [fetchError, setFetchError] = useState<string | null>(null);
+
+  const [category, setCategory] = useState<RouteCategory>('all');
   const [search, setSearch] = useState('');
-  const [yearGroup, setYearGroup] = useState('7');
+  const [yearGroup, setYearGroup] = useState('all');
   const [topicFilter, setTopicFilter] = useState('all');
   const [resourceTypeFilter, setResourceTypeFilter] = useState('all');
   const [sortBy, setSortBy] = useState('recent-used');
@@ -347,65 +238,124 @@ export function TeacherResourcesClient() {
   const recentScrollRef = useRef<HTMLDivElement>(null);
   const topicScrollRef = useRef<HTMLDivElement>(null);
 
+  const subjectId = data.subjectId;
+
+  const loadForSubject = useCallback(async (nextSubjectId: string) => {
+    const revertTo = data.subjectId;
+    setLoading(true);
+    setFetchError(null);
+    try {
+      const res = await fetch(`/api/teacher/resources?subjectId=${encodeURIComponent(nextSubjectId)}`);
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error((err as { error?: string }).error ?? `Request failed (${res.status})`);
+      }
+      const next = (await res.json()) as TeacherResourcesPayload;
+      setData(next);
+    } catch (e) {
+      setFetchError(e instanceof Error ? e.message : 'Could not load resources');
+      if (revertTo) setSelectedSubjectId(revertTo);
+    } finally {
+      setLoading(false);
+    }
+  }, [data.subjectId]);
+
   const scrollByRef = useCallback((el: HTMLDivElement | null, delta: number) => {
     el?.scrollBy({ left: delta, behavior: 'smooth' });
   }, []);
 
   const yearOptions = useMemo(
-    () =>
-      ['7', '8', '9', '10', '11'].map((y) => ({
-        value: y,
-        label: `Year ${y}`,
-      })),
+    () => [{ value: 'all', label: 'All years' }, ...['7', '8', '9', '10', '11'].map((y) => ({ value: y, label: `Year ${y}` }))],
     [],
   );
 
-  const topicOptions = useMemo(
-    () => [
-      { value: 'all', label: 'All' },
-      { value: 'algebra', label: 'Algebra' },
-      { value: 'number', label: 'Number' },
-      { value: 'geometry', label: 'Geometry' },
-      { value: 'ratio', label: 'Ratio & Proportion' },
-      { value: 'statistics', label: 'Statistics' },
-    ],
-    [],
-  );
+  const topicOptions = useMemo(() => {
+    const base = [{ value: 'all', label: 'All topics' }];
+    const strands = data.strandFolders.map((f) => ({ value: f.id, label: f.label }));
+    return [...base, ...strands];
+  }, [data.strandFolders]);
 
   const resourceTypeOptions = useMemo(
     () => [
-      { value: 'all', label: 'All' },
-      { value: 'model', label: 'Model' },
-      { value: 'check', label: 'Check' },
-      { value: 'practice', label: 'Practice' },
-      { value: 'recap', label: 'Recap' },
-      { value: 'reteach', label: 'Reteach' },
-      { value: 'discussion', label: 'Discussion' },
-      { value: 'worksheet', label: 'Worksheet' },
+      { value: 'all', label: 'All route types' },
+      { value: 'A', label: 'Standard (A)' },
+      { value: 'B', label: 'Easier (B)' },
+      { value: 'C', label: 'Misconception repair (C)' },
     ],
     [],
   );
 
   const sortOptions = useMemo(
     () => [
-      { value: 'recent-used', label: 'Recently used' },
+      { value: 'recent-used', label: 'Recently updated' },
       { value: 'title', label: 'Title A–Z' },
-      { value: 'topic', label: 'Topic' },
+      { value: 'topic', label: 'Topic (strand)' },
     ],
     [],
   );
 
-  const filteredRecent = useMemo(() => {
+  const categoryRows: CategoryRow[] = useMemo(() => {
+    const countMap = Object.fromEntries(data.categoryCounts.map((c) => [c.id, c.count])) as Record<RouteCategory, number>;
+    return CATEGORY_META.map((m) => ({ ...m, count: countMap[m.id] ?? 0 }));
+  }, [data.categoryCounts]);
+
+  const filteredRoutes = useMemo(() => {
     const q = search.trim().toLowerCase();
-    let list = RECENT_RESOURCES;
-    if (category !== 'all') {
-      list = list.filter((r) => r.typeKey === category);
+    let list = [...data.routes];
+
+    const typeKey = category !== 'all' ? category : resourceTypeFilter !== 'all' ? (resourceTypeFilter as RouteCategory) : null;
+    if (typeKey && typeKey !== 'all') {
+      list = list.filter((r) => r.routeType === typeKey);
     }
+
+    if (topicFilter !== 'all') {
+      list = list.filter((r) => r.strand === topicFilter);
+    }
+
     if (q) {
-      list = list.filter((r) => r.title.toLowerCase().includes(q) || r.topic.toLowerCase().includes(q));
+      list = list.filter(
+        (r) =>
+          r.skillName.toLowerCase().includes(q) ||
+          r.skillCode.toLowerCase().includes(q) ||
+          r.strand.toLowerCase().includes(q) ||
+          r.misconceptionSummary.toLowerCase().includes(q),
+      );
     }
+
+    if (sortBy === 'title') {
+      list.sort((a, b) => a.skillName.localeCompare(b.skillName) || a.routeType.localeCompare(b.routeType));
+    } else if (sortBy === 'topic') {
+      list.sort((a, b) => a.strand.localeCompare(b.strand) || a.skillCode.localeCompare(b.skillCode));
+    } else {
+      list.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+    }
+
     return list;
-  }, [search, category]);
+  }, [data.routes, search, category, resourceTypeFilter, topicFilter, sortBy]);
+
+  const syncFiltersFromCategory = (cat: RouteCategory) => {
+    setCategory(cat);
+    setResourceTypeFilter(cat === 'all' ? 'all' : cat);
+  };
+
+  const syncCategoryFromResourceType = (v: string) => {
+    setResourceTypeFilter(v);
+    if (v === 'all') setCategory('all');
+    else setCategory(v as RouteCategory);
+  };
+
+  const onSubjectChange = (id: string) => {
+    if (id === selectedSubjectId) return;
+    setSelectedSubjectId(id);
+    setTopicFilter('all');
+    setSearch('');
+    setCategory('all');
+    setResourceTypeFilter('all');
+    void loadForSubject(id);
+  };
+
+  const emptySubjects = data.subjects.length === 0;
+  const noRoutesInSubject = !subjectId || data.routes.length === 0;
 
   return (
     <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:gap-8">
@@ -416,16 +366,25 @@ export function TeacherResourcesClient() {
               Resources
             </h1>
             <p className="text-sm sm:text-base" style={{ color: 'var(--anx-text-muted)' }}>
-              Your teaching library. Ready to use in every lesson.
+              Explanation routes from your curriculum — launch them in a live lesson or browse by strand.
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2 sm:justify-end">
             <label className="relative min-w-[10rem]">
-              <span className="sr-only">Course</span>
-              <select className="anx-input w-full cursor-pointer appearance-none rounded-xl py-2 pl-3 pr-9 text-sm font-medium">
-                <option>Year 7 Maths</option>
-                <option>Year 8 Maths</option>
-                <option>Year 9 Maths</option>
+              <span className="sr-only">Subject</span>
+              <select
+                className="anx-input w-full cursor-pointer appearance-none rounded-xl py-2 pl-3 pr-9 text-sm font-medium"
+                value={selectedSubjectId}
+                onChange={(e) => onSubjectChange(e.target.value)}
+                disabled={emptySubjects || loading}
+              >
+                {emptySubjects ? <option value="">No subjects</option> : null}
+                {!emptySubjects &&
+                  data.subjects.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.title}
+                    </option>
+                  ))}
               </select>
               <SelectChevron />
             </label>
@@ -437,29 +396,50 @@ export function TeacherResourcesClient() {
               <BellIcon />
               <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-red-500 ring-2 ring-white" aria-hidden />
             </button>
-            <button type="button" className="anx-btn-primary whitespace-nowrap rounded-xl px-4 py-2 text-sm">
+            <Link href="/teacher/question-bank/generate" className="anx-btn-primary inline-flex whitespace-nowrap rounded-xl px-4 py-2 text-sm no-underline">
               + Create new
-            </button>
+            </Link>
           </div>
         </div>
+
+        {fetchError ? (
+          <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900">
+            {fetchError}{' '}
+            <button
+              type="button"
+              className="font-semibold underline"
+              onClick={() => {
+                if (data.subjectId) void loadForSubject(data.subjectId);
+              }}
+            >
+              Retry
+            </button>
+          </div>
+        ) : null}
 
         <div className="relative">
           <SearchIcon className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[color:var(--anx-text-muted)]" />
           <input
             type="search"
             className="anx-input w-full rounded-2xl py-2.5 pl-10 pr-3 text-sm"
-            placeholder="Search resources…"
+            placeholder="Search by skill name, code, or strand…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             aria-label="Search resources"
+            disabled={!subjectId}
           />
         </div>
 
         <div className="flex flex-col gap-3 lg:flex-row lg:flex-wrap lg:items-end lg:justify-between">
           <div className="grid w-full gap-3 sm:grid-cols-3 lg:max-w-3xl lg:flex-1">
             <FilterSelect label="Year group" value={yearGroup} onChange={setYearGroup} options={yearOptions} />
-            <FilterSelect label="Topic" value={topicFilter} onChange={setTopicFilter} options={topicOptions} />
-            <FilterSelect label="Resource type" value={resourceTypeFilter} onChange={setResourceTypeFilter} options={resourceTypeOptions} />
+            <FilterSelect label="Strand" value={topicFilter} onChange={setTopicFilter} options={topicOptions} />
+            <FilterSelect
+              label="Route type"
+              value={resourceTypeFilter}
+              onChange={syncCategoryFromResourceType}
+              options={resourceTypeOptions}
+            />
           </div>
           <label className="relative min-w-[12rem]">
             <span className="mb-1 block text-xs font-medium text-[color:var(--anx-text-muted)]">Sort by</span>
@@ -467,6 +447,7 @@ export function TeacherResourcesClient() {
               className="anx-input w-full cursor-pointer appearance-none rounded-full py-2 pl-3 pr-9 text-sm"
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
+              disabled={!subjectId}
             >
               {sortOptions.map((o) => (
                 <option key={o.value} value={o.value}>
@@ -478,13 +459,17 @@ export function TeacherResourcesClient() {
           </label>
         </div>
 
+        <p className="text-xs" style={{ color: 'var(--anx-text-muted)' }}>
+          Year group is a visual filter for now; strands and route types match your curriculum data.
+        </p>
+
         <div className="relative">
           <div
             className="flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
             role="tablist"
-            aria-label="Resource categories"
+            aria-label="Route categories"
           >
-            {CATEGORY_ROWS.map((row) => {
+            {categoryRows.map((row) => {
               const active = category === row.id;
               return (
                 <button
@@ -492,8 +477,9 @@ export function TeacherResourcesClient() {
                   type="button"
                   role="tab"
                   aria-selected={active}
-                  onClick={() => setCategory(row.id)}
-                  className={`flex min-w-[8.5rem] shrink-0 flex-col gap-2 rounded-2xl border px-3 py-3 text-left transition ${categoryAccentClass(row.accent, active)}`}
+                  onClick={() => syncFiltersFromCategory(row.id)}
+                  disabled={!subjectId}
+                  className={`flex min-w-[8.5rem] shrink-0 flex-col gap-2 rounded-2xl border px-3 py-3 text-left transition disabled:opacity-50 ${categoryAccentClass(row.accent, active)}`}
                 >
                   <span className={`flex h-9 w-9 items-center justify-center rounded-xl ${active ? 'bg-white/80' : 'bg-[var(--anx-surface-container-low)]'}`}>
                     <CategoryIcon kind={row.icon} />
@@ -509,16 +495,16 @@ export function TeacherResourcesClient() {
         <section aria-labelledby="recent-resources-heading" className="space-y-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h2 id="recent-resources-heading" className="m-0 text-lg font-semibold" style={{ color: 'var(--anx-text)' }}>
-              Recently used
+              Explanation routes
             </h2>
             <div className="flex items-center gap-2">
-              <button type="button" className="text-sm font-medium text-[color:var(--anx-primary)] hover:underline">
-                View all
-              </button>
+              <span className="text-sm text-[color:var(--anx-text-muted)]">
+                {loading ? 'Loading…' : `${filteredRoutes.length} shown`}
+              </span>
               <button
                 type="button"
                 className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-[var(--anx-border)] bg-[var(--anx-surface-raised)] text-[color:var(--anx-text-secondary)] hover:bg-[var(--anx-surface-hover)]"
-                aria-label="Scroll recently used"
+                aria-label="Scroll routes"
                 onClick={() => scrollByRef(recentScrollRef.current, 280)}
               >
                 <ChevronRightIcon />
@@ -526,50 +512,57 @@ export function TeacherResourcesClient() {
             </div>
           </div>
           <div ref={recentScrollRef} className="flex gap-4 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {filteredRecent.map((item) => (
-              <article
-                key={item.id}
-                className="anx-card flex w-[min(100%,17rem)] shrink-0 flex-col overflow-hidden rounded-2xl"
-              >
-                <div className={`relative h-24 ${item.thumbClass}`} aria-hidden>
-                  <div className="absolute inset-0 flex items-center justify-center opacity-40">
-                    <span className="font-mono text-xs text-[color:var(--anx-text-muted)]">Preview</span>
+            {filteredRoutes.map((item) => {
+              const typeLabel = ROUTE_TYPE_LABELS[item.routeType] ?? `Route ${item.routeType}`;
+              const tagStyle = TYPE_TAG_STYLES[item.routeType] ?? 'bg-[var(--anx-surface-container-low)] text-[color:var(--anx-text-secondary)]';
+              const liveHref = `/teacher/live/new?subjectId=${encodeURIComponent(item.subjectId)}&skillId=${encodeURIComponent(item.skillId)}`;
+              return (
+                <article key={item.id} className="anx-card flex w-[min(100%,17rem)] shrink-0 flex-col overflow-hidden rounded-2xl">
+                  <div className={`relative h-24 ${thumbClassForId(item.id)}`} aria-hidden>
+                    <div className="absolute inset-0 flex items-center justify-center opacity-40">
+                      <span className="font-mono text-xs text-[color:var(--anx-text-muted)]">{item.stepCount} steps</span>
+                    </div>
                   </div>
-                </div>
-                <div className="flex flex-1 flex-col gap-2 p-3">
-                  <span className={`w-fit rounded-full px-2 py-0.5 text-[11px] font-semibold ${TYPE_TAG_STYLES[item.typeKey]}`}>{item.typeLabel}</span>
-                  <h3 className="m-0 text-sm font-bold leading-snug" style={{ color: 'var(--anx-text)' }}>
-                    {item.title}
-                  </h3>
-                  <p className="m-0 text-xs" style={{ color: 'var(--anx-text-muted)' }}>
-                    {item.topic} · {item.yearLabel}
-                  </p>
-                  <p className="m-0 text-xs" style={{ color: 'var(--anx-text-muted)' }}>
-                    Used {item.usedAgo} ago
-                  </p>
-                  <div className="mt-auto flex items-center gap-2 pt-1">
-                    <button
-                      type="button"
-                      className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-xl border-2 border-[var(--anx-primary)] bg-transparent px-2 py-2 text-xs font-semibold text-[color:var(--anx-primary)] transition hover:bg-[var(--anx-primary-soft)]"
-                    >
-                      <PlayIcon />
-                      Use in lesson
-                    </button>
-                    <button
-                      type="button"
-                      className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[var(--anx-border)] text-[color:var(--anx-text-muted)] hover:bg-[var(--anx-surface-hover)]"
-                      aria-label="More options"
-                    >
-                      <MoreIcon />
-                    </button>
+                  <div className="flex flex-1 flex-col gap-2 p-3">
+                    <span className={`w-fit rounded-full px-2 py-0.5 text-[11px] font-semibold ${tagStyle}`}>{typeLabel}</span>
+                    <h3 className="m-0 text-sm font-bold leading-snug" style={{ color: 'var(--anx-text)' }}>
+                      {item.skillName}
+                    </h3>
+                    <p className="m-0 text-xs" style={{ color: 'var(--anx-text-muted)' }}>
+                      {item.skillCode} · {item.strand}
+                    </p>
+                    <p className="m-0 text-xs" style={{ color: 'var(--anx-text-muted)' }}>
+                      Updated {formatDistanceToNow(new Date(item.updatedAt), { addSuffix: true })}
+                    </p>
+                    <div className="mt-auto flex items-center gap-2 pt-1">
+                      <Link
+                        href={liveHref}
+                        className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-xl border-2 border-[var(--anx-primary)] bg-transparent px-2 py-2 text-xs font-semibold text-[color:var(--anx-primary)] no-underline transition hover:bg-[var(--anx-primary-soft)]"
+                      >
+                        <PlayIcon />
+                        Use in lesson
+                      </Link>
+                      <button
+                        type="button"
+                        className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[var(--anx-border)] text-[color:var(--anx-text-muted)] hover:bg-[var(--anx-surface-hover)]"
+                        aria-label="More options"
+                      >
+                        <MoreIcon />
+                      </button>
+                    </div>
                   </div>
-                </div>
-              </article>
-            ))}
+                </article>
+              );
+            })}
           </div>
-          {filteredRecent.length === 0 ? (
+          {noRoutesInSubject && !loading ? (
             <p className="text-sm" style={{ color: 'var(--anx-text-muted)' }}>
-              No resources match this category and search. Try &quot;All resources&quot; or clear the search.
+              No explanation routes for this subject yet. Routes are created with skills in the database.
+            </p>
+          ) : null}
+          {!noRoutesInSubject && filteredRoutes.length === 0 ? (
+            <p className="text-sm" style={{ color: 'var(--anx-text-muted)' }}>
+              No routes match these filters. Try clearing search or choosing &quot;All routes&quot;.
             </p>
           ) : null}
         </section>
@@ -577,14 +570,23 @@ export function TeacherResourcesClient() {
         <section aria-labelledby="browse-topic-heading" className="space-y-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h2 id="browse-topic-heading" className="m-0 text-lg font-semibold" style={{ color: 'var(--anx-text)' }}>
-              Browse by topic
+              Browse by strand
             </h2>
             <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-[color:var(--anx-primary)]">View all topics</span>
+              <button
+                type="button"
+                className="text-sm font-medium text-[color:var(--anx-primary)] hover:underline"
+                onClick={() => {
+                  setTopicFilter('all');
+                  syncFiltersFromCategory('all');
+                }}
+              >
+                Clear strand filter
+              </button>
               <button
                 type="button"
                 className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-[var(--anx-border)] bg-[var(--anx-surface-raised)] text-[color:var(--anx-text-secondary)] hover:bg-[var(--anx-surface-hover)]"
-                aria-label="Scroll topics"
+                aria-label="Scroll strands"
                 onClick={() => scrollByRef(topicScrollRef.current, 240)}
               >
                 <ChevronRightIcon />
@@ -592,66 +594,90 @@ export function TeacherResourcesClient() {
             </div>
           </div>
           <div ref={topicScrollRef} className="flex gap-3 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {TOPIC_FOLDERS.map((t) => (
+            {data.strandFolders.map((t) => (
               <button
                 key={t.id}
                 type="button"
+                onClick={() => {
+                  setTopicFilter(t.id);
+                  setCategory('all');
+                  setResourceTypeFilter('all');
+                }}
                 className={`flex min-w-[10.5rem] shrink-0 flex-col gap-2 rounded-2xl border border-[var(--anx-border)] bg-gradient-to-br px-4 py-4 text-left transition hover:border-[var(--anx-primary)]/30 ${t.accent}`}
               >
                 <span className="text-sm font-bold">{t.label}</span>
-                <span className="text-xs font-medium opacity-90">{t.count} resources</span>
+                <span className="text-xs font-medium opacity-90">{t.count} routes</span>
               </button>
             ))}
           </div>
+          {data.strandFolders.length === 0 && !loading ? (
+            <p className="text-sm" style={{ color: 'var(--anx-text-muted)' }}>
+              Strands appear here once explanation routes exist for this subject.
+            </p>
+          ) : null}
         </section>
 
         <section aria-labelledby="ai-resources-heading" className="space-y-3">
           <h2 id="ai-resources-heading" className="m-0 flex items-center gap-2 text-lg font-semibold" style={{ color: 'var(--anx-text)' }}>
             <SparkleIcon className="text-[#6338f1]" />
-            AI-generated for you
+            Misconception repair highlights
           </h2>
+          <p className="m-0 text-sm" style={{ color: 'var(--anx-text-muted)' }}>
+            Route C explanations with a misconception summary from your curriculum.
+          </p>
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            {AI_RESOURCES.map((item) => (
-              <article key={item.id} className="anx-card flex flex-col gap-3 rounded-2xl p-4">
-                <div className="flex items-start gap-2">
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[rgba(99,56,241,0.08)] text-[#6338f1]">
-                    <SparkleIcon className="h-4 w-4" />
-                  </span>
-                  <div className="min-w-0 flex-1 space-y-1">
-                    <span className="inline-block rounded-full bg-[var(--anx-surface-container-low)] px-2 py-0.5 text-[11px] font-semibold text-[color:var(--anx-text-secondary)]">
-                      {item.typeLabel}
+            {data.aiSuggestions.map((item) => {
+              const route = data.routes.find((r) => r.id === item.id);
+              const liveHref = route
+                ? `/teacher/live/new?subjectId=${encodeURIComponent(route.subjectId)}&skillId=${encodeURIComponent(route.skillId)}`
+                : '/teacher/live/new';
+              return (
+                <article key={item.id} className="anx-card flex flex-col gap-3 rounded-2xl p-4">
+                  <div className="flex items-start gap-2">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[rgba(99,56,241,0.08)] text-[#6338f1]">
+                      <SparkleIcon className="h-4 w-4" />
                     </span>
-                    <h3 className="m-0 text-sm font-bold leading-snug" style={{ color: 'var(--anx-text)' }}>
-                      {item.title}
-                    </h3>
-                    <p className="m-0 text-xs leading-relaxed" style={{ color: 'var(--anx-text-muted)' }}>
-                      {item.context}
-                    </p>
+                    <div className="min-w-0 flex-1 space-y-1">
+                      <span className="inline-block rounded-full bg-[var(--anx-surface-container-low)] px-2 py-0.5 text-[11px] font-semibold text-[color:var(--anx-text-secondary)]">
+                        {item.typeLabel}
+                      </span>
+                      <h3 className="m-0 text-sm font-bold leading-snug" style={{ color: 'var(--anx-text)' }}>
+                        {item.title}
+                      </h3>
+                      <p className="m-0 text-xs leading-relaxed" style={{ color: 'var(--anx-text-muted)' }}>
+                        {item.context}
+                      </p>
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-center gap-2 border-t border-[var(--anx-border)] pt-3">
-                  <button
-                    type="button"
-                    className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-xl border-2 border-[var(--anx-primary)] bg-transparent px-3 py-2 text-sm font-semibold text-[color:var(--anx-primary)] transition hover:bg-[var(--anx-primary-soft)]"
-                  >
-                    <PlayIcon />
-                    Use in lesson
-                  </button>
-                  <button
-                    type="button"
-                    className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[var(--anx-border)] text-[color:var(--anx-text-muted)] hover:bg-[var(--anx-surface-hover)]"
-                    aria-label="More options"
-                  >
-                    <MoreIcon />
-                  </button>
-                </div>
-              </article>
-            ))}
+                  <div className="flex items-center gap-2 border-t border-[var(--anx-border)] pt-3">
+                    <Link
+                      href={liveHref}
+                      className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-xl border-2 border-[var(--anx-primary)] bg-transparent px-3 py-2 text-sm font-semibold text-[color:var(--anx-primary)] no-underline transition hover:bg-[var(--anx-primary-soft)]"
+                    >
+                      <PlayIcon />
+                      Use in lesson
+                    </Link>
+                    <button
+                      type="button"
+                      className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[var(--anx-border)] text-[color:var(--anx-text-muted)] hover:bg-[var(--anx-surface-hover)]"
+                      aria-label="More options"
+                    >
+                      <MoreIcon />
+                    </button>
+                  </div>
+                </article>
+              );
+            })}
           </div>
+          {data.aiSuggestions.length === 0 && !loading ? (
+            <p className="text-sm" style={{ color: 'var(--anx-text-muted)' }}>
+              No Route C misconception summaries are available for this subject yet.
+            </p>
+          ) : null}
         </section>
 
         <p className="text-sm leading-relaxed" style={{ color: 'var(--anx-text-muted)' }}>
-          Sample content for layout preview. Search, filters, and actions will connect to your school library when the backend is ready. You can still use{' '}
+          For English coursework workflows, use{' '}
           <Link href="/teacher/content/booklet-review" className="font-medium text-[color:var(--anx-primary)] hover:underline">
             English booklet review
           </Link>{' '}
@@ -666,41 +692,49 @@ export function TeacherResourcesClient() {
       <aside className="w-full shrink-0 space-y-4 lg:sticky lg:top-4 lg:w-80" aria-label="Library shortcuts">
         <div className="anx-card space-y-3 rounded-2xl p-4">
           <h2 className="m-0 text-base font-bold" style={{ color: 'var(--anx-text)' }}>
-            School library
+            Question bank
           </h2>
           <p className="m-0 text-sm leading-relaxed" style={{ color: 'var(--anx-text-secondary)' }}>
-            Shared materials from your school. Browse sequences and approved resources.
+            Browse and generate items aligned to skills — pairs with explanation routes in live lessons.
           </p>
-          <button
-            type="button"
-            className="inline-flex w-full items-center justify-center gap-2 rounded-xl border-2 border-[var(--anx-border)] bg-[var(--anx-surface-raised)] px-3 py-2.5 text-sm font-semibold text-[color:var(--anx-text)] transition hover:bg-[var(--anx-surface-hover)]"
+          <Link
+            href="/teacher/question-bank"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-xl border-2 border-[var(--anx-border)] bg-[var(--anx-surface-raised)] px-3 py-2.5 text-sm font-semibold text-[color:var(--anx-text)] no-underline transition hover:bg-[var(--anx-surface-hover)]"
           >
-            Browse school library
+            Open question bank
             <ChevronRightIcon />
-          </button>
+          </Link>
         </div>
 
         <div className="anx-card space-y-3 rounded-2xl p-4">
           <h2 className="m-0 text-base font-bold" style={{ color: 'var(--anx-text)' }}>
-            Saved sequences
+            Recent live lessons
           </h2>
-          <ul className="m-0 list-none space-y-2 p-0">
-            {SAVED_SEQUENCES.map((s) => (
-              <li key={s.title}>
-                <button
-                  type="button"
-                  className="flex w-full items-center justify-between rounded-xl border border-transparent px-2 py-2 text-left text-sm font-medium transition hover:border-[var(--anx-border)] hover:bg-[var(--anx-surface-container-low)]"
-                  style={{ color: 'var(--anx-text)' }}
-                >
-                  <span className="min-w-0 truncate">{s.title}</span>
-                  <span className="shrink-0 text-xs text-[color:var(--anx-text-muted)]">({s.count})</span>
-                </button>
-              </li>
-            ))}
-          </ul>
-          <button type="button" className="text-sm font-medium text-[color:var(--anx-primary)] hover:underline">
-            View all sequences
-          </button>
+          {data.recentSessions.length === 0 ? (
+            <p className="m-0 text-sm" style={{ color: 'var(--anx-text-muted)' }}>
+              Completed sessions you have run will appear here.
+            </p>
+          ) : (
+            <ul className="m-0 list-none space-y-2 p-0">
+              {data.recentSessions.map((s) => (
+                <li key={s.id}>
+                  <Link
+                    href={`/teacher/live/${s.id}/review`}
+                    className="flex w-full items-center justify-between rounded-xl border border-transparent px-2 py-2 text-left text-sm font-medium no-underline transition hover:border-[var(--anx-border)] hover:bg-[var(--anx-surface-container-low)]"
+                    style={{ color: 'var(--anx-text)' }}
+                  >
+                    <span className="min-w-0 truncate">{s.title}</span>
+                    <span className="shrink-0 text-xs text-[color:var(--anx-text-muted)]">
+                      ({s.phaseCount} phase{s.phaseCount === 1 ? '' : 's'})
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+          <Link href="/teacher/live/new" className="text-sm font-medium text-[color:var(--anx-primary)] no-underline hover:underline">
+            Start a new live lesson
+          </Link>
         </div>
 
         <div className="anx-card space-y-3 rounded-2xl p-4">
@@ -715,7 +749,7 @@ export function TeacherResourcesClient() {
               Create from template
             </span>
             <span className="text-xs" style={{ color: 'var(--anx-text-muted)' }}>
-              Start with a template.
+              Coming soon — templates will mirror your school schemes.
             </span>
           </button>
           <Link
@@ -726,7 +760,7 @@ export function TeacherResourcesClient() {
               <SparkleIcon className="h-4 w-4 text-[#6338f1]" />
               Generate with AI
             </span>
-            <span className="text-xs text-[color:var(--anx-text-secondary)]">Describe what you need.</span>
+            <span className="text-xs text-[color:var(--anx-text-secondary)]">Describe what you need in the question bank.</span>
           </Link>
         </div>
       </aside>
