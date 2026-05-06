@@ -437,9 +437,12 @@ export function TeacherResourcesClient() {
               <BellIcon />
               <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-red-500 ring-2 ring-white" aria-hidden />
             </button>
-            <button type="button" className="anx-btn-primary whitespace-nowrap rounded-xl px-4 py-2 text-sm">
+            <Link
+              href="/teacher/question-bank"
+              className="anx-btn-primary inline-flex whitespace-nowrap rounded-xl px-4 py-2 text-sm no-underline"
+            >
               + Create new
-            </button>
+            </Link>
           </div>
         </div>
 
@@ -707,9 +710,9 @@ export function TeacherResourcesClient() {
           <h2 className="m-0 text-base font-bold" style={{ color: 'var(--anx-text)' }}>
             Create new resource
           </h2>
-          <button
-            type="button"
-            className="flex w-full flex-col items-start gap-1 rounded-2xl border-2 border-[var(--anx-border)] bg-[var(--anx-surface-raised)] px-4 py-4 text-left transition hover:border-[var(--anx-primary)]/40 hover:bg-[var(--anx-primary-soft)]"
+          <Link
+            href="/teacher/question-bank"
+            className="flex w-full flex-col items-start gap-1 rounded-2xl border-2 border-[var(--anx-border)] bg-[var(--anx-surface-raised)] px-4 py-4 text-left no-underline transition hover:border-[var(--anx-primary)]/40 hover:bg-[var(--anx-primary-soft)]"
           >
             <span className="text-sm font-bold" style={{ color: 'var(--anx-text)' }}>
               Create from template
@@ -717,7 +720,7 @@ export function TeacherResourcesClient() {
             <span className="text-xs" style={{ color: 'var(--anx-text-muted)' }}>
               Start with a template.
             </span>
-          </button>
+          </Link>
           <Link
             href="/teacher/question-bank/generate"
             className="flex w-full flex-col items-start gap-1 rounded-2xl border-2 border-[#6338f1] bg-[rgba(99,56,241,0.06)] px-4 py-4 text-left no-underline transition hover:bg-[rgba(99,56,241,0.1)]"
