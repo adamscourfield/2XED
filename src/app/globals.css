@@ -296,17 +296,18 @@
     z-index: 1;
   }
 
-  /* Marketing home — full-width hero, soft waves, spec palette */
+  /* Marketing home — full-width hero, soft waves (spec: #F8F9FF canvas) */
   .anx-landing-page {
-    --anx-landing-bg: #f7f7ff;
-    --anx-landing-ink: #2d205f;
-    --anx-landing-muted: rgba(45, 32, 95, 0.62);
-    --anx-landing-link: #6345ed;
+    --anx-landing-bg: #f8f9ff;
+    --anx-landing-ink: #2d2d5f;
+    --anx-landing-muted: rgba(92, 92, 138, 0.92);
+    --anx-landing-link: #4a69ff;
     min-height: 100dvh;
     background-color: var(--anx-landing-bg);
     position: relative;
     isolation: isolate;
     overflow-x: hidden;
+    color: var(--anx-landing-ink);
   }
 
   .anx-landing-wave {
@@ -325,74 +326,6 @@
     height: 100%;
   }
 
-  /* Header: logo | centered nav | outline sign-in (matches mockup balance) */
-  .anx-landing-header {
-    display: grid;
-    grid-template-columns: 1fr;
-    justify-items: center;
-    gap: 1.25rem;
-    text-align: center;
-  }
-
-  .anx-landing-header__brand {
-    justify-self: center;
-  }
-
-  .anx-landing-header__cta {
-    width: 100%;
-    justify-content: center;
-  }
-
-  @media (min-width: 900px) {
-    .anx-landing-header {
-      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-      align-items: center;
-      gap: 1rem 1.5rem;
-      text-align: initial;
-    }
-
-    .anx-landing-header__brand {
-      justify-self: start;
-    }
-
-    .anx-landing-header__nav {
-      justify-self: center;
-    }
-
-    .anx-landing-header__cta {
-      width: auto;
-      justify-self: end;
-    }
-  }
-
-  .anx-landing-signin-outline {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.5625rem 1.375rem;
-    border-radius: 9999px;
-    border: 1px solid #6345ed;
-    font-size: 0.9375rem;
-    font-weight: 600;
-    letter-spacing: 0.01em;
-    color: #6345ed;
-    text-decoration: none;
-    background: rgba(255, 255, 255, 0.35);
-    transition:
-      background-color 180ms ease,
-      box-shadow 180ms ease,
-      transform 180ms ease;
-  }
-
-  .anx-landing-signin-outline:hover {
-    background: rgba(99, 69, 237, 0.06);
-    box-shadow: 0 0 0 4px rgba(99, 69, 237, 0.08);
-  }
-
-  .anx-landing-signin-outline:active {
-    transform: scale(0.98);
-  }
-
   .anx-landing-wordmark {
     height: auto;
     max-width: 100%;
@@ -402,10 +335,10 @@
     width: auto;
   }
 
-  /* Purple → coral headline accent (mockup gradient on “average.”) */
+  /* Headline “average.” — blue → purple → orange (spec) */
   .anx-landing-gradient-text {
     display: inline;
-    background-image: linear-gradient(90deg, #6345ed 0%, #ff825c 100%);
+    background-image: linear-gradient(90deg, #4a69ff 0%, #9d50bb 48%, #ff8c61 100%);
     background-clip: text;
     -webkit-background-clip: text;
     color: transparent;
@@ -413,50 +346,35 @@
     padding-bottom: 0.06em;
   }
 
-  .anx-landing-gradient-text--center {
-    display: block;
-    width: fit-content;
-    margin-inline: auto;
-  }
-
-  /* Floating glass sign-in panel */
+  /* White floating panel (~40px radius), soft diffused shadow */
   .anx-landing-signin-card {
-    border-radius: 2.875rem;
-    background: linear-gradient(165deg, rgba(255, 255, 255, 0.97) 0%, rgba(252, 251, 255, 0.94) 55%, rgba(248, 246, 255, 0.92) 100%);
-    border: 1px solid rgba(255, 255, 255, 0.88);
+    border-radius: 2.5rem;
+    background: #ffffff;
+    border: 1px solid rgba(235, 238, 255, 0.95);
     box-shadow:
-      0 1px 0 rgba(255, 255, 255, 0.95) inset,
-      0 28px 56px -18px rgba(45, 32, 95, 0.18),
-      0 12px 28px -12px rgba(99, 69, 237, 0.12);
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
+      0 28px 56px -20px rgba(45, 45, 95, 0.14),
+      0 12px 28px -14px rgba(45, 45, 95, 0.08);
   }
 
-  @supports not (backdrop-filter: blur(18px)) {
-    .anx-landing-signin-card {
-      background: #ffffff;
-    }
-  }
-
-  /* Primary pill — #5B42F3 → #AF7DFF + glow under button */
+  /* Primary pill — #6345FF → #8B63FF (spec) */
   .anx-landing-cta {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 0.45rem;
     width: 100%;
-    padding: 1.0625rem 1.625rem;
-    border-radius: 9999px;
+    padding: 1rem 1.625rem;
+    border-radius: 1.875rem;
     font-size: 1rem;
     font-weight: 600;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.015em;
     color: #ffffff;
     text-decoration: none;
-    background: linear-gradient(90deg, #5b42f3 0%, #af7dff 100%);
+    background: linear-gradient(90deg, #6345ff 0%, #8b63ff 100%);
     box-shadow:
-      0 20px 44px rgba(91, 66, 243, 0.38),
-      0 8px 20px rgba(91, 66, 243, 0.22),
-      0 2px 0 rgba(255, 255, 255, 0.22) inset;
+      0 20px 46px rgba(99, 69, 255, 0.33),
+      0 8px 18px rgba(99, 69, 255, 0.2),
+      0 1px 0 rgba(255, 255, 255, 0.28) inset;
     transition:
       transform 200ms cubic-bezier(0.4, 0, 0.2, 1),
       box-shadow 200ms cubic-bezier(0.4, 0, 0.2, 1),
@@ -465,33 +383,33 @@
 
   .anx-landing-cta--hero {
     width: auto;
-    min-width: min(100%, 15.5rem);
+    min-width: min(100%, 15.75rem);
     padding-inline: 1.875rem;
   }
 
   .anx-landing-cta--card {
-    padding-block: 1.125rem;
+    padding-block: 1.0625rem;
     box-shadow:
-      0 24px 52px rgba(91, 66, 243, 0.42),
-      0 10px 24px rgba(91, 66, 243, 0.28),
-      0 2px 0 rgba(255, 255, 255, 0.22) inset;
+      0 22px 48px rgba(99, 69, 255, 0.36),
+      0 10px 22px rgba(99, 69, 255, 0.22),
+      0 1px 0 rgba(255, 255, 255, 0.28) inset;
   }
 
   .anx-landing-cta:hover {
     transform: translateY(-2px);
     box-shadow:
-      0 26px 56px rgba(91, 66, 243, 0.45),
-      0 12px 26px rgba(91, 66, 243, 0.26),
-      0 2px 0 rgba(255, 255, 255, 0.24) inset;
-    filter: brightness(1.03);
+      0 26px 54px rgba(99, 69, 255, 0.38),
+      0 12px 26px rgba(99, 69, 255, 0.24),
+      0 1px 0 rgba(255, 255, 255, 0.32) inset;
+    filter: brightness(1.04);
   }
 
   .anx-landing-cta:active {
     transform: translateY(0);
     box-shadow:
-      0 14px 36px rgba(91, 66, 243, 0.32),
-      0 4px 12px rgba(91, 66, 243, 0.2),
-      0 2px 0 rgba(255, 255, 255, 0.18) inset;
+      0 14px 36px rgba(99, 69, 255, 0.28),
+      0 4px 12px rgba(99, 69, 255, 0.16),
+      0 1px 0 rgba(255, 255, 255, 0.22) inset;
   }
 
   .anx-landing-cta-arrow {
