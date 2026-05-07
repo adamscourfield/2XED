@@ -9,6 +9,7 @@ const createSchema = z.object({
   title: z.string().min(1).max(200),
   topic: z.string().min(1).max(200),
   subjectId: z.string().min(1),
+  curriculumUnitId: z.string().optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -33,6 +34,9 @@ export async function POST(req: NextRequest) {
       topic: parsed.data.topic,
       subjectId: parsed.data.subjectId,
       teacherUserId: user.id,
+      curriculumUnitId: parsed.data.curriculumUnitId ?? null,
+      // If created from within a curriculum unit, dismiss the linking prompt
+      curriculumPromptDismissed: !!parsed.data.curriculumUnitId,
     },
     select: { id: true, title: true, topic: true, subjectId: true, isPublished: true, createdAt: true, updatedAt: true },
   });

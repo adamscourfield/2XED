@@ -1,0 +1,288 @@
+'use client';
+
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import type { CurriculumPlanSummary } from '@/app/api/curriculum-plans/route';
+
+// ── Types ─────────────────────────────────────────────────────────────────────
+
+interface Subject {
+  id: string;
+  title: string;
+  slug: string;
+}
+
+interface Props {
+  plans: CurriculumPlanSummary[];
+  subjects: Subject[];
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+function formatDate(iso: string) {
+  const d = new Date(iso);
+  const now = new Date();
+  const diff = Math.floor((now.getTime() - d.getTime()) / 86400000);
+  if (diff === 0) return 'Today';
+  if (diff === 1) return 'Yesterday';
+  if (diff < 7) return `${diff} days ago`;
+  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+// ── New Plan Modal ─────────────────────────────────────────────────────────────
+
+function NewPlanModal({ subjects, onClose, onCreated }: {
+  subjects: Subject[];
+  onClose: () => void;
+  onCreated: (plan: CurriculumPlanSummary) => void;
+}) {
+  const router = useRouter();
+  const [title, setTitle] = useState('');
+  const [subjectId, setSubjectId] = useState(subjects[0]?.id ?? '');
+  const [academicYear, setAcademicYear] = useState('');
+  const [termLabel, setTermLabel] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!title.trim() || !subjectId) return;
+    setSaving(true);
+    setError(null);
+    try {
+      const res = await fetch('/api/curriculum-plans', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: title.trim(), subjectId, academicYear: academicYear || undefined, termLabel: termLabel || undefined }),
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({})) as { error?: string };
+        throw new Error(body.error ?? `HTTP ${res.status}`);
+      }
+      const plan = await res.json() as CurriculumPlanSummary & { subject: { title: string } };
+      // Redirect directly to the new plan
+      router.push(`/teacher/curriculum/${plan.id}`);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to create plan');
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm"
+      onClick={(e) => { if (e.currentTarget === e.target) onClose(); }}
+      role="dialog"
+      aria-modal
+      aria-labelledby="new-plan-title"
+    >
+      <div className="w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-2xl">
+        {/* Header */}
+        <div className="flex items-start gap-4 bg-[#5850ec] px-6 py-5">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/20">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
+              <path d="M12 2L2 7l10 5 10-5-10-5Z" stroke="white" strokeWidth="1.75" strokeLinejoin="round" />
+              <path d="M2 17l10 5 10-5" stroke="white" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M2 12l10 5 10-5" stroke="white" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </div>
+          <div className="flex-1">
+            <h2 id="new-plan-title" className="font-bold text-white">New curriculum plan</h2>
+            <p className="mt-0.5 text-sm text-white/80">Set up topics, aims, and lessons before you teach.</p>
+          </div>
+          <button type="button" onClick={onClose} className="shrink-0 text-white/70 hover:text-white">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
+              <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            </svg>
+          </button>
+        </div>
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="px-6 py-5 space-y-4">
+          <div>
+            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-[#6b7280]">
+              Plan title
+            </label>
+            <input
+              className="w-full rounded-xl border border-[#e5e7eb] px-3 py-2.5 text-sm text-[#111827] placeholder:text-[#9ca3af] focus:border-[#5850ec] focus:outline-none focus:ring-2 focus:ring-[#5850ec]/20"
+              placeholder="e.g. Year 9 Maths — Autumn Term"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              required
+              autoFocus
+            />
+          </div>
+
+          <div>
+            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-[#6b7280]">
+              Subject
+            </label>
+            <select
+              className="w-full rounded-xl border border-[#e5e7eb] px-3 py-2.5 text-sm text-[#111827] focus:border-[#5850ec] focus:outline-none focus:ring-2 focus:ring-[#5850ec]/20"
+              value={subjectId}
+              onChange={(e) => setSubjectId(e.target.value)}
+              required
+            >
+              {subjects.map((s) => (
+                <option key={s.id} value={s.id}>{s.title}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-[#6b7280]">
+                Academic year <span className="font-normal normal-case text-[#9ca3af]">(optional)</span>
+              </label>
+              <input
+                className="w-full rounded-xl border border-[#e5e7eb] px-3 py-2.5 text-sm text-[#111827] placeholder:text-[#9ca3af] focus:border-[#5850ec] focus:outline-none focus:ring-2 focus:ring-[#5850ec]/20"
+                placeholder="2025–26"
+                value={academicYear}
+                onChange={(e) => setAcademicYear(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-[#6b7280]">
+                Term <span className="font-normal normal-case text-[#9ca3af]">(optional)</span>
+              </label>
+              <input
+                className="w-full rounded-xl border border-[#e5e7eb] px-3 py-2.5 text-sm text-[#111827] placeholder:text-[#9ca3af] focus:border-[#5850ec] focus:outline-none focus:ring-2 focus:ring-[#5850ec]/20"
+                placeholder="Autumn"
+                value={termLabel}
+                onChange={(e) => setTermLabel(e.target.value)}
+              />
+            </div>
+          </div>
+
+          {error && (
+            <p className="rounded-lg bg-red-50 px-3 py-2 text-xs text-red-600">{error}</p>
+          )}
+
+          <div className="flex items-center justify-end gap-3 pt-1">
+            <button type="button" onClick={onClose} disabled={saving} className="rounded-lg px-4 py-2 text-sm font-semibold text-[#6b7280] hover:bg-[#f3f4f6] disabled:opacity-50">
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={saving || !title.trim() || !subjectId}
+              className="inline-flex items-center gap-2 rounded-lg bg-[#5850ec] px-5 py-2 text-sm font-semibold text-white shadow hover:bg-[#4338ca] disabled:opacity-50"
+            >
+              {saving ? 'Creating…' : 'Create plan'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+// ── Plan Card ─────────────────────────────────────────────────────────────────
+
+function PlanCard({ plan }: { plan: CurriculumPlanSummary }) {
+  return (
+    <a
+      href={`/teacher/curriculum/${plan.id}`}
+      className="group flex flex-col gap-3 rounded-2xl border border-[#e5e7eb] bg-white p-5 shadow-sm transition hover:border-[#5850ec]/40 hover:shadow-md"
+    >
+      <div className="flex items-start gap-3">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#eef2ff] text-[#5850ec]">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
+            <path d="M12 2L2 7l10 5 10-5-10-5Z" stroke="currentColor" strokeWidth="1.75" strokeLinejoin="round" />
+            <path d="M2 17l10 5 10-5" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M2 12l10 5 10-5" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="truncate font-semibold text-[#111827] group-hover:text-[#5850ec] transition-colors">{plan.title}</p>
+          <p className="mt-0.5 text-xs text-[#6b7280]">
+            {plan.subjectTitle}
+            {plan.academicYear && ` · ${plan.academicYear}`}
+            {plan.termLabel && ` · ${plan.termLabel}`}
+          </p>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-4 border-t border-[#f3f4f6] pt-3 text-xs text-[#6b7280]">
+        <span>
+          <span className="font-semibold text-[#374151]">{plan.unitCount}</span> {plan.unitCount === 1 ? 'unit' : 'units'}
+        </span>
+        <span>
+          <span className="font-semibold text-[#374151]">{plan.lessonCount}</span> {plan.lessonCount === 1 ? 'lesson' : 'lessons'}
+        </span>
+        <span className="ml-auto">Updated {formatDate(plan.updatedAt)}</span>
+      </div>
+    </a>
+  );
+}
+
+// ── Main Component ────────────────────────────────────────────────────────────
+
+export function CurriculumPlanner({ plans: initialPlans, subjects }: Props) {
+  const [plans, setPlans] = useState(initialPlans);
+  const [showNew, setShowNew] = useState(false);
+
+  return (
+    <div className="space-y-6">
+      {/* Top bar */}
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-[#6b7280]">
+          {plans.length === 0
+            ? 'No plans yet — create one to start mapping your curriculum.'
+            : `${plans.length} ${plans.length === 1 ? 'plan' : 'plans'}`}
+        </p>
+        <button
+          type="button"
+          onClick={() => setShowNew(true)}
+          className="inline-flex items-center gap-2 rounded-xl bg-[#5850ec] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#4338ca] transition"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
+            <path d="M12 5v14M5 12h14" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+          </svg>
+          New plan
+        </button>
+      </div>
+
+      {/* Grid */}
+      {plans.length > 0 ? (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {plans.map((p) => <PlanCard key={p.id} plan={p} />)}
+        </div>
+      ) : (
+        <div className="rounded-2xl border border-dashed border-[#e5e7eb] px-6 py-16 text-center">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#eef2ff] text-[#5850ec]">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden>
+              <path d="M12 2L2 7l10 5 10-5-10-5Z" stroke="currentColor" strokeWidth="1.75" strokeLinejoin="round" />
+              <path d="M2 17l10 5 10-5" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M2 12l10 5 10-5" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </div>
+          <p className="text-base font-semibold text-[#111827]">Plan before you teach</p>
+          <p className="mt-2 max-w-sm mx-auto text-sm text-[#6b7280]">
+            Create a curriculum plan to map your units, set aims and success measures, and build lessons in context.
+          </p>
+          <button
+            type="button"
+            onClick={() => setShowNew(true)}
+            className="mt-5 inline-flex items-center gap-2 rounded-xl bg-[#5850ec] px-5 py-2.5 text-sm font-semibold text-white shadow hover:bg-[#4338ca] transition"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
+              <path d="M12 5v14M5 12h14" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+            </svg>
+            Create your first plan
+          </button>
+        </div>
+      )}
+
+      {showNew && (
+        <NewPlanModal
+          subjects={subjects}
+          onClose={() => setShowNew(false)}
+          onCreated={(plan) => {
+            setPlans((prev) => [plan, ...prev]);
+            setShowNew(false);
+          }}
+        />
+      )}
+    </div>
+  );
+}

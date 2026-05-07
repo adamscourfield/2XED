@@ -1,7 +1,10 @@
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/features/auth/authOptions';
 import { redirect } from 'next/navigation';
+import { prisma } from '@/db/prisma';
 import { LearningPageShell } from '@/components/LearningPageShell';
+import { CurriculumPlanner } from './CurriculumPlanner';
+import type { CurriculumPlanSummary } from '@/app/api/curriculum-plans/route';
 
 export default async function CurriculumPage() {
   const session = await getServerSession(authOptions);
@@ -10,25 +13,59 @@ export default async function CurriculumPage() {
   const user = session.user as { id: string; role?: string };
   if (user.role !== 'TEACHER' && user.role !== 'ADMIN' && user.role !== 'LEADERSHIP') redirect('/dashboard');
 
+  const subjects = await prisma.subject.findMany({
+    select: { id: true, title: true, slug: true },
+    orderBy: { title: 'asc' },
+  });
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const planModel = (prisma as any).curriculumPlan;
+  const plans: CurriculumPlanSummary[] = planModel
+    ? await planModel
+        .findMany({
+          where: { teacherUserId: user.id },
+          include: {
+            subject: { select: { title: true } },
+            units: { select: { id: true, _count: { select: { lessons: true } } } },
+          },
+          orderBy: { updatedAt: 'desc' },
+        })
+        .then(
+          (
+            rows: Array<{
+              id: string;
+              title: string;
+              subjectId: string;
+              academicYear: string | null;
+              termLabel: string | null;
+              createdAt: Date;
+              updatedAt: Date;
+              subject: { title: string };
+              units: Array<{ id: string; _count: { lessons: number } }>;
+            }>,
+          ) =>
+            rows.map((p) => ({
+              id: p.id,
+              title: p.title,
+              subjectId: p.subjectId,
+              subjectTitle: p.subject.title,
+              academicYear: p.academicYear,
+              termLabel: p.termLabel,
+              unitCount: p.units.length,
+              lessonCount: p.units.reduce((sum, u) => sum + u._count.lessons, 0),
+              createdAt: p.createdAt.toISOString(),
+              updatedAt: p.updatedAt.toISOString(),
+            })),
+        )
+    : [];
+
   return (
     <LearningPageShell
       title="Curriculum"
-      subtitle="Map your topics, set aims and success measures."
+      subtitle="Map your topics, set aims and success measures, then build lessons from here."
       appChrome="teacher"
     >
-      <div className="rounded-xl border border-dashed border-[#e5e7eb] px-6 py-16 text-center">
-        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#f5f3ff] text-[#5850ec]">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden>
-            <path d="M12 2L2 7l10 5 10-5-10-5Z" stroke="currentColor" strokeWidth="1.75" strokeLinejoin="round" />
-            <path d="M2 17l10 5 10-5" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
-            <path d="M2 12l10 5 10-5" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </div>
-        <p className="text-base font-semibold text-[#111827]">Curriculum mapper coming soon</p>
-        <p className="mt-2 max-w-sm mx-auto text-sm text-[#6b7280]">
-          Map topics over a term or year, set learning aims and success measures, and get AI feedback on your coverage. Build your lessons first and come back here to organise them into a curriculum plan.
-        </p>
-      </div>
+      <CurriculumPlanner plans={plans} subjects={subjects} />
     </LearningPageShell>
   );
 }
