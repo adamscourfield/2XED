@@ -7,6 +7,7 @@ import { z } from 'zod';
 const loginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(6),
+  remember: z.enum(['true', 'false']).optional(),
 });
 
 export const authOptions: NextAuthOptions = {
@@ -16,6 +17,7 @@ export const authOptions: NextAuthOptions = {
       credentials: {
         email: { label: 'Email', type: 'email' },
         password: { label: 'Password', type: 'password' },
+        remember: { label: 'Remember me', type: 'text' },
       },
       async authorize(credentials) {
         const parsed = loginSchema.safeParse(credentials);
@@ -30,11 +32,14 @@ export const authOptions: NextAuthOptions = {
         const valid = await bcrypt.compare(parsed.data.password, user.password);
         if (!valid) return null;
 
+        const remember = parsed.data.remember === 'true';
+
         return {
           id: user.id,
           email: user.email,
           name: user.name,
           role: user.role,
+          remember,
         };
       },
     }),
@@ -45,6 +50,9 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id;
         token.role = (user as unknown as { role: string }).role;
+        const remember = Boolean((user as unknown as { remember?: boolean }).remember);
+        const maxAgeSec = remember ? 60 * 60 * 24 * 30 : 60 * 60 * 24;
+        token.exp = Math.floor(Date.now() / 1000) + maxAgeSec;
       }
       return token;
     },
