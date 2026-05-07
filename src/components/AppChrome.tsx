@@ -27,7 +27,8 @@ type NavIconKind =
   | "clock"
   | "help"
   | "gear"
-  | "layers";
+  | "layers"
+  | "stackedPages";
 
 interface NavItem {
   href: string;
@@ -73,10 +74,10 @@ function NavIconBox({
   const isTeacher = chrome === "teacher";
   const box = active
     ? isTeacher
-      ? "bg-[#f5f3ff] text-[#5850ec] ring-1 ring-inset ring-[#e9e5ff]"
+      ? ""
       : "bg-[rgba(99,102,241,0.18)] text-[#4338ca]"
     : isTeacher
-      ? "bg-white text-[#6b7280] ring-1 ring-inset ring-[#e5e7eb]"
+      ? ""
       : "bg-[#f0f1f4] text-[#374151]";
   const stroke = "currentColor";
   const icon = (() => {
@@ -285,15 +286,35 @@ function NavIconBox({
             />
           </svg>
         );
+      case "stackedPages":
+        return (
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
+            <path
+              d="M7 4h10a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H7"
+              stroke={stroke}
+              strokeWidth="1.75"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M5 6h10a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2Z"
+              stroke={stroke}
+              strokeWidth="1.75"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path d="M8 10h6M8 13h6M8 16h4" stroke={stroke} strokeWidth="1.75" strokeLinecap="round" />
+          </svg>
+        );
       default:
         return null;
     }
   })();
+  const shellClass = isTeacher
+    ? "flex h-9 w-9 shrink-0 items-center justify-center text-current"
+    : `flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] ${box}`;
   return (
-    <span
-      className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] ${box}`}
-      aria-hidden
-    >
+    <span className={shellClass} aria-hidden>
       {icon}
     </span>
   );
@@ -406,17 +427,15 @@ export function AppChrome({
   const studentTagline = "Your learning hub";
 
   const teacherNavPrimary: NavItem[] = [
-    { href: "/teacher/dashboard", label: "Dashboard", icon: "dashboard" },
-    { href: "/teacher/curriculum", label: "Curriculum", icon: "layers" },
+    { href: "/teacher/dashboard", label: "Dashboard", icon: "home" },
+    { href: "/teacher/curriculum", label: "Curriculum", icon: "stackedPages" },
     { href: "/teacher/lessons", label: "Lessons", icon: "bookOpen" },
     { href: "/teacher/live", label: "Live", icon: "bolt" },
     { href: "/teacher/reports", label: "Reports", icon: "chart" },
     { href: "/teacher/settings", label: "Settings", icon: "gear" },
   ];
 
-  const teacherNavSecondary: NavItem[] = [
-    { href: "/teacher/help", label: "Help Centre", icon: "help" },
-  ];
+  const teacherNavSecondary: NavItem[] = [{ href: "/teacher/help", label: "Help Centre", icon: "help" }];
 
   const liveStudentItem: NavItem = {
     href: "/student/live",
@@ -476,10 +495,10 @@ export function AppChrome({
         onClick={onNavigate}
         className={
           teacher
-            ? `group relative flex items-center gap-3 rounded-2xl py-2.5 pl-3 pr-2.5 transition-colors duration-150 ${
+            ? `group relative flex items-center gap-3 rounded-xl px-3 py-3 transition-colors duration-150 ${
                 active
-                  ? "bg-[#f5f3ff] before:absolute before:left-0 before:top-1/2 before:h-[2.125rem] before:w-[4px] before:-translate-y-1/2 before:rounded-full before:bg-[#5850ec] before:content-['']"
-                  : "text-[#374151] hover:bg-[#f9fafb]"
+                  ? "bg-[#F3F4FF] text-[#5D5FEF]"
+                  : "text-[#2D3748] hover:bg-[#F9FAFB]"
               }`
             : `group relative flex items-center gap-3 rounded-2xl px-3 py-2.5 pl-3 transition-colors duration-150 ${
                 active
@@ -500,8 +519,8 @@ export function AppChrome({
             className={`block text-[0.9375rem] font-semibold leading-snug tracking-tight ${
               teacher
                 ? active
-                  ? "text-[#5850ec]"
-                  : "text-[#374151]"
+                  ? "text-[#5D5FEF]"
+                  : "text-[#2D3748]"
                 : active
                   ? "text-[#312e81]"
                   : "text-[color:var(--anx-text)]"
@@ -514,8 +533,8 @@ export function AppChrome({
               className={`mt-0.5 block text-xs leading-relaxed ${
                 teacher
                   ? active
-                    ? "text-[#5850ec]"
-                    : "text-[#6b7280]"
+                    ? "text-[#5D5FEF]/90"
+                    : "text-[#718096]"
                   : active
                     ? "text-[#4f46e5]/90"
                     : "text-[color:var(--anx-text-muted)]"
@@ -607,8 +626,8 @@ export function AppChrome({
 
   function TeacherNav({ onNavigate }: { onNavigate?: () => void }) {
     return (
-      <div className="flex flex-col gap-5 px-2 py-3">
-        <nav className="flex flex-col gap-0.5" aria-label="Primary">
+      <div className="flex flex-col gap-8 px-3 py-5">
+        <nav className="flex flex-col gap-1.5" aria-label="Primary">
           {teacherNavPrimary.map((item) => {
             const active = isNavActive(pathname, item.href);
             return (
@@ -625,8 +644,8 @@ export function AppChrome({
             );
           })}
         </nav>
-        <div className="mx-2 border-t border-[#eceaf4]" />
-        <nav className="flex flex-col gap-0.5" aria-label="Secondary">
+        <div className="mx-1 border-t border-[#E8EAEF]" />
+        <nav className="flex flex-col gap-1.5" aria-label="Secondary">
           {teacherNavSecondary.map((item) => {
             const active = isNavActive(pathname, item.href);
             return (
@@ -647,24 +666,48 @@ export function AppChrome({
     );
   }
 
+  const teacherBrandInner = (
+    <>
+      <Image
+        src="/Ember_logo_icon.png"
+        alt=""
+        width={512}
+        height={512}
+        className="h-9 w-9 shrink-0 sm:h-10 sm:w-10"
+        aria-hidden
+        priority
+      />
+      <Image
+        src="/Ember_logo_text.png"
+        alt="Ember"
+        width={512}
+        height={128}
+        className="h-[1.375rem] w-auto shrink-0 sm:h-6"
+        priority
+      />
+    </>
+  );
+
   const brandBlock = (
     <Link
       href={homeHref}
       className={`flex items-center gap-3 rounded-2xl p-2 outline-none transition-colors focus-visible:ring-2 ${
         variant === "teacher"
-          ? "hover:bg-[#f9fafb] focus-visible:ring-[#5850ec]/25"
+          ? "hover:bg-[#F6F7FB] focus-visible:ring-[#5D5FEF]/25"
           : "hover:bg-[var(--anx-surface-hover)] focus-visible:ring-[var(--anx-primary-glow)]"
       }`}
       onClick={() => setMenuOpen(false)}
     >
-      <LogoImage className="h-8 w-auto shrink-0 sm:h-9" />
-      <div className="min-w-0 text-left">
-        {variant === "teacher" ? (
-          <p className="truncate text-xl font-bold leading-none tracking-tight text-[#1e1b4b]">ember</p>
-        ) : (
-          <p className="truncate text-xs font-medium text-[color:var(--anx-text-muted)]">{studentTagline}</p>
-        )}
-      </div>
+      {variant === "teacher" ? (
+        teacherBrandInner
+      ) : (
+        <>
+          <LogoImage className="h-8 w-auto shrink-0 sm:h-9" />
+          <div className="min-w-0 text-left">
+            <p className="truncate text-xs font-medium text-[color:var(--anx-text-muted)]">{studentTagline}</p>
+          </div>
+        </>
+      )}
     </Link>
   );
 
@@ -768,20 +811,20 @@ export function AppChrome({
         id="app-chrome-drawer"
         className={`fixed inset-y-0 left-0 z-50 flex w-[min(18rem,88vw)] flex-col border-r shadow-[var(--anx-shadow-lg)] transition-transform duration-200 ease-out lg:static lg:z-0 lg:w-[min(17.5rem,20vw)] lg:max-w-[280px] lg:translate-x-0 lg:shadow-none ${
           variant === "teacher"
-            ? "border-[#eceaf4] bg-[#f8f7fb] lg:border-[#eceaf4] lg:shadow-[1px_0_0_rgba(88,80,236,0.06)]"
+            ? "border-[#E8EAEF] bg-white lg:border-[#E8EAEF] lg:shadow-[1px_0_0_rgba(45,55,72,0.06)]"
             : "border-[var(--anx-outline-variant)] bg-[color:var(--anx-surface-raised)] lg:shadow-none"
         } ${menuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
       >
         <div
           className={`hidden p-4 lg:block ${
-            variant === "teacher" ? "border-b border-[#eceaf4]" : "border-b border-[var(--anx-outline-variant)]"
+            variant === "teacher" ? "border-b border-[#E8EAEF]" : "border-b border-[var(--anx-outline-variant)]"
           }`}
         >
           {brandBlock}
         </div>
         <div
           className={`p-3 lg:hidden ${
-            variant === "teacher" ? "border-b border-[#eceaf4]" : "border-b border-[var(--anx-outline-variant)]"
+            variant === "teacher" ? "border-b border-[#E8EAEF]" : "border-b border-[var(--anx-outline-variant)]"
           }`}
         >
           {brandBlock}
@@ -798,28 +841,34 @@ export function AppChrome({
 
         <div
           className={`p-4 ${
-            variant === "teacher" ? "border-t border-[#eceaf4] bg-[#f4f3f8]" : "border-t border-[var(--anx-outline-variant)]"
+            variant === "teacher" ? "border-t border-[#E8EAEF] bg-white" : "border-t border-[var(--anx-outline-variant)]"
           }`}
         >
           {variant === "teacher" ? (
             <Link
               href="/teacher/settings"
-              className="flex items-center gap-3 rounded-xl border border-[#e5e7eb] bg-white px-3 py-2.5 shadow-sm transition hover:border-[#d1d5db] hover:shadow-md"
+              className="flex items-center gap-3 rounded-2xl border border-[#E8EAEF] bg-white px-3 py-3 shadow-[0_1px_2px_rgba(45,55,72,0.05)] transition hover:border-[#D8DCE8] hover:shadow-[0_4px_14px_rgba(45,55,72,0.07)]"
               onClick={() => setMenuOpen(false)}
             >
               <div
                 className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white"
-                style={{ background: "linear-gradient(145deg, #5850ec 0%, #7c3aed 100%)" }}
+                style={{ backgroundColor: "#5D5FEF" }}
                 aria-hidden
               >
                 {teacherInitials}
               </div>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-semibold text-[#111827]">{userName}</p>
+                <p className="truncate text-sm font-semibold text-[#2D3748]">{userName}</p>
               </div>
-              <span className="shrink-0 text-[#9ca3af]" aria-hidden>
+              <span className="shrink-0 text-[#718096]" aria-hidden>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                  <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  <path
+                    d="M6 9l6 6 6-6"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
                 </svg>
               </span>
             </Link>
@@ -846,16 +895,23 @@ export function AppChrome({
           <button
             type="button"
             onClick={() => signOut({ callbackUrl: "/login" })}
-            className={`mt-3 flex w-full items-center justify-center gap-2 text-xs font-semibold transition ${
+            className={`mt-4 flex w-full items-center gap-2.5 rounded-xl px-2 py-2.5 text-sm font-medium transition ${
               variant === "teacher"
-                ? "text-[#6b7280] hover:text-[#5850ec]"
-                : "text-[color:var(--anx-text-muted)] hover:text-[color:var(--anx-text)]"
+                ? "justify-start text-left text-[#718096] hover:bg-[#F9FAFB] hover:text-[#5D5FEF]"
+                : "justify-center text-center text-[color:var(--anx-text-muted)] hover:text-[color:var(--anx-text)]"
             }`}
           >
             {variant === "teacher" ? (
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="shrink-0 opacity-80" aria-hidden>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="shrink-0" aria-hidden>
                 <path
-                  d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"
+                  d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"
+                  stroke="currentColor"
+                  strokeWidth="1.75"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M16 17l5-5-5-5M21 12H9"
                   stroke="currentColor"
                   strokeWidth="1.75"
                   strokeLinecap="round"
