@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
 import type { CurriculumPlanDetail, CurriculumUnitDetail } from '@/app/api/curriculum-plans/[planId]/route';
+import type { UnitAiSuggestion } from '@/app/api/curriculum-plans/[planId]/units/ai-suggest/route';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -154,6 +155,218 @@ function NewLessonModal({
   );
 }
 
+// ── AI Assist Panel ───────────────────────────────────────────────────────────
+
+function AiAssistPanel({
+  planId,
+  unitTitle,
+  availableSkills,
+  onApply,
+}: {
+  planId: string;
+  unitTitle: string;
+  availableSkills: Skill[];
+  onApply: (suggestion: UnitAiSuggestion) => void;
+}) {
+  type AiMode = 'describe' | 'import';
+  const [mode, setMode] = useState<AiMode>('describe');
+  const [description, setDescription] = useState('');
+  const [file, setFile] = useState<File | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [preview, setPreview] = useState<UnitAiSuggestion | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const skillCodeMap = new Map(availableSkills.map((s) => [s.code.toUpperCase(), s.id]));
+
+  const handleGenerate = async () => {
+    if (!unitTitle.trim()) {
+      setError('Add a unit title first so AI has context.');
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    setPreview(null);
+    try {
+      let res: Response;
+      if (mode === 'import' && file) {
+        const form = new FormData();
+        form.append('mode', 'import');
+        form.append('unitTitle', unitTitle);
+        form.append('file', file);
+        res = await fetch(`/api/curriculum-plans/${planId}/units/ai-suggest`, { method: 'POST', body: form });
+      } else {
+        res = await fetch(`/api/curriculum-plans/${planId}/units/ai-suggest`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ mode: 'describe', unitTitle, description }),
+        });
+      }
+      if (!res.ok) {
+        const b = await res.json().catch(() => ({})) as { error?: string };
+        throw new Error(b.error ?? `HTTP ${res.status}`);
+      }
+      const suggestion = await res.json() as UnitAiSuggestion;
+      setPreview(suggestion);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'AI generation failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleApply = () => {
+    if (!preview) return;
+    // Resolve skill codes → IDs
+    const resolvedIds = (preview.suggestedSkillCodes ?? [])
+      .map((code) => skillCodeMap.get(code.toUpperCase()))
+      .filter((id): id is string => !!id);
+    onApply({ ...preview, suggestedSkillCodes: resolvedIds });
+    setPreview(null);
+  };
+
+  return (
+    <div className="rounded-xl border border-[#5850ec]/20 bg-[#eef2ff] p-4 space-y-3">
+      {/* Header */}
+      <div className="flex items-center gap-2">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="shrink-0 text-[#5850ec]" aria-hidden>
+          <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6L12 2Z" stroke="currentColor" strokeWidth="1.75" strokeLinejoin="round" />
+        </svg>
+        <span className="text-sm font-semibold text-[#4338ca]">AI assist</span>
+      </div>
+
+      {/* Mode toggle */}
+      <div className="flex rounded-xl border border-[#c7d2fe] bg-white overflow-hidden text-xs font-semibold">
+        <button
+          type="button"
+          onClick={() => setMode('describe')}
+          className={`flex-1 py-2 transition ${mode === 'describe' ? 'bg-[#5850ec] text-white' : 'text-[#6b7280] hover:bg-[#f9fafb]'}`}
+        >
+          Describe topic
+        </button>
+        <button
+          type="button"
+          onClick={() => setMode('import')}
+          className={`flex-1 py-2 transition ${mode === 'import' ? 'bg-[#5850ec] text-white' : 'text-[#6b7280] hover:bg-[#f9fafb]'}`}
+        >
+          Import file
+        </button>
+      </div>
+
+      {/* Input */}
+      {mode === 'describe' ? (
+        <textarea
+          rows={3}
+          className="w-full resize-none rounded-xl border border-[#c7d2fe] bg-white px-3 py-2.5 text-sm text-[#111827] placeholder:text-[#9ca3af] focus:border-[#5850ec] focus:outline-none focus:ring-2 focus:ring-[#5850ec]/20"
+          placeholder="Describe what this unit covers, any key topics, or paste a scheme of work excerpt…"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+        />
+      ) : (
+        <div>
+          <input
+            ref={fileRef}
+            type="file"
+            accept=".pdf,.csv,.docx,.pptx,.txt"
+            className="hidden"
+            onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+          />
+          <button
+            type="button"
+            onClick={() => fileRef.current?.click()}
+            className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-[#c7d2fe] bg-white py-3 text-sm text-[#6b7280] transition hover:border-[#5850ec]/60 hover:text-[#5850ec]"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            {file ? file.name : 'Choose PDF, CSV, DOCX, or PPTX'}
+          </button>
+          <p className="mt-1.5 text-center text-xs text-[#6b7280]">AI will extract unit structure from the file</p>
+        </div>
+      )}
+
+      {/* Preview of AI suggestion */}
+      {preview && (
+        <div className="rounded-xl border border-[#c7d2fe] bg-white p-3 space-y-2 text-sm">
+          <p className="text-xs font-semibold uppercase tracking-wide text-[#6b7280]">AI suggestion — review before applying</p>
+          {preview.aims && (
+            <div>
+              <p className="text-xs font-semibold text-[#374151]">Aims</p>
+              <p className="mt-0.5 whitespace-pre-line text-[#374151]">{preview.aims}</p>
+            </div>
+          )}
+          {preview.successMeasures && (
+            <div>
+              <p className="text-xs font-semibold text-[#374151]">Success measures</p>
+              <p className="mt-0.5 whitespace-pre-line text-[#374151]">{preview.successMeasures}</p>
+            </div>
+          )}
+          {preview.suggestedSkillCodes?.length > 0 && (
+            <div>
+              <p className="text-xs font-semibold text-[#374151]">Skills</p>
+              <div className="mt-1 flex flex-wrap gap-1.5">
+                {preview.suggestedSkillCodes.map((code) => {
+                  const skill = availableSkills.find((s) => s.code.toUpperCase() === code.toUpperCase());
+                  return skill ? (
+                    <span key={code} className="rounded-full bg-[#eef2ff] px-2 py-0.5 text-xs text-[#5850ec]">
+                      {skill.code} — {skill.name}
+                    </span>
+                  ) : null;
+                })}
+              </div>
+            </div>
+          )}
+          <div className="flex gap-2 pt-1">
+            <button
+              type="button"
+              onClick={handleApply}
+              className="rounded-lg bg-[#5850ec] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#4338ca] transition"
+            >
+              Apply to form
+            </button>
+            <button
+              type="button"
+              onClick={() => setPreview(null)}
+              className="rounded-lg px-3 py-1.5 text-xs font-semibold text-[#6b7280] hover:bg-[#f3f4f6] transition"
+            >
+              Discard
+            </button>
+          </div>
+        </div>
+      )}
+
+      {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-xs text-red-600">{error}</p>}
+
+      {/* Generate button */}
+      {!preview && (
+        <button
+          type="button"
+          onClick={handleGenerate}
+          disabled={loading || (mode === 'import' && !file)}
+          className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#5850ec] py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#4338ca] disabled:opacity-50 transition"
+        >
+          {loading ? (
+            <>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="animate-spin" aria-hidden>
+                <circle cx="12" cy="12" r="9" stroke="white" strokeWidth="2" strokeOpacity="0.3" />
+                <path d="M12 3a9 9 0 0 1 9 9" stroke="white" strokeWidth="2" strokeLinecap="round" />
+              </svg>
+              Generating…
+            </>
+          ) : (
+            <>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
+                <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6L12 2Z" stroke="white" strokeWidth="1.75" strokeLinejoin="round" />
+              </svg>
+              Generate with AI
+            </>
+          )}
+        </button>
+      )}
+    </div>
+  );
+}
+
 // ── Unit Editor Panel ─────────────────────────────────────────────────────────
 
 function UnitEditorPanel({
@@ -184,6 +397,20 @@ function UnitEditorPanel({
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showAi, setShowAi] = useState(isNew); // open by default for new units
+
+  const handleAiApply = (suggestion: UnitAiSuggestion) => {
+    if (suggestion.aims) setAims(suggestion.aims);
+    if (suggestion.successMeasures) setSuccessMeasures(suggestion.successMeasures);
+    // suggestedSkillCodes here are already resolved to IDs by AiAssistPanel
+    if (suggestion.suggestedSkillCodes?.length > 0) {
+      setSelectedSkillIds((prev) => {
+        const merged = new Set([...prev, ...suggestion.suggestedSkillCodes]);
+        return Array.from(merged);
+      });
+    }
+    setShowAi(false);
+  };
 
   const filteredSkills = availableSkills.filter(
     (s) =>
@@ -275,12 +502,38 @@ function UnitEditorPanel({
       {/* Header */}
       <div className="flex items-center justify-between">
         <h3 className="font-semibold text-[#111827]">{isNew ? 'New unit' : 'Edit unit'}</h3>
-        <button type="button" onClick={onClose} className="text-[#9ca3af] hover:text-[#374151]">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
-            <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-          </svg>
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setShowAi((v) => !v)}
+            className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-semibold transition ${
+              showAi
+                ? 'bg-[#5850ec] text-white'
+                : 'text-[#5850ec] hover:bg-[#eef2ff]'
+            }`}
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden>
+              <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6L12 2Z" stroke="currentColor" strokeWidth="1.75" strokeLinejoin="round" />
+            </svg>
+            AI assist
+          </button>
+          <button type="button" onClick={onClose} className="text-[#9ca3af] hover:text-[#374151]">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
+              <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            </svg>
+          </button>
+        </div>
       </div>
+
+      {/* AI assist panel */}
+      {showAi && (
+        <AiAssistPanel
+          planId={planId}
+          unitTitle={title}
+          availableSkills={availableSkills}
+          onApply={handleAiApply}
+        />
+      )}
 
       {/* Title */}
       <div>
