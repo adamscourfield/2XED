@@ -23,7 +23,7 @@ export default async function TeacherDashboardPage() {
     <LearningPageShell
       title="Home"
       subtitle="Teacher workspace"
-      maxWidthClassName="max-w-5xl"
+      maxWidthClassName="max-w-6xl"
       appChrome="teacher"
       hideHeader
     >
