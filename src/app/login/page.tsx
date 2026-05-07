@@ -7,8 +7,10 @@ import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 
 const ink = '#2D236E';
+const subhead = '#7C7199';
 const iconWell = '#EDE9FE';
 const borderField = '#D8DCE6';
+const linkMuted = '#5B4DB8';
 
 /** Gradient flame (purple → orange → pink) when brand PNG is unavailable. */
 function EmberFlameMark({ className }: { className?: string }) {
@@ -30,11 +32,42 @@ function EmberFlameMark({ className }: { className?: string }) {
           <stop offset="100%" stopColor="#F472B6" />
         </linearGradient>
       </defs>
-      <path
-        fill={`url(#${gradId})`}
-        d="M24 6C12 18 10 34 24 56 38 34 36 18 24 6z"
-      />
+      <path fill={`url(#${gradId})`} d="M24 6C12 18 10 34 24 56 38 34 36 18 24 6z" />
     </svg>
+  );
+}
+
+function LoginBackdrop() {
+  return (
+    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+      <div
+        className="absolute inset-0"
+        style={{
+          background: 'linear-gradient(165deg, #FCFAFF 0%, #F4F0FF 38%, #EDE9FE 72%, #E8E2FC 100%)',
+        }}
+      />
+      <div className="absolute -bottom-px left-1/2 w-[min(140%,1200px)] -translate-x-1/2 opacity-[0.42]">
+        <svg viewBox="0 0 1440 380" className="w-full" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+          <path
+            d="M0 280C180 200 360 240 540 200C720 160 900 120 1080 140C1260 160 1380 220 1440 260V380H0V280Z"
+            fill="#9D8FD9"
+            fillOpacity="0.35"
+          />
+          <path
+            d="M0 320C200 260 400 300 640 240C880 180 1120 200 1440 280V380H0V320Z"
+            fill="#7C6BD4"
+            fillOpacity="0.28"
+          />
+        </svg>
+      </div>
+      <div
+        className="absolute bottom-0 left-0 right-0 h-[42%] blur-[2px]"
+        style={{
+          background:
+            'radial-gradient(120% 85% at 50% 100%, rgba(157, 143, 217, 0.45) 0%, rgba(237, 233, 254, 0) 65%)',
+        }}
+      />
+    </div>
   );
 }
 
@@ -96,6 +129,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [logoOk, setLogoOk] = useState(true);
+  const [remember, setRemember] = useState(false);
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -109,6 +143,7 @@ export default function LoginPage() {
     const result = await signIn('credentials', {
       email,
       password,
+      remember: remember ? 'true' : 'false',
       redirect: false,
     });
 
@@ -130,6 +165,8 @@ export default function LoginPage() {
       className="relative isolate flex min-h-[100dvh] w-full flex-col items-center justify-center overflow-x-hidden px-5 py-10 sm:px-6"
       style={{ color: ink }}
     >
+      <LoginBackdrop />
+
       <div className="relative z-[1] w-full max-w-[420px]">
         <header className="flex flex-col items-center text-center">
           <div className="relative flex h-[4.25rem] w-[4.25rem] items-center justify-center sm:h-[4.75rem] sm:w-[4.75rem]">
@@ -153,24 +190,21 @@ export default function LoginPage() {
           >
             ember
           </p>
-          <h1 className="mt-5 text-[1.85rem] font-bold leading-tight tracking-[-0.03em] sm:text-[2.125rem]">
-            Sign in
+          <h1 className="mt-6 text-[1.85rem] font-bold leading-tight tracking-[-0.03em] sm:text-[2.125rem]">
+            Welcome back
           </h1>
-          <div
-            className="mt-3 h-[3px] w-16 rounded-full sm:w-[4.25rem]"
-            style={{
-              background: 'linear-gradient(90deg, #2D236E 0%, #2D236E 28%, #FF8A4C 55%, #F472B6 100%)',
-            }}
-          />
+          <p className="mt-2 max-w-[20rem] text-[0.9375rem] leading-snug sm:max-w-none" style={{ color: subhead }}>
+            Sign in to continue teaching the room.
+          </p>
         </header>
 
         <div
-          className="mt-9 rounded-[24px] bg-white px-7 py-9 shadow-[0_20px_50px_rgba(45,35,110,0.08),0_8px_20px_rgba(45,35,110,0.05)] sm:px-9 sm:py-10"
+          className="mt-8 rounded-[2rem] bg-white px-7 py-9 shadow-[0_24px_64px_rgba(45,35,110,0.1),0_10px_28px_rgba(45,35,110,0.06)] sm:px-9 sm:py-10"
           style={{ border: `1px solid ${borderField}` }}
         >
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label htmlFor="email" className="mb-2 block text-[0.8125rem] font-semibold tracking-wide">
+              <label htmlFor="email" className="mb-2 block text-[0.8125rem] font-bold tracking-wide">
                 Email
               </label>
               <div className={fieldRow} style={{ borderColor: borderField }}>
@@ -194,7 +228,7 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <label htmlFor="password" className="mb-2 block text-[0.8125rem] font-semibold tracking-wide">
+              <label htmlFor="password" className="mb-2 block text-[0.8125rem] font-bold tracking-wide">
                 Password
               </label>
               <div className={fieldRow} style={{ borderColor: borderField }}>
@@ -225,6 +259,26 @@ export default function LoginPage() {
               </div>
             </div>
 
+            <div className="flex flex-wrap items-center justify-between gap-3 text-[0.875rem]">
+              <label className="flex cursor-pointer select-none items-center gap-2.5" style={{ color: ink }}>
+                <input
+                  type="checkbox"
+                  name="remember_me_ui"
+                  checked={remember}
+                  onChange={(ev) => setRemember(ev.target.checked)}
+                  className="h-4 w-4 shrink-0 cursor-pointer rounded border-[#D0D5E0] bg-white text-[#5B4DB8] accent-[#5B4DB8] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#5B4DB8]"
+                />
+                <span className="font-medium opacity-90">Remember me</span>
+              </label>
+              <Link
+                href="mailto:admin@ember.local?subject=Password%20reset%20request"
+                className="font-semibold no-underline transition-opacity hover:opacity-80"
+                style={{ color: linkMuted }}
+              >
+                Forgot password?
+              </Link>
+            </div>
+
             {error ? (
               <div
                 className="rounded-xl border border-red-200/90 bg-red-50/95 px-3 py-2.5 text-sm text-red-900"
@@ -237,9 +291,9 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="flex h-[3.25rem] w-full items-center justify-center gap-2 rounded-2xl text-[0.9375rem] font-semibold text-white shadow-[0_10px_28px_rgba(62,41,211,0.35)] transition-[filter,transform,opacity] hover:brightness-[1.04] active:translate-y-px active:brightness-[0.98] disabled:cursor-not-allowed disabled:opacity-55"
+              className="flex h-[3.35rem] w-full items-center justify-center gap-2 rounded-full text-[0.9375rem] font-semibold text-white shadow-[0_12px_32px_rgba(91,75,184,0.38)] transition-[filter,transform,opacity] hover:brightness-[1.04] active:translate-y-px active:brightness-[0.98] disabled:cursor-not-allowed disabled:opacity-55"
               style={{
-                background: 'linear-gradient(90deg, #3E29D3 0%, #6D69F6 100%)',
+                background: 'linear-gradient(90deg, #4C32D4 0%, #6B5AE8 42%, #7C6CF0 100%)',
               }}
             >
               {loading ? (

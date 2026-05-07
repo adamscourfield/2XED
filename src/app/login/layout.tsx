@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
-import { Inter } from 'next/font/google';
+import { Manrope } from 'next/font/google';
 
-const inter = Inter({
+const manrope = Manrope({
   subsets: ['latin'],
   display: 'swap',
 });
@@ -9,7 +9,7 @@ const inter = Inter({
 export default function LoginLayout({ children }: { children: ReactNode }) {
   return (
     <div
-      className={`${inter.className} anx-app-canvas min-h-[100dvh] text-[#2D236E] antialiased`}
+      className={`${manrope.className} anx-app-canvas min-h-[100dvh] text-[#2D236E] antialiased`}
     >
       {children}
     </div>
