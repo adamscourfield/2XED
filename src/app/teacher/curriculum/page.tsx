@@ -60,11 +60,7 @@ export default async function CurriculumPage() {
     : [];
 
   return (
-    <LearningPageShell
-      title="Curriculum"
-      subtitle="Map your topics, set aims and success measures, then build lessons from here."
-      appChrome="teacher"
-    >
+    <LearningPageShell appChrome="teacher" hideHeader maxWidthClassName="max-w-3xl">
       <CurriculumPlanner plans={plans} subjects={subjects} />
     </LearningPageShell>
   );
