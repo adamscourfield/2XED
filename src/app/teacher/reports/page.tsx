@@ -27,7 +27,7 @@ export default async function TeacherReportsPage() {
       appChromeShowLeadershipNav={showLeadership}
       maxWidthClassName="max-w-[min(100%,1600px)]"
       innerClassName="sm:px-8 lg:px-10"
-      contentWrapperClassName="anx-reports-page -mx-4 rounded-2xl bg-[var(--report-canvas)] px-4 py-6 sm:-mx-6 sm:px-6 sm:py-8 lg:-mx-10 lg:px-10"
+      contentWrapperClassName="anx-reports-page -mx-4 rounded-2xl px-4 py-6 sm:-mx-6 sm:px-6 sm:py-8 lg:-mx-10 lg:px-10"
       actions={<TeacherReportsHeaderActions />}
     >
       <TeacherReportsDashboard />
