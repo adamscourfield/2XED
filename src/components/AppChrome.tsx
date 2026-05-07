@@ -403,9 +403,10 @@ export function AppChrome({
   }, [variant, role, sessionStatus, studentLayout]);
 
   const homeHref = variant === "teacher" ? "/teacher/dashboard" : "/dashboard";
-  const tagline = variant === "teacher" ? "Teach the Room" : "Your learning hub";
+  const studentTagline = "Your learning hub";
 
   const teacherNavPrimary: NavItem[] = [
+    { href: "/teacher/dashboard", label: "Dashboard", icon: "dashboard" },
     { href: "/teacher/curriculum", label: "Curriculum", icon: "layers" },
     { href: "/teacher/lessons", label: "Lessons", icon: "bookOpen" },
     { href: "/teacher/live", label: "Live", icon: "bolt" },
@@ -414,7 +415,7 @@ export function AppChrome({
   ];
 
   const teacherNavSecondary: NavItem[] = [
-    { href: "/teacher/help", label: "Help centre", icon: "help" },
+    { href: "/teacher/help", label: "Help Centre", icon: "help" },
   ];
 
   const liveStudentItem: NavItem = {
@@ -475,9 +476,9 @@ export function AppChrome({
         onClick={onNavigate}
         className={
           teacher
-            ? `group relative flex items-center gap-3 rounded-xl py-2.5 pl-3 pr-2.5 transition-colors duration-150 ${
+            ? `group relative flex items-center gap-3 rounded-2xl py-2.5 pl-3 pr-2.5 transition-colors duration-150 ${
                 active
-                  ? "bg-[#f5f3ff] before:absolute before:left-0 before:top-1/2 before:h-[2.125rem] before:w-[4px] before:-translate-y-1/2 before:rounded-full before:bg-[#2563eb] before:content-['']"
+                  ? "bg-[#f5f3ff] before:absolute before:left-0 before:top-1/2 before:h-[2.125rem] before:w-[4px] before:-translate-y-1/2 before:rounded-full before:bg-[#5850ec] before:content-['']"
                   : "text-[#374151] hover:bg-[#f9fafb]"
               }`
             : `group relative flex items-center gap-3 rounded-2xl px-3 py-2.5 pl-3 transition-colors duration-150 ${
@@ -499,7 +500,7 @@ export function AppChrome({
             className={`block text-[0.9375rem] font-semibold leading-snug tracking-tight ${
               teacher
                 ? active
-                  ? "text-[#111827]"
+                  ? "text-[#5850ec]"
                   : "text-[#374151]"
                 : active
                   ? "text-[#312e81]"
@@ -624,7 +625,7 @@ export function AppChrome({
             );
           })}
         </nav>
-        <div className="mx-2 border-t border-[#e5e7eb]" />
+        <div className="mx-2 border-t border-[#eceaf4]" />
         <nav className="flex flex-col gap-0.5" aria-label="Secondary">
           {teacherNavSecondary.map((item) => {
             const active = isNavActive(pathname, item.href);
@@ -658,15 +659,11 @@ export function AppChrome({
     >
       <LogoImage className="h-8 w-auto shrink-0 sm:h-9" />
       <div className="min-w-0 text-left">
-        <p
-          className={
-            variant === "teacher"
-              ? "truncate text-base font-bold leading-tight tracking-tight text-[#111827]"
-              : "truncate text-xs font-medium text-[color:var(--anx-text-muted)]"
-          }
-        >
-          {tagline}
-        </p>
+        {variant === "teacher" ? (
+          <p className="truncate text-xl font-bold leading-none tracking-tight text-[#1e1b4b]">ember</p>
+        ) : (
+          <p className="truncate text-xs font-medium text-[color:var(--anx-text-muted)]">{studentTagline}</p>
+        )}
       </div>
     </Link>
   );
@@ -771,20 +768,20 @@ export function AppChrome({
         id="app-chrome-drawer"
         className={`fixed inset-y-0 left-0 z-50 flex w-[min(18rem,88vw)] flex-col border-r shadow-[var(--anx-shadow-lg)] transition-transform duration-200 ease-out lg:static lg:z-0 lg:w-[min(17.5rem,20vw)] lg:max-w-[280px] lg:translate-x-0 lg:shadow-none ${
           variant === "teacher"
-            ? "border-[#e5e7eb] bg-[#fafafa] lg:border-[#e5e7eb] lg:shadow-[1px_0_0_rgba(0,0,0,0.04)]"
+            ? "border-[#eceaf4] bg-[#f8f7fb] lg:border-[#eceaf4] lg:shadow-[1px_0_0_rgba(88,80,236,0.06)]"
             : "border-[var(--anx-outline-variant)] bg-[color:var(--anx-surface-raised)] lg:shadow-none"
         } ${menuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
       >
         <div
           className={`hidden p-4 lg:block ${
-            variant === "teacher" ? "border-b border-[#e5e7eb]" : "border-b border-[var(--anx-outline-variant)]"
+            variant === "teacher" ? "border-b border-[#eceaf4]" : "border-b border-[var(--anx-outline-variant)]"
           }`}
         >
           {brandBlock}
         </div>
         <div
           className={`p-3 lg:hidden ${
-            variant === "teacher" ? "border-b border-[#e5e7eb]" : "border-b border-[var(--anx-outline-variant)]"
+            variant === "teacher" ? "border-b border-[#eceaf4]" : "border-b border-[var(--anx-outline-variant)]"
           }`}
         >
           {brandBlock}
@@ -801,7 +798,7 @@ export function AppChrome({
 
         <div
           className={`p-4 ${
-            variant === "teacher" ? "border-t border-[#e5e7eb] bg-[#fafafa]" : "border-t border-[var(--anx-outline-variant)]"
+            variant === "teacher" ? "border-t border-[#eceaf4] bg-[#f4f3f8]" : "border-t border-[var(--anx-outline-variant)]"
           }`}
         >
           {variant === "teacher" ? (
@@ -822,7 +819,7 @@ export function AppChrome({
               </div>
               <span className="shrink-0 text-[#9ca3af]" aria-hidden>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                  <path d="M9 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </span>
             </Link>
@@ -849,12 +846,23 @@ export function AppChrome({
           <button
             type="button"
             onClick={() => signOut({ callbackUrl: "/login" })}
-            className={`mt-3 w-full text-center text-xs font-medium transition ${
+            className={`mt-3 flex w-full items-center justify-center gap-2 text-xs font-semibold transition ${
               variant === "teacher"
                 ? "text-[#6b7280] hover:text-[#5850ec]"
                 : "text-[color:var(--anx-text-muted)] hover:text-[color:var(--anx-text)]"
             }`}
           >
+            {variant === "teacher" ? (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="shrink-0 opacity-80" aria-hidden>
+                <path
+                  d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"
+                  stroke="currentColor"
+                  strokeWidth="1.75"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            ) : null}
             Sign out
           </button>
         </div>
