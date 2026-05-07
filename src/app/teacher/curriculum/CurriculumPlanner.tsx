@@ -19,22 +19,23 @@ interface Props {
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-function formatDate(iso: string) {
+function formatUpdatedPhrase(iso: string): string {
   const d = new Date(iso);
   const now = new Date();
-  const diff = Math.floor((now.getTime() - d.getTime()) / 86400000);
-  if (diff === 0) return 'Today';
-  if (diff === 1) return 'Yesterday';
-  if (diff < 7) return `${diff} days ago`;
-  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  const startToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  const startUpdated = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+  const diffDays = Math.round((startToday - startUpdated) / 86400000);
+  if (diffDays === 0) return 'Updated today';
+  if (diffDays === 1) return 'Updated yesterday';
+  if (diffDays < 7) return `Updated ${diffDays} days ago`;
+  return `Updated ${d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}`;
 }
 
 // ── New Plan Modal ─────────────────────────────────────────────────────────────
 
-function NewPlanModal({ subjects, onClose, onCreated }: {
+function NewPlanModal({ subjects, onClose }: {
   subjects: Subject[];
   onClose: () => void;
-  onCreated: (plan: CurriculumPlanSummary) => void;
 }) {
   const router = useRouter();
   const [title, setTitle] = useState('');
@@ -78,8 +79,8 @@ function NewPlanModal({ subjects, onClose, onCreated }: {
     >
       <div className="w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-2xl">
         {/* Header */}
-        <div className="flex items-start gap-4 bg-[#5850ec] px-6 py-5">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/20">
+        <div className="flex items-start gap-4 bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] px-6 py-5">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/20">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
               <path d="M12 2L2 7l10 5 10-5-10-5Z" stroke="white" strokeWidth="1.75" strokeLinejoin="round" />
               <path d="M2 17l10 5 10-5" stroke="white" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
@@ -104,7 +105,7 @@ function NewPlanModal({ subjects, onClose, onCreated }: {
               Plan title
             </label>
             <input
-              className="w-full rounded-xl border border-[#e5e7eb] px-3 py-2.5 text-sm text-[#111827] placeholder:text-[#9ca3af] focus:border-[#5850ec] focus:outline-none focus:ring-2 focus:ring-[#5850ec]/20"
+              className="w-full rounded-xl border border-[#e5e7eb] px-3 py-2.5 text-sm text-[#111827] placeholder:text-[#9ca3af] focus:border-[#6366F1] focus:outline-none focus:ring-2 focus:ring-[#6366F1]/20"
               placeholder="e.g. Year 9 Maths — Autumn Term"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
@@ -118,7 +119,7 @@ function NewPlanModal({ subjects, onClose, onCreated }: {
               Subject
             </label>
             <select
-              className="w-full rounded-xl border border-[#e5e7eb] px-3 py-2.5 text-sm text-[#111827] focus:border-[#5850ec] focus:outline-none focus:ring-2 focus:ring-[#5850ec]/20"
+              className="w-full rounded-xl border border-[#e5e7eb] px-3 py-2.5 text-sm text-[#111827] focus:border-[#6366F1] focus:outline-none focus:ring-2 focus:ring-[#6366F1]/20"
               value={subjectId}
               onChange={(e) => setSubjectId(e.target.value)}
               required
@@ -135,7 +136,7 @@ function NewPlanModal({ subjects, onClose, onCreated }: {
                 Academic year <span className="font-normal normal-case text-[#9ca3af]">(optional)</span>
               </label>
               <input
-                className="w-full rounded-xl border border-[#e5e7eb] px-3 py-2.5 text-sm text-[#111827] placeholder:text-[#9ca3af] focus:border-[#5850ec] focus:outline-none focus:ring-2 focus:ring-[#5850ec]/20"
+                className="w-full rounded-xl border border-[#e5e7eb] px-3 py-2.5 text-sm text-[#111827] placeholder:text-[#9ca3af] focus:border-[#6366F1] focus:outline-none focus:ring-2 focus:ring-[#6366F1]/20"
                 placeholder="2025–26"
                 value={academicYear}
                 onChange={(e) => setAcademicYear(e.target.value)}
@@ -146,7 +147,7 @@ function NewPlanModal({ subjects, onClose, onCreated }: {
                 Term <span className="font-normal normal-case text-[#9ca3af]">(optional)</span>
               </label>
               <input
-                className="w-full rounded-xl border border-[#e5e7eb] px-3 py-2.5 text-sm text-[#111827] placeholder:text-[#9ca3af] focus:border-[#5850ec] focus:outline-none focus:ring-2 focus:ring-[#5850ec]/20"
+                className="w-full rounded-xl border border-[#e5e7eb] px-3 py-2.5 text-sm text-[#111827] placeholder:text-[#9ca3af] focus:border-[#6366F1] focus:outline-none focus:ring-2 focus:ring-[#6366F1]/20"
                 placeholder="Autumn"
                 value={termLabel}
                 onChange={(e) => setTermLabel(e.target.value)}
@@ -165,7 +166,7 @@ function NewPlanModal({ subjects, onClose, onCreated }: {
             <button
               type="submit"
               disabled={saving || !title.trim() || !subjectId}
-              className="inline-flex items-center gap-2 rounded-lg bg-[#5850ec] px-5 py-2 text-sm font-semibold text-white shadow hover:bg-[#4338ca] disabled:opacity-50"
+              className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] px-6 py-2.5 text-sm font-semibold text-white shadow-[0_6px_20px_rgba(99,102,241,0.35)] transition hover:brightness-[1.03] disabled:opacity-50"
             >
               {saving ? 'Creating…' : 'Create plan'}
             </button>
@@ -182,19 +183,21 @@ function PlanCard({ plan }: { plan: CurriculumPlanSummary }) {
   return (
     <a
       href={`/teacher/curriculum/${plan.id}`}
-      className="group flex flex-col gap-3 rounded-2xl border border-[#e5e7eb] bg-white p-5 shadow-sm transition hover:border-[#5850ec]/40 hover:shadow-md"
+      className="group block w-full max-w-2xl rounded-2xl border border-[#EEF0FB] bg-white shadow-[0_4px_28px_rgba(26,26,61,0.07)] transition hover:border-[#6366F1]/25 hover:shadow-[0_8px_32px_rgba(99,102,241,0.10)]"
     >
-      <div className="flex items-start gap-3">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#eef2ff] text-[#5850ec]">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <div className="flex gap-4 p-6 pb-5">
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#EEF2FF] text-[#6366F1]">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
             <path d="M12 2L2 7l10 5 10-5-10-5Z" stroke="currentColor" strokeWidth="1.75" strokeLinejoin="round" />
             <path d="M2 17l10 5 10-5" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
             <path d="M2 12l10 5 10-5" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </div>
-        <div className="min-w-0 flex-1">
-          <p className="truncate font-semibold text-[#111827] group-hover:text-[#5850ec] transition-colors">{plan.title}</p>
-          <p className="mt-0.5 text-xs text-[#6b7280]">
+        <div className="min-w-0 flex-1 pt-0.5">
+          <p className="truncate text-lg font-bold tracking-tight text-[#1A1A3D] transition-colors group-hover:text-[#6366F1]">
+            {plan.title}
+          </p>
+          <p className="mt-1.5 text-sm leading-relaxed text-[#6B7280]">
             {plan.subjectTitle}
             {plan.academicYear && ` · ${plan.academicYear}`}
             {plan.termLabel && ` · ${plan.termLabel}`}
@@ -202,14 +205,16 @@ function PlanCard({ plan }: { plan: CurriculumPlanSummary }) {
         </div>
       </div>
 
-      <div className="flex items-center gap-4 border-t border-[#f3f4f6] pt-3 text-xs text-[#6b7280]">
-        <span>
-          <span className="font-semibold text-[#374151]">{plan.unitCount}</span> {plan.unitCount === 1 ? 'unit' : 'units'}
+      <div className="grid grid-cols-3 gap-3 border-t border-[#EEF0F4] px-6 py-4 text-sm">
+        <span className="text-[#6B7280]">
+          <span className="font-bold text-[#374151]">{plan.unitCount}</span>
+          {plan.unitCount === 1 ? ' unit' : ' units'}
         </span>
-        <span>
-          <span className="font-semibold text-[#374151]">{plan.lessonCount}</span> {plan.lessonCount === 1 ? 'lesson' : 'lessons'}
+        <span className="text-center text-[#6B7280]">
+          <span className="font-bold text-[#374151]">{plan.lessonCount}</span>
+          {plan.lessonCount === 1 ? ' lesson' : ' lessons'}
         </span>
-        <span className="ml-auto">Updated {formatDate(plan.updatedAt)}</span>
+        <span className="text-right text-[#6B7280]">{formatUpdatedPhrase(plan.updatedAt)}</span>
       </div>
     </a>
   );
@@ -217,72 +222,68 @@ function PlanCard({ plan }: { plan: CurriculumPlanSummary }) {
 
 // ── Main Component ────────────────────────────────────────────────────────────
 
-export function CurriculumPlanner({ plans: initialPlans, subjects }: Props) {
-  const [plans, setPlans] = useState(initialPlans);
+export function CurriculumPlanner({ plans, subjects }: Props) {
   const [showNew, setShowNew] = useState(false);
 
+  const gradientBtn =
+    'inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_8px_24px_rgba(99,102,241,0.35)] transition hover:brightness-[1.03] active:scale-[0.99]';
+
   return (
-    <div className="space-y-6">
-      {/* Top bar */}
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-[#6b7280]">
+    <div className="-mx-4 bg-[#F8F8FD] px-4 pb-16 pt-1 sm:-mx-6 sm:px-6">
+      <header className="max-w-2xl">
+        <h1 className="text-3xl font-bold tracking-tight text-[#1A1A3D] sm:text-[2rem] sm:leading-tight">
+          Curriculum
+        </h1>
+        <p className="mt-3 max-w-xl text-base leading-relaxed text-[#6B7280]">
+          Map your topics, set aims and success measures, then build lessons from here.
+        </p>
+      </header>
+
+      <div className="mt-10 flex max-w-2xl flex-wrap items-center justify-between gap-4">
+        <p className="text-sm text-[#9CA3AF]">
           {plans.length === 0
-            ? 'No plans yet — create one to start mapping your curriculum.'
+            ? '0 plans'
             : `${plans.length} ${plans.length === 1 ? 'plan' : 'plans'}`}
         </p>
-        <button
-          type="button"
-          onClick={() => setShowNew(true)}
-          className="inline-flex items-center gap-2 rounded-xl bg-[#5850ec] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#4338ca] transition"
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
-            <path d="M12 5v14M5 12h14" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+        <button type="button" onClick={() => setShowNew(true)} className={gradientBtn}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
+            <path d="M12 5v14M5 12h14" stroke="white" strokeWidth="2.25" strokeLinecap="round" />
           </svg>
           New plan
         </button>
       </div>
 
-      {/* Grid */}
-      {plans.length > 0 ? (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {plans.map((p) => <PlanCard key={p.id} plan={p} />)}
-        </div>
-      ) : (
-        <div className="rounded-2xl border border-dashed border-[#e5e7eb] px-6 py-16 text-center">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#eef2ff] text-[#5850ec]">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden>
-              <path d="M12 2L2 7l10 5 10-5-10-5Z" stroke="currentColor" strokeWidth="1.75" strokeLinejoin="round" />
-              <path d="M2 17l10 5 10-5" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
-              <path d="M2 12l10 5 10-5" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+      <div className="mt-8">
+        {plans.length > 0 ? (
+          <div className="flex flex-col gap-5">
+            {plans.map((p) => (
+              <PlanCard key={p.id} plan={p} />
+            ))}
           </div>
-          <p className="text-base font-semibold text-[#111827]">Plan before you teach</p>
-          <p className="mt-2 max-w-sm mx-auto text-sm text-[#6b7280]">
-            Create a curriculum plan to map your units, set aims and success measures, and build lessons in context.
-          </p>
-          <button
-            type="button"
-            onClick={() => setShowNew(true)}
-            className="mt-5 inline-flex items-center gap-2 rounded-xl bg-[#5850ec] px-5 py-2.5 text-sm font-semibold text-white shadow hover:bg-[#4338ca] transition"
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
-              <path d="M12 5v14M5 12h14" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-            </svg>
-            Create your first plan
-          </button>
-        </div>
-      )}
+        ) : (
+          <div className="max-w-2xl rounded-2xl border border-dashed border-[#D9DCF0] bg-white/70 px-8 py-14 text-center shadow-[0_2px_16px_rgba(26,26,61,0.04)]">
+            <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-[#EEF2FF] text-[#6366F1]">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden>
+                <path d="M12 2L2 7l10 5 10-5-10-5Z" stroke="currentColor" strokeWidth="1.75" strokeLinejoin="round" />
+                <path d="M2 17l10 5 10-5" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M2 12l10 5 10-5" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+            <p className="text-lg font-bold text-[#1A1A3D]">Plan before you teach</p>
+            <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-[#6B7280]">
+              Create a curriculum plan to map your units, set aims and success measures, and build lessons in context.
+            </p>
+            <button type="button" onClick={() => setShowNew(true)} className={`${gradientBtn} mt-6`}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
+                <path d="M12 5v14M5 12h14" stroke="white" strokeWidth="2.25" strokeLinecap="round" />
+              </svg>
+              Create your first plan
+            </button>
+          </div>
+        )}
+      </div>
 
-      {showNew && (
-        <NewPlanModal
-          subjects={subjects}
-          onClose={() => setShowNew(false)}
-          onCreated={(plan) => {
-            setPlans((prev) => [plan, ...prev]);
-            setShowNew(false);
-          }}
-        />
-      )}
+      {showNew && <NewPlanModal subjects={subjects} onClose={() => setShowNew(false)} />}
     </div>
   );
 }
