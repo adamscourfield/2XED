@@ -2,6 +2,7 @@
 
 import { useCallback, useState } from 'react';
 import type { AnswerMode, LessonItem } from './LessonBuilder';
+import { QuestionBankPicker } from './QuestionBankPicker';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -363,6 +364,7 @@ export function QuestionForm({ item, onSave, onDelete, index, collapsible = fals
 interface CheckBlockEditorProps {
   blockId: string;
   lessonId: string;
+  subjectId: string;
   item: LessonItem | null;
   onItemCreated: (item: LessonItem) => void;
   onItemUpdated: (item: LessonItem) => void;
@@ -372,12 +374,14 @@ interface CheckBlockEditorProps {
 export function CheckBlockEditor({
   blockId,
   lessonId,
+  subjectId,
   item,
   onItemCreated,
   onItemUpdated,
   onItemDeleted,
 }: CheckBlockEditorProps) {
   const [creating, setCreating] = useState(false);
+  const [pickerOpen, setPickerOpen] = useState(false);
 
   const createItem = useCallback(async () => {
     setCreating(true);
@@ -421,20 +425,40 @@ export function CheckBlockEditor({
 
   if (!item) {
     return (
-      <div className="rounded-xl border-2 border-dashed border-[#e5e7eb] px-6 py-10 text-center">
-        <p className="text-sm font-medium text-[#374151]">No question yet</p>
-        <p className="mt-1 text-xs text-[#6b7280]">
-          A Check block has one question that everyone answers at the same time.
-        </p>
-        <button
-          type="button"
-          onClick={createItem}
-          disabled={creating}
-          className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-[#10b981] px-4 py-2 text-sm font-semibold text-white shadow transition hover:bg-[#059669] disabled:opacity-50"
-        >
-          {creating ? 'Creating…' : '+ Add question'}
-        </button>
-      </div>
+      <>
+        <div className="rounded-xl border-2 border-dashed border-[#e5e7eb] px-6 py-10 text-center">
+          <p className="text-sm font-medium text-[#374151]">No question yet</p>
+          <p className="mt-1 text-xs text-[#6b7280]">
+            A Check block has one question that everyone answers at the same time.
+          </p>
+          <div className="mt-4 flex items-center justify-center gap-2">
+            <button
+              type="button"
+              onClick={createItem}
+              disabled={creating}
+              className="inline-flex items-center gap-1.5 rounded-lg bg-[#10b981] px-4 py-2 text-sm font-semibold text-white shadow transition hover:bg-[#059669] disabled:opacity-50"
+            >
+              {creating ? 'Creating…' : '+ Write question'}
+            </button>
+            <button
+              type="button"
+              onClick={() => setPickerOpen(true)}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-[#5850ec] bg-white px-4 py-2 text-sm font-semibold text-[#5850ec] shadow transition hover:bg-[#f5f3ff]"
+            >
+              Browse bank
+            </button>
+          </div>
+        </div>
+        {pickerOpen && (
+          <QuestionBankPicker
+            subjectId={subjectId}
+            lessonId={lessonId}
+            blockId={blockId}
+            onItemAdded={(newItem) => { onItemCreated(newItem); setPickerOpen(false); }}
+            onClose={() => setPickerOpen(false)}
+          />
+        )}
+      </>
     );
   }
 
@@ -453,6 +477,7 @@ export function CheckBlockEditor({
 interface PracticeBlockEditorProps {
   blockId: string;
   lessonId: string;
+  subjectId: string;
   items: LessonItem[];
   onItemCreated: (item: LessonItem) => void;
   onItemUpdated: (item: LessonItem) => void;
@@ -462,12 +487,14 @@ interface PracticeBlockEditorProps {
 export function PracticeBlockEditor({
   blockId,
   lessonId,
+  subjectId,
   items,
   onItemCreated,
   onItemUpdated,
   onItemDeleted,
 }: PracticeBlockEditorProps) {
   const [adding, setAdding] = useState(false);
+  const [pickerOpen, setPickerOpen] = useState(false);
 
   const addQuestion = useCallback(async () => {
     setAdding(true);
@@ -490,52 +517,76 @@ export function PracticeBlockEditor({
   }, [lessonId, blockId, onItemCreated]);
 
   return (
-    <div className="space-y-3">
-      {items.length === 0 ? (
-        <div className="rounded-xl border-2 border-dashed border-[#e5e7eb] px-6 py-10 text-center">
-          <p className="text-sm font-medium text-[#374151]">No questions yet</p>
-          <p className="mt-1 text-xs text-[#6b7280]">
-            Students work through these at their own pace. AI will route students who struggle to the right explanation.
-          </p>
-        </div>
-      ) : (
-        items.map((item, i) => (
-          <QuestionForm
-            key={item.id}
-            item={item}
-            index={i}
-            collapsible
-            onSave={async (updates) => {
-              const res = await fetch(`/api/lessons/${lessonId}/blocks/${blockId}/items/${item.id}`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(updates),
-              });
-              if (!res.ok) throw new Error(`HTTP ${res.status}`);
-              const updated = await res.json() as LessonItem;
-              onItemUpdated(updated);
-            }}
-            onDelete={async () => {
-              if (!confirm('Remove this question?')) return;
-              const res = await fetch(`/api/lessons/${lessonId}/blocks/${blockId}/items/${item.id}`, { method: 'DELETE' });
-              if (!res.ok) throw new Error(`HTTP ${res.status}`);
-              onItemDeleted(item.id);
-            }}
-          />
-        ))
-      )}
+    <>
+      <div className="space-y-3">
+        {items.length === 0 ? (
+          <div className="rounded-xl border-2 border-dashed border-[#e5e7eb] px-6 py-10 text-center">
+            <p className="text-sm font-medium text-[#374151]">No questions yet</p>
+            <p className="mt-1 text-xs text-[#6b7280]">
+              Students work through these at their own pace. AI will route students who struggle to the right explanation.
+            </p>
+          </div>
+        ) : (
+          items.map((item, i) => (
+            <QuestionForm
+              key={item.id}
+              item={item}
+              index={i}
+              collapsible
+              onSave={async (updates) => {
+                const res = await fetch(`/api/lessons/${lessonId}/blocks/${blockId}/items/${item.id}`, {
+                  method: 'PATCH',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(updates),
+                });
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const updated = await res.json() as LessonItem;
+                onItemUpdated(updated);
+              }}
+              onDelete={async () => {
+                if (!confirm('Remove this question?')) return;
+                const res = await fetch(`/api/lessons/${lessonId}/blocks/${blockId}/items/${item.id}`, { method: 'DELETE' });
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                onItemDeleted(item.id);
+              }}
+            />
+          ))
+        )}
 
-      <button
-        type="button"
-        onClick={addQuestion}
-        disabled={adding}
-        className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-[#5850ec]/30 py-3 text-sm font-semibold text-[#5850ec] transition hover:border-[#5850ec]/60 hover:bg-[#f5f3ff] disabled:opacity-50"
-      >
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
-          <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" />
-        </svg>
-        {adding ? 'Adding…' : 'Add question'}
-      </button>
-    </div>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={addQuestion}
+            disabled={adding}
+            className="flex flex-1 items-center justify-center gap-2 rounded-xl border-2 border-dashed border-[#5850ec]/30 py-3 text-sm font-semibold text-[#5850ec] transition hover:border-[#5850ec]/60 hover:bg-[#f5f3ff] disabled:opacity-50"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
+              <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" />
+            </svg>
+            {adding ? 'Adding…' : 'Write question'}
+          </button>
+          <button
+            type="button"
+            onClick={() => setPickerOpen(true)}
+            className="flex items-center gap-1.5 rounded-xl border-2 border-dashed border-[#5850ec]/30 px-4 py-3 text-sm font-semibold text-[#5850ec] transition hover:border-[#5850ec]/60 hover:bg-[#f5f3ff]"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
+              <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            Browse bank
+          </button>
+        </div>
+      </div>
+
+      {pickerOpen && (
+        <QuestionBankPicker
+          subjectId={subjectId}
+          lessonId={lessonId}
+          blockId={blockId}
+          onItemAdded={(newItem) => { onItemCreated(newItem); }}
+          onClose={() => setPickerOpen(false)}
+        />
+      )}
+    </>
   );
 }
