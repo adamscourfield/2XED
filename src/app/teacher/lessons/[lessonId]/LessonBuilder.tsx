@@ -186,6 +186,7 @@ function BlockRow({
 function BlockEditor({
   block,
   lessonId,
+  lessonSubjectId,
   lessonTopic,
   lessonSubjectTitle,
   curriculumUnit,
@@ -198,6 +199,7 @@ function BlockEditor({
 }: {
   block: LessonBlock;
   lessonId: string;
+  lessonSubjectId: string;
   lessonTopic: string;
   lessonSubjectTitle: string;
   curriculumUnit: { id: string; title: string } | null;
@@ -245,6 +247,7 @@ function BlockEditor({
         <CheckBlockEditor
           blockId={block.id}
           lessonId={lessonId}
+          subjectId={lessonSubjectId}
           item={block.items[0] ?? null}
           onItemCreated={onItemCreated}
           onItemUpdated={onItemUpdated}
@@ -254,6 +257,7 @@ function BlockEditor({
         <PracticeBlockEditor
           blockId={block.id}
           lessonId={lessonId}
+          subjectId={lessonSubjectId}
           items={block.items}
           onItemCreated={onItemCreated}
           onItemUpdated={onItemUpdated}
@@ -674,6 +678,7 @@ export function LessonBuilder({ lesson: initialLesson }: { lesson: LessonBuilder
             <BlockEditor
               block={selectedBlock}
               lessonId={lesson.id}
+              lessonSubjectId={lesson.subject.id}
               lessonTopic={lesson.topic}
               lessonSubjectTitle={lesson.subject.title}
               curriculumUnit={lesson.curriculumUnit}
