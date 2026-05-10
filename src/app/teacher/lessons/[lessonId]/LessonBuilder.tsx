@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useDebounce } from '@/hooks/useDebounce';
 import { CheckBlockEditor, PracticeBlockEditor } from './QuestionEditor';
 import { ExplainBlockEditor, ModelBlockEditor } from './SlideEditor';
 import { DoNowBlockEditor } from './DoNowEditor';
@@ -55,15 +56,53 @@ const BLOCK_META: Record<BlockType, { label: string; shortLabel: string; color: 
 
 const ADD_BLOCK_ORDER: BlockType[] = ['DO_NOW', 'EXPLAIN', 'MODEL', 'CHECK', 'PRACTICE'];
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
+// ─── Confirm modal (UX-8: replaces window.confirm) ───────────────────────────
 
-function useDebounce<T>(value: T, delay: number): T {
-  const [debounced, setDebounced] = useState(value);
+interface ConfirmModalProps {
+  message: string;
+  confirmLabel?: string;
+  onConfirm: () => void;
+  onCancel: () => void;
+}
+
+function ConfirmModal({ message, confirmLabel = 'Delete', onConfirm, onCancel }: ConfirmModalProps) {
+  // Close on Escape
   useEffect(() => {
-    const t = setTimeout(() => setDebounced(value), delay);
-    return () => clearTimeout(t);
-  }, [value, delay]);
-  return debounced;
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onCancel(); };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, [onCancel]);
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm"
+      role="dialog"
+      aria-modal="true"
+      onClick={(e) => { if (e.target === e.currentTarget) onCancel(); }}
+    >
+      <div className="w-full max-w-sm overflow-hidden rounded-2xl bg-white shadow-2xl">
+        <div className="px-5 py-5">
+          <p className="text-sm font-medium text-[#111827]">{message}</p>
+        </div>
+        <div className="flex items-center justify-end gap-2 border-t border-[#f3f4f6] px-5 py-3">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="rounded-lg px-4 py-2 text-sm font-semibold text-[#6b7280] transition hover:bg-[#f3f4f6]"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={onConfirm}
+            className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow transition hover:bg-red-700"
+          >
+            {confirmLabel}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 // ─── Block palette ────────────────────────────────────────────────────────────
@@ -303,7 +342,7 @@ function BlockEditor({
 
 // ─── Student preview panel ───────────────────────────────────────────────────
 
-function StudentPreview({ block, lessonTitle }: { block: LessonBlock | null; lessonTitle: string }) {
+function StudentPreviewContent({ block, lessonTitle }: { block: LessonBlock | null; lessonTitle: string }) {
   return (
     <div className="flex h-full flex-col">
       <div className="mb-3 flex items-center gap-2">
@@ -362,6 +401,42 @@ function StudentPreview({ block, lessonTitle }: { block: LessonBlock | null; les
   );
 }
 
+// UX-10: Preview modal for screens < xl
+function PreviewModal({ block, lessonTitle, onClose }: { block: LessonBlock | null; lessonTitle: string; onClose: () => void }) {
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, [onClose]);
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm xl:hidden"
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Student preview"
+    >
+      <div className="w-full max-w-sm overflow-y-auto rounded-2xl bg-white p-5 shadow-2xl">
+        <div className="mb-4 flex items-center justify-between">
+          <span className="text-sm font-semibold text-[#111827]">Student preview</span>
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex h-7 w-7 items-center justify-center rounded-lg text-[#6b7280] transition hover:bg-[#f3f4f6]"
+            aria-label="Close preview"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
+              <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            </svg>
+          </button>
+        </div>
+        <StudentPreviewContent block={block} lessonTitle={lessonTitle} />
+      </div>
+    </div>
+  );
+}
+
 // ─── Main builder ────────────────────────────────────────────────────────────
 
 export function LessonBuilder({ lesson: initialLesson }: { lesson: LessonBuilderData }) {
@@ -373,6 +448,10 @@ export function LessonBuilder({ lesson: initialLesson }: { lesson: LessonBuilder
   const [saveError, setSaveError] = useState<string | null>(null);
   const [showAddPanel, setShowAddPanel] = useState(false);
   const [showGoLive, setShowGoLive] = useState(false);
+  const [showPreviewModal, setShowPreviewModal] = useState(false);  // UX-10
+
+  // UX-8: confirm modal state
+  const [confirmModal, setConfirmModal] = useState<{ message: string; onConfirm: () => void } | null>(null);
 
   const debouncedTitle = useDebounce(lesson.title, 600);
   const debouncedTopic = useDebounce(lesson.topic, 600);
@@ -412,36 +491,49 @@ export function LessonBuilder({ lesson: initialLesson }: { lesson: LessonBuilder
     }
   }, [lesson.id]);
 
-  // Delete block
-  const deleteBlock = useCallback(async (blockId: string) => {
-    if (!confirm('Delete this block and all its content?')) return;
-    try {
-      const res = await fetch(`/api/lessons/${lesson.id}/blocks/${blockId}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      setLesson((prev) => {
-        const blocks = prev.blocks.filter((b) => b.id !== blockId);
-        return { ...prev, blocks };
-      });
-      setSelectedBlockId((prev) => {
-        if (prev !== blockId) return prev;
-        const remaining = lesson.blocks.filter((b) => b.id !== blockId);
-        return remaining[0]?.id ?? null;
-      });
-    } catch (e) {
-      setSaveError(e instanceof Error ? e.message : 'Failed to delete block');
-    }
+  // Delete block — UX-8: uses ConfirmModal instead of window.confirm
+  const deleteBlock = useCallback((blockId: string) => {
+    setConfirmModal({
+      message: 'Delete this block and all its content? This can\'t be undone.',
+      onConfirm: async () => {
+        setConfirmModal(null);
+        try {
+          const res = await fetch(`/api/lessons/${lesson.id}/blocks/${blockId}`, { method: 'DELETE' });
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          // Critical #1: two flat sequential state updates — never call setState inside another updater
+          setLesson((prev) => ({ ...prev, blocks: prev.blocks.filter((b) => b.id !== blockId) }));
+          setSelectedBlockId((prev) => {
+            if (prev !== blockId) return prev;
+            const remaining = lesson.blocks.filter((b) => b.id !== blockId);
+            return remaining[0]?.id ?? null;
+          });
+        } catch (e) {
+          setSaveError(e instanceof Error ? e.message : 'Failed to delete block');
+        }
+      },
+    });
+  // lesson.blocks in deps so the callback captures the current list when computing next selection
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lesson.id, lesson.blocks]);
 
-  // Move block
+  // BUG-3: Move block — functional updater avoids stale closure race condition
   const moveBlock = useCallback(async (blockId: string, dir: 'up' | 'down') => {
-    const blocks = [...lesson.blocks];
-    const idx = blocks.findIndex((b) => b.id === blockId);
-    if (idx < 0) return;
-    const targetIdx = dir === 'up' ? idx - 1 : idx + 1;
-    if (targetIdx < 0 || targetIdx >= blocks.length) return;
-    [blocks[idx], blocks[targetIdx]] = [blocks[targetIdx], blocks[idx]];
-    const reordered = blocks.map((b, i) => ({ ...b, sortOrder: i }));
-    setLesson((prev) => ({ ...prev, blocks: reordered }));
+    let reordered: LessonBlock[] = [];
+    let original: LessonBlock[] = [];
+
+    setLesson((prev) => {
+      const blocks = [...prev.blocks];
+      const idx = blocks.findIndex((b) => b.id === blockId);
+      if (idx < 0) return prev;
+      const targetIdx = dir === 'up' ? idx - 1 : idx + 1;
+      if (targetIdx < 0 || targetIdx >= blocks.length) return prev;
+      original = prev.blocks;
+      [blocks[idx], blocks[targetIdx]] = [blocks[targetIdx], blocks[idx]];
+      reordered = blocks.map((b, i) => ({ ...b, sortOrder: i }));
+      return { ...prev, blocks: reordered };
+    });
+
+    if (reordered.length === 0) return;
 
     try {
       await fetch(`/api/lessons/${lesson.id}/blocks/reorder`, {
@@ -450,10 +542,12 @@ export function LessonBuilder({ lesson: initialLesson }: { lesson: LessonBuilder
         body: JSON.stringify({ blockIds: reordered.map((b) => b.id) }),
       });
     } catch {
-      // Revert on failure
-      setLesson((prev) => ({ ...prev, blocks: lesson.blocks }));
+      // Revert to snapshot taken before optimistic update
+      if (original.length > 0) {
+        setLesson((prev) => ({ ...prev, blocks: original }));
+      }
     }
-  }, [lesson]);
+  }, [lesson.id]);
 
   // Item mutations — scoped to a specific block
   const addItemToBlock = useCallback((blockId: string, item: LessonItem) => {
@@ -485,7 +579,7 @@ export function LessonBuilder({ lesson: initialLesson }: { lesson: LessonBuilder
     }));
   }, []);
 
-  // Dismiss curriculum prompt (Do Now banner)
+  // Dismiss curriculum prompt
   const dismissCurriculumPrompt = useCallback(async () => {
     setLesson((prev) => ({ ...prev, curriculumPromptDismissed: true }));
     await fetch(`/api/lessons/${lesson.id}`, {
@@ -495,25 +589,51 @@ export function LessonBuilder({ lesson: initialLesson }: { lesson: LessonBuilder
     }).catch(() => setLesson((prev) => ({ ...prev, curriculumPromptDismissed: false })));
   }, [lesson.id]);
 
-  // Update block title
-  const updateBlockTitle = useCallback(async (blockId: string, title: string) => {
+  // UX-12: Block title with debounced API call — Medium #16: cleanup on unmount
+  const blockTitleTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+  useEffect(() => {
+    const timers = blockTitleTimers.current;
+    return () => { Object.values(timers).forEach(clearTimeout); };
+  }, []);
+  const updateBlockTitle = useCallback((blockId: string, title: string) => {
+    // Optimistic update immediately
     setLesson((prev) => ({
       ...prev,
       blocks: prev.blocks.map((b) => b.id === blockId ? { ...b, title: title || null } : b),
     }));
-    try {
-      await fetch(`/api/lessons/${lesson.id}/blocks/${blockId}`, {
+    // Debounce the API call (600ms)
+    if (blockTitleTimers.current[blockId]) clearTimeout(blockTitleTimers.current[blockId]);
+    blockTitleTimers.current[blockId] = setTimeout(() => {
+      void fetch(`/api/lessons/${lesson.id}/blocks/${blockId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ title: title || null }),
-      });
-    } catch { /* non-fatal */ }
+      }).catch(() => { /* non-fatal */ });
+    }, 600);
   }, [lesson.id]);
 
   const selectedBlock = lesson.blocks.find((b) => b.id === selectedBlockId) ?? null;
 
   return (
     <div className="flex h-screen flex-col overflow-hidden bg-[#f9fafb]">
+      {/* UX-8: Confirm modal */}
+      {confirmModal && (
+        <ConfirmModal
+          message={confirmModal.message}
+          onConfirm={confirmModal.onConfirm}
+          onCancel={() => setConfirmModal(null)}
+        />
+      )}
+
+      {/* UX-10: Preview modal for small screens */}
+      {showPreviewModal && (
+        <PreviewModal
+          block={selectedBlock}
+          lessonTitle={lesson.title}
+          onClose={() => setShowPreviewModal(false)}
+        />
+      )}
+
       {/* Top bar */}
       <header className="flex shrink-0 items-center gap-3 border-b border-[#e5e7eb] bg-white px-4 py-3 shadow-sm">
         <Link
@@ -645,7 +765,7 @@ export function LessonBuilder({ lesson: initialLesson }: { lesson: LessonBuilder
                   total={lesson.blocks.length}
                   selected={selectedBlockId === block.id}
                   onSelect={() => setSelectedBlockId(block.id)}
-                  onMove={(dir) => moveBlock(block.id, dir)}
+                  onMove={(dir) => void moveBlock(block.id, dir)}
                   onDelete={() => deleteBlock(block.id)}
                 />
               ))
@@ -692,11 +812,25 @@ export function LessonBuilder({ lesson: initialLesson }: { lesson: LessonBuilder
           )}
         </main>
 
-        {/* ── Right: student preview ── */}
+        {/* ── Right: student preview (xl+ only) ── */}
         <aside className="hidden w-[280px] shrink-0 overflow-y-auto border-l border-[#e5e7eb] bg-white p-4 xl:block">
-          <StudentPreview block={selectedBlock} lessonTitle={lesson.title} />
+          <StudentPreviewContent block={selectedBlock} lessonTitle={lesson.title} />
         </aside>
       </div>
+
+      {/* UX-10: Floating preview button on screens < xl */}
+      <button
+        type="button"
+        onClick={() => setShowPreviewModal(true)}
+        className="fixed bottom-5 right-5 z-40 flex items-center gap-2 rounded-full bg-[#5850ec] px-4 py-2.5 text-xs font-semibold text-white shadow-lg transition hover:bg-[#4338ca] xl:hidden"
+        aria-label="Open student preview"
+      >
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
+          <path d="M1 12C1 12 5 4 12 4s11 8 11 8-4 8-11 8S1 12 1 12Z" stroke="currentColor" strokeWidth="1.75" />
+          <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.75" />
+        </svg>
+        Preview
+      </button>
 
       {/* Go Live modal */}
       {showGoLive && (
@@ -704,6 +838,7 @@ export function LessonBuilder({ lesson: initialLesson }: { lesson: LessonBuilder
           lessonId={lesson.id}
           lessonTitle={lesson.title}
           subjectId={lesson.subject.id}
+          blocks={lesson.blocks}
           onClose={() => setShowGoLive(false)}
         />
       )}

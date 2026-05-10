@@ -131,6 +131,12 @@ export default function LoginPage() {
   const [logoOk, setLogoOk] = useState(true);
   const [remember, setRemember] = useState(false);
 
+  function routeForRole(role?: string) {
+    if (role === 'ADMIN') return '/admin';
+    if (role === 'TEACHER' || role === 'LEADERSHIP') return '/teacher/dashboard';
+    return '/dashboard';
+  }
+
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
@@ -153,7 +159,11 @@ export default function LoginPage() {
       return;
     }
 
-    router.push('/dashboard');
+    const sessionRes = await fetch('/api/auth/session');
+    const session = await sessionRes.json().catch(() => null);
+    const role = session?.user?.role as string | undefined;
+
+    router.push(routeForRole(role));
     router.refresh();
   }
 

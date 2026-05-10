@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import type { LessonItem } from './LessonBuilder';
 import { QuestionForm } from './QuestionEditor';
 import type { QuestionContent, } from './QuestionEditor';
@@ -34,12 +34,15 @@ export interface DoNowBlockEditorProps {
 
 const MAX_QUESTIONS = 3;
 
+// Critical #2: derive correctIndex from options array instead of storing answer text for MCQ
 function suggestionToContent(s: AiSuggestion): QuestionContent {
   if (s.type === 'MCQ') {
+    const options = s.options ?? [];
+    const correctIndex = s.answer !== undefined ? options.indexOf(s.answer) : undefined;
     return {
       question: s.stem,
-      options: s.options ?? [],
-      answer: s.answer ?? '',
+      options,
+      correctIndex: correctIndex !== undefined && correctIndex !== -1 ? correctIndex : undefined,
     };
   }
   return {
@@ -50,6 +53,55 @@ function suggestionToContent(s: AiSuggestion): QuestionContent {
 
 function suggestionToMode(s: AiSuggestion): AnswerMode {
   return s.type === 'MCQ' ? 'MCQ' : 'SHORT_ANSWER';
+}
+
+// ─── Confirm modal ────────────────────────────────────────────────────────────
+
+function ConfirmModal({
+  message,
+  onConfirm,
+  onCancel,
+}: {
+  message: string;
+  onConfirm: () => void;
+  onCancel: () => void;
+}) {
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onCancel(); };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, [onCancel]);
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm"
+      role="dialog"
+      aria-modal="true"
+      onClick={(e) => { if (e.target === e.currentTarget) onCancel(); }}
+    >
+      <div className="w-full max-w-sm overflow-hidden rounded-2xl bg-white shadow-2xl">
+        <div className="px-5 py-5">
+          <p className="text-sm font-medium text-[#111827]">{message}</p>
+        </div>
+        <div className="flex items-center justify-end gap-2 border-t border-[#f3f4f6] px-5 py-3">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="rounded-lg px-4 py-2 text-sm font-semibold text-[#6b7280] transition hover:bg-[#f3f4f6]"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={onConfirm}
+            className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow transition hover:bg-red-700"
+          >
+            Remove
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 // ─── Curriculum banner ────────────────────────────────────────────────────────
@@ -124,6 +176,11 @@ function SuggestionCard({
   onAccept: () => void;
   accepting: boolean;
 }) {
+  // Low #18: precompute correct index instead of comparing text strings
+  const correctIndex = suggestion.type === 'MCQ' && suggestion.answer !== undefined
+    ? (suggestion.options ?? []).indexOf(suggestion.answer)
+    : -1;
+
   return (
     <div className="flex items-start gap-3 rounded-xl border border-[#fde68a] bg-white px-3.5 py-3 shadow-sm">
       <div className="min-w-0 flex-1 space-y-1.5">
@@ -135,12 +192,12 @@ function SuggestionCard({
               <span
                 key={i}
                 className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${
-                  opt === suggestion.answer
+                  i === correctIndex
                     ? 'bg-green-100 text-green-700'
                     : 'bg-[#f3f4f6] text-[#6b7280]'
                 }`}
               >
-                {opt === suggestion.answer && '✓ '}{opt}
+                {i === correctIndex && '✓ '}{opt}
               </span>
             ))}
           </div>
@@ -188,10 +245,11 @@ function AddManualButton({
       const res = await fetch(`/api/lessons/${lessonId}/blocks/${blockId}/items`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        // Critical #2: create with correctIndex (undefined), not legacy answer text
         body: JSON.stringify({
           itemType: 'QUESTION',
           answerMode: 'MCQ',
-          content: { question: '', options: ['', '', '', ''], answer: '' },
+          content: { question: '', options: ['', '', '', ''], correctIndex: undefined },
         }),
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -236,10 +294,13 @@ export function DoNowBlockEditor({
   const [generateError, setGenerateError] = useState<string | null>(null);
   const [suggestions, setSuggestions] = useState<AiSuggestion[] | null>(null);
   const [accepting, setAccepting] = useState<Set<number>>(new Set());
+  // High #5: ConfirmModal state replaces window.confirm
+  const [confirmDelete, setConfirmDelete] = useState<{ itemId: string } | null>(null);
 
   const canAdd = items.length < MAX_QUESTIONS;
 
-  const generateSuggestions = async () => {
+  // Medium #11: wrap generateSuggestions in useCallback with correct deps
+  const generateSuggestions = useCallback(async () => {
     setGenerating(true);
     setGenerateError(null);
     try {
@@ -266,7 +327,7 @@ export function DoNowBlockEditor({
     } finally {
       setGenerating(false);
     }
-  };
+  }, [lessonId, blockId, lessonTopic, lessonSubjectTitle, curriculumUnit?.title]);
 
   const acceptSuggestion = useCallback(
     async (i: number, suggestion: AiSuggestion) => {
@@ -301,6 +362,24 @@ export function DoNowBlockEditor({
 
   return (
     <div className="space-y-5">
+      {/* High #5: ConfirmModal replaces window.confirm */}
+      {confirmDelete && (
+        <ConfirmModal
+          message="Remove this question? This can't be undone."
+          onConfirm={async () => {
+            const { itemId } = confirmDelete;
+            setConfirmDelete(null);
+            const res = await fetch(
+              `/api/lessons/${lessonId}/blocks/${blockId}/items/${itemId}`,
+              { method: 'DELETE' }
+            );
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            onItemDeleted(itemId);
+          }}
+          onCancel={() => setConfirmDelete(null)}
+        />
+      )}
+
       {/* Curriculum context banner */}
       <CurriculumBanner
         curriculumUnit={curriculumUnit}
@@ -319,7 +398,7 @@ export function DoNowBlockEditor({
           </div>
           <button
             type="button"
-            onClick={generateSuggestions}
+            onClick={() => void generateSuggestions()}
             disabled={generating || !canAdd}
             className="shrink-0 inline-flex items-center gap-1.5 rounded-lg bg-[#f59e0b] px-3 py-2 text-xs font-semibold text-white shadow transition hover:bg-[#d97706] disabled:opacity-50"
           >
@@ -405,13 +484,8 @@ export function DoNowBlockEditor({
                   onItemUpdated((await res.json()) as LessonItem);
                 }}
                 onDelete={async () => {
-                  if (!confirm('Remove this question?')) return;
-                  const res = await fetch(
-                    `/api/lessons/${lessonId}/blocks/${blockId}/items/${item.id}`,
-                    { method: 'DELETE' }
-                  );
-                  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                  onItemDeleted(item.id);
+                  // High #5: use ConfirmModal, not window.confirm
+                  setConfirmDelete({ itemId: item.id });
                 }}
               />
             ))}

@@ -31,6 +31,15 @@ export async function PUT(req: NextRequest, { params }: { params: { lessonId: st
   const parsed = schema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: 'Invalid input' }, { status: 400 });
 
+  // SEC-1: Verify all submitted blockIds actually belong to this lesson
+  const ownedBlocks = await blockModel.findMany({
+    where: { id: { in: parsed.data.blockIds }, lessonId: params.lessonId },
+    select: { id: true },
+  });
+  if (ownedBlocks.length !== parsed.data.blockIds.length) {
+    return NextResponse.json({ error: 'One or more blocks do not belong to this lesson' }, { status: 400 });
+  }
+
   // Update each block's sortOrder in a transaction
   await prisma.$transaction(
     parsed.data.blockIds.map((blockId, index) =>

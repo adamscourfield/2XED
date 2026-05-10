@@ -44,7 +44,27 @@ export async function PATCH(
 
   const body = await req.json();
   const parsed = patchSchema.safeParse(body);
-  if (!parsed.success) return NextResponse.json({ error: 'Invalid input' }, { status: 400 });
+  if (!parsed.success) return NextResponse.json({ error: 'Invalid input', issues: parsed.error.issues }, { status: 400 });
+
+  // Medium #14: server-side content structure validation for QUESTION items
+  const answerMode = parsed.data.answerMode ?? item.answerMode;
+  const content = parsed.data.content as Record<string, unknown> | undefined;
+  if (content !== undefined && answerMode === 'MCQ') {
+    if (typeof content.question !== 'string') {
+      return NextResponse.json({ error: 'MCQ content must have a question string' }, { status: 400 });
+    }
+    if (content.options !== undefined && !Array.isArray(content.options)) {
+      return NextResponse.json({ error: 'MCQ content.options must be an array' }, { status: 400 });
+    }
+    if (content.correctIndex !== undefined && typeof content.correctIndex !== 'number') {
+      return NextResponse.json({ error: 'MCQ content.correctIndex must be a number' }, { status: 400 });
+    }
+  }
+  if (content !== undefined && answerMode === 'SHORT_ANSWER') {
+    if (typeof content.question !== 'string') {
+      return NextResponse.json({ error: 'SHORT_ANSWER content must have a question string' }, { status: 400 });
+    }
+  }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const updated = await (prisma as any).lessonItem.update({

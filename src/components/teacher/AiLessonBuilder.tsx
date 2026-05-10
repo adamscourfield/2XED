@@ -369,6 +369,8 @@ const DESCRIBE_STEPS: Array<{
   placeholder: string;
   hint: string;
   required: boolean;
+  type?: 'text' | 'select';
+  options?: string[];
 }> = [
   {
     field: 'topic',
@@ -376,6 +378,16 @@ const DESCRIBE_STEPS: Array<{
     placeholder: 'e.g. Adding fractions with unlike denominators',
     hint: 'Be as specific as you like — a curriculum code like "N3.4" works too.',
     required: true,
+  },
+  {
+    // FEAT-9: yearGroup now shown as step 2
+    field: 'yearGroup',
+    label: 'Which year group is this for?',
+    placeholder: '',
+    hint: 'Helps Ember pitch difficulty, vocabulary, and examples at the right level.',
+    required: false,
+    type: 'select',
+    options: ['7', '8', '9', '10', '11', '12', '13'],
   },
   {
     field: 'priorKnowledge',
@@ -412,6 +424,7 @@ export function AiLessonBuilder({ subjectId, subjectTitle, onPlanGenerated, onCl
   // Upload-mode state
   const [topicHint, setTopicHint] = useState('');
   const [file, setFile] = useState<File | null>(null);
+  const [dragActive, setDragActive] = useState(false);  // UX-5
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Streaming / progress state
@@ -734,18 +747,35 @@ export function AiLessonBuilder({ subjectId, subjectTitle, onPlanGenerated, onCl
                 </span>
               )}
             </label>
-            <textarea
-              id={`describe-${currentStep.field}`}
-              rows={3}
-              value={describeForm[currentStep.field]}
-              onChange={(e) =>
-                setDescribeForm((prev) => ({ ...prev, [currentStep.field]: e.target.value }))
-              }
-              onKeyDown={handleDescribeKeyDown}
-              placeholder={currentStep.placeholder}
-              className="anx-input w-full resize-none text-sm"
-              autoFocus
-            />
+            {currentStep.type === 'select' ? (
+              <select
+                id={`describe-${currentStep.field}`}
+                value={describeForm[currentStep.field]}
+                onChange={(e) =>
+                  setDescribeForm((prev) => ({ ...prev, [currentStep.field]: e.target.value }))
+                }
+                className="anx-input w-full text-sm"
+                autoFocus
+              >
+                <option value="">Select year group…</option>
+                {(currentStep.options ?? []).map((opt) => (
+                  <option key={opt} value={opt}>Year {opt}</option>
+                ))}
+              </select>
+            ) : (
+              <textarea
+                id={`describe-${currentStep.field}`}
+                rows={3}
+                value={describeForm[currentStep.field]}
+                onChange={(e) =>
+                  setDescribeForm((prev) => ({ ...prev, [currentStep.field]: e.target.value }))
+                }
+                onKeyDown={handleDescribeKeyDown}
+                placeholder={currentStep.placeholder}
+                className="anx-input w-full resize-none text-sm"
+                autoFocus
+              />
+            )}
             <p className="text-[11px]" style={{ color: 'var(--anx-text-muted)' }}>
               {currentStep.hint}
             </p>
@@ -796,12 +826,22 @@ export function AiLessonBuilder({ subjectId, subjectTitle, onPlanGenerated, onCl
             </label>
             <div
               className={`flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed px-4 py-6 text-center transition-all ${
-                file
+                dragActive
+                  ? 'border-[var(--anx-primary)] bg-[var(--anx-primary-soft)] scale-[1.01]'
+                  : file
                   ? 'border-[var(--anx-primary)]/50 bg-[var(--anx-primary-soft)]'
                   : 'border-[var(--anx-outline-variant)] hover:border-[var(--anx-primary)]/40'
               }`}
               onClick={() => fileInputRef.current?.click()}
               onKeyDown={(e) => e.key === 'Enter' && fileInputRef.current?.click()}
+              onDragOver={(e) => { e.preventDefault(); setDragActive(true); }}
+              onDragLeave={(e) => { e.preventDefault(); setDragActive(false); }}
+              onDrop={(e) => {
+                e.preventDefault();
+                setDragActive(false);
+                const dropped = e.dataTransfer.files[0];
+                if (dropped) setFile(dropped);
+              }}
               role="button"
               tabIndex={0}
               aria-label="Upload file"

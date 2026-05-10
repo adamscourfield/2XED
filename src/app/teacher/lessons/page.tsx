@@ -19,7 +19,7 @@ export default async function TeacherLessonsPage() {
     ? await lessonModel.findMany({
         where: { teacherUserId: user.id },
         include: {
-          subject: { select: { title: true, slug: true } },
+          subject: { select: { id: true, title: true, slug: true } },
           curriculumUnit: { select: { id: true, title: true } },
           _count: { select: { blocks: true } },
         },
@@ -35,7 +35,8 @@ export default async function TeacherLessonsPage() {
         curriculumUnitId: string | null;
         createdAt: Date;
         updatedAt: Date;
-        subject: { title: string; slug: string };
+        subjectId: string;
+        subject: { id: string; title: string; slug: string };
         curriculumUnit: { id: string; title: string } | null;
         _count: { blocks: number };
       }>) =>
@@ -47,6 +48,7 @@ export default async function TeacherLessonsPage() {
           isCopy: r.isCopy,
           curriculumUnitId: r.curriculumUnitId,
           curriculumUnitTitle: r.curriculumUnit?.title ?? null,
+          subjectId: r.subject.id,
           subjectTitle: r.subject.title,
           subjectSlug: r.subject.slug,
           blockCount: r._count.blocks,

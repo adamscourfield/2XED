@@ -30,6 +30,17 @@ export async function PUT(
   const parsed = z.object({ itemIds: z.array(z.string()).min(1) }).safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: 'Invalid input' }, { status: 400 });
 
+  // SEC-2: Verify all submitted itemIds actually belong to this block
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const itemModel = (prisma as any).lessonItem;
+  const ownedItems = await itemModel.findMany({
+    where: { id: { in: parsed.data.itemIds }, blockId: params.blockId },
+    select: { id: true },
+  });
+  if (ownedItems.length !== parsed.data.itemIds.length) {
+    return NextResponse.json({ error: 'One or more items do not belong to this block' }, { status: 400 });
+  }
+
   await prisma.$transaction(
     parsed.data.itemIds.map((itemId, index) =>
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

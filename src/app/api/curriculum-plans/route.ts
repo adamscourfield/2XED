@@ -32,7 +32,7 @@ const createSchema = z.object({
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function requireTeacher(user: { role?: string }) {
-  return user.role === 'TEACHER' || user.role === 'ADMIN';
+  return user.role === 'TEACHER' || user.role === 'ADMIN' || user.role === 'LEADERSHIP';
 }
 
 // ── GET /api/curriculum-plans ─────────────────────────────────────────────────

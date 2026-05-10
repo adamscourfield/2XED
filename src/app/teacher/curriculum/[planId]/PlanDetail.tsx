@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
+import Link from 'next/link';
 import type { CurriculumPlanDetail, CurriculumUnitDetail } from '@/app/api/curriculum-plans/[planId]/route';
 import type { UnitAiSuggestion } from '@/app/api/curriculum-plans/[planId]/units/ai-suggest/route';
 
@@ -11,6 +12,13 @@ interface Skill {
   id: string;
   code: string;
   name: string;
+}
+
+// M4: separate type for AI suggestions after skill codes have been resolved to IDs
+interface ResolvedAiSuggestion {
+  aims: string;
+  successMeasures: string;
+  suggestedSkillIds: string[]; // already resolved from skill codes → DB IDs
 }
 
 interface Props {
@@ -23,12 +31,18 @@ interface Props {
 
 function fmtDate(iso: string | null): string {
   if (!iso) return '';
-  return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  // Parse only the date portion so display is never shifted by timezone offset
+  const [year, month, day] = iso.slice(0, 10).split('-').map(Number);
+  return new Date(year, month - 1, day).toLocaleDateString('en-GB', {
+    day: 'numeric', month: 'short', year: 'numeric',
+  });
 }
 
 function toIsoDate(val: string): string | undefined {
   if (!val) return undefined;
-  return new Date(val).toISOString();
+  // val is YYYY-MM-DD from <input type="date">. Use noon UTC so the date is
+  // unambiguous across all timezones when the server converts back to a Date.
+  return `${val}T12:00:00.000Z`;
 }
 
 const UNIT_COLOURS = [
@@ -155,6 +169,49 @@ function NewLessonModal({
   );
 }
 
+// ── Confirm Modal ─────────────────────────────────────────────────────────────
+
+function ConfirmModal({ message, onConfirm, onCancel }: {
+  message: string;
+  onConfirm: () => void;
+  onCancel: () => void;
+}) {
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onCancel(); };
+    document.addEventListener('keydown', handleKey);
+    return () => document.removeEventListener('keydown', handleKey);
+  }, [onCancel]);
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+      onClick={(e) => { if (e.currentTarget === e.target) onCancel(); }}
+      role="dialog"
+      aria-modal
+    >
+      <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl">
+        <p className="text-sm text-[#374151]">{message}</p>
+        <div className="mt-5 flex justify-end gap-3">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="rounded-lg px-4 py-2 text-sm font-semibold text-[#6b7280] hover:bg-[#f3f4f6]"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={onConfirm}
+            className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── AI Assist Panel ───────────────────────────────────────────────────────────
 
 function AiAssistPanel({
@@ -166,7 +223,7 @@ function AiAssistPanel({
   planId: string;
   unitTitle: string;
   availableSkills: Skill[];
-  onApply: (suggestion: UnitAiSuggestion) => void;
+  onApply: (suggestion: ResolvedAiSuggestion) => void;
 }) {
   type AiMode = 'describe' | 'import';
   const [mode, setMode] = useState<AiMode>('describe');
@@ -217,11 +274,11 @@ function AiAssistPanel({
 
   const handleApply = () => {
     if (!preview) return;
-    // Resolve skill codes → IDs
-    const resolvedIds = (preview.suggestedSkillCodes ?? [])
+    // Resolve skill codes → IDs and pass via typed ResolvedAiSuggestion (M4)
+    const suggestedSkillIds = (preview.suggestedSkillCodes ?? [])
       .map((code) => skillCodeMap.get(code.toUpperCase()))
       .filter((id): id is string => !!id);
-    onApply({ ...preview, suggestedSkillCodes: resolvedIds });
+    onApply({ aims: preview.aims, successMeasures: preview.successMeasures, suggestedSkillIds });
     setPreview(null);
   };
 
@@ -398,14 +455,15 @@ function UnitEditorPanel({
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showAi, setShowAi] = useState(isNew); // open by default for new units
+  const [confirmDelete, setConfirmDelete] = useState(false); // M1
 
-  const handleAiApply = (suggestion: UnitAiSuggestion) => {
+  // M4: onApply now receives ResolvedAiSuggestion with skill IDs (not codes)
+  const handleAiApply = (suggestion: ResolvedAiSuggestion) => {
     if (suggestion.aims) setAims(suggestion.aims);
     if (suggestion.successMeasures) setSuccessMeasures(suggestion.successMeasures);
-    // suggestedSkillCodes here are already resolved to IDs by AiAssistPanel
-    if (suggestion.suggestedSkillCodes?.length > 0) {
+    if (suggestion.suggestedSkillIds?.length > 0) {
       setSelectedSkillIds((prev) => {
-        const merged = new Set([...prev, ...suggestion.suggestedSkillCodes]);
+        const merged = new Set([...prev, ...suggestion.suggestedSkillIds]);
         return Array.from(merged);
       });
     }
@@ -484,15 +542,25 @@ function UnitEditorPanel({
     }
   };
 
-  const handleDelete = async () => {
+  // M1: use ConfirmModal instead of window.confirm
+  const handleDelete = () => {
     if (!unit || !onDeleted) return;
-    if (!confirm(`Delete "${unit.title}"? This will not delete its lessons, but they will be unlinked from this unit.`)) return;
+    setConfirmDelete(true);
+  };
+
+  const doDelete = async () => {
+    if (!unit || !onDeleted) return;
     setDeleting(true);
+    setConfirmDelete(false);
     try {
-      await fetch(`/api/curriculum-plans/${planId}/units/${unit.id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/curriculum-plans/${planId}/units/${unit.id}`, { method: 'DELETE' });
+      if (!res.ok && res.status !== 204) {
+        const b = await res.json().catch(() => ({})) as { error?: string };
+        throw new Error(b.error ?? `HTTP ${res.status}`);
+      }
       onDeleted(unit.id);
-    } catch {
-      setError('Delete failed');
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Delete failed');
       setDeleting(false);
     }
   };
@@ -639,6 +707,15 @@ function UnitEditorPanel({
 
       {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-xs text-red-600">{error}</p>}
 
+      {/* M1: ConfirmModal for unit deletion */}
+      {confirmDelete && unit && (
+        <ConfirmModal
+          message={`Delete "${unit.title}"? Lessons will be unlinked but not deleted.`}
+          onConfirm={doDelete}
+          onCancel={() => setConfirmDelete(false)}
+        />
+      )}
+
       {/* Actions */}
       <div className="flex items-center justify-between gap-3 border-t border-[#f3f4f6] pt-4">
         {!isNew && onDeleted ? (
@@ -677,16 +754,24 @@ function UnitCard({
   planId,
   availableSkills,
   subjectId,
+  isFirst,
+  isLast,
   onUpdated,
   onDeleted,
+  onMoveUp,
+  onMoveDown,
 }: {
   unit: CurriculumUnitDetail;
   index: number;
   planId: string;
   availableSkills: Skill[];
   subjectId: string;
+  isFirst: boolean;
+  isLast: boolean;
   onUpdated: (unit: CurriculumUnitDetail) => void;
   onDeleted: (id: string) => void;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
 }) {
   const [editing, setEditing] = useState(false);
   const [newLesson, setNewLesson] = useState(false);
@@ -707,13 +792,38 @@ function UnitCard({
             </p>
           )}
         </div>
-        <button
-          type="button"
-          onClick={() => setEditing(true)}
-          className="shrink-0 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-[#6b7280] hover:bg-[#f3f4f6] transition"
-        >
-          Edit
-        </button>
+        {/* L2: reorder buttons */}
+        <div className="flex shrink-0 items-center gap-1">
+          <button
+            type="button"
+            onClick={onMoveUp}
+            disabled={isFirst}
+            aria-label="Move unit up"
+            className="rounded p-1 text-[#9ca3af] hover:bg-[#f3f4f6] hover:text-[#374151] disabled:opacity-30 disabled:cursor-not-allowed transition"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
+              <path d="M18 15l-6-6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+          <button
+            type="button"
+            onClick={onMoveDown}
+            disabled={isLast}
+            aria-label="Move unit down"
+            className="rounded p-1 text-[#9ca3af] hover:bg-[#f3f4f6] hover:text-[#374151] disabled:opacity-30 disabled:cursor-not-allowed transition"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
+              <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+          <button
+            type="button"
+            onClick={() => setEditing(true)}
+            className="rounded-lg px-2.5 py-1.5 text-xs font-semibold text-[#6b7280] hover:bg-[#f3f4f6] transition"
+          >
+            Edit
+          </button>
+        </div>
       </div>
 
       {/* Aims / success measures */}
@@ -770,7 +880,7 @@ function UnitCard({
         ) : (
           <div className="space-y-1">
             {unit.lessons.map((lesson) => (
-              <a
+              <Link
                 key={lesson.id}
                 href={`/teacher/lessons/${lesson.id}`}
                 className="flex items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-[#f9fafb] transition group"
@@ -778,7 +888,7 @@ function UnitCard({
                 <span className={`h-2 w-2 shrink-0 rounded-full ${lesson.isPublished ? 'bg-[#10b981]' : 'bg-[#d1d5db]'}`} />
                 <span className="truncate text-sm text-[#374151] group-hover:text-[#111827]">{lesson.title}</span>
                 <span className="ml-auto shrink-0 text-xs text-[#9ca3af] group-hover:text-[#5850ec]">Open →</span>
-              </a>
+              </Link>
             ))}
           </div>
         )}
@@ -813,29 +923,46 @@ function UnitCard({
 // ── Main Component ────────────────────────────────────────────────────────────
 
 export function PlanDetail({ plan: initialPlan, availableSkills, subjectId }: Props) {
+  const router = useRouter();
   const [plan, setPlan] = useState(initialPlan);
   const [addingUnit, setAddingUnit] = useState(false);
   const [editingTitle, setEditingTitle] = useState(false);
   const [titleDraft, setTitleDraft] = useState(plan.title);
+  const [titleSaveError, setTitleSaveError] = useState<string | null>(null);
+  const [confirmDeletePlan, setConfirmDeletePlan] = useState(false); // L3
+  const [deletingPlan, setDeletingPlan] = useState(false);
   const titleRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (editingTitle) titleRef.current?.focus();
   }, [editingTitle]);
 
+  // H2: handle save errors and revert on failure
   const saveTitle = async () => {
-    if (!titleDraft.trim() || titleDraft.trim() === plan.title) {
+    const trimmed = titleDraft.trim();
+    if (!trimmed || trimmed === plan.title) {
       setEditingTitle(false);
       setTitleDraft(plan.title);
       return;
     }
-    await fetch(`/api/curriculum-plans/${plan.id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title: titleDraft.trim() }),
-    });
-    setPlan((p) => ({ ...p, title: titleDraft.trim() }));
+    const prevTitle = plan.title;
     setEditingTitle(false);
+    try {
+      const res = await fetch(`/api/curriculum-plans/${plan.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: trimmed }),
+      });
+      if (!res.ok) {
+        const b = await res.json().catch(() => ({})) as { error?: string };
+        throw new Error(b.error ?? `HTTP ${res.status}`);
+      }
+      setPlan((p) => ({ ...p, title: trimmed }));
+      setTitleSaveError(null);
+    } catch (e) {
+      setTitleDraft(prevTitle);
+      setTitleSaveError(e instanceof Error ? e.message : 'Failed to save title');
+    }
   };
 
   const handleUnitSaved = (unit: CurriculumUnitDetail) => {
@@ -853,10 +980,67 @@ export function PlanDetail({ plan: initialPlan, availableSkills, subjectId }: Pr
     setPlan((p) => ({ ...p, units: p.units.filter((u) => u.id !== unitId) }));
   };
 
+  // L2: swap two adjacent units' sortOrder values, optimistic + persisted
+  const handleMoveUnit = async (unitId: string, direction: 'up' | 'down') => {
+    const idx = plan.units.findIndex((u) => u.id === unitId);
+    if (idx === -1) return;
+    const swapIdx = direction === 'up' ? idx - 1 : idx + 1;
+    if (swapIdx < 0 || swapIdx >= plan.units.length) return;
+
+    const unitA = plan.units[idx];
+    const unitB = plan.units[swapIdx];
+
+    // Optimistic UI update
+    setPlan((p) => {
+      const units = p.units.map((u) => {
+        if (u.id === unitA.id) return { ...u, sortOrder: unitB.sortOrder };
+        if (u.id === unitB.id) return { ...u, sortOrder: unitA.sortOrder };
+        return u;
+      });
+      units.sort((a, b) => a.sortOrder - b.sortOrder);
+      return { ...p, units };
+    });
+
+    // Persist both sortOrder changes concurrently
+    await Promise.all([
+      fetch(`/api/curriculum-plans/${plan.id}/units/${unitA.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sortOrder: unitB.sortOrder }),
+      }),
+      fetch(`/api/curriculum-plans/${plan.id}/units/${unitB.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sortOrder: unitA.sortOrder }),
+      }),
+    ]);
+  };
+
+  // L3: plan deletion
+  const doDeletePlan = async () => {
+    setDeletingPlan(true);
+    setConfirmDeletePlan(false);
+    try {
+      await fetch(`/api/curriculum-plans/${plan.id}`, { method: 'DELETE' });
+      router.push('/teacher/curriculum');
+    } catch {
+      setDeletingPlan(false);
+    }
+  };
+
   const totalLessons = plan.units.reduce((sum, u) => sum + u.lessons.length, 0);
 
   return (
     <div className="space-y-6">
+      {/* L3: plan delete confirm modal */}
+      {confirmDeletePlan && (
+        <ConfirmModal
+          message={`Permanently delete "${plan.title}"? All units will be removed. Lessons will be unlinked but not deleted.`}
+          onConfirm={doDeletePlan}
+          onCancel={() => setConfirmDeletePlan(false)}
+        />
+      )}
+
       {/* Plan header */}
       <div className="rounded-2xl border border-[#e5e7eb] bg-white px-6 py-5">
         <div className="flex items-start gap-4">
@@ -875,7 +1059,10 @@ export function PlanDetail({ plan: initialPlan, availableSkills, subjectId }: Pr
                 value={titleDraft}
                 onChange={(e) => setTitleDraft(e.target.value)}
                 onBlur={saveTitle}
-                onKeyDown={(e) => { if (e.key === 'Enter') saveTitle(); if (e.key === 'Escape') { setEditingTitle(false); setTitleDraft(plan.title); } }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') saveTitle();
+                  if (e.key === 'Escape') { setEditingTitle(false); setTitleDraft(plan.title); }
+                }}
               />
             ) : (
               <button
@@ -890,18 +1077,34 @@ export function PlanDetail({ plan: initialPlan, availableSkills, subjectId }: Pr
                 </svg>
               </button>
             )}
+            {titleSaveError && (
+              <p className="mt-1 text-xs text-red-600">{titleSaveError}</p>
+            )}
             <p className="mt-0.5 text-sm text-[#6b7280]">
               {plan.subjectTitle}
               {plan.academicYear && ` · ${plan.academicYear}`}
               {plan.termLabel && ` · ${plan.termLabel}`}
             </p>
           </div>
+          {/* L3: plan delete button */}
+          <button
+            type="button"
+            onClick={() => setConfirmDeletePlan(true)}
+            disabled={deletingPlan}
+            className="shrink-0 rounded-lg p-2 text-[#9ca3af] hover:bg-red-50 hover:text-red-500 transition disabled:opacity-50"
+            aria-label="Delete plan"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
+              <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
         </div>
 
         <div className="mt-4 flex items-center gap-4 border-t border-[#f3f4f6] pt-4 text-sm text-[#6b7280]">
           <span><span className="font-semibold text-[#374151]">{plan.units.length}</span> {plan.units.length === 1 ? 'unit' : 'units'}</span>
           <span><span className="font-semibold text-[#374151]">{totalLessons}</span> {totalLessons === 1 ? 'lesson' : 'lessons'}</span>
-          <a href="/teacher/curriculum" className="ml-auto text-xs text-[#9ca3af] hover:text-[#6b7280] transition">← All plans</a>
+          {/* M2: Link instead of <a> */}
+          <Link href="/teacher/curriculum" className="ml-auto text-xs text-[#9ca3af] hover:text-[#6b7280] transition">← All plans</Link>
         </div>
       </div>
 
@@ -915,8 +1118,12 @@ export function PlanDetail({ plan: initialPlan, availableSkills, subjectId }: Pr
             planId={plan.id}
             availableSkills={availableSkills}
             subjectId={subjectId}
+            isFirst={i === 0}
+            isLast={i === plan.units.length - 1}
             onUpdated={handleUnitSaved}
             onDeleted={handleUnitDeleted}
+            onMoveUp={() => handleMoveUnit(unit.id, 'up')}
+            onMoveDown={() => handleMoveUnit(unit.id, 'down')}
           />
         ))}
       </div>

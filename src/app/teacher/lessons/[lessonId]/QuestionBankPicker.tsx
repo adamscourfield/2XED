@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useDebounce } from '@/hooks/useDebounce';
 import type { AnswerMode, LessonItem } from './LessonBuilder';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -61,15 +62,6 @@ function getLiveMetadata(raw: unknown): { difficultyBand?: string; itemPurpose?:
   return {};
 }
 
-function useDebounce<T>(value: T, delay: number): T {
-  const [debounced, setDebounced] = useState(value);
-  useEffect(() => {
-    const t = setTimeout(() => setDebounced(value), delay);
-    return () => clearTimeout(t);
-  }, [value, delay]);
-  return debounced;
-}
-
 // ─── QuestionBankPicker ───────────────────────────────────────────────────────
 
 interface QuestionBankPickerProps {
@@ -92,6 +84,7 @@ export function QuestionBankPicker({
   const [total, setTotal] = useState(0);
   const [hasMore, setHasMore] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [adding, setAdding] = useState<string | null>(null);
 
   // Filters
@@ -115,6 +108,7 @@ export function QuestionBankPicker({
   const loadItems = useCallback(
     async (nextSkip: number) => {
       setLoading(true);
+      setLoadError(null);
       try {
         const params = new URLSearchParams({ subjectId, take: '24', skip: String(nextSkip) });
         if (debouncedSearch) params.set('search', debouncedSearch);
@@ -122,11 +116,16 @@ export function QuestionBankPicker({
         if (difficulty) params.set('difficulty', difficulty);
 
         const res = await fetch(`/api/items/search?${params}`);
-        if (!res.ok) return;
+        if (!res.ok) {
+          const body = await res.json().catch(() => ({})) as { error?: string };
+          throw new Error(body.error ?? `HTTP ${res.status}`);
+        }
         const data = await res.json() as { items: BankItem[]; total: number; hasMore: boolean };
         setItems(nextSkip === 0 ? data.items : (prev) => [...prev, ...data.items]);
         setTotal(data.total);
         setHasMore(data.hasMore);
+      } catch (e) {
+        setLoadError(e instanceof Error ? e.message : 'Failed to load questions');
       } finally {
         setLoading(false);
       }
@@ -160,7 +159,17 @@ export function QuestionBankPicker({
 
       const content: Record<string, unknown> = { question: bankItem.question };
       if (choices.length > 0) content.options = choices;
-      if (bankItem.answer) content.answer = bankItem.answer;
+
+      // MCQ stores correctIndex (integer), not answer text
+      if (answerMode === 'MCQ' && bankItem.answer && choices.length > 0) {
+        const correctIndex = choices.indexOf(bankItem.answer);
+        if (correctIndex !== -1) content.correctIndex = correctIndex;
+      } else if (answerMode === 'SHORT_ANSWER' && bankItem.answer) {
+        content.answer = bankItem.answer;
+      } else if (bankItem.answer) {
+        // ORDER / PICK — preserve raw answer
+        content.answer = bankItem.answer;
+      }
 
       const res = await fetch(`/api/lessons/${lessonId}/blocks/${blockId}/items`, {
         method: 'POST',
@@ -338,13 +347,26 @@ export function QuestionBankPicker({
 
         {/* Results */}
         <div className="flex-1 overflow-y-auto">
-          {/* Result count */}
+          {/* Result count / error */}
           <div className="sticky top-0 z-10 border-b border-[#f3f4f6] bg-white px-5 py-2.5">
-            <p className="text-xs text-[#6b7280]">
-              {loading && items.length === 0
-                ? 'Loading…'
-                : `${total.toLocaleString()} question${total !== 1 ? 's' : ''}`}
-            </p>
+            {loadError ? (
+              <p className="text-xs text-red-600">
+                Failed to load: {loadError}
+                <button
+                  type="button"
+                  onClick={() => void loadItems(0)}
+                  className="ml-2 font-semibold underline"
+                >
+                  Retry
+                </button>
+              </p>
+            ) : (
+              <p className="text-xs text-[#6b7280]">
+                {loading && items.length === 0
+                  ? 'Loading…'
+                  : `${total.toLocaleString()} question${total !== 1 ? 's' : ''}`}
+              </p>
+            )}
           </div>
 
           {/* Item list */}
@@ -357,12 +379,8 @@ export function QuestionBankPicker({
               return (
                 <li key={item.id} className="flex items-start gap-3 px-5 py-4 hover:bg-[#f9fafb] transition">
                   <div className="min-w-0 flex-1">
-                    {/* Question text */}
                     <p className="text-sm text-[#111827] line-clamp-3 leading-snug">{item.question}</p>
-
-                    {/* Tags row */}
                     <div className="mt-2 flex flex-wrap items-center gap-1.5">
-                      {/* Difficulty badge */}
                       {band && (
                         <span
                           className="rounded-full px-2 py-0.5 text-[11px] font-semibold text-white"
@@ -371,13 +389,9 @@ export function QuestionBankPicker({
                           {difficultyLabel(band)}
                         </span>
                       )}
-
-                      {/* Question type */}
                       <span className="rounded-full border border-[#e5e7eb] bg-[#f9fafb] px-2 py-0.5 text-[11px] font-medium text-[#6b7280]">
                         {item.type}
                       </span>
-
-                      {/* Skill tags */}
                       {item.skills.slice(0, 3).map(({ skill }) => (
                         <span
                           key={skill.id}
@@ -391,8 +405,6 @@ export function QuestionBankPicker({
                       )}
                     </div>
                   </div>
-
-                  {/* Add button */}
                   <button
                     type="button"
                     onClick={() => void handleAddItem(item)}

@@ -74,6 +74,24 @@ Rules:
 - Keep language clear and teacher-facing`;
 }
 
+// ── Rate limiting ─────────────────────────────────────────────────────────────
+
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+const RATE_LIMIT_MAX = 10;
+const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute
+
+function checkRateLimit(userId: string): boolean {
+  const now = Date.now();
+  const entry = rateLimitMap.get(userId);
+  if (!entry || now >= entry.resetAt) {
+    rateLimitMap.set(userId, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
+    return true;
+  }
+  if (entry.count >= RATE_LIMIT_MAX) return false;
+  entry.count++;
+  return true;
+}
+
 // ── Anthropic call ────────────────────────────────────────────────────────────
 
 async function callAnthropic(prompt: string): Promise<UnitAiSuggestion> {
@@ -95,8 +113,10 @@ async function callAnthropic(prompt: string): Promise<UnitAiSuggestion> {
   });
 
   if (!res.ok) {
-    const err = await res.text();
-    throw new Error(`Anthropic API error ${res.status}: ${err}`);
+    const errText = await res.text();
+    // Log details server-side but never expose them to the client
+    console.error(`[unit ai-suggest] Anthropic API error ${res.status}: ${errText}`);
+    throw new Error('AI generation failed');
   }
 
   const json = await res.json();
@@ -124,8 +144,16 @@ export async function POST(
   const session = await getServerSession(authOptions);
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const user = session.user as { id: string; role?: string };
-  if (user.role !== 'TEACHER' && user.role !== 'ADMIN') {
+  if (user.role !== 'TEACHER' && user.role !== 'ADMIN' && user.role !== 'LEADERSHIP') {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
+
+  // L4: per-user rate limiting
+  if (!checkRateLimit(user.id)) {
+    return NextResponse.json(
+      { error: 'Too many requests — please wait a minute before generating again.' },
+      { status: 429 },
+    );
   }
 
   // Verify the plan belongs to this teacher
@@ -172,6 +200,15 @@ export async function POST(
       const file = form.get('file') as File | null;
       if (!file) return NextResponse.json({ error: 'No file provided' }, { status: 400 });
 
+      // H3: reject oversized uploads before writing to disk
+      const MAX_FILE_BYTES = 10 * 1024 * 1024; // 10 MB
+      if (file.size > MAX_FILE_BYTES) {
+        return NextResponse.json(
+          { error: 'File too large. Maximum size is 10 MB.' },
+          { status: 413 },
+        );
+      }
+
       uploadedFileName = file.name;
       uploadedFileType = file.type;
       tmpFilePath = path.join(
@@ -198,7 +235,8 @@ export async function POST(
     return NextResponse.json(suggestion);
   } catch (e) {
     console.error('[unit ai-suggest]', (e as Error).message);
-    return NextResponse.json({ error: (e as Error).message }, { status: 500 });
+    // H4: never expose internal error details (may include API keys, model names, etc.)
+    return NextResponse.json({ error: 'AI generation failed. Please try again.' }, { status: 500 });
   } finally {
     if (tmpFilePath) await unlink(tmpFilePath).catch(() => void 0);
   }

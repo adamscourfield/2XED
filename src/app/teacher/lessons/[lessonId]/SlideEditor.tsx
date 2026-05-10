@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { LessonItem } from './LessonBuilder';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
@@ -42,8 +42,60 @@ function parseSlide(raw: unknown): SlideContent {
   return blankSlide();
 }
 
-function uid() {
-  return Math.random().toString(36).slice(2, 10);
+// Medium #10: use crypto.randomUUID() instead of weak Math.random uid
+function newId(): string {
+  return crypto.randomUUID();
+}
+
+// ─── Confirm modal ────────────────────────────────────────────────────────────
+
+function ConfirmModal({
+  message,
+  confirmLabel = 'Delete',
+  onConfirm,
+  onCancel,
+}: {
+  message: string;
+  confirmLabel?: string;
+  onConfirm: () => void;
+  onCancel: () => void;
+}) {
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onCancel(); };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, [onCancel]);
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm"
+      role="dialog"
+      aria-modal="true"
+      onClick={(e) => { if (e.target === e.currentTarget) onCancel(); }}
+    >
+      <div className="w-full max-w-sm overflow-hidden rounded-2xl bg-white shadow-2xl">
+        <div className="px-5 py-5">
+          <p className="text-sm font-medium text-[#111827]">{message}</p>
+        </div>
+        <div className="flex items-center justify-end gap-2 border-t border-[#f3f4f6] px-5 py-3">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="rounded-lg px-4 py-2 text-sm font-semibold text-[#6b7280] transition hover:bg-[#f3f4f6]"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={onConfirm}
+            className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow transition hover:bg-red-700"
+          >
+            {confirmLabel}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 // ─── Canvas with click-to-place annotation labels ────────────────────────────
@@ -84,7 +136,7 @@ function SlideCanvas({
       return;
     }
     const newAnnot: SlideAnnotation = {
-      id: uid(),
+      id: newId(), // Medium #10: was uid()
       text: pendingText.trim(),
       x: pending.x,
       y: pending.y,
@@ -135,13 +187,13 @@ function SlideCanvas({
         </div>
       </div>
 
-      {/* Canvas area */}
+      {/* Canvas area — Medium #13: role="application" (interactive region, not static image) */}
       <div
         ref={containerRef}
         onClick={handleCanvasClick}
         className="relative w-full cursor-crosshair overflow-hidden rounded-xl border-2 border-dashed border-[#5850ec]/20 select-none"
         style={{ aspectRatio: '4/3', background: content.bgColor ?? '#ffffff' }}
-        role="img"
+        role="application"
         aria-label="Stage canvas — click to add annotation labels"
       >
         {/* Body text (top-left, pointer-events-none so click reaches canvas) */}
@@ -282,7 +334,7 @@ interface StageEditorProps {
   stageIndex: number;
   blockVariant: 'explain' | 'model';
   onSave: (content: SlideContent) => Promise<void>;
-  onDelete: () => Promise<void>;
+  onDelete: () => void; // now synchronous — triggers ConfirmModal in parent
 }
 
 function StageEditor({ item, stageIndex, blockVariant, onSave, onDelete }: StageEditorProps) {
@@ -381,6 +433,7 @@ function StageEditor({ item, stageIndex, blockVariant, onSave, onDelete }: Stage
         >
           {saving ? 'Saving…' : saved ? '✓ Saved' : `Save ${blockVariant === 'model' ? 'step' : 'stage'}`}
         </button>
+        {/* High #5: triggers ConfirmModal in parent, not window.confirm */}
         <button
           type="button"
           onClick={onDelete}
@@ -413,6 +466,12 @@ function StageList({
   const noun = blockVariant === 'model' ? 'step' : 'stage';
   const Noun = blockVariant === 'model' ? 'Step' : 'Stage';
 
+  // Low #17: memoize parseSlide calls so StageList doesn't re-parse on every render
+  const parsedItems = useMemo(
+    () => items.map((item) => ({ id: item.id, parsed: parseSlide(item.content) })),
+    [items]
+  );
+
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
@@ -436,14 +495,13 @@ function StageList({
         <p className="text-[11px] text-[#9ca3af]">No {noun}s yet</p>
       ) : (
         <div className="space-y-1">
-          {items.map((item, i) => {
-            const c = parseSlide(item.content);
-            const isSelected = item.id === selectedId;
+          {parsedItems.map(({ id, parsed: c }, i) => {
+            const isSelected = id === selectedId;
             return (
               <button
-                key={item.id}
+                key={id}
                 type="button"
-                onClick={() => onSelect(item.id)}
+                onClick={() => onSelect(id)}
                 className={`w-full rounded-lg border px-2.5 py-2 text-left transition ${
                   isSelected
                     ? 'border-[#5850ec]/40 bg-[#f5f3ff]'
@@ -500,8 +558,14 @@ function SlideBlockEditor({
 }: SlideBlockEditorProps) {
   const [selectedId, setSelectedId] = useState<string | null>(items[0]?.id ?? null);
   const [adding, setAdding] = useState(false);
+  // High #5: ConfirmModal state
+  const [confirmDelete, setConfirmDelete] = useState<{ itemId: string } | null>(null);
 
   const noun = blockVariant === 'model' ? 'step' : 'stage';
+
+  // High #9: items ref to avoid stale closure in deleteStage
+  const itemsRef = useRef(items);
+  itemsRef.current = items;
 
   const addStage = useCallback(async () => {
     setAdding(true);
@@ -540,23 +604,26 @@ function SlideBlockEditor({
     [lessonId, blockId, onItemUpdated]
   );
 
-  const deleteStage = useCallback(
-    async (itemId: string) => {
-      if (!confirm(`Delete this ${noun}?`)) return;
-      const res = await fetch(
-        `/api/lessons/${lessonId}/blocks/${blockId}/items/${itemId}`,
-        { method: 'DELETE' }
-      );
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      onItemDeleted(itemId);
-      setSelectedId((prev) => {
-        if (prev !== itemId) return prev;
-        const remaining = items.filter((i) => i.id !== itemId);
-        return remaining[0]?.id ?? null;
-      });
-    },
-    [lessonId, blockId, noun, items, onItemDeleted]
-  );
+  // High #5 + #9: triggers ConfirmModal, uses itemsRef to avoid stale closure
+  const requestDeleteStage = useCallback((itemId: string) => {
+    setConfirmDelete({ itemId });
+  }, []);
+
+  const confirmDeleteStage = useCallback(async (itemId: string) => {
+    setConfirmDelete(null);
+    const res = await fetch(
+      `/api/lessons/${lessonId}/blocks/${blockId}/items/${itemId}`,
+      { method: 'DELETE' }
+    );
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    onItemDeleted(itemId);
+    // High #9: use itemsRef (current) to compute next selection — no stale closure
+    setSelectedId((prev) => {
+      if (prev !== itemId) return prev;
+      const remaining = itemsRef.current.filter((i) => i.id !== itemId);
+      return remaining[0]?.id ?? null;
+    });
+  }, [lessonId, blockId, onItemDeleted]);
 
   // Empty state
   if (items.length === 0 && !adding) {
@@ -585,37 +652,49 @@ function SlideBlockEditor({
   const selectedIndex = selectedItem ? items.indexOf(selectedItem) : -1;
 
   return (
-    <div className="grid grid-cols-[160px_1fr] gap-4 lg:grid-cols-[180px_1fr]">
-      {/* Stage list */}
-      <div className="rounded-xl border border-[#e5e7eb] bg-[#f9fafb] p-3">
-        <StageList
-          items={items}
-          selectedId={selectedId}
-          onSelect={setSelectedId}
-          onAdd={addStage}
-          adding={adding}
-          blockVariant={blockVariant}
+    <>
+      {/* High #5: ConfirmModal instead of window.confirm */}
+      {confirmDelete && (
+        <ConfirmModal
+          message={`Delete this ${noun}? This can't be undone.`}
+          confirmLabel="Delete"
+          onConfirm={() => void confirmDeleteStage(confirmDelete.itemId)}
+          onCancel={() => setConfirmDelete(null)}
         />
-      </div>
+      )}
 
-      {/* Stage editor */}
-      <div>
-        {selectedItem ? (
-          <StageEditor
-            key={selectedItem.id}
-            item={selectedItem}
-            stageIndex={selectedIndex}
+      <div className="grid grid-cols-[160px_1fr] gap-4 lg:grid-cols-[180px_1fr]">
+        {/* Stage list */}
+        <div className="rounded-xl border border-[#e5e7eb] bg-[#f9fafb] p-3">
+          <StageList
+            items={items}
+            selectedId={selectedId}
+            onSelect={setSelectedId}
+            onAdd={addStage}
+            adding={adding}
             blockVariant={blockVariant}
-            onSave={(content) => saveStage(selectedItem.id, content)}
-            onDelete={() => deleteStage(selectedItem.id)}
           />
-        ) : (
-          <div className="flex items-center justify-center rounded-xl border border-dashed border-[#e5e7eb] py-16 text-center">
-            <p className="text-xs text-[#9ca3af]">Select a {noun} to edit</p>
-          </div>
-        )}
+        </div>
+
+        {/* Stage editor */}
+        <div>
+          {selectedItem ? (
+            <StageEditor
+              key={selectedItem.id}
+              item={selectedItem}
+              stageIndex={selectedIndex}
+              blockVariant={blockVariant}
+              onSave={(content) => saveStage(selectedItem.id, content)}
+              onDelete={() => requestDeleteStage(selectedItem.id)}
+            />
+          ) : (
+            <div className="flex items-center justify-center rounded-xl border border-dashed border-[#e5e7eb] py-16 text-center">
+              <p className="text-xs text-[#9ca3af]">Select a {noun} to edit</p>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 

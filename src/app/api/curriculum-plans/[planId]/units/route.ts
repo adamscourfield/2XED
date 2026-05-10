@@ -39,6 +39,12 @@ export async function POST(
   if (!parsed.success)
     return NextResponse.json({ error: 'Invalid input', issues: parsed.error.issues }, { status: 400 });
 
+  if (parsed.data.dateStart && parsed.data.dateEnd) {
+    if (new Date(parsed.data.dateStart) >= new Date(parsed.data.dateEnd)) {
+      return NextResponse.json({ error: 'dateStart must be before dateEnd' }, { status: 400 });
+    }
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const unitModel = (prisma as any).curriculumUnit;
   if (!unitModel) return NextResponse.json({ error: 'Model unavailable' }, { status: 503 });

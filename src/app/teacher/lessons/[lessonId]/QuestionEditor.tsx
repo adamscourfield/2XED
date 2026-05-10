@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { AnswerMode, LessonItem } from './LessonBuilder';
 import { QuestionBankPicker } from './QuestionBankPicker';
 
@@ -8,9 +8,10 @@ import { QuestionBankPicker } from './QuestionBankPicker';
 
 export interface QuestionContent {
   question: string;
-  options?: string[];        // MCQ / ORDER / PICK
-  answer?: string;           // MCQ (correct text) / SHORT_ANSWER (model answer)
-  correctIndices?: number[]; // PICK (which options are correct)
+  options?: string[];         // MCQ / ORDER / PICK
+  correctIndex?: number;      // BUG-1: MCQ correct answer stored as index (not text)
+  answer?: string;            // SHORT_ANSWER model answer only
+  correctIndices?: number[];  // PICK (which options are correct)
   hint?: string;
 }
 
@@ -19,7 +20,7 @@ export interface QuestionContent {
 function blankContent(mode: AnswerMode): QuestionContent {
   switch (mode) {
     case 'MCQ':
-      return { question: '', options: ['', '', '', ''], answer: '' };
+      return { question: '', options: ['', '', '', ''], correctIndex: undefined };
     case 'ORDER':
       return { question: '', options: ['', '', '', ''] };
     case 'SHORT_ANSWER':
@@ -31,9 +32,105 @@ function blankContent(mode: AnswerMode): QuestionContent {
 
 function parseContent(raw: unknown): QuestionContent {
   if (raw && typeof raw === 'object' && !Array.isArray(raw)) {
-    return raw as QuestionContent;
+    const c = raw as QuestionContent;
+    // BUG-1 migration: if legacy answer (text) present but no correctIndex, try to
+    // derive correctIndex from the options array for a seamless transition.
+    if (
+      c.correctIndex === undefined &&
+      typeof c.answer === 'string' &&
+      c.answer !== '' &&
+      Array.isArray(c.options)
+    ) {
+      const idx = c.options.indexOf(c.answer);
+      if (idx !== -1) return { ...c, correctIndex: idx };
+    }
+    return c;
   }
   return { question: '' };
+}
+
+// ─── Validation ───────────────────────────────────────────────────────────────
+
+interface ValidationResult {
+  valid: boolean;
+  errors: Partial<Record<'question' | 'options' | 'answer' | 'correctIndex', string>>;
+}
+
+function validate(mode: AnswerMode, content: QuestionContent): ValidationResult {
+  const errors: ValidationResult['errors'] = {};
+
+  if (!content.question.trim()) {
+    errors.question = 'Question text is required.';
+  }
+
+  if (mode === 'MCQ') {
+    const opts = (content.options ?? []).filter((o) => o.trim() !== '');
+    if (opts.length < 2) {
+      errors.options = 'Add at least 2 non-empty options.';
+    }
+    if (content.correctIndex === undefined || content.correctIndex === null) {
+      errors.correctIndex = 'Mark one option as correct.';
+    }
+  }
+
+  if (mode === 'PICK') {
+    const opts = (content.options ?? []).filter((o) => o.trim() !== '');
+    if (opts.length < 2) errors.options = 'Add at least 2 non-empty options.';
+    if ((content.correctIndices ?? []).length === 0) {
+      errors.correctIndex = 'Tick at least one correct option.';
+    }
+  }
+
+  if (mode === 'ORDER') {
+    const opts = (content.options ?? []).filter((o) => o.trim() !== '');
+    if (opts.length < 2) errors.options = 'Add at least 2 steps.';
+  }
+
+  if (mode === 'SHORT_ANSWER' && !content.answer?.trim()) {
+    errors.answer = 'Model answer is required.';
+  }
+
+  return { valid: Object.keys(errors).length === 0, errors };
+}
+
+// ─── Confirm modal (replaces window.confirm) ─────────────────────────────────
+
+interface ConfirmModalProps {
+  message: string;
+  onConfirm: () => void;
+  onCancel: () => void;
+}
+
+function ConfirmModal({ message, onConfirm, onCancel }: ConfirmModalProps) {
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm"
+      role="dialog"
+      aria-modal="true"
+    >
+      <div className="w-full max-w-sm overflow-hidden rounded-2xl bg-white shadow-2xl">
+        <div className="px-5 py-5">
+          <p className="text-sm font-medium text-[#111827]">{message}</p>
+        </div>
+        <div className="flex items-center justify-end gap-2 border-t border-[#f3f4f6] px-5 py-3">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="rounded-lg px-4 py-2 text-sm font-semibold text-[#6b7280] transition hover:bg-[#f3f4f6]"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={onConfirm}
+            className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow transition hover:bg-red-700"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 // ─── Single question form ────────────────────────────────────────────────────
@@ -42,31 +139,96 @@ interface QuestionFormProps {
   item: LessonItem;
   onSave: (updates: { answerMode: AnswerMode; content: QuestionContent }) => Promise<void>;
   onDelete: () => Promise<void>;
+  onDuplicate?: () => Promise<void>;
   index: number;
   collapsible?: boolean;
 }
 
-export function QuestionForm({ item, onSave, onDelete, index, collapsible = false }: QuestionFormProps) {
+export function QuestionForm({
+  item,
+  onSave,
+  onDelete,
+  onDuplicate,
+  index,
+  collapsible = false,
+}: QuestionFormProps) {
   const initialMode: AnswerMode = (item.answerMode as AnswerMode | null) ?? 'MCQ';
   const initialContent = parseContent(item.content);
 
   const [mode, setMode] = useState<AnswerMode>(initialMode);
   const [content, setContent] = useState<QuestionContent>(initialContent);
-  const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
-  const [open, setOpen] = useState(!collapsible);
 
-  const handleSave = useCallback(async () => {
-    setSaving(true);
-    setSaved(false);
+  // BUG-2: Auto-save state
+  const [autoSaveStatus, setAutoSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const [open, setOpen] = useState(!collapsible);
+  const [showConfirm, setShowConfirm] = useState(false);
+
+  // UX-3: Validation errors (shown after first save attempt)
+  const [validationErrors, setValidationErrors] = useState<ValidationResult['errors']>({});
+  const [showErrors, setShowErrors] = useState(false);
+
+  // Refs to avoid stale closures in auto-save timer
+  const isDirtyRef = useRef(false);
+  const isFirstRender = useRef(true);
+  const autoSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const modeRef = useRef(mode);
+  const contentRef = useRef(content);
+  modeRef.current = mode;
+  contentRef.current = content;
+
+  const onSaveRef = useRef(onSave);
+  onSaveRef.current = onSave;
+
+  const performSave = useCallback(async () => {
+    setAutoSaveStatus('saving');
     try {
-      await onSave({ answerMode: mode, content });
-      setSaved(true);
-      setTimeout(() => setSaved(false), 2000);
-    } finally {
-      setSaving(false);
+      await onSaveRef.current({ answerMode: modeRef.current, content: contentRef.current });
+      isDirtyRef.current = false;
+      setAutoSaveStatus('saved');
+      setTimeout(() => setAutoSaveStatus('idle'), 2000);
+    } catch {
+      setAutoSaveStatus('error');
     }
-  }, [mode, content, onSave]);
+  }, []);
+
+  // BUG-2: Trigger auto-save on content/mode change (skip first render)
+  useEffect(() => {
+    if (isFirstRender.current) { isFirstRender.current = false; return; }
+    isDirtyRef.current = true;
+    setAutoSaveStatus('idle');
+    if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
+    autoSaveTimerRef.current = setTimeout(() => void performSave(), 600);
+    return () => {
+      if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
+    };
+  }, [content, mode, performSave]);
+
+  // BUG-2: beforeunload warning when dirty
+  useEffect(() => {
+    const handler = (e: BeforeUnloadEvent) => {
+      if (isDirtyRef.current) { e.preventDefault(); e.returnValue = ''; }
+    };
+    window.addEventListener('beforeunload', handler);
+    return () => window.removeEventListener('beforeunload', handler);
+  }, []);
+
+  // UX-3: Validate whenever content/mode changes (after first error shown)
+  useEffect(() => {
+    if (showErrors) {
+      setValidationErrors(validate(mode, content).errors);
+    }
+  }, [content, mode, showErrors]);
+
+  const handleManualSave = useCallback(async () => {
+    const result = validate(mode, content);
+    if (!result.valid) {
+      setShowErrors(true);
+      setValidationErrors(result.errors);
+      return;
+    }
+    if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
+    await performSave();
+  }, [mode, content, performSave]);
 
   const updateOption = (i: number, val: string) => {
     setContent((c) => {
@@ -83,10 +245,16 @@ export function QuestionForm({ item, onSave, onDelete, index, collapsible = fals
   const removeOption = (i: number) => {
     setContent((c) => {
       const options = (c.options ?? []).filter((_, idx) => idx !== i);
+      // Adjust correctIndex if needed
+      let correctIndex = c.correctIndex;
+      if (correctIndex !== undefined) {
+        if (correctIndex === i) correctIndex = undefined;
+        else if (correctIndex > i) correctIndex = correctIndex - 1;
+      }
       const correctIndices = (c.correctIndices ?? [])
         .filter((ci) => ci !== i)
         .map((ci) => (ci > i ? ci - 1 : ci));
-      return { ...c, options, correctIndices };
+      return { ...c, options, correctIndex, correctIndices };
     });
   };
 
@@ -101,10 +269,14 @@ export function QuestionForm({ item, onSave, onDelete, index, collapsible = fals
   const handleModeChange = (newMode: AnswerMode) => {
     setMode(newMode);
     setContent((c) => ({ ...blankContent(newMode), question: c.question }));
+    setShowErrors(false);
+    setValidationErrors({});
   };
 
   const inputCls =
     'w-full rounded-lg border border-[#e5e7eb] bg-white px-3 py-2.5 text-sm text-[#111827] shadow-sm outline-none transition focus:border-[#5850ec] focus:ring-2 focus:ring-[#5850ec]/20 placeholder:text-[#9ca3af]';
+  const inputErrCls =
+    'w-full rounded-lg border border-red-400 bg-white px-3 py-2.5 text-sm text-[#111827] shadow-sm outline-none transition focus:border-red-500 focus:ring-2 focus:ring-red-200 placeholder:text-[#9ca3af]';
   const modeBtnCls = (active: boolean) =>
     `rounded-lg px-3 py-1.5 text-xs font-semibold transition border ${
       active
@@ -112,250 +284,318 @@ export function QuestionForm({ item, onSave, onDelete, index, collapsible = fals
         : 'border-[#e5e7eb] bg-white text-[#374151] hover:border-[#5850ec]/40'
     }`;
 
+  const autoSaveLabel =
+    autoSaveStatus === 'saving' ? '↻ Saving…' :
+    autoSaveStatus === 'saved'  ? '✓ Saved' :
+    autoSaveStatus === 'error'  ? '⚠ Save failed' : null;
+
   return (
-    <div className="rounded-xl border border-[#e5e7eb] bg-white shadow-sm">
-      {/* Header */}
-      <div
-        className="flex items-center gap-3 px-4 py-3"
-        onClick={collapsible ? () => setOpen((o) => !o) : undefined}
-        role={collapsible ? 'button' : undefined}
-        style={collapsible ? { cursor: 'pointer' } : undefined}
-      >
-        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-[#5850ec] text-[11px] font-bold text-white">
-          {index + 1}
-        </span>
-        <p className="min-w-0 flex-1 truncate text-sm font-semibold text-[#111827]">
-          {content.question || <span className="text-[#9ca3af] font-normal">Question {index + 1}</span>}
-        </p>
-        <span className="shrink-0 rounded-full border border-[#e5e7eb] bg-[#f9fafb] px-2 py-0.5 text-[11px] font-semibold text-[#6b7280]">
-          {mode}
-        </span>
-        <button
-          type="button"
-          onClick={(e) => { e.stopPropagation(); void onDelete(); }}
-          className="ml-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg text-[#9ca3af] transition hover:bg-red-50 hover:text-red-500"
-          aria-label="Delete question"
+    <>
+      {showConfirm && (
+        <ConfirmModal
+          message="Remove this question? This can't be undone."
+          onConfirm={() => { setShowConfirm(false); void onDelete(); }}
+          onCancel={() => setShowConfirm(false)}
+        />
+      )}
+
+      <div className="rounded-xl border border-[#e5e7eb] bg-white shadow-sm">
+        {/* Header */}
+        <div
+          className="flex items-center gap-3 px-4 py-3"
+          onClick={collapsible ? () => setOpen((o) => !o) : undefined}
+          role={collapsible ? 'button' : undefined}
+          style={collapsible ? { cursor: 'pointer' } : undefined}
         >
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden>
-            <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </button>
-        {collapsible && (
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className={`text-[#9ca3af] transition-transform ${open ? 'rotate-180' : ''}`} aria-hidden>
-            <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        )}
-      </div>
+          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-[#5850ec] text-[11px] font-bold text-white">
+            {index + 1}
+          </span>
+          <p className="min-w-0 flex-1 truncate text-sm font-semibold text-[#111827]">
+            {content.question || <span className="text-[#9ca3af] font-normal">Question {index + 1}</span>}
+          </p>
 
-      {open && (
-        <div className="border-t border-[#f3f4f6] px-4 pb-4 pt-4 space-y-4">
-          {/* Answer mode */}
-          <div>
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-[#6b7280]">Answer mode</p>
-            <div className="flex flex-wrap gap-2">
-              {(['MCQ', 'SHORT_ANSWER', 'PICK', 'ORDER'] as AnswerMode[]).map((m) => (
-                <button key={m} type="button" className={modeBtnCls(mode === m)} onClick={() => handleModeChange(m)}>
-                  {m === 'MCQ' && 'Multiple choice'}
-                  {m === 'SHORT_ANSWER' && 'Short answer'}
-                  {m === 'PICK' && 'Pick all correct'}
-                  {m === 'ORDER' && 'Ordering'}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Question text */}
-          <div>
-            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-[#6b7280]">
-              Question
-            </label>
-            <textarea
-              value={content.question}
-              onChange={(e) => setContent((c) => ({ ...c, question: e.target.value }))}
-              placeholder="Type your question here…"
-              className={`${inputCls} resize-none`}
-              rows={2}
-            />
-          </div>
-
-          {/* MCQ options */}
-          {mode === 'MCQ' && (
-            <div>
-              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-[#6b7280]">
-                Options <span className="normal-case font-normal text-[#9ca3af]">(click radio to mark correct)</span>
-              </p>
-              <div className="space-y-2">
-                {(content.options ?? []).map((opt, i) => (
-                  <div key={i} className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setContent((c) => ({ ...c, answer: opt }))}
-                      className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition ${
-                        content.answer === opt && opt !== ''
-                          ? 'border-[#5850ec] bg-[#5850ec]'
-                          : 'border-[#d1d5db] bg-white hover:border-[#5850ec]'
-                      }`}
-                      aria-label={`Mark option ${i + 1} as correct`}
-                    >
-                      {content.answer === opt && opt !== '' && (
-                        <span className="h-2 w-2 rounded-full bg-white" />
-                      )}
-                    </button>
-                    <input
-                      type="text"
-                      value={opt}
-                      onChange={(e) => updateOption(i, e.target.value)}
-                      placeholder={`Option ${i + 1}`}
-                      className={inputCls}
-                    />
-                    {(content.options ?? []).length > 2 && (
-                      <button
-                        type="button"
-                        onClick={() => removeOption(i)}
-                        className="shrink-0 text-[#9ca3af] hover:text-red-500"
-                        aria-label="Remove option"
-                      >
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                          <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                        </svg>
-                      </button>
-                    )}
-                  </div>
-                ))}
-              </div>
-              {(content.options ?? []).length < 6 && (
-                <button type="button" onClick={addOption} className="mt-2 text-xs font-semibold text-[#5850ec] hover:underline">
-                  + Add option
-                </button>
-              )}
-            </div>
+          {/* Auto-save status */}
+          {autoSaveLabel && (
+            <span className={`shrink-0 text-[11px] font-semibold ${
+              autoSaveStatus === 'error' ? 'text-red-500' :
+              autoSaveStatus === 'saved' ? 'text-green-600' : 'text-[#9ca3af]'
+            }`}>
+              {autoSaveLabel}
+            </span>
           )}
 
-          {/* PICK options */}
-          {mode === 'PICK' && (
-            <div>
-              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-[#6b7280]">
-                Options <span className="normal-case font-normal text-[#9ca3af]">(tick all correct answers)</span>
-              </p>
-              <div className="space-y-2">
-                {(content.options ?? []).map((opt, i) => (
-                  <div key={i} className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => toggleCorrect(i)}
-                      className={`flex h-5 w-5 shrink-0 items-center justify-center rounded transition border-2 ${
-                        (content.correctIndices ?? []).includes(i)
-                          ? 'border-[#5850ec] bg-[#5850ec]'
-                          : 'border-[#d1d5db] bg-white hover:border-[#5850ec]'
-                      }`}
-                      aria-label={`Toggle option ${i + 1} as correct`}
-                    >
-                      {(content.correctIndices ?? []).includes(i) && (
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
-                          <path d="M20 6L9 17l-5-5" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                      )}
-                    </button>
-                    <input
-                      type="text"
-                      value={opt}
-                      onChange={(e) => updateOption(i, e.target.value)}
-                      placeholder={`Option ${i + 1}`}
-                      className={inputCls}
-                    />
-                    {(content.options ?? []).length > 2 && (
-                      <button type="button" onClick={() => removeOption(i)} className="shrink-0 text-[#9ca3af] hover:text-red-500" aria-label="Remove">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
-                      </button>
-                    )}
-                  </div>
-                ))}
-              </div>
-              {(content.options ?? []).length < 6 && (
-                <button type="button" onClick={addOption} className="mt-2 text-xs font-semibold text-[#5850ec] hover:underline">
-                  + Add option
-                </button>
-              )}
-            </div>
+          <span className="shrink-0 rounded-full border border-[#e5e7eb] bg-[#f9fafb] px-2 py-0.5 text-[11px] font-semibold text-[#6b7280]">
+            {mode}
+          </span>
+
+          {/* Duplicate */}
+          {onDuplicate && (
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); void onDuplicate(); }}
+              className="ml-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg text-[#9ca3af] transition hover:bg-[#f3f4f6] hover:text-[#5850ec]"
+              aria-label="Duplicate question"
+              title="Duplicate question"
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden>
+                <rect x="9" y="9" width="11" height="11" rx="2" stroke="currentColor" strokeWidth="1.75" />
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
+              </svg>
+            </button>
           )}
 
-          {/* ORDER options */}
-          {mode === 'ORDER' && (
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); setShowConfirm(true); }}
+            className="ml-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg text-[#9ca3af] transition hover:bg-red-50 hover:text-red-500"
+            aria-label="Delete question"
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden>
+              <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+          {collapsible && (
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className={`text-[#9ca3af] transition-transform ${open ? 'rotate-180' : ''}`} aria-hidden>
+              <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          )}
+        </div>
+
+        {open && (
+          <div className="border-t border-[#f3f4f6] px-4 pb-4 pt-4 space-y-4">
+            {/* Answer mode */}
             <div>
-              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-[#6b7280]">
-                Items in correct order <span className="normal-case font-normal text-[#9ca3af]">(students will see them shuffled)</span>
-              </p>
-              <div className="space-y-2">
-                {(content.options ?? []).map((opt, i) => (
-                  <div key={i} className="flex items-center gap-2">
-                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-[#f3f4f6] text-[11px] font-bold text-[#6b7280]">{i + 1}</span>
-                    <input
-                      type="text"
-                      value={opt}
-                      onChange={(e) => updateOption(i, e.target.value)}
-                      placeholder={`Step ${i + 1}`}
-                      className={inputCls}
-                    />
-                    {(content.options ?? []).length > 2 && (
-                      <button type="button" onClick={() => removeOption(i)} className="shrink-0 text-[#9ca3af] hover:text-red-500" aria-label="Remove">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
-                      </button>
-                    )}
-                  </div>
+              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-[#6b7280]">Answer mode</p>
+              <div className="flex flex-wrap gap-2">
+                {(['MCQ', 'SHORT_ANSWER', 'PICK', 'ORDER'] as AnswerMode[]).map((m) => (
+                  <button key={m} type="button" className={modeBtnCls(mode === m)} onClick={() => handleModeChange(m)}>
+                    {m === 'MCQ' && 'Multiple choice'}
+                    {m === 'SHORT_ANSWER' && 'Short answer'}
+                    {m === 'PICK' && 'Pick all correct'}
+                    {m === 'ORDER' && 'Ordering'}
+                  </button>
                 ))}
               </div>
-              {(content.options ?? []).length < 8 && (
-                <button type="button" onClick={addOption} className="mt-2 text-xs font-semibold text-[#5850ec] hover:underline">
-                  + Add step
-                </button>
-              )}
             </div>
-          )}
 
-          {/* SHORT_ANSWER model answer */}
-          {mode === 'SHORT_ANSWER' && (
+            {/* Question text */}
             <div>
               <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-[#6b7280]">
-                Model answer <span className="normal-case font-normal text-[#9ca3af]">(used by AI to mark)</span>
+                Question
+              </label>
+              <textarea
+                value={content.question}
+                onChange={(e) => setContent((c) => ({ ...c, question: e.target.value }))}
+                placeholder="Type your question here…"
+                className={`${showErrors && validationErrors.question ? inputErrCls : inputCls} resize-none`}
+                rows={2}
+              />
+              {showErrors && validationErrors.question && (
+                <p className="mt-1 text-xs text-red-500">{validationErrors.question}</p>
+              )}
+            </div>
+
+            {/* MCQ options */}
+            {mode === 'MCQ' && (
+              <div>
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-[#6b7280]">
+                  Options <span className="normal-case font-normal text-[#9ca3af]">(click radio to mark correct)</span>
+                </p>
+                <div className="space-y-2">
+                  {(content.options ?? []).map((opt, i) => (
+                    <div key={i} className="flex items-center gap-2">
+                      {/* BUG-1: compare by index, not text */}
+                      <button
+                        type="button"
+                        onClick={() => setContent((c) => ({ ...c, correctIndex: i }))}
+                        className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition ${
+                          content.correctIndex === i
+                            ? 'border-[#5850ec] bg-[#5850ec]'
+                            : 'border-[#d1d5db] bg-white hover:border-[#5850ec]'
+                        }`}
+                        aria-label={`Mark option ${i + 1} as correct`}
+                      >
+                        {content.correctIndex === i && (
+                          <span className="h-2 w-2 rounded-full bg-white" />
+                        )}
+                      </button>
+                      <input
+                        type="text"
+                        value={opt}
+                        onChange={(e) => updateOption(i, e.target.value)}
+                        placeholder={`Option ${i + 1}`}
+                        className={inputCls}
+                      />
+                      {(content.options ?? []).length > 2 && (
+                        <button
+                          type="button"
+                          onClick={() => removeOption(i)}
+                          className="shrink-0 text-[#9ca3af] hover:text-red-500"
+                          aria-label="Remove option"
+                        >
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                            <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                          </svg>
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                {showErrors && (validationErrors.options || validationErrors.correctIndex) && (
+                  <div className="mt-1 space-y-0.5">
+                    {validationErrors.options && <p className="text-xs text-red-500">{validationErrors.options}</p>}
+                    {validationErrors.correctIndex && <p className="text-xs text-red-500">{validationErrors.correctIndex}</p>}
+                  </div>
+                )}
+                {(content.options ?? []).length < 6 && (
+                  <button type="button" onClick={addOption} className="mt-2 text-xs font-semibold text-[#5850ec] hover:underline">
+                    + Add option
+                  </button>
+                )}
+              </div>
+            )}
+
+            {/* PICK options */}
+            {mode === 'PICK' && (
+              <div>
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-[#6b7280]">
+                  Options <span className="normal-case font-normal text-[#9ca3af]">(tick all correct answers)</span>
+                </p>
+                <div className="space-y-2">
+                  {(content.options ?? []).map((opt, i) => (
+                    <div key={i} className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => toggleCorrect(i)}
+                        className={`flex h-5 w-5 shrink-0 items-center justify-center rounded transition border-2 ${
+                          (content.correctIndices ?? []).includes(i)
+                            ? 'border-[#5850ec] bg-[#5850ec]'
+                            : 'border-[#d1d5db] bg-white hover:border-[#5850ec]'
+                        }`}
+                        aria-label={`Toggle option ${i + 1} as correct`}
+                      >
+                        {(content.correctIndices ?? []).includes(i) && (
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
+                            <path d="M20 6L9 17l-5-5" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        )}
+                      </button>
+                      <input
+                        type="text"
+                        value={opt}
+                        onChange={(e) => updateOption(i, e.target.value)}
+                        placeholder={`Option ${i + 1}`}
+                        className={inputCls}
+                      />
+                      {(content.options ?? []).length > 2 && (
+                        <button type="button" onClick={() => removeOption(i)} className="shrink-0 text-[#9ca3af] hover:text-red-500" aria-label="Remove">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                {showErrors && (validationErrors.options || validationErrors.correctIndex) && (
+                  <div className="mt-1 space-y-0.5">
+                    {validationErrors.options && <p className="text-xs text-red-500">{validationErrors.options}</p>}
+                    {validationErrors.correctIndex && <p className="text-xs text-red-500">{validationErrors.correctIndex}</p>}
+                  </div>
+                )}
+                {(content.options ?? []).length < 6 && (
+                  <button type="button" onClick={addOption} className="mt-2 text-xs font-semibold text-[#5850ec] hover:underline">
+                    + Add option
+                  </button>
+                )}
+              </div>
+            )}
+
+            {/* ORDER options */}
+            {mode === 'ORDER' && (
+              <div>
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-[#6b7280]">
+                  Items in correct order <span className="normal-case font-normal text-[#9ca3af]">(students will see them shuffled)</span>
+                </p>
+                <div className="space-y-2">
+                  {(content.options ?? []).map((opt, i) => (
+                    <div key={i} className="flex items-center gap-2">
+                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-[#f3f4f6] text-[11px] font-bold text-[#6b7280]">{i + 1}</span>
+                      <input
+                        type="text"
+                        value={opt}
+                        onChange={(e) => updateOption(i, e.target.value)}
+                        placeholder={`Step ${i + 1}`}
+                        className={inputCls}
+                      />
+                      {(content.options ?? []).length > 2 && (
+                        <button type="button" onClick={() => removeOption(i)} className="shrink-0 text-[#9ca3af] hover:text-red-500" aria-label="Remove">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                {showErrors && validationErrors.options && (
+                  <p className="mt-1 text-xs text-red-500">{validationErrors.options}</p>
+                )}
+                {(content.options ?? []).length < 8 && (
+                  <button type="button" onClick={addOption} className="mt-2 text-xs font-semibold text-[#5850ec] hover:underline">
+                    + Add step
+                  </button>
+                )}
+              </div>
+            )}
+
+            {/* SHORT_ANSWER model answer */}
+            {mode === 'SHORT_ANSWER' && (
+              <div>
+                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-[#6b7280]">
+                  Model answer <span className="normal-case font-normal text-[#9ca3af]">(used by AI to mark)</span>
+                </label>
+                <input
+                  type="text"
+                  value={content.answer ?? ''}
+                  onChange={(e) => setContent((c) => ({ ...c, answer: e.target.value }))}
+                  placeholder="e.g. The answer is 42"
+                  className={showErrors && validationErrors.answer ? inputErrCls : inputCls}
+                />
+                {showErrors && validationErrors.answer && (
+                  <p className="mt-1 text-xs text-red-500">{validationErrors.answer}</p>
+                )}
+              </div>
+            )}
+
+            {/* Hint */}
+            <div>
+              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-[#6b7280]">
+                Hint <span className="normal-case font-normal text-[#9ca3af]">(optional)</span>
               </label>
               <input
                 type="text"
-                value={content.answer ?? ''}
-                onChange={(e) => setContent((c) => ({ ...c, answer: e.target.value }))}
-                placeholder="e.g. The answer is 42"
+                value={content.hint ?? ''}
+                onChange={(e) => setContent((c) => ({ ...c, hint: e.target.value || undefined }))}
+                placeholder="A hint shown when students get stuck"
                 className={inputCls}
               />
             </div>
-          )}
 
-          {/* Hint */}
-          <div>
-            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-[#6b7280]">
-              Hint <span className="normal-case font-normal text-[#9ca3af]">(optional)</span>
-            </label>
-            <input
-              type="text"
-              value={content.hint ?? ''}
-              onChange={(e) => setContent((c) => ({ ...c, hint: e.target.value || undefined }))}
-              placeholder="A hint shown when students get stuck"
-              className={inputCls}
-            />
+            {/* Footer: auto-save status + manual save button */}
+            <div className="flex items-center gap-3 pt-1">
+              <button
+                type="button"
+                onClick={() => void handleManualSave()}
+                disabled={autoSaveStatus === 'saving'}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-[#5850ec] px-4 py-2 text-xs font-semibold text-white shadow transition hover:bg-[#4338ca] disabled:opacity-50"
+              >
+                {autoSaveStatus === 'saving' ? 'Saving…' : 'Save question'}
+              </button>
+              {autoSaveStatus === 'error' && (
+                <p className="text-xs text-red-500">Auto-save failed — click Save to retry.</p>
+              )}
+            </div>
           </div>
-
-          {/* Save button */}
-          <div className="flex items-center gap-3 pt-1">
-            <button
-              type="button"
-              onClick={handleSave}
-              disabled={saving}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-[#5850ec] px-4 py-2 text-xs font-semibold text-white shadow transition hover:bg-[#4338ca] disabled:opacity-50"
-            >
-              {saving ? 'Saving…' : saved ? '✓ Saved' : 'Save question'}
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </>
   );
 }
 
@@ -381,7 +621,8 @@ export function CheckBlockEditor({
   onItemDeleted,
 }: CheckBlockEditorProps) {
   const [creating, setCreating] = useState(false);
-  const [pickerOpen, setPickerOpen] = useState(false);
+  // High #8: bank picker
+  const [showPicker, setShowPicker] = useState(false);
 
   const createItem = useCallback(async () => {
     setCreating(true);
@@ -417,7 +658,6 @@ export function CheckBlockEditor({
 
   const deleteItem = useCallback(async () => {
     if (!item) return;
-    if (!confirm('Remove this question?')) return;
     const res = await fetch(`/api/lessons/${lessonId}/blocks/${blockId}/items/${item.id}`, { method: 'DELETE' });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     onItemDeleted(item.id);
@@ -426,49 +666,60 @@ export function CheckBlockEditor({
   if (!item) {
     return (
       <>
+        {showPicker && (
+          <QuestionBankPicker
+            subjectId={subjectId}
+            lessonId={lessonId}
+            blockId={blockId}
+            onItemAdded={(newItem) => { onItemCreated(newItem); setShowPicker(false); }}
+            onClose={() => setShowPicker(false)}
+          />
+        )}
         <div className="rounded-xl border-2 border-dashed border-[#e5e7eb] px-6 py-10 text-center">
           <p className="text-sm font-medium text-[#374151]">No question yet</p>
           <p className="mt-1 text-xs text-[#6b7280]">
             A Check block has one question that everyone answers at the same time.
           </p>
-          <div className="mt-4 flex items-center justify-center gap-2">
+          <div className="mt-4 flex justify-center gap-2">
             <button
               type="button"
               onClick={createItem}
               disabled={creating}
               className="inline-flex items-center gap-1.5 rounded-lg bg-[#10b981] px-4 py-2 text-sm font-semibold text-white shadow transition hover:bg-[#059669] disabled:opacity-50"
             >
-              {creating ? 'Creating…' : '+ Write question'}
+              {creating ? 'Creating…' : '+ New question'}
             </button>
             <button
               type="button"
-              onClick={() => setPickerOpen(true)}
+              onClick={() => setShowPicker(true)}
               className="inline-flex items-center gap-1.5 rounded-lg border border-[#5850ec] bg-white px-4 py-2 text-sm font-semibold text-[#5850ec] shadow transition hover:bg-[#f5f3ff]"
             >
               Browse bank
             </button>
           </div>
         </div>
-        {pickerOpen && (
-          <QuestionBankPicker
-            subjectId={subjectId}
-            lessonId={lessonId}
-            blockId={blockId}
-            onItemAdded={(newItem) => { onItemCreated(newItem); setPickerOpen(false); }}
-            onClose={() => setPickerOpen(false)}
-          />
-        )}
       </>
     );
   }
 
   return (
-    <QuestionForm
-      item={item}
-      onSave={saveItem}
-      onDelete={deleteItem}
-      index={0}
-    />
+    <>
+      {showPicker && (
+        <QuestionBankPicker
+          subjectId={subjectId}
+          lessonId={lessonId}
+          blockId={blockId}
+          onItemAdded={(newItem) => { onItemCreated(newItem); setShowPicker(false); }}
+          onClose={() => setShowPicker(false)}
+        />
+      )}
+      <QuestionForm
+        item={item}
+        onSave={saveItem}
+        onDelete={deleteItem}
+        index={0}
+      />
+    </>
   );
 }
 
@@ -494,7 +745,8 @@ export function PracticeBlockEditor({
   onItemDeleted,
 }: PracticeBlockEditorProps) {
   const [adding, setAdding] = useState(false);
-  const [pickerOpen, setPickerOpen] = useState(false);
+  // High #8: bank picker
+  const [showPicker, setShowPicker] = useState(false);
 
   const addQuestion = useCallback(async () => {
     setAdding(true);
@@ -516,8 +768,39 @@ export function PracticeBlockEditor({
     }
   }, [lessonId, blockId, onItemCreated]);
 
+  // FEAT-5: Duplicate a question
+  const duplicateQuestion = useCallback(async (item: LessonItem) => {
+    try {
+      const res = await fetch(`/api/lessons/${lessonId}/blocks/${blockId}/items`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          itemType: item.itemType,
+          answerMode: item.answerMode,
+          content: item.content,
+        }),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const newItem = await res.json() as LessonItem;
+      onItemCreated(newItem);
+    } catch {
+      // silently fail — not critical
+    }
+  }, [lessonId, blockId, onItemCreated]);
+
   return (
     <>
+      {/* High #8: bank picker drawer */}
+      {showPicker && (
+        <QuestionBankPicker
+          subjectId={subjectId}
+          lessonId={lessonId}
+          blockId={blockId}
+          onItemAdded={(newItem) => { onItemCreated(newItem); }}
+          onClose={() => setShowPicker(false)}
+        />
+      )}
+
       <div className="space-y-3">
         {items.length === 0 ? (
           <div className="rounded-xl border-2 border-dashed border-[#e5e7eb] px-6 py-10 text-center">
@@ -533,6 +816,7 @@ export function PracticeBlockEditor({
               item={item}
               index={i}
               collapsible
+              onDuplicate={() => duplicateQuestion(item)}
               onSave={async (updates) => {
                 const res = await fetch(`/api/lessons/${lessonId}/blocks/${blockId}/items/${item.id}`, {
                   method: 'PATCH',
@@ -544,7 +828,6 @@ export function PracticeBlockEditor({
                 onItemUpdated(updated);
               }}
               onDelete={async () => {
-                if (!confirm('Remove this question?')) return;
                 const res = await fetch(`/api/lessons/${lessonId}/blocks/${blockId}/items/${item.id}`, { method: 'DELETE' });
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 onItemDeleted(item.id);
@@ -563,30 +846,17 @@ export function PracticeBlockEditor({
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
               <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" />
             </svg>
-            {adding ? 'Adding…' : 'Write question'}
+            {adding ? 'Adding…' : 'Add question'}
           </button>
           <button
             type="button"
-            onClick={() => setPickerOpen(true)}
-            className="flex items-center gap-1.5 rounded-xl border-2 border-dashed border-[#5850ec]/30 px-4 py-3 text-sm font-semibold text-[#5850ec] transition hover:border-[#5850ec]/60 hover:bg-[#f5f3ff]"
+            onClick={() => setShowPicker(true)}
+            className="inline-flex items-center gap-1.5 rounded-xl border border-[#5850ec]/30 bg-white px-4 py-3 text-sm font-semibold text-[#5850ec] transition hover:border-[#5850ec]/60 hover:bg-[#f5f3ff]"
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
-              <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
             Browse bank
           </button>
         </div>
       </div>
-
-      {pickerOpen && (
-        <QuestionBankPicker
-          subjectId={subjectId}
-          lessonId={lessonId}
-          blockId={blockId}
-          onItemAdded={(newItem) => { onItemCreated(newItem); }}
-          onClose={() => setPickerOpen(false)}
-        />
-      )}
     </>
   );
 }

@@ -49,6 +49,19 @@ export async function POST(
   const parsed = createSchema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: 'Invalid input', issues: parsed.error.issues }, { status: 400 });
 
+  // Medium #14: validate content shape for QUESTION items on creation
+  if (parsed.data.itemType === 'QUESTION') {
+    const c = parsed.data.content as Record<string, unknown>;
+    if (parsed.data.answerMode === 'MCQ') {
+      if (c.options !== undefined && !Array.isArray(c.options)) {
+        return NextResponse.json({ error: 'MCQ content.options must be an array' }, { status: 400 });
+      }
+      if (c.correctIndex !== undefined && typeof c.correctIndex !== 'number') {
+        return NextResponse.json({ error: 'MCQ content.correctIndex must be a number' }, { status: 400 });
+      }
+    }
+  }
+
   let sortOrder = parsed.data.sortOrder;
   if (sortOrder === undefined) {
     const last = await itemModel.findFirst({

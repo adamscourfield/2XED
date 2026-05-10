@@ -10,6 +10,8 @@ const createSchema = z.object({
   topic: z.string().min(1).max(200),
   subjectId: z.string().min(1),
   curriculumUnitId: z.string().optional(),
+  yearGroup: z.string().optional(),
+  isCopy: z.boolean().optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -35,6 +37,8 @@ export async function POST(req: NextRequest) {
       subjectId: parsed.data.subjectId,
       teacherUserId: user.id,
       curriculumUnitId: parsed.data.curriculumUnitId ?? null,
+      yearGroup: parsed.data.yearGroup ?? null,
+      isCopy: parsed.data.isCopy ?? false,
       // If created from within a curriculum unit, dismiss the linking prompt
       curriculumPromptDismissed: !!parsed.data.curriculumUnitId,
     },

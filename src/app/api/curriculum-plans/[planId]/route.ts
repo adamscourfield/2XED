@@ -35,7 +35,7 @@ const patchSchema = z.object({
   termLabel: z.string().max(50).nullable().optional(),
 });
 
-async function resolvePlan(planId: string, userId: string) {
+async function resolvePlan(planId: string, userId: string, role: string) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const model = (prisma as any).curriculumPlan;
   if (!model) return null;
@@ -76,7 +76,7 @@ async function resolvePlan(planId: string, userId: string) {
       lessons: Array<{ id: string; title: string; topic: string; isPublished: boolean }>;
     }>;
   } | null) => {
-    if (!p || p.teacherUserId !== userId) return null;
+    if (!p || (p.teacherUserId !== userId && role !== 'ADMIN')) return null;
     return p;
   });
 }
@@ -91,7 +91,7 @@ export async function GET(
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const user = session.user as { id: string; role?: string };
 
-  const plan = await resolvePlan(params.planId, user.id);
+  const plan = await resolvePlan(params.planId, user.id, user.role ?? '');
   if (!plan) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
   const detail: CurriculumPlanDetail = {
@@ -103,7 +103,12 @@ export async function GET(
     termLabel: plan.termLabel,
     createdAt: plan.createdAt.toISOString(),
     updatedAt: plan.updatedAt.toISOString(),
-    units: plan.units.map((u) => ({
+    units: plan.units.map((u: {
+      id: string; title: string; aims: string | null; successMeasures: string | null;
+      dateStart: Date | null; dateEnd: Date | null; sortOrder: number;
+      skills: Array<{ skillId: string; skill: { code: string; name: string } }>;
+      lessons: Array<{ id: string; title: string; topic: string; isPublished: boolean }>;
+    }) => ({
       id: u.id,
       title: u.title,
       aims: u.aims,
@@ -111,7 +116,9 @@ export async function GET(
       dateStart: u.dateStart?.toISOString() ?? null,
       dateEnd: u.dateEnd?.toISOString() ?? null,
       sortOrder: u.sortOrder,
-      skills: u.skills.map((s) => ({ skillId: s.skillId, skillCode: s.skill.code, skillName: s.skill.name })),
+      skills: u.skills.map((s: { skillId: string; skill: { code: string; name: string } }) => ({
+        skillId: s.skillId, skillCode: s.skill.code, skillName: s.skill.name,
+      })),
       lessons: u.lessons,
     })),
   };
@@ -129,7 +136,7 @@ export async function PATCH(
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const user = session.user as { id: string; role?: string };
 
-  const plan = await resolvePlan(params.planId, user.id);
+  const plan = await resolvePlan(params.planId, user.id, user.role ?? '');
   if (!plan) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
   const parsed = patchSchema.safeParse(await req.json());
@@ -137,12 +144,13 @@ export async function PATCH(
     return NextResponse.json({ error: 'Invalid input', issues: parsed.error.issues }, { status: 400 });
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const updated = await (prisma as any).curriculumPlan.update({
+  await (prisma as any).curriculumPlan.update({
     where: { id: params.planId },
     data: parsed.data,
   });
 
-  return NextResponse.json(updated);
+  // Return a clean DTO, not the raw Prisma object
+  return NextResponse.json({ id: params.planId, ...parsed.data });
 }
 
 // ── DELETE /api/curriculum-plans/[planId] ────────────────────────────────────
@@ -155,7 +163,7 @@ export async function DELETE(
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const user = session.user as { id: string; role?: string };
 
-  const plan = await resolvePlan(params.planId, user.id);
+  const plan = await resolvePlan(params.planId, user.id, user.role ?? '');
   if (!plan) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

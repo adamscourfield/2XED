@@ -1,7 +1,8 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import type { CurriculumPlanSummary } from '@/app/api/curriculum-plans/route';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -44,6 +45,13 @@ function NewPlanModal({ subjects, onClose }: {
   const [termLabel, setTermLabel] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // M3: close on Escape
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', handleKey);
+    return () => document.removeEventListener('keydown', handleKey);
+  }, [onClose]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -181,7 +189,7 @@ function NewPlanModal({ subjects, onClose }: {
 
 function PlanCard({ plan }: { plan: CurriculumPlanSummary }) {
   return (
-    <a
+    <Link
       href={`/teacher/curriculum/${plan.id}`}
       className="group block w-full max-w-2xl rounded-2xl border border-[#EEF0FB] bg-white shadow-[0_4px_28px_rgba(26,26,61,0.07)] transition hover:border-[#6366F1]/25 hover:shadow-[0_8px_32px_rgba(99,102,241,0.10)]"
     >
@@ -216,7 +224,7 @@ function PlanCard({ plan }: { plan: CurriculumPlanSummary }) {
         </span>
         <span className="text-right text-[#6B7280]">{formatUpdatedPhrase(plan.updatedAt)}</span>
       </div>
-    </a>
+    </Link>
   );
 }
 

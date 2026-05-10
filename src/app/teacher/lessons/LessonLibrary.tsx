@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useRef, useState, useMemo, useEffect } from 'react';
 
 export type LessonLibraryRow = {
   id: string;
@@ -13,6 +13,7 @@ export type LessonLibraryRow = {
   curriculumUnitTitle: string | null;
   subjectTitle: string;
   subjectSlug: string;
+  subjectId: string;
   blockCount: number;
   createdAt: string;
   updatedAt: string;
@@ -28,12 +29,8 @@ function formatDate(iso: string): string {
   if (diffDays === 0) {
     return `Today, ${d.toLocaleTimeString('en-GB', { hour: 'numeric', minute: '2-digit', hour12: true })}`;
   }
-  if (diffDays === 1) {
-    return `Yesterday`;
-  }
-  if (diffDays < 7) {
-    return `${diffDays} days ago`;
-  }
+  if (diffDays === 1) return 'Yesterday';
+  if (diffDays < 7) return `${diffDays} days ago`;
   return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: d.getFullYear() !== now.getFullYear() ? 'numeric' : undefined });
 }
 
@@ -51,9 +48,174 @@ function LessonIcon({ title, published }: { title: string; published: boolean })
   );
 }
 
+// ─── Confirm modal ────────────────────────────────────────────────────────────
+
+function ConfirmModal({ message, onConfirm, onCancel }: { message: string; onConfirm: () => void; onCancel: () => void }) {
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onCancel(); };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, [onCancel]);
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm"
+      role="dialog"
+      aria-modal="true"
+      onClick={(e) => { if (e.target === e.currentTarget) onCancel(); }}
+    >
+      <div className="w-full max-w-sm overflow-hidden rounded-2xl bg-white shadow-2xl">
+        <div className="px-5 py-5">
+          <p className="text-sm font-medium text-[#111827]">{message}</p>
+        </div>
+        <div className="flex items-center justify-end gap-2 border-t border-[#f3f4f6] px-5 py-3">
+          <button type="button" onClick={onCancel} className="rounded-lg px-4 py-2 text-sm font-semibold text-[#6b7280] transition hover:bg-[#f3f4f6]">
+            Cancel
+          </button>
+          <button type="button" onClick={onConfirm} className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow transition hover:bg-red-700">
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Lesson card "..." menu ────────────────────────────────────────────────────
+
+function LessonCardMenu({
+  lesson,
+  onDeleted,
+  onDuplicated,
+}: {
+  lesson: LessonLibraryRow;
+  onDeleted: (id: string) => void;
+  onDuplicated: (row: LessonLibraryRow) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [confirm, setConfirm] = useState(false);
+  const [duplicating, setDuplicating] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Close on outside click
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [open]);
+
+  const handleDuplicate = async () => {
+    setOpen(false);
+    setDuplicating(true);
+    try {
+      const res = await fetch('/api/lessons', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: `${lesson.title} (copy)`,
+          topic: lesson.topic,
+          subjectId: lesson.subjectId,
+          isCopy: true,
+        }),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const created = await res.json() as { id: string; createdAt: string; updatedAt: string };
+      onDuplicated({
+        ...lesson,
+        id: created.id,
+        title: `${lesson.title} (copy)`,
+        isCopy: true,
+        isPublished: false,
+        blockCount: 0,
+        createdAt: created.createdAt,
+        updatedAt: created.updatedAt,
+      });
+    } catch {
+      // non-fatal — user can retry
+    } finally {
+      setDuplicating(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    setConfirm(false);
+    const res = await fetch(`/api/lessons/${lesson.id}`, { method: 'DELETE' });
+    if (res.ok) onDeleted(lesson.id);
+  };
+
+  return (
+    <>
+      {confirm && (
+        <ConfirmModal
+          message={`Delete "${lesson.title}"? This can't be undone.`}
+          onConfirm={() => void handleDelete()}
+          onCancel={() => setConfirm(false)}
+        />
+      )}
+
+      <div ref={menuRef} className="relative">
+        <button
+          type="button"
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen((o) => !o); }}
+          disabled={duplicating}
+          className="flex h-7 w-7 items-center justify-center rounded-lg text-[#9ca3af] transition hover:bg-[#f3f4f6] hover:text-[#374151] disabled:opacity-40"
+          aria-label="Lesson options"
+          aria-expanded={open}
+        >
+          {duplicating ? (
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="animate-spin" aria-hidden>
+              <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2" strokeOpacity="0.3" />
+              <path d="M12 3a9 9 0 0 1 9 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            </svg>
+          ) : (
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
+              <circle cx="12" cy="5" r="1.5" fill="currentColor" />
+              <circle cx="12" cy="12" r="1.5" fill="currentColor" />
+              <circle cx="12" cy="19" r="1.5" fill="currentColor" />
+            </svg>
+          )}
+        </button>
+
+        {open && (
+          <div className="absolute right-0 top-8 z-30 w-40 overflow-hidden rounded-xl border border-[#e5e7eb] bg-white shadow-lg">
+            <button
+              type="button"
+              onClick={(e) => { e.preventDefault(); void handleDuplicate(); }}
+              className="flex w-full items-center gap-2.5 px-3 py-2.5 text-sm text-[#374151] transition hover:bg-[#f9fafb]"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
+                <rect x="9" y="9" width="11" height="11" rx="2" stroke="currentColor" strokeWidth="1.75" />
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
+              </svg>
+              Duplicate
+            </button>
+            <div className="border-t border-[#f3f4f6]" />
+            <button
+              type="button"
+              onClick={(e) => { e.preventDefault(); setOpen(false); setConfirm(true); }}
+              className="flex w-full items-center gap-2.5 px-3 py-2.5 text-sm text-red-600 transition hover:bg-red-50"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
+                <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              Delete
+            </button>
+          </div>
+        )}
+      </div>
+    </>
+  );
+}
+
+// ─── Main component ───────────────────────────────────────────────────────────
+
 type Props = { rows: LessonLibraryRow[] };
 
-export function LessonLibrary({ rows }: Props) {
+export function LessonLibrary({ rows: initialRows }: Props) {
+  const [rows, setRows] = useState<LessonLibraryRow[]>(initialRows);
   const [search, setSearch] = useState('');
   const [subjectFilter, setSubjectFilter] = useState('');
   const [mappedFilter, setMappedFilter] = useState<'all' | 'mapped' | 'unmapped'>('all');
@@ -79,14 +241,9 @@ export function LessonLibrary({ rows }: Props) {
           r.subjectTitle.toLowerCase().includes(q),
       );
     }
-    if (subjectFilter) {
-      list = list.filter((r) => r.subjectTitle === subjectFilter);
-    }
-    if (mappedFilter === 'mapped') {
-      list = list.filter((r) => !!r.curriculumUnitId);
-    } else if (mappedFilter === 'unmapped') {
-      list = list.filter((r) => !r.curriculumUnitId);
-    }
+    if (subjectFilter) list = list.filter((r) => r.subjectTitle === subjectFilter);
+    if (mappedFilter === 'mapped') list = list.filter((r) => !!r.curriculumUnitId);
+    else if (mappedFilter === 'unmapped') list = list.filter((r) => !r.curriculumUnitId);
     list = [...list].sort((a, b) => {
       if (sortBy === 'title') return a.title.localeCompare(b.title);
       if (sortBy === 'created') return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
@@ -133,7 +290,7 @@ export function LessonLibrary({ rows }: Props) {
           </svg>
           <p className="text-amber-800">
             <span className="font-semibold">{unmappedCount} lesson{unmappedCount !== 1 ? 's' : ''}</span>{' '}
-            {unmappedCount === 1 ? 'hasn\'t' : 'haven\'t'} been added to your curriculum plan.{' '}
+            {unmappedCount === 1 ? "hasn't" : "haven't"} been added to your curriculum plan.{' '}
             <Link href="/teacher/curriculum" className="font-semibold underline hover:no-underline">
               Map them now →
             </Link>
@@ -230,7 +387,7 @@ export function LessonLibrary({ rows }: Props) {
           ) : (
             <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {pageRows.map((r) => (
-                <li key={r.id}>
+                <li key={r.id} className="relative">
                   <Link
                     href={`/teacher/lessons/${r.id}`}
                     className="group flex flex-col rounded-xl border border-[#e5e7eb] bg-white p-4 shadow-sm transition hover:border-[#5850ec]/40 hover:shadow-md"
@@ -252,6 +409,12 @@ export function LessonLibrary({ rows }: Props) {
                             Copy
                           </span>
                         )}
+                        {/* UX-6: "..." menu */}
+                        <LessonCardMenu
+                          lesson={r}
+                          onDeleted={(id) => setRows((prev) => prev.filter((row) => row.id !== id))}
+                          onDuplicated={(newRow) => setRows((prev) => [newRow, ...prev])}
+                        />
                       </div>
                     </div>
 

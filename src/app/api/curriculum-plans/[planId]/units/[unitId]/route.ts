@@ -15,7 +15,7 @@ const patchSchema = z.object({
   skillIds: z.array(z.string()).max(20).optional(),
 });
 
-async function resolveUnit(unitId: string, planId: string, userId: string) {
+async function resolveUnit(unitId: string, planId: string, userId: string, role: string) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const model = (prisma as any).curriculumUnit;
   if (!model) return null;
@@ -23,9 +23,15 @@ async function resolveUnit(unitId: string, planId: string, userId: string) {
     where: { id: unitId },
     include: { plan: { select: { teacherUserId: true } } },
   });
-  if (!unit || unit.planId !== planId || unit.plan.teacherUserId !== userId) return null;
+  if (!unit || unit.planId !== planId) return null;
+  if (unit.plan.teacherUserId !== userId && role !== 'ADMIN') return null;
   return unit;
 }
+
+const UNIT_INCLUDE = {
+  skills: { include: { skill: { select: { code: true, name: true } } } },
+  lessons: { select: { id: true, title: true, topic: true, isPublished: true } },
+} as const;
 
 // ── PATCH /api/curriculum-plans/[planId]/units/[unitId] ──────────────────────
 
@@ -37,38 +43,48 @@ export async function PATCH(
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const user = session.user as { id: string; role?: string };
 
-  const unit = await resolveUnit(params.unitId, params.planId, user.id);
+  const unit = await resolveUnit(params.unitId, params.planId, user.id, user.role ?? '');
   if (!unit) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
   const parsed = patchSchema.safeParse(await req.json());
   if (!parsed.success)
     return NextResponse.json({ error: 'Invalid input', issues: parsed.error.issues }, { status: 400 });
 
+  // L1: date ordering validation
+  const effectiveDateStart = parsed.data.dateStart !== undefined ? parsed.data.dateStart : unit.dateStart;
+  const effectiveDateEnd = parsed.data.dateEnd !== undefined ? parsed.data.dateEnd : unit.dateEnd;
+  if (effectiveDateStart && effectiveDateEnd) {
+    if (new Date(effectiveDateStart) >= new Date(effectiveDateEnd)) {
+      return NextResponse.json({ error: 'dateStart must be before dateEnd' }, { status: 400 });
+    }
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const unitModel = (prisma as any).curriculumUnit;
   const { skillIds, dateStart, dateEnd, ...rest } = parsed.data;
 
-  // Build update data
+  // Build core update data
   const data: Record<string, unknown> = { ...rest };
   if (dateStart !== undefined) data.dateStart = dateStart ? new Date(dateStart) : null;
   if (dateEnd !== undefined) data.dateEnd = dateEnd ? new Date(dateEnd) : null;
 
-  // If skillIds supplied, replace the entire skill set
+  // C1: wrap skill replacement in a transaction to prevent partial-update corruption
   if (skillIds !== undefined) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (prisma as any).curriculumUnitSkill.deleteMany({ where: { unitId: params.unitId } });
-    data.skills = {
-      create: skillIds.map((skillId) => ({ skillId })),
-    };
+    const [, updated] = await (prisma as any).$transaction([
+      (prisma as any).curriculumUnitSkill.deleteMany({ where: { unitId: params.unitId } }),
+      unitModel.update({
+        where: { id: params.unitId },
+        data: { ...data, skills: { create: skillIds.map((skillId: string) => ({ skillId })) } },
+        include: UNIT_INCLUDE,
+      }),
+    ]);
+    return NextResponse.json(updated);
   }
 
   const updated = await unitModel.update({
     where: { id: params.unitId },
     data,
-    include: {
-      skills: { include: { skill: { select: { code: true, name: true } } } },
-      lessons: { select: { id: true, title: true, topic: true, isPublished: true } },
-    },
+    include: UNIT_INCLUDE,
   });
 
   return NextResponse.json(updated);
@@ -84,7 +100,7 @@ export async function DELETE(
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const user = session.user as { id: string; role?: string };
 
-  const unit = await resolveUnit(params.unitId, params.planId, user.id);
+  const unit = await resolveUnit(params.unitId, params.planId, user.id, user.role ?? '');
   if (!unit) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

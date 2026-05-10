@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
@@ -7,11 +8,14 @@ type Subject = { id: string; title: string; slug: string };
 
 type Props = { subjects: Subject[] };
 
+const YEAR_GROUPS = ['7', '8', '9', '10', '11', '12', '13'];
+
 export function NewLessonForm({ subjects }: Props) {
   const router = useRouter();
   const [title, setTitle] = useState('');
   const [topic, setTopic] = useState('');
   const [subjectId, setSubjectId] = useState(subjects[0]?.id ?? '');
+  const [yearGroup, setYearGroup] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -24,7 +28,7 @@ export function NewLessonForm({ subjects }: Props) {
       const res = await fetch('/api/lessons', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: title.trim(), topic: topic.trim(), subjectId }),
+        body: JSON.stringify({ title: title.trim(), topic: topic.trim(), subjectId, yearGroup: yearGroup || undefined }),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
@@ -81,6 +85,26 @@ export function NewLessonForm({ subjects }: Props) {
       </div>
 
       <div>
+        <label htmlFor="lesson-year" className={labelCls}>
+          Year group <span className="text-[#9ca3af] font-normal">(optional)</span>
+        </label>
+        <select
+          id="lesson-year"
+          value={yearGroup}
+          onChange={(e) => setYearGroup(e.target.value)}
+          className={inputCls}
+        >
+          <option value="">Select year group…</option>
+          {YEAR_GROUPS.map((y) => (
+            <option key={y} value={y}>Year {y}</option>
+          ))}
+        </select>
+        <p className="mt-1.5 text-xs text-[#6b7280]">
+          Helps the AI target difficulty and question level appropriately.
+        </p>
+      </div>
+
+      <div>
         <label htmlFor="lesson-subject" className={labelCls}>
           Subject <span className="text-red-500">*</span>
         </label>
@@ -130,9 +154,9 @@ export function NewLessonForm({ subjects }: Props) {
             </>
           )}
         </button>
-        <a href="/teacher/lessons" className="text-sm text-[#6b7280] hover:text-[#374151]">
+        <Link href="/teacher/lessons" className="text-sm text-[#6b7280] hover:text-[#374151]">
           Cancel
-        </a>
+        </Link>
       </div>
     </form>
   );
