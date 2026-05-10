@@ -366,7 +366,7 @@ function AiAssistPanel({
                   const skill = availableSkills.find((s) => s.code.toUpperCase() === code.toUpperCase());
                   return skill ? (
                     <span key={code} className="rounded-full bg-[#eef2ff] px-2 py-0.5 text-xs text-[#5850ec]">
-                      {skill.code} — {skill.name}
+                      {skill.name}
                     </span>
                   ) : null;
                 })}
@@ -696,7 +696,6 @@ function UnitEditorPanel({
                       </svg>
                     )}
                   </span>
-                  <span className="font-mono text-[10px] text-[#6b7280]">{skill.code}</span>
                   <span className="truncate">{skill.name}</span>
                 </button>
               );

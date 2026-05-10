@@ -436,7 +436,7 @@ export function TeacherDashboardClassesView({
                       <div className="min-w-0">
                         <p className="truncate text-sm font-semibold text-[color:var(--anx-text)]">
                           {ls.subject.title}
-                          {ls.skill ? ` — ${ls.skill.code}: ${ls.skill.name}` : ''}
+                          {ls.skill ? ` — ${ls.skill.name}` : ''}
                         </p>
                         <p className="text-xs text-[color:var(--anx-text-muted)]">
                           <span className="font-mono font-semibold">{ls.joinCode}</span> · {ls._count.participants} student

@@ -105,9 +105,6 @@ export function EnglishLearnSession({ subject, skill, blocks, userId }: EnglishL
             <h1 className="text-2xl font-bold" style={{ color: 'var(--anx-text)' }}>
               {skill.name}
             </h1>
-            <p className="text-xs mt-1 font-mono" style={{ color: 'var(--anx-text-muted)' }}>
-              {skill.code}
-            </p>
           </div>
 
           {(skill.intro || skill.description) && (

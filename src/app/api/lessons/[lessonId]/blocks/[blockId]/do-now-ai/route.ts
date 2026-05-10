@@ -11,25 +11,26 @@ interface AiSuggestion {
   answer?: string;
 }
 
-function buildPrompt(topic: string, subject: string, unitTitle: string | null): string {
+function buildPrompt(topic: string, subject: string, unitTitle: string | null, count: number): string {
   const context = unitTitle
     ? `The lesson is part of the curriculum unit: "${unitTitle}". Target prerequisites for that unit.`
     : `No curriculum unit linked — use general prerequisites for the topic.`;
 
-  return `Generate exactly 3 Do Now questions for a ${subject || 'secondary'} lesson on: "${topic || 'this topic'}".
+  return `Generate exactly ${count} Do Now questions for a ${subject || 'secondary'} lesson on: "${topic || 'this topic'}".
 
 ${context}
 
 Do Now questions test what students need to ALREADY KNOW before this lesson — not the new content itself.
 Keep stems concise and student-facing.
+Mix question types — aim for roughly 60% MCQ and 40% SHORT_ANSWER across the set.
 
-Output ONLY a valid JSON array with exactly 3 items. Each item must have:
+Output ONLY a valid JSON array with exactly ${count} items. Each item must have:
   "stem" — the question text (string)
   "type" — "MCQ" or "SHORT_ANSWER" (string)
   "options" — for MCQ: exactly 4 distinct answer choices (string[]); for SHORT_ANSWER: [] (empty array)
   "answer" — for MCQ: one of the options, matching exactly; for SHORT_ANSWER: a brief model answer (string)
 
-Example:
+Example (showing 3 items for brevity — your output must have exactly ${count}):
 [
   {"stem":"What is the gradient of a horizontal line?","type":"MCQ","options":["0","1","-1","undefined"],"answer":"0"},
   {"stem":"State the formula for the area of a triangle.","type":"SHORT_ANSWER","options":[],"answer":"½ × base × height"},
@@ -37,7 +38,10 @@ Example:
 ]`;
 }
 
-async function callAnthropic(apiKey: string, prompt: string): Promise<AiSuggestion[]> {
+async function callAnthropic(apiKey: string, prompt: string, count: number): Promise<AiSuggestion[]> {
+  // Scale token budget with question count: ~200 tokens per question + 256 overhead
+  const maxTokens = Math.min(4096, count * 200 + 256);
+
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {
@@ -47,7 +51,7 @@ async function callAnthropic(apiKey: string, prompt: string): Promise<AiSuggesti
     },
     body: JSON.stringify({
       model: 'claude-haiku-4-5-20251001',
-      max_tokens: 1024,
+      max_tokens: maxTokens,
       messages: [{ role: 'user', content: prompt }],
     }),
   });
@@ -109,12 +113,16 @@ export async function POST(
   const subjectTitle = typeof body.subjectTitle === 'string' ? body.subjectTitle.trim() : '';
   const unitTitle = typeof body.curriculumUnitTitle === 'string' ? body.curriculumUnitTitle : null;
 
+  // count: teacher-controlled, clamped server-side to valid range (5–10)
+  const rawCount = typeof body.count === 'number' ? body.count : 5;
+  const count = Math.max(5, Math.min(10, Math.round(rawCount)));
+
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey)
     return NextResponse.json({ error: 'AI not configured — ANTHROPIC_API_KEY is not set' }, { status: 503 });
 
   try {
-    const questions = await callAnthropic(apiKey, buildPrompt(topic, subjectTitle, unitTitle));
+    const questions = await callAnthropic(apiKey, buildPrompt(topic, subjectTitle, unitTitle, count), count);
     return NextResponse.json({ questions });
   } catch (e) {
     console.error('[do-now-ai] generation failed:', (e as Error).message);

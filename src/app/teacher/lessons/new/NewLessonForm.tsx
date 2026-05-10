@@ -2,9 +2,10 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 type Subject = { id: string; title: string; slug: string };
+type Skill = { id: string; name: string; strand: string };
 
 type Props = { subjects: Subject[] };
 
@@ -18,6 +19,39 @@ export function NewLessonForm({ subjects }: Props) {
   const [yearGroup, setYearGroup] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Skill search state
+  const [skills, setSkills] = useState<Skill[]>([]);
+  const [skillSearch, setSkillSearch] = useState('');
+  const [skillsLoading, setSkillsLoading] = useState(false);
+  const [skillDropdownOpen, setSkillDropdownOpen] = useState(false);
+  const skillInputRef = useRef<HTMLInputElement>(null);
+
+  // Fetch skills whenever subject changes
+  useEffect(() => {
+    if (!subjectId) return;
+    setSkillsLoading(true);
+    setSkills([]);
+    setSkillSearch('');
+    fetch(`/api/subjects/${subjectId}/skills`)
+      .then((r) => r.ok ? r.json() : { skills: [] })
+      .then((data: { skills?: Skill[] }) => setSkills(data.skills ?? []))
+      .catch(() => setSkills([]))
+      .finally(() => setSkillsLoading(false));
+  }, [subjectId]);
+
+  const filteredSkills = skillSearch.trim()
+    ? skills.filter((s) =>
+        s.name.toLowerCase().includes(skillSearch.trim().toLowerCase()) ||
+        s.strand.toLowerCase().includes(skillSearch.trim().toLowerCase())
+      )
+    : skills;
+
+  function handleSkillSelect(skill: Skill) {
+    setTopic(skill.name);
+    setSkillSearch(skill.name);
+    setSkillDropdownOpen(false);
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -66,6 +100,87 @@ export function NewLessonForm({ subjects }: Props) {
       </div>
 
       <div>
+        <label htmlFor="lesson-subject" className={labelCls}>
+          Subject <span className="text-red-500">*</span>
+        </label>
+        {subjects.length === 0 ? (
+          <p className="text-sm text-red-600">No subjects found. Check your database setup.</p>
+        ) : (
+          <select
+            id="lesson-subject"
+            value={subjectId}
+            onChange={(e) => setSubjectId(e.target.value)}
+            className={inputCls}
+            required
+          >
+            {subjects.map((s) => (
+              <option key={s.id} value={s.id}>{s.title}</option>
+            ))}
+          </select>
+        )}
+      </div>
+
+      {/* Skill search — optional, populates topic when selected */}
+      {subjectId && (
+        <div className="relative">
+          <label htmlFor="skill-search" className={labelCls}>
+            Search for a skill or sub-topic{' '}
+            <span className="text-[#9ca3af] font-normal">(optional)</span>
+          </label>
+          <div className="relative">
+            <input
+              id="skill-search"
+              ref={skillInputRef}
+              type="text"
+              value={skillSearch}
+              onChange={(e) => {
+                setSkillSearch(e.target.value);
+                setSkillDropdownOpen(true);
+                // Keep topic in sync with free-form typing if user clears the pick
+                if (!e.target.value) setTopic('');
+              }}
+              onFocus={() => setSkillDropdownOpen(true)}
+              onBlur={() => setTimeout(() => setSkillDropdownOpen(false), 150)}
+              placeholder={skillsLoading ? 'Loading skills…' : 'e.g. Equivalent fractions'}
+              className={inputCls}
+              disabled={skillsLoading}
+              autoComplete="off"
+            />
+            {skillsLoading && (
+              <svg
+                className="absolute right-3 top-1/2 -translate-y-1/2 animate-spin h-4 w-4 text-[#9ca3af]"
+                viewBox="0 0 24 24" fill="none" aria-hidden
+              >
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+              </svg>
+            )}
+          </div>
+          {skillDropdownOpen && filteredSkills.length > 0 && (
+            <ul className="absolute z-20 mt-1 max-h-56 w-full overflow-y-auto rounded-xl border border-[#e5e7eb] bg-white shadow-lg">
+              {filteredSkills.slice(0, 40).map((skill) => (
+                <li key={skill.id}>
+                  <button
+                    type="button"
+                    onMouseDown={() => handleSkillSelect(skill)}
+                    className="w-full px-4 py-2.5 text-left text-sm hover:bg-[#f5f3ff] flex flex-col"
+                  >
+                    <span className="font-medium text-[#111827]">{skill.name}</span>
+                    {skill.strand && (
+                      <span className="text-xs text-[#9ca3af]">{skill.strand}</span>
+                    )}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+          <p className="mt-1.5 text-xs text-[#6b7280]">
+            Select a skill to auto-fill the topic below, or type your own.
+          </p>
+        </div>
+      )}
+
+      <div>
         <label htmlFor="lesson-topic" className={labelCls}>
           Topic / learning objective <span className="text-red-500">*</span>
         </label>
@@ -102,27 +217,6 @@ export function NewLessonForm({ subjects }: Props) {
         <p className="mt-1.5 text-xs text-[#6b7280]">
           Helps the AI target difficulty and question level appropriately.
         </p>
-      </div>
-
-      <div>
-        <label htmlFor="lesson-subject" className={labelCls}>
-          Subject <span className="text-red-500">*</span>
-        </label>
-        {subjects.length === 0 ? (
-          <p className="text-sm text-red-600">No subjects found. Check your database setup.</p>
-        ) : (
-          <select
-            id="lesson-subject"
-            value={subjectId}
-            onChange={(e) => setSubjectId(e.target.value)}
-            className={inputCls}
-            required
-          >
-            {subjects.map((s) => (
-              <option key={s.id} value={s.id}>{s.title}</option>
-            ))}
-          </select>
-        )}
       </div>
 
       {error && (

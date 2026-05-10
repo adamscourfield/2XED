@@ -33,15 +33,19 @@ function blankContent(mode: AnswerMode): QuestionContent {
 function parseContent(raw: unknown): QuestionContent {
   if (raw && typeof raw === 'object' && !Array.isArray(raw)) {
     const c = raw as QuestionContent;
-    // BUG-1 migration: if legacy answer (text) present but no correctIndex, try to
+    // R5 / BUG-1 migration: if legacy answer (text) present but no correctIndex, try to
     // derive correctIndex from the options array for a seamless transition.
+    // Uses case-insensitive, trimmed comparison so minor formatting differences don't break it.
     if (
       c.correctIndex === undefined &&
       typeof c.answer === 'string' &&
       c.answer !== '' &&
       Array.isArray(c.options)
     ) {
-      const idx = c.options.indexOf(c.answer);
+      const needle = c.answer.trim().toLowerCase();
+      const idx = c.options.findIndex(
+        (opt) => typeof opt === 'string' && opt.trim().toLowerCase() === needle
+      );
       if (idx !== -1) return { ...c, correctIndex: idx };
     }
     return c;
@@ -327,6 +331,19 @@ export function QuestionForm({
           <span className="shrink-0 rounded-full border border-[#e5e7eb] bg-[#f9fafb] px-2 py-0.5 text-[11px] font-semibold text-[#6b7280]">
             {mode}
           </span>
+
+          {/* R2 / R5: warn when MCQ has no correct answer set — visible in collapsed state */}
+          {mode === 'MCQ' && content.correctIndex === undefined && (
+            <span
+              title="No correct answer marked — open to fix"
+              className="shrink-0 inline-flex items-center gap-1 rounded-full border border-[#fde68a] bg-[#fffbeb] px-2 py-0.5 text-[11px] font-semibold text-[#92400e]"
+            >
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" aria-hidden>
+                <path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              No answer set
+            </span>
+          )}
 
           {/* Duplicate */}
           {onDuplicate && (

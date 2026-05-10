@@ -49,15 +49,32 @@ export async function POST(
   const parsed = createSchema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: 'Invalid input', issues: parsed.error.issues }, { status: 400 });
 
-  // Medium #14: validate content shape for QUESTION items on creation
+  // R3 + R8: validate content shape for QUESTION items on creation
   if (parsed.data.itemType === 'QUESTION') {
     const c = parsed.data.content as Record<string, unknown>;
+
+    // R8: reject completely empty content — at minimum a question string must be present
+    // (allow blank string so teachers can create a placeholder and fill in later)
+    if (c.question !== undefined && typeof c.question !== 'string') {
+      return NextResponse.json({ error: 'content.question must be a string' }, { status: 400 });
+    }
+
     if (parsed.data.answerMode === 'MCQ') {
+      // options must be an array when provided
       if (c.options !== undefined && !Array.isArray(c.options)) {
         return NextResponse.json({ error: 'MCQ content.options must be an array' }, { status: 400 });
       }
-      if (c.correctIndex !== undefined && typeof c.correctIndex !== 'number') {
-        return NextResponse.json({ error: 'MCQ content.correctIndex must be a number' }, { status: 400 });
+      // correctIndex must be a non-negative integer when provided
+      if (c.correctIndex !== undefined) {
+        if (typeof c.correctIndex !== 'number' || !Number.isInteger(c.correctIndex) || (c.correctIndex as number) < 0) {
+          return NextResponse.json({ error: 'MCQ content.correctIndex must be a non-negative integer' }, { status: 400 });
+        }
+      }
+    }
+
+    if (parsed.data.answerMode === 'SHORT_ANSWER') {
+      if (c.answer !== undefined && typeof c.answer !== 'string') {
+        return NextResponse.json({ error: 'SHORT_ANSWER content.answer must be a string' }, { status: 400 });
       }
     }
   }

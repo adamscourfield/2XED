@@ -51,7 +51,7 @@ export function ClassHeatmap({ participants, skills }: Props) {
             <th className="px-4 py-2 text-left text-xs font-semibold text-on-surface-variant">Student</th>
             {skills.map((skill) => (
               <th key={skill.id} className="px-4 py-2 text-center text-xs font-semibold text-on-surface-variant">
-                {skill.code}
+                {skill.name}
               </th>
             ))}
           </tr>

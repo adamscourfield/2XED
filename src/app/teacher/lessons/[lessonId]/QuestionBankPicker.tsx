@@ -42,7 +42,10 @@ function inferAnswerMode(type: string): AnswerMode {
   const t = type.toUpperCase();
   if (t === 'ORDER') return 'ORDER';
   if (t === 'SHORT_TEXT' || t === 'SHORT_NUMERIC' || t === 'NUMERIC' || t === 'SHORT_ANSWER') return 'SHORT_ANSWER';
-  return 'MCQ';
+  if (t === 'MCQ' || t === 'TRUE_FALSE') return 'MCQ';
+  // R6: unknown types fall back to SHORT_ANSWER, not MCQ, to avoid creating a
+  // broken MCQ with no options. The teacher will see a short-answer form and can fix it.
+  return 'SHORT_ANSWER';
 }
 
 function difficultyLabel(band: string | undefined): string {
@@ -86,6 +89,8 @@ export function QuestionBankPicker({
   const [loading, setLoading] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [adding, setAdding] = useState<string | null>(null);
+  // R2: track items added where the bank answer text didn't match any option
+  const [answerMatchWarning, setAnswerMatchWarning] = useState<string | null>(null);
 
   // Filters
   const [search, setSearch] = useState('');
@@ -153,6 +158,7 @@ export function QuestionBankPicker({
 
   const handleAddItem = async (bankItem: BankItem) => {
     setAdding(bankItem.id);
+    setAnswerMatchWarning(null);
     try {
       const choices = parseChoices(bankItem.options);
       const answerMode = inferAnswerMode(bankItem.type);
@@ -163,7 +169,15 @@ export function QuestionBankPicker({
       // MCQ stores correctIndex (integer), not answer text
       if (answerMode === 'MCQ' && bankItem.answer && choices.length > 0) {
         const correctIndex = choices.indexOf(bankItem.answer);
-        if (correctIndex !== -1) content.correctIndex = correctIndex;
+        if (correctIndex !== -1) {
+          content.correctIndex = correctIndex;
+        } else {
+          // R2: answer text didn't match any option — add the question but warn the teacher
+          // so they know to set the correct answer manually in the editor.
+          setAnswerMatchWarning(
+            `"${bankItem.question.slice(0, 60)}${bankItem.question.length > 60 ? '…' : ''}" was added but its correct answer couldn't be matched to an option. Open the question to set it manually.`
+          );
+        }
       } else if (answerMode === 'SHORT_ANSWER' && bankItem.answer) {
         content.answer = bankItem.answer;
       } else if (bankItem.answer) {
@@ -369,6 +383,26 @@ export function QuestionBankPicker({
             )}
           </div>
 
+          {/* R2: answer-match warning — shown when an MCQ's correct answer couldn't be matched */}
+          {answerMatchWarning && (
+            <div className="mx-5 mt-3 flex items-start gap-2.5 rounded-xl border border-[#fde68a] bg-[#fffbeb] px-3.5 py-3">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="mt-0.5 shrink-0 text-[#f59e0b]" aria-hidden>
+                <path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0Z" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              <p className="min-w-0 flex-1 text-xs text-[#92400e]">{answerMatchWarning}</p>
+              <button
+                type="button"
+                aria-label="Dismiss"
+                onClick={() => setAnswerMatchWarning(null)}
+                className="shrink-0 text-[#9ca3af] transition hover:text-[#6b7280]"
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden>
+                  <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                </svg>
+              </button>
+            </div>
+          )}
+
           {/* Item list */}
           <ul className="divide-y divide-[#f3f4f6]">
             {items.map((item) => {
@@ -397,7 +431,7 @@ export function QuestionBankPicker({
                           key={skill.id}
                           className="rounded-full border border-[#e5e7eb] bg-[#f5f3ff] px-2 py-0.5 text-[11px] font-medium text-[#5850ec]"
                         >
-                          {skill.code ?? skill.name}
+                          {skill.name}
                         </span>
                       ))}
                       {item.skills.length > 3 && (

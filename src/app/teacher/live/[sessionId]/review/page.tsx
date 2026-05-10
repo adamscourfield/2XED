@@ -275,7 +275,7 @@ export default async function SessionReviewPage({ params }: Props) {
     .filter(Boolean)
     .join(' · ');
   const pageTitle = liveSession.skill
-    ? `${liveSession.skill.code}: ${liveSession.skill.name}`
+    ? liveSession.skill.name
     : liveSession.subject.title;
 
   return (

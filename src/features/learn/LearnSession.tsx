@@ -335,7 +335,7 @@ export function LearnSession({ subject, skill, items, retryItems, userId, gamifi
             <h1 className="text-2xl font-bold" style={{ color: 'var(--anx-text)' }}>{skill.name}</h1>
             {SHOW_DEBUG && (
               <p className="text-xs mt-1" style={{ color: 'var(--anx-text-faint)' }}>
-                {skill.code} · {skill.strand}
+                {skill.strand}
               </p>
             )}
           </div>
@@ -390,9 +390,6 @@ export function LearnSession({ subject, skill, items, retryItems, userId, gamifi
               <div className="text-right">
                 <p className="text-sm" style={{ color: 'var(--anx-text-muted)' }}>
                   {skill.name}
-                  {SHOW_DEBUG && (
-                    <span className="ml-2 text-xs" style={{ color: 'var(--anx-text-faint)' }}>[{skill.code}]</span>
-                  )}
                 </p>
                 <span className="text-sm tabular-nums" style={{ color: 'var(--anx-text-faint)' }}>
                   {currentIndex + 1} / {currentItems.length}

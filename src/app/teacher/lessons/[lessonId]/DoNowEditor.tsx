@@ -32,7 +32,8 @@ export interface DoNowBlockEditorProps {
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-const MAX_QUESTIONS = 3;
+const MIN_QUESTIONS = 5;
+const MAX_QUESTIONS = 10;
 
 // Critical #2: derive correctIndex from options array instead of storing answer text for MCQ
 function suggestionToContent(s: AiSuggestion): QuestionContent {
@@ -294,10 +295,14 @@ export function DoNowBlockEditor({
   const [generateError, setGenerateError] = useState<string | null>(null);
   const [suggestions, setSuggestions] = useState<AiSuggestion[] | null>(null);
   const [accepting, setAccepting] = useState<Set<number>>(new Set());
+  // Teacher-controlled question count (5–10)
+  const [questionCount, setQuestionCount] = useState(MIN_QUESTIONS);
   // High #5: ConfirmModal state replaces window.confirm
   const [confirmDelete, setConfirmDelete] = useState<{ itemId: string } | null>(null);
 
-  const canAdd = items.length < MAX_QUESTIONS;
+  function adjustCount(delta: -1 | 1) {
+    setQuestionCount((c) => Math.max(MIN_QUESTIONS, Math.min(MAX_QUESTIONS, c + delta)));
+  }
 
   // Medium #11: wrap generateSuggestions in useCallback with correct deps
   const generateSuggestions = useCallback(async () => {
@@ -313,6 +318,7 @@ export function DoNowBlockEditor({
             topic: lessonTopic,
             subjectTitle: lessonSubjectTitle,
             curriculumUnitTitle: curriculumUnit?.title ?? null,
+            count: questionCount,
           }),
         }
       );
@@ -327,7 +333,7 @@ export function DoNowBlockEditor({
     } finally {
       setGenerating(false);
     }
-  }, [lessonId, blockId, lessonTopic, lessonSubjectTitle, curriculumUnit?.title]);
+  }, [lessonId, blockId, lessonTopic, lessonSubjectTitle, curriculumUnit?.title, questionCount]);
 
   const acceptSuggestion = useCallback(
     async (i: number, suggestion: AiSuggestion) => {
@@ -390,16 +396,16 @@ export function DoNowBlockEditor({
       {/* AI generation */}
       <div className="rounded-xl border border-[#e5e7eb] bg-[#f9fafb] p-4">
         <div className="flex items-start justify-between gap-3">
-          <div>
+          <div className="min-w-0 flex-1">
             <p className="text-sm font-semibold text-[#374151]">Generate with AI</p>
             <p className="mt-0.5 text-xs text-[#6b7280]">
-              Suggest Do Now questions based on prerequisites for "{lessonTopic || 'this lesson'}"
+              Suggest Do Now questions based on prerequisites for &ldquo;{lessonTopic || 'this lesson'}&rdquo;
             </p>
           </div>
           <button
             type="button"
             onClick={() => void generateSuggestions()}
-            disabled={generating || !canAdd}
+            disabled={generating}
             className="shrink-0 inline-flex items-center gap-1.5 rounded-lg bg-[#f59e0b] px-3 py-2 text-xs font-semibold text-white shadow transition hover:bg-[#d97706] disabled:opacity-50"
           >
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" className="shrink-0" aria-hidden>
@@ -409,11 +415,38 @@ export function DoNowBlockEditor({
           </button>
         </div>
 
-        {!canAdd && !generating && (
-          <p className="mt-2 text-[11px] text-[#9ca3af]">
-            Maximum {MAX_QUESTIONS} questions reached.
-          </p>
-        )}
+        {/* Question count stepper */}
+        <div className="mt-3 flex items-center gap-2">
+          <p className="text-[11px] font-semibold text-[#6b7280]">Questions to generate:</p>
+          <div className="flex items-center gap-1 rounded-lg border border-[#e5e7eb] bg-white px-1 py-0.5">
+            <button
+              type="button"
+              aria-label="Fewer questions"
+              onClick={() => adjustCount(-1)}
+              disabled={questionCount <= MIN_QUESTIONS}
+              className="flex h-5 w-5 items-center justify-center rounded text-[#6b7280] transition hover:bg-[#f3f4f6] disabled:opacity-30"
+            >
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" aria-hidden>
+                <path d="M5 12h14" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+              </svg>
+            </button>
+            <span className="min-w-[1.5rem] text-center text-xs font-semibold text-[#374151]">
+              {questionCount}
+            </span>
+            <button
+              type="button"
+              aria-label="More questions"
+              onClick={() => adjustCount(1)}
+              disabled={questionCount >= MAX_QUESTIONS}
+              className="flex h-5 w-5 items-center justify-center rounded text-[#6b7280] transition hover:bg-[#f3f4f6] disabled:opacity-30"
+            >
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" aria-hidden>
+                <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+              </svg>
+            </button>
+          </div>
+          <span className="text-[11px] text-[#9ca3af]">{MIN_QUESTIONS}–{MAX_QUESTIONS}</span>
+        </div>
 
         {generateError && (
           <p className="mt-2 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-600">
@@ -448,7 +481,7 @@ export function DoNowBlockEditor({
       <div>
         <div className="mb-2 flex items-center justify-between">
           <p className="text-xs font-semibold uppercase tracking-wide text-[#6b7280]">
-            Questions ({items.length}/{MAX_QUESTIONS})
+            Questions ({items.length})
           </p>
           {items.length > 0 && (
             <p className="text-[11px] text-[#9ca3af]">
@@ -492,13 +525,11 @@ export function DoNowBlockEditor({
           </div>
         )}
 
-        {canAdd && (
-          <AddManualButton
-            blockId={blockId}
-            lessonId={lessonId}
-            onItemCreated={onItemCreated}
-          />
-        )}
+        <AddManualButton
+          blockId={blockId}
+          lessonId={lessonId}
+          onItemCreated={onItemCreated}
+        />
       </div>
     </div>
   );
