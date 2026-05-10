@@ -46,15 +46,53 @@ export interface LessonBuilderData {
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
-const BLOCK_META: Record<BlockType, { label: string; shortLabel: string; color: string; bg: string; description: string }> = {
-  DO_NOW:   { label: 'Do Now',  shortLabel: 'DO',  color: '#f59e0b', bg: '#fffbeb', description: 'Opening warm-up to activate prior knowledge' },
-  EXPLAIN:  { label: 'Explain', shortLabel: 'EX',  color: '#3b82f6', bg: '#eff6ff', description: 'Teacher-led explanation with slides or visuals' },
-  MODEL:    { label: 'Model',   shortLabel: 'MO',  color: '#8b5cf6', bg: '#f5f3ff', description: 'Worked example students can follow' },
-  CHECK:    { label: 'Check',   shortLabel: 'CH',  color: '#10b981', bg: '#ecfdf5', description: 'Whole-class question — everyone answers at once' },
-  PRACTICE: { label: 'Practice', shortLabel: 'PR', color: '#ef4444', bg: '#fef2f2', description: 'Self-paced questions with AI-routed support' },
+const BLOCK_META: Record<BlockType, { label: string; shortLabel: string; color: string; bg: string; description: string; estimatedMins: number }> = {
+  DO_NOW:   { label: 'Do Now',         shortLabel: 'DN',  color: '#f59e0b', bg: '#fffbeb', description: 'Opening warm-up to activate prior knowledge',           estimatedMins: 5 },
+  EXPLAIN:  { label: 'Teacher Slides', shortLabel: 'TS',  color: '#3b82f6', bg: '#eff6ff', description: 'Teacher-led explanation with slides or visuals',         estimatedMins: 8 },
+  MODEL:    { label: 'Worked Example', shortLabel: 'WE',  color: '#8b5cf6', bg: '#f5f3ff', description: 'Step-by-step worked example students can follow',        estimatedMins: 8 },
+  CHECK:    { label: 'Check',          shortLabel: 'CH',  color: '#10b981', bg: '#ecfdf5', description: 'Whole-class question — everyone answers at once',         estimatedMins: 3 },
+  PRACTICE: { label: 'Practice',       shortLabel: 'PR',  color: '#ef4444', bg: '#fef2f2', description: 'Self-paced questions with AI-routed support',            estimatedMins: 10 },
 };
 
 const ADD_BLOCK_ORDER: BlockType[] = ['DO_NOW', 'EXPLAIN', 'MODEL', 'CHECK', 'PRACTICE'];
+
+// ─── Duration helpers ─────────────────────────────────────────────────────────
+
+/**
+ * Estimate how long a block will take to deliver in minutes.
+ * Slides/steps: ~3 min each. Questions: ~2 min each. Falls back to type default.
+ */
+function estimateBlockMins(block: LessonBlock): number {
+  const base = BLOCK_META[block.type].estimatedMins;
+  const count = block.items.length;
+  if (count === 0) return base;
+  if (block.type === 'EXPLAIN' || block.type === 'MODEL') return Math.max(base, count * 3);
+  if (block.type === 'PRACTICE' || block.type === 'DO_NOW') return Math.max(base, count * 2);
+  return base; // CHECK is fixed
+}
+
+function formatMins(mins: number): string {
+  if (mins < 60) return `${mins} min`;
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  return m === 0 ? `${h}h` : `${h}h ${m}m`;
+}
+
+// ─── Item-title extractor (for auto-generating block titles) ──────────────────
+
+function extractItemTitle(item: LessonItem): string | null {
+  if (!item.content || typeof item.content !== 'object' || Array.isArray(item.content)) return null;
+  const c = item.content as Record<string, unknown>;
+  if (item.itemType === 'QUESTION' && typeof c.question === 'string' && c.question.trim()) {
+    const q = c.question.trim();
+    return q.length > 80 ? q.slice(0, 77) + '…' : q;
+  }
+  if (item.itemType === 'SLIDE' && typeof c.body === 'string' && c.body.trim()) {
+    const b = c.body.trim();
+    return b.length > 80 ? b.slice(0, 77) + '…' : b;
+  }
+  return null;
+}
 
 // ─── Confirm modal (UX-8: replaces window.confirm) ───────────────────────────
 
@@ -174,11 +212,11 @@ function BlockRow({
         <p className="mt-0.5 text-xs text-[#374151] line-clamp-1">
           {block.title ?? m.description}
         </p>
-        {block.items.length > 0 && (
-          <p className="mt-0.5 text-[11px] text-[#9ca3af]">
-            {block.items.length} item{block.items.length !== 1 ? 's' : ''}
-          </p>
-        )}
+        <p className="mt-0.5 text-[11px] text-[#9ca3af]">
+          {block.items.length > 0
+            ? `${block.items.length} item${block.items.length !== 1 ? 's' : ''} · ~${estimateBlockMins(block)} min`
+            : `~${estimateBlockMins(block)} min`}
+        </p>
       </div>
 
       {/* Controls */}
@@ -553,9 +591,23 @@ export function LessonBuilder({ lesson: initialLesson }: { lesson: LessonBuilder
   const addItemToBlock = useCallback((blockId: string, item: LessonItem) => {
     setLesson((prev) => ({
       ...prev,
-      blocks: prev.blocks.map((b) =>
-        b.id === blockId ? { ...b, items: [...b.items, item] } : b
-      ),
+      blocks: prev.blocks.map((b) => {
+        if (b.id !== blockId) return b;
+        const newItems = [...b.items, item];
+        // Auto-generate block title from first item if still blank (#27)
+        if (!b.title && newItems.length === 1) {
+          const autoTitle = extractItemTitle(item);
+          if (autoTitle) {
+            void fetch(`/api/lessons/${prev.id}/blocks/${blockId}`, {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ title: autoTitle }),
+            });
+            return { ...b, items: newItems, title: autoTitle };
+          }
+        }
+        return { ...b, items: newItems };
+      }),
     }));
   }, []);
 
@@ -717,9 +769,16 @@ export function LessonBuilder({ lesson: initialLesson }: { lesson: LessonBuilder
         {/* ── Left: block list ── */}
         <aside className="flex w-[220px] shrink-0 flex-col border-r border-[#e5e7eb] bg-white lg:w-[260px]">
           <div className="flex items-center justify-between border-b border-[#e5e7eb] px-3 py-2.5">
-            <span className="text-xs font-semibold uppercase tracking-wide text-[#6b7280]">
-              Blocks <span className="text-[#9ca3af]">({lesson.blocks.length})</span>
-            </span>
+            <div>
+              <span className="text-xs font-semibold uppercase tracking-wide text-[#6b7280]">
+                Blocks <span className="text-[#9ca3af]">({lesson.blocks.length})</span>
+              </span>
+              {lesson.blocks.length > 0 && (
+                <p className="text-[10px] text-[#9ca3af]">
+                  ~{formatMins(lesson.blocks.reduce((sum, b) => sum + estimateBlockMins(b), 0))} total
+                </p>
+              )}
+            </div>
             <button
               type="button"
               onClick={() => setShowAddPanel((p) => !p)}

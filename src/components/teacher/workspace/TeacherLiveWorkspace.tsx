@@ -498,6 +498,37 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
     fetchSnapshot();
   }
 
+  // ── Emergency controls (#26) ──────────────────────────────────────────────
+  /** Restart the active explanation from step 0 */
+  function replayExplanation() {
+    if (!activeExplanation) return;
+    setActiveExplanation((prev) => (prev ? { ...prev, stepIndex: 0 } : null));
+    void fetch(`/api/live-sessions/${sessionId}/broadcast`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contentType: 'EXPLANATION',
+        explanationRouteId: activeExplanation.route.id,
+        stepIndex: 0,
+      }),
+    }).catch(() => void 0);
+  }
+
+  /** Navigate to previous or next lesson phase */
+  async function navigatePhase(delta: -1 | 1) {
+    const current = snapshot?.currentPhaseIndex ?? 0;
+    const total = snapshot?.phases?.length ?? 0;
+    if (total === 0) return;
+    const next = Math.max(0, Math.min(total - 1, current + delta));
+    if (next === current) return;
+    await fetch(`/api/live-sessions/${sessionId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ currentPhaseIndex: next }),
+    });
+    fetchSnapshot();
+  }
+
   // ── Top bar interactions ──────────────────────────────────────────────────
   function copyJoinCode() {
     if (!snapshot?.joinCode) return;
@@ -934,6 +965,76 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
           )}
         </aside>
       </div>
+
+      {/* ── Emergency controls (#26) — visible only during ACTIVE sessions ── */}
+      {sessionStatus === 'ACTIVE' && (
+        <div
+          className="flex shrink-0 flex-wrap items-center gap-2 border-t px-4 py-2"
+          style={{ borderColor: 'var(--anx-outline-variant)', background: 'var(--anx-surface)' }}
+        >
+          <span
+            className="mr-1 text-[11px] font-semibold uppercase tracking-[0.12em]"
+            style={{ color: 'var(--anx-text-muted)' }}
+          >
+            Quick actions
+          </span>
+
+          {/* Restart current explanation from step 0 */}
+          {activeExplanation && (
+            <button
+              type="button"
+              onClick={replayExplanation}
+              className="inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-medium transition hover:bg-[var(--anx-surface-hover)]"
+              style={{ borderColor: 'var(--anx-outline-variant)', color: 'var(--anx-text-secondary)' }}
+              title="Restart the explanation from the beginning"
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden>
+                <path d="M1 4v6h6" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M3.51 15a9 9 0 1 0 .49-4.95L1 10" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              Replay explanation
+            </button>
+          )}
+
+          {/* Phase navigation — only rendered when session has multiple phases */}
+          {(snapshot?.phases?.length ?? 0) > 1 && (
+            <>
+              <button
+                type="button"
+                disabled={(snapshot?.currentPhaseIndex ?? 0) === 0}
+                onClick={() => void navigatePhase(-1)}
+                className="inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-medium transition hover:bg-[var(--anx-surface-hover)] disabled:opacity-40"
+                style={{ borderColor: 'var(--anx-outline-variant)', color: 'var(--anx-text-secondary)' }}
+                title="Go back to the previous phase"
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden>
+                  <path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                Prev phase
+              </button>
+              <button
+                type="button"
+                disabled={(snapshot?.currentPhaseIndex ?? 0) >= (snapshot?.phases?.length ?? 1) - 1}
+                onClick={() => void navigatePhase(1)}
+                className="inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-medium transition hover:bg-[var(--anx-surface-hover)] disabled:opacity-40"
+                style={{ borderColor: 'var(--anx-outline-variant)', color: 'var(--anx-text-secondary)' }}
+                title="Advance to the next phase"
+              >
+                Next phase
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden>
+                  <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+              <span
+                className="text-[11px]"
+                style={{ color: 'var(--anx-text-muted)' }}
+              >
+                Phase {(snapshot?.currentPhaseIndex ?? 0) + 1} / {snapshot?.phases?.length}
+              </span>
+            </>
+          )}
+        </div>
+      )}
 
       {/* ── Bottom bar ──────────────────────────────────────────────────── */}
       <TeacherBottomBar

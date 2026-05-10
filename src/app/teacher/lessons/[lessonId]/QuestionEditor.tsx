@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { AnswerMode, LessonItem } from './LessonBuilder';
 import { QuestionBankPicker } from './QuestionBankPicker';
 
@@ -735,6 +735,22 @@ interface PracticeBlockEditorProps {
   onItemDeleted: (itemId: string) => void;
 }
 
+// ─── Inline toast ─────────────────────────────────────────────────────────────
+
+function InlineToast({ message, ok }: { message: string; ok: boolean }) {
+  return (
+    <div
+      className={`fixed bottom-5 left-1/2 z-50 -translate-x-1/2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white shadow-lg transition ${
+        ok ? 'bg-[#10b981]' : 'bg-red-500'
+      }`}
+      role="status"
+      aria-live="polite"
+    >
+      {message}
+    </div>
+  );
+}
+
 export function PracticeBlockEditor({
   blockId,
   lessonId,
@@ -745,8 +761,26 @@ export function PracticeBlockEditor({
   onItemDeleted,
 }: PracticeBlockEditorProps) {
   const [adding, setAdding] = useState(false);
-  // High #8: bank picker
   const [showPicker, setShowPicker] = useState(false);
+  // Toast for duplicate / reorder feedback (#21)
+  const [toast, setToast] = useState<{ ok: boolean; msg: string } | null>(null);
+  // Local ordering override — ids only, content still driven by parent items (#23)
+  const [orderedIds, setOrderedIds] = useState<string[] | null>(null);
+
+  // Merge local ordering with parent item data
+  const displayItems = useMemo(() => {
+    if (!orderedIds) return items;
+    const map = new Map(items.map((item) => [item.id, item]));
+    const ordered = orderedIds.flatMap((id) => { const it = map.get(id); return it ? [it] : []; });
+    const seen = new Set(orderedIds);
+    const newItems = items.filter((item) => !seen.has(item.id));
+    return [...ordered, ...newItems];
+  }, [items, orderedIds]);
+
+  const showToast = useCallback((ok: boolean, msg: string) => {
+    setToast({ ok, msg });
+    setTimeout(() => setToast(null), 2500);
+  }, []);
 
   const addQuestion = useCallback(async () => {
     setAdding(true);
@@ -768,7 +802,7 @@ export function PracticeBlockEditor({
     }
   }, [lessonId, blockId, onItemCreated]);
 
-  // FEAT-5: Duplicate a question
+  // FEAT-5: Duplicate a question — with toast feedback (#21)
   const duplicateQuestion = useCallback(async (item: LessonItem) => {
     try {
       const res = await fetch(`/api/lessons/${lessonId}/blocks/${blockId}/items`, {
@@ -783,14 +817,42 @@ export function PracticeBlockEditor({
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const newItem = await res.json() as LessonItem;
       onItemCreated(newItem);
+      showToast(true, 'Question duplicated');
     } catch {
-      // silently fail — not critical
+      showToast(false, 'Failed to duplicate — try again');
     }
-  }, [lessonId, blockId, onItemCreated]);
+  }, [lessonId, blockId, onItemCreated, showToast]);
+
+  // Move item up/down with optimistic reorder + API call (#23)
+  const moveItem = useCallback(async (itemId: string, dir: 'up' | 'down') => {
+    const current = orderedIds ?? items.map((i) => i.id);
+    const idx = current.indexOf(itemId);
+    if (idx < 0) return;
+    const targetIdx = dir === 'up' ? idx - 1 : idx + 1;
+    if (targetIdx < 0 || targetIdx >= current.length) return;
+
+    const reordered = [...current];
+    [reordered[idx], reordered[targetIdx]] = [reordered[targetIdx], reordered[idx]];
+    setOrderedIds(reordered);
+
+    try {
+      const res = await fetch(`/api/lessons/${lessonId}/blocks/${blockId}/items/reorder`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ itemIds: reordered }),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    } catch {
+      setOrderedIds(current); // revert
+      showToast(false, 'Reorder failed — try again');
+    }
+  }, [orderedIds, items, lessonId, blockId, showToast]);
 
   return (
     <>
-      {/* High #8: bank picker drawer */}
+      {toast && <InlineToast ok={toast.ok} message={toast.msg} />}
+
+      {/* Question bank picker */}
       {showPicker && (
         <QuestionBankPicker
           subjectId={subjectId}
@@ -802,7 +864,7 @@ export function PracticeBlockEditor({
       )}
 
       <div className="space-y-3">
-        {items.length === 0 ? (
+        {displayItems.length === 0 ? (
           <div className="rounded-xl border-2 border-dashed border-[#e5e7eb] px-6 py-10 text-center">
             <p className="text-sm font-medium text-[#374151]">No questions yet</p>
             <p className="mt-1 text-xs text-[#6b7280]">
@@ -810,29 +872,57 @@ export function PracticeBlockEditor({
             </p>
           </div>
         ) : (
-          items.map((item, i) => (
-            <QuestionForm
-              key={item.id}
-              item={item}
-              index={i}
-              collapsible
-              onDuplicate={() => duplicateQuestion(item)}
-              onSave={async (updates) => {
-                const res = await fetch(`/api/lessons/${lessonId}/blocks/${blockId}/items/${item.id}`, {
-                  method: 'PATCH',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify(updates),
-                });
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                const updated = await res.json() as LessonItem;
-                onItemUpdated(updated);
-              }}
-              onDelete={async () => {
-                const res = await fetch(`/api/lessons/${lessonId}/blocks/${blockId}/items/${item.id}`, { method: 'DELETE' });
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                onItemDeleted(item.id);
-              }}
-            />
+          displayItems.map((item, i) => (
+            <div key={item.id} className="flex items-start gap-1.5">
+              {/* Reorder controls (#23) */}
+              <div className="flex shrink-0 flex-col gap-0.5 pt-3">
+                <button
+                  type="button"
+                  disabled={i === 0}
+                  onClick={() => void moveItem(item.id, 'up')}
+                  className="flex h-6 w-6 items-center justify-center rounded text-[#9ca3af] transition hover:bg-[#f3f4f6] hover:text-[#374151] disabled:opacity-25"
+                  aria-label="Move question up"
+                >
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" aria-hidden>
+                    <path d="M18 15l-6-6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </button>
+                <button
+                  type="button"
+                  disabled={i === displayItems.length - 1}
+                  onClick={() => void moveItem(item.id, 'down')}
+                  className="flex h-6 w-6 items-center justify-center rounded text-[#9ca3af] transition hover:bg-[#f3f4f6] hover:text-[#374151] disabled:opacity-25"
+                  aria-label="Move question down"
+                >
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" aria-hidden>
+                    <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </button>
+              </div>
+              <div className="min-w-0 flex-1">
+                <QuestionForm
+                  item={item}
+                  index={i}
+                  collapsible
+                  onDuplicate={() => duplicateQuestion(item)}
+                  onSave={async (updates) => {
+                    const res = await fetch(`/api/lessons/${lessonId}/blocks/${blockId}/items/${item.id}`, {
+                      method: 'PATCH',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify(updates),
+                    });
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    const updated = await res.json() as LessonItem;
+                    onItemUpdated(updated);
+                  }}
+                  onDelete={async () => {
+                    const res = await fetch(`/api/lessons/${lessonId}/blocks/${blockId}/items/${item.id}`, { method: 'DELETE' });
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    onItemDeleted(item.id);
+                  }}
+                />
+              </div>
+            </div>
           ))
         )}
 

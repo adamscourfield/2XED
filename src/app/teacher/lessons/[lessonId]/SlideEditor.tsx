@@ -47,6 +47,95 @@ function newId(): string {
   return crypto.randomUUID();
 }
 
+// ─── Slide preview modal (#25) ────────────────────────────────────────────────
+
+function SlidePreviewModal({
+  content,
+  label,
+  onClose,
+}: {
+  content: SlideContent;
+  label: string;
+  onClose: () => void;
+}) {
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, [onClose]);
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+      role="dialog"
+      aria-modal="true"
+      aria-label={`Preview ${label}`}
+    >
+      <div className="w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-2xl">
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-[#f3f4f6] px-5 py-3">
+          <span className="text-sm font-semibold text-[#111827]">{label} — preview</span>
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex h-7 w-7 items-center justify-center rounded-lg text-[#6b7280] transition hover:bg-[#f3f4f6]"
+            aria-label="Close preview"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
+              <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            </svg>
+          </button>
+        </div>
+
+        {/* Slide canvas — read-only */}
+        <div className="p-5">
+          <div
+            className="relative w-full overflow-hidden rounded-xl border border-[#e5e7eb] shadow-sm"
+            style={{ aspectRatio: '4/3', background: content.bgColor ?? '#ffffff' }}
+          >
+            {content.body ? (
+              <div className="absolute inset-0 p-5">
+                <p className="whitespace-pre-wrap text-sm leading-relaxed text-[#374151]">{content.body}</p>
+              </div>
+            ) : null}
+            {content.annotations.map((annot) => (
+              <div
+                key={annot.id}
+                className="absolute"
+                style={{ left: `${annot.x}%`, top: `${annot.y}%`, transform: 'translate(-50%, -50%)', zIndex: 10 }}
+              >
+                <div
+                  className="rounded-full px-2.5 py-1 text-[11px] font-bold text-white shadow-md"
+                  style={{ background: annot.color }}
+                >
+                  {annot.text}
+                </div>
+              </div>
+            ))}
+            {!content.body && content.annotations.length === 0 && (
+              <div className="flex h-full items-center justify-center">
+                <p className="text-sm text-[#9ca3af]">Empty slide</p>
+              </div>
+            )}
+          </div>
+          {content.speakerNote && (
+            <div className="mt-3 rounded-lg bg-[#fffbeb] px-3 py-2.5 text-xs text-[#374151]">
+              <p className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-[#9ca3af]">Speaker note</p>
+              {content.speakerNote}
+            </div>
+          )}
+          {!content.body && !content.speakerNote && content.annotations.length === 0 && (
+            <p className="mt-3 text-center text-xs text-[#9ca3af]">
+              Add body text, speaker notes, or canvas labels to see them previewed here.
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Confirm modal ────────────────────────────────────────────────────────────
 
 function ConfirmModal({
@@ -342,6 +431,7 @@ function StageEditor({ item, stageIndex, blockVariant, onSave, onDelete }: Stage
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [showNotes, setShowNotes] = useState(false);
+  const [showPreview, setShowPreview] = useState(false); // #25
 
   const label = blockVariant === 'model' ? `Step ${stageIndex + 1}` : `Stage ${stageIndex + 1}`;
 
@@ -433,15 +523,36 @@ function StageEditor({ item, stageIndex, blockVariant, onSave, onDelete }: Stage
         >
           {saving ? 'Saving…' : saved ? '✓ Saved' : `Save ${blockVariant === 'model' ? 'step' : 'stage'}`}
         </button>
+        {/* Preview (#25) */}
+        <button
+          type="button"
+          onClick={() => setShowPreview(true)}
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#5850ec] transition hover:underline"
+        >
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden>
+            <path d="M1 12C1 12 5 4 12 4s11 8 11 8-4 8-11 8S1 12 1 12Z" stroke="currentColor" strokeWidth="1.75" />
+            <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.75" />
+          </svg>
+          Preview
+        </button>
         {/* High #5: triggers ConfirmModal in parent, not window.confirm */}
         <button
           type="button"
           onClick={onDelete}
-          className="text-xs text-[#9ca3af] transition hover:text-red-500"
+          className="ml-auto text-xs text-[#9ca3af] transition hover:text-red-500"
         >
           Delete
         </button>
       </div>
+
+      {/* Preview modal (#25) */}
+      {showPreview && (
+        <SlidePreviewModal
+          content={content}
+          label={label}
+          onClose={() => setShowPreview(false)}
+        />
+      )}
     </div>
   );
 }
