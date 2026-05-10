@@ -499,7 +499,10 @@ function WaitingTip() {
   const [i, setI] = useState(0);
   return (
     <p className="student-live-waiting-tip mt-2 text-sm" style={{ color: 'var(--anx-text-muted)' }}>
-      {WAITING_TIPS[i % WAITING_TIPS.length]}
+      {/* L3: aria-live so screen readers announce each new tip when the student cycles through */}
+      <span aria-live="polite" aria-atomic="true">
+        {WAITING_TIPS[i % WAITING_TIPS.length]}
+      </span>
       <button
         type="button"
         className="ml-2 text-xs font-semibold underline decoration-dotted underline-offset-2"

@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import {
   CheckIcon,
   ExplainIcon,
@@ -35,13 +36,15 @@ interface Props {
   onAssignPractice?: (
     kind: 'easier' | 'similar' | 'challenge' | 'misconception',
     audience: 'all' | 'lane' | 'individual',
+    practiceTargetLane?: 'LANE_1' | 'LANE_2' | 'LANE_3',
   ) => void;
 }
 
+// M1: labels synced with builder's block type names (Teacher Slides / Worked Example)
 const MODES: Array<{ key: TeachingMode; label: string; Icon: () => JSX.Element }> = [
   { key: 'CHECK', label: 'Check', Icon: CheckIcon },
-  { key: 'MODEL', label: 'Model', Icon: ModelIcon },
-  { key: 'EXPLAIN', label: 'Explain', Icon: ExplainIcon },
+  { key: 'MODEL', label: 'Worked Example', Icon: ModelIcon },
+  { key: 'EXPLAIN', label: 'Teacher Slides', Icon: ExplainIcon },
   { key: 'PRACTICE', label: 'Practice', Icon: PracticeIcon },
 ];
 
@@ -78,9 +81,9 @@ function ModelMode() {
   return (
     <div className="flex flex-col gap-3">
       <div>
-        <h3 className="text-base font-bold" style={{ color: 'var(--anx-text)' }}>Model</h3>
+        <h3 className="text-base font-bold" style={{ color: 'var(--anx-text)' }}>Worked Example</h3>
         <p className="mt-1 text-sm" style={{ color: 'var(--anx-text-muted)' }}>
-          Students follow your canvas. Annotate freely — they’ll see your strokes and notes.
+          Students follow your canvas. Annotate freely — they'll see your strokes and notes.
         </p>
       </div>
       <div className="anx-callout-info text-sm">
@@ -115,11 +118,11 @@ function ExplainMode({
   return (
     <div className="flex flex-col gap-3">
       <div>
-        <h3 className="text-base font-bold" style={{ color: 'var(--anx-text)' }}>Explain again</h3>
+        <h3 className="text-base font-bold" style={{ color: 'var(--anx-text)' }}>Teacher Slides</h3>
         <p className="mt-1 text-sm" style={{ color: 'var(--anx-text-muted)' }}>
           {activeExplanation
-            ? 'Students are viewing this explanation. Advance the steps below.'
-            : 'Pick a bridging move. The explanation displays on student devices.'}
+            ? 'Students are viewing this slide. Advance the steps below.'
+            : 'Pick a bridging move. Slides display on student devices.'}
         </p>
       </div>
 
@@ -186,13 +189,23 @@ function ExplainMode({
   );
 }
 
+// H1: lane picker so the teacher can target any lane, not just LANE_2
+const LANE_OPTIONS: Array<{ value: 'LANE_1' | 'LANE_2' | 'LANE_3'; label: string }> = [
+  { value: 'LANE_1', label: 'Got it' },
+  { value: 'LANE_2', label: 'Nearly there' },
+  { value: 'LANE_3', label: 'Needs teacher' },
+];
+
 function PracticeMode({ onAssignPractice }: { onAssignPractice?: Props['onAssignPractice'] }) {
+  const [targetLane, setTargetLane] = useState<'LANE_1' | 'LANE_2' | 'LANE_3'>('LANE_2');
+
   const variants: Array<{ key: Parameters<NonNullable<Props['onAssignPractice']>>[0]; label: string }> = [
     { key: 'easier', label: 'Easier question' },
     { key: 'similar', label: 'Similar question' },
     { key: 'challenge', label: 'Challenge question' },
     { key: 'misconception', label: 'Misconception repair' },
   ];
+
   return (
     <div className="flex flex-col gap-3">
       <div>
@@ -201,6 +214,32 @@ function PracticeMode({ onAssignPractice }: { onAssignPractice?: Props['onAssign
           Send work for independent practice. Choose what and who.
         </p>
       </div>
+
+      {/* H1: Lane picker — selects which single lane receives "A lane" practice dispatches */}
+      <div>
+        <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: 'var(--anx-text-muted)' }}>
+          Target lane
+        </p>
+        <div className="flex gap-1.5 flex-wrap">
+          {LANE_OPTIONS.map((opt) => (
+            <button
+              key={opt.value}
+              type="button"
+              onClick={() => setTargetLane(opt.value)}
+              aria-pressed={targetLane === opt.value}
+              className="rounded-full border px-2.5 py-1 text-xs font-medium transition"
+              style={{
+                borderColor: targetLane === opt.value ? 'var(--anx-primary)' : 'var(--anx-outline-variant)',
+                color: targetLane === opt.value ? 'var(--anx-primary)' : 'var(--anx-text-secondary)',
+                background: targetLane === opt.value ? 'var(--anx-primary-soft)' : 'transparent',
+              }}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 gap-2">
         {variants.map((v) => (
           <div
@@ -213,17 +252,30 @@ function PracticeMode({ onAssignPractice }: { onAssignPractice?: Props['onAssign
               <span className="anx-badge anx-badge-neutral text-[10px]">Live</span>
             </div>
             <div className="mt-2 flex flex-wrap gap-1.5">
-              {(['all', 'lane', 'individual'] as const).map((aud) => (
-                <button
-                  key={aud}
-                  type="button"
-                  onClick={() => onAssignPractice?.(v.key, aud)}
-                  className="rounded-full border px-2.5 py-1 text-xs font-medium transition hover:bg-[var(--anx-primary-soft)]"
-                  style={{ borderColor: 'var(--anx-outline-variant)', color: 'var(--anx-text-secondary)' }}
-                >
-                  {aud === 'all' ? 'All students' : aud === 'lane' ? 'A lane' : 'Individual'}
-                </button>
-              ))}
+              <button
+                type="button"
+                onClick={() => onAssignPractice?.(v.key, 'all')}
+                className="rounded-full border px-2.5 py-1 text-xs font-medium transition hover:bg-[var(--anx-primary-soft)]"
+                style={{ borderColor: 'var(--anx-outline-variant)', color: 'var(--anx-text-secondary)' }}
+              >
+                All students
+              </button>
+              <button
+                type="button"
+                onClick={() => onAssignPractice?.(v.key, 'lane', targetLane)}
+                className="rounded-full border px-2.5 py-1 text-xs font-medium transition hover:bg-[var(--anx-primary-soft)]"
+                style={{ borderColor: 'var(--anx-outline-variant)', color: 'var(--anx-text-secondary)' }}
+              >
+                {LANE_OPTIONS.find((l) => l.value === targetLane)?.label} lane
+              </button>
+              <button
+                type="button"
+                onClick={() => onAssignPractice?.(v.key, 'individual')}
+                className="rounded-full border px-2.5 py-1 text-xs font-medium transition hover:bg-[var(--anx-primary-soft)]"
+                style={{ borderColor: 'var(--anx-outline-variant)', color: 'var(--anx-text-secondary)' }}
+              >
+                Individual
+              </button>
             </div>
           </div>
         ))}

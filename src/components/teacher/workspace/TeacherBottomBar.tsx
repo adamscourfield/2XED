@@ -49,9 +49,9 @@ export function TeacherBottomBar({
         <ClearIcon size={16} />
         Clear board
       </button>
-      <button type="button" className="anx-workspace-bottombar-btn ml-auto" onClick={onMore}>
+      <button type="button" className="anx-workspace-bottombar-btn ml-auto" onClick={onMore} title="Copy student join link to clipboard">
         <DotsIcon size={16} />
-        More
+        Copy link
       </button>
     </div>
   );

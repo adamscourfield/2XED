@@ -311,6 +311,16 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
   const [paused, setPaused] = useState(false);
   const [copied, setCopied] = useState(false);
   const [endingPrompt, setEndingPrompt] = useState(false);
+  // Toast for action feedback (H3)
+  const [toast, setToast] = useState<{ ok: boolean; msg: string } | null>(null);
+  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  function showToast(ok: boolean, msg: string) {
+    setToast({ ok, msg });
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    toastTimerRef.current = setTimeout(() => setToast(null), 3000);
+  }
+
   const [latestVersion, setLatestVersion] = useState(0);
   const [canvasHasContent, setCanvasHasContent] = useState(false);
   const [canUndo, setCanUndo] = useState(false);
@@ -338,7 +348,7 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
         setSnapshotLoading(false);
         return;
       }
-      const data = await res.json();
+      const data = await res.json() as SessionSnapshot;
       setSnapshot(data);
       setPaused(data.status === 'PAUSED');
     } catch {
@@ -349,11 +359,9 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
   }, [sessionId]);
 
   useEffect(() => {
-    let sseConnected = false;
-
     function startPolling() {
-      if (fallbackRef.current) return;
-      fallbackRef.current = setInterval(fetchSnapshot, 3000);
+      if (fallbackRef.current) return; // guard: never start twice
+      fallbackRef.current = setInterval(() => void fetchSnapshot(), 3000);
     }
 
     fetchSnapshot();
@@ -362,13 +370,13 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
       const es = new EventSource(`/api/live-sessions/${sessionId}/stream`);
       sseRef.current = es;
       es.addEventListener('state', (e) => {
-        sseConnected = true;
         const data = JSON.parse((e as MessageEvent).data) as SessionSnapshot;
         setSnapshot(data);
         setPaused(data.status === 'PAUSED');
       });
+      // C2: always start polling on SSE error — handles mid-session drops too
       es.onerror = () => {
-        if (!sseConnected) startPolling();
+        startPolling();
       };
     } catch {
       startPolling();
@@ -486,16 +494,22 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
 
   // ── Status controls ───────────────────────────────────────────────────────
   async function setStatus(next: 'ACTIVE' | 'PAUSED' | 'COMPLETED') {
-    await fetch(`/api/live-sessions/${sessionId}`, {
+    const r = await fetch(`/api/live-sessions/${sessionId}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status: next }),
     });
+    if (!r.ok) {
+      showToast(false, next === 'PAUSED' ? 'Could not pause the session.' : next === 'ACTIVE' ? 'Could not resume the session.' : 'Could not end the session.');
+      return;
+    }
     if (next === 'COMPLETED') {
       router.push(`/teacher/live/${sessionId}/review`);
       return;
     }
-    fetchSnapshot();
+    // M5: only update local state after a confirmed API success, preventing desync
+    setPaused(next === 'PAUSED');
+    void fetchSnapshot();
   }
 
   // ── Emergency controls (#26) ──────────────────────────────────────────────
@@ -521,21 +535,48 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
     if (total === 0) return;
     const next = Math.max(0, Math.min(total - 1, current + delta));
     if (next === current) return;
-    await fetch(`/api/live-sessions/${sessionId}`, {
+    // C1: use the correct /phase endpoint with phaseIndex
+    const res = await fetch(`/api/live-sessions/${sessionId}/phase`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ currentPhaseIndex: next }),
+      body: JSON.stringify({ phaseIndex: next }),
     });
-    fetchSnapshot();
+    if (!res.ok) {
+      showToast(false, 'Could not navigate to that phase.');
+      return;
+    }
+    void fetchSnapshot();
   }
 
   // ── Top bar interactions ──────────────────────────────────────────────────
   function copyJoinCode() {
-    if (!snapshot?.joinCode) return;
-    navigator.clipboard.writeText(snapshot.joinCode).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1800);
-    });
+    const code = snapshot?.joinCode;
+    if (!code) return;
+    // M6: navigator.clipboard requires HTTPS; fall back to execCommand for local/HTTP contexts
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      navigator.clipboard.writeText(code).then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 1800);
+      }).catch(() => {
+        showToast(false, 'Could not copy join code. Try copying manually.');
+      });
+    } else {
+      try {
+        const ta = document.createElement('textarea');
+        ta.value = code;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 1800);
+      } catch {
+        showToast(false, 'Could not copy join code. Try copying manually.');
+      }
+    }
   }
 
   // ── Canvas convenience ────────────────────────────────────────────────────
@@ -546,6 +587,12 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
   async function handleImageFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+    // L2: reject images over 10 MB before attempting canvas insertion
+    if (file.size > 10 * 1024 * 1024) {
+      showToast(false, 'Image is too large (max 10 MB). Please choose a smaller file.');
+      e.target.value = '';
+      return;
+    }
     await canvasRef.current?.insertImage(file);
     e.target.value = '';
   }
@@ -560,12 +607,17 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
   // ── Mode-driven actions ───────────────────────────────────────────────────
   async function handleNewCheckQuestion() {
     try {
-      await fetch(`/api/live-sessions/${sessionId}/check`, {
+      const r = await fetch(`/api/live-sessions/${sessionId}/check`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
       });
+      if (!r.ok) {
+        showToast(false, 'Could not send check question to students.');
+      } else {
+        showToast(true, 'Check question sent.');
+      }
     } catch {
-      // soft fail for now
+      showToast(false, 'Network error — check question not sent.');
     }
   }
 
@@ -598,11 +650,11 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
       return;
     }
 
-    setActiveExplanation({ route, stepIndex: 0 });
+    // C5: clear canvas optimistically, but only commit activeExplanation after broadcast confirms
     canvasRef.current?.clear();
 
     try {
-      await fetch(`/api/live-sessions/${sessionId}/broadcast`, {
+      const res = await fetch(`/api/live-sessions/${sessionId}/broadcast`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -611,15 +663,22 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
           stepIndex: 0,
         }),
       });
+      if (!res.ok) throw new Error('broadcast failed');
+      // Only set active explanation after a confirmed delivery
+      setActiveExplanation({ route, stepIndex: 0 });
       setExplainRoutesHint(null);
     } catch {
       setExplainRoutesHint('Could not send the explanation to students. Try again.');
+      showToast(false, 'Explanation not sent — please try again.');
     }
   }
 
   async function handleStepChange(newStep: number) {
     if (!activeExplanation) return;
-    setActiveExplanation((prev) => (prev ? { ...prev, stepIndex: newStep } : null));
+    // M4: clamp to valid step range to prevent out-of-bounds broadcast
+    const totalSteps = activeExplanation.route.steps?.length ?? 1;
+    const clampedStep = Math.max(0, Math.min(totalSteps - 1, newStep));
+    setActiveExplanation((prev) => (prev ? { ...prev, stepIndex: clampedStep } : null));
     try {
       await fetch(`/api/live-sessions/${sessionId}/broadcast`, {
         method: 'POST',
@@ -627,31 +686,40 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
         body: JSON.stringify({
           contentType: 'EXPLANATION',
           explanationRouteId: activeExplanation.route.id,
-          stepIndex: newStep,
+          stepIndex: clampedStep,
         }),
       });
     } catch {
-      // soft fail
+      // soft fail — step is already applied locally; next broadcast will sync
     }
   }
   async function handleAssignPractice(
     kind: 'easier' | 'similar' | 'challenge' | 'misconception',
     audience: 'all' | 'lane' | 'individual',
+    // H1: practiceTargetLane allows the caller to specify which lane gets practice
+    // when audience === 'lane'. Defaults to LANE_2 (Nearly there).
+    practiceTargetLane: 'LANE_1' | 'LANE_2' | 'LANE_3' = 'LANE_2',
   ) {
     const lanes =
       audience === 'all'
         ? ['LANE_1', 'LANE_2', 'LANE_3']
         : audience === 'lane'
-          ? ['LANE_2']
+          ? [practiceTargetLane]
           : ['LANE_3'];
     try {
-      await fetch(`/api/live-sessions/${sessionId}/practice`, {
+      const r = await fetch(`/api/live-sessions/${sessionId}/practice`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ kind, audience, lanes }),
       });
+      if (!r.ok) {
+        showToast(false, 'Could not assign practice to students.');
+      } else {
+        const laneLabel = audience === 'all' ? 'all students' : audience === 'lane' ? `${practiceTargetLane.replace('_', ' ')} lane` : 'Lane 3';
+        showToast(true, `Practice assigned to ${laneLabel}.`);
+      }
     } catch {
-      // soft fail for now
+      showToast(false, 'Network error — practice not assigned.');
     }
   }
 
@@ -728,6 +796,32 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
 
   return (
     <div className="anx-workspace-shell">
+      {/* ── Action toast (H3) ───────────────────────────────────────────── */}
+      {toast && (
+        <div
+          role="status"
+          aria-live="polite"
+          style={{
+            position: 'fixed',
+            bottom: '5rem',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 9999,
+            padding: '0.5rem 1.1rem',
+            borderRadius: '0.625rem',
+            fontSize: '0.8125rem',
+            fontWeight: 500,
+            color: '#fff',
+            background: toast.ok ? 'var(--anx-success)' : 'var(--anx-danger)',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.18)',
+            pointerEvents: 'none',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {toast.msg}
+        </div>
+      )}
+
       {/* ── Top bar ─────────────────────────────────────────────────────── */}
       <header className="anx-workspace-topbar">
         <Link
@@ -1042,10 +1136,41 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
         screensLocked={screensLocked}
         onTogglePause={() => setStatus(paused ? 'ACTIVE' : 'PAUSED')}
         onStudentsView={() => window.open('/student/live', '_blank', 'noopener')}
-        onLockScreens={() => setScreensLocked((v) => !v)}
+        onLockScreens={() => {
+          const next = !screensLocked;
+          setScreensLocked(next);
+          // C3: broadcast the lock state change so student screens respond immediately
+          void fetch(`/api/live-sessions/${sessionId}/broadcast`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              lanes: ['LANE_1', 'LANE_2', 'LANE_3'],
+              contentType: 'MESSAGE',
+              message: next
+                ? 'SCREEN_LOCK'
+                : 'SCREEN_UNLOCK',
+            }),
+          });
+        }}
         onClearBoard={handleClearBoard}
         onMore={() => {
-          /* future overflow menu */
+          // M7: copy the shareable student join link instead of a dead overflow menu
+          const joinCode = snapshot?.joinCode;
+          if (!joinCode) return;
+          const url = `${window.location.origin}/join/${joinCode}`;
+          if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+            navigator.clipboard.writeText(url).then(() => showToast(true, 'Student link copied.')).catch(() => showToast(false, 'Could not copy link.'));
+          } else {
+            try {
+              const ta = document.createElement('textarea');
+              ta.value = url;
+              ta.style.position = 'fixed'; ta.style.opacity = '0';
+              document.body.appendChild(ta); ta.focus(); ta.select();
+              document.execCommand('copy');
+              document.body.removeChild(ta);
+              showToast(true, 'Student link copied.');
+            } catch { showToast(false, 'Could not copy link.'); }
+          }
         }}
       />
 

@@ -109,6 +109,8 @@ export function StudentSignalsPanel({
   laneCounts,
 }: Props) {
   const [showDetail, setShowDetail] = useState(false);
+  // M2: local dismissed set so teachers can clear individual messages without a full API round-trip
+  const [dismissedMessageKeys, setDismissedMessageKeys] = useState<Set<string>>(new Set());
   const noResponses = overview.total - overview.responded;
   const total = Math.max(1, overview.responded);
   const correctPct = (overview.correct / total) * 100;
@@ -268,7 +270,9 @@ export function StudentSignalsPanel({
                     {mc.label}
                   </p>
                   <p className="mt-0.5 text-xs leading-snug" style={{ color: 'var(--anx-text-muted)' }}>
-                    {mc.studentNames.join(', ')}{mc.studentNames.length < mc.studentCount ? ` +${mc.studentCount - mc.studentNames.length} more` : ''}
+                    {/* M3: cap visible names at 3 to prevent overflow */}
+                    {mc.studentNames.slice(0, 3).join(', ')}
+                    {mc.studentCount > 3 ? ` +${mc.studentCount - 3} more` : ''}
                   </p>
                 </div>
               </div>
@@ -325,33 +329,64 @@ export function StudentSignalsPanel({
         </div>
       )}
 
-      {studentMessages && studentMessages.length > 0 && (
-        <div className="mt-4 space-y-2">
-          <p className="text-xs font-semibold" style={{ color: 'var(--anx-text-secondary)' }}>
-            Student messages
-          </p>
-          {studentMessages.map((entry) => (
-            <div
-              key={`${entry.kind}-${entry.studentUserId}-${entry.createdAt}`}
-              className="rounded-2xl border px-3 py-3"
-              style={{ borderColor: 'var(--anx-outline-variant)', background: 'var(--anx-surface-container-low)' }}
-            >
-              <p className="text-xs font-semibold" style={{ color: 'var(--anx-text)' }}>
-                {entry.studentName}
-                {entry.lane ? <span style={{ color: 'var(--anx-text-muted)' }}> · {entry.lane.replace('_', ' ')}</span> : ''}
-              </p>
-              <p className="mt-0.5 text-xs" style={{ color: 'var(--anx-text-secondary)' }}>
-                {entry.kind === 'help' ? '🙋 Needs help' : '💬 Message'}
-              </p>
-              {entry.message && (
-                <p className="mt-1.5 text-sm leading-relaxed" style={{ color: 'var(--anx-text)' }}>
-                  {entry.message}
-                </p>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
+      {studentMessages && studentMessages.length > 0 && (() => {
+        const visibleMessages = studentMessages.filter(
+          (entry) => !dismissedMessageKeys.has(`${entry.kind}-${entry.studentUserId}-${entry.createdAt}`)
+        );
+        if (visibleMessages.length === 0) return null;
+        return (
+          <div className="mt-4 space-y-2">
+            <p className="text-xs font-semibold" style={{ color: 'var(--anx-text-secondary)' }}>
+              Student messages
+            </p>
+            {visibleMessages.map((entry) => {
+              const msgKey = `${entry.kind}-${entry.studentUserId}-${entry.createdAt}`;
+              return (
+                <div
+                  key={msgKey}
+                  className="rounded-2xl border px-3 py-3"
+                  style={{ borderColor: 'var(--anx-outline-variant)', background: 'var(--anx-surface-container-low)' }}
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs font-semibold" style={{ color: 'var(--anx-text)' }}>
+                        {entry.studentName}
+                        {entry.lane ? <span style={{ color: 'var(--anx-text-muted)' }}> · {entry.lane.replace('_', ' ')}</span> : ''}
+                      </p>
+                      <p className="mt-0.5 text-xs" style={{ color: 'var(--anx-text-secondary)' }}>
+                        {entry.kind === 'help' ? '🙋 Needs help' : '💬 Message'}
+                      </p>
+                      {entry.message && (
+                        <p className="mt-1.5 text-sm leading-relaxed" style={{ color: 'var(--anx-text)' }}>
+                          {entry.message}
+                        </p>
+                      )}
+                    </div>
+                    {/* M2: dismiss button so teachers can clear handled messages */}
+                    <button
+                      type="button"
+                      aria-label="Dismiss message"
+                      onClick={() =>
+                        setDismissedMessageKeys((prev) => {
+                          const next = new Set(prev);
+                          next.add(msgKey);
+                          return next;
+                        })
+                      }
+                      className="shrink-0 rounded-lg p-1 transition hover:bg-[var(--anx-surface-hover)]"
+                      style={{ color: 'var(--anx-text-muted)' }}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
+                        <path d="M18 6 6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        );
+      })()}
 
       <button
         type="button"
