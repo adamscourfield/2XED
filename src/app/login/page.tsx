@@ -132,8 +132,7 @@ export default function LoginPage() {
   const [remember, setRemember] = useState(false);
 
   function routeForRole(role?: string) {
-    if (role === 'ADMIN') return '/admin';
-    if (role === 'TEACHER' || role === 'LEADERSHIP') return '/teacher/dashboard';
+    if (role === 'ADMIN' || role === 'TEACHER' || role === 'LEADERSHIP') return '/teacher/dashboard';
     return '/dashboard';
   }
 

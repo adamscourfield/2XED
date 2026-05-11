@@ -11,11 +11,7 @@ export default async function DashboardRedirectPage() {
 
   const role = (session.user as { role?: string }).role;
 
-  if (role === 'ADMIN') {
-    redirect('/admin');
-  }
-
-  if (role === 'TEACHER' || role === 'LEADERSHIP') {
+  if (role === 'ADMIN' || role === 'TEACHER' || role === 'LEADERSHIP') {
     redirect('/teacher/dashboard');
   }
 
