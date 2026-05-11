@@ -937,6 +937,7 @@ model Lesson {
   id                        String          @id @default(cuid())
   title                     String
   topic                     String
+  yearGroup                 String?
   teacherUserId             String
   subjectId                 String
   curriculumUnitId          String?
