@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useCallback, useRef } from 'react';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface SplashScreenProps {
@@ -80,17 +81,28 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
             }}
           />
 
-          <div className="relative flex flex-col items-center gap-6">
+          <div className="relative flex flex-col items-center gap-8">
             <motion.div
-              className="relative"
+              className="relative flex flex-col items-center gap-5"
               initial={{ opacity: 0, y: 20, filter: 'blur(8px)' }}
               animate={phase >= 1 ? { opacity: 1, y: 0, filter: 'blur(0px)' } : {}}
               transition={{ duration: 0.9, ease: EASE }}
             >
-              <img
+              <Image
+                src="/Ember_logo_icon.png"
+                alt=""
+                width={320}
+                height={320}
+                className="h-24 w-auto drop-shadow-lg md:h-32"
+                priority
+              />
+              <Image
                 src="/Ember_logo_text.png"
                 alt="Ember"
-                className="h-12 md:h-14 w-auto"
+                width={400}
+                height={120}
+                className="h-12 w-auto drop-shadow-md md:h-16"
+                priority
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
                   target.style.display = 'none';
@@ -110,7 +122,7 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
             <motion.div
               className="h-[2px] bg-gradient-to-r from-transparent via-purple-800 to-transparent"
               initial={{ width: 0, opacity: 0 }}
-              animate={phase >= 1 ? { width: 80, opacity: 0.25 } : {}}
+              animate={phase >= 1 ? { width: 120, opacity: 0.25 } : {}}
               transition={{ duration: 0.6, ease: EASE, delay: 0.3 }}
             />
 

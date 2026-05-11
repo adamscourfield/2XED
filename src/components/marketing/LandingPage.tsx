@@ -308,9 +308,9 @@ export default function LandingPage() {
                   <X className="h-4 w-4 text-gray-600" />
                 </button>
                 <div className="mb-8 text-center">
-                  <div className="mb-4 flex items-center justify-center gap-3">
-                    <Image src="/Ember_logo_icon.png" alt="" width={120} height={120} className="h-12 w-auto" priority />
-                    <Image src="/Ember_logo_text.png" alt="" width={280} height={80} className="h-7 w-auto" priority />
+                  <div className="mb-4 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
+                    <Image src="/Ember_logo_icon.png" alt="" width={200} height={200} className="h-14 w-auto sm:h-16" priority />
+                    <Image src="/Ember_logo_text.png" alt="" width={320} height={92} className="h-9 w-auto sm:h-10" priority />
                   </div>
                   <h2 id="sign-in-heading" className="font-marketing text-2xl font-bold text-gray-900">
                     Welcome back
@@ -409,14 +409,21 @@ export default function LandingPage() {
       >
         <div className="mx-auto max-w-7xl px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Image src="/Ember_logo_icon.png" alt="Ember" width={160} height={160} className="h-14 w-auto" priority />
+            <div className="flex items-center gap-3 sm:gap-4">
+              <Image
+                src="/Ember_logo_icon.png"
+                alt="Ember"
+                width={256}
+                height={256}
+                className="h-12 w-auto sm:h-16"
+                priority
+              />
               <Image
                 src="/Ember_logo_text.png"
                 alt="Ember"
-                width={320}
-                height={96}
-                className="hidden h-9 w-auto sm:block"
+                width={360}
+                height={108}
+                className="hidden h-9 w-auto sm:block md:h-11"
                 priority
               />
             </div>
@@ -522,6 +529,28 @@ export default function LandingPage() {
               whileInView="visible"
               viewport={{ once: true }}
             >
+              <motion.div
+                variants={fadeIn}
+                className="flex flex-col items-start gap-3 sm:flex-row sm:items-end sm:gap-5"
+              >
+                <Image
+                  src="/Ember_logo_icon.png"
+                  alt=""
+                  width={256}
+                  height={256}
+                  className="h-16 w-auto shrink-0 drop-shadow-md sm:h-20 md:h-[5.25rem]"
+                  priority
+                />
+                <Image
+                  src="/Ember_logo_text.png"
+                  alt=""
+                  width={400}
+                  height={120}
+                  className="h-10 w-auto max-w-full object-contain object-left drop-shadow-sm sm:h-12 md:h-14"
+                  priority
+                />
+              </motion.div>
+
               <motion.div variants={fadeIn} className="inline-flex items-center gap-2 rounded-full border border-purple-200 bg-purple-50 px-4 py-2">
                 <span className="h-2 w-2 animate-pulse rounded-full bg-red-400" />
                 <span className="text-sm font-semibold text-purple-800">Coming Soon — Join the Waitlist</span>
@@ -1085,9 +1114,9 @@ export default function LandingPage() {
         <div className="mx-auto max-w-7xl px-6">
           <div className="mb-8 grid gap-8 md:grid-cols-4">
             <div className="md:col-span-1">
-              <div className="mb-4 flex items-center gap-3">
-                <Image src="/Ember_logo_icon.png" alt="Ember" width={120} height={120} className="h-10 w-auto" />
-                <Image src="/Ember_logo_text.png" alt="Ember" width={280} height={72} className="h-6 w-auto" />
+              <div className="mb-4 flex flex-wrap items-center gap-3 sm:gap-4">
+                <Image src="/Ember_logo_icon.png" alt="Ember" width={200} height={200} className="h-12 w-auto sm:h-14" />
+                <Image src="/Ember_logo_text.png" alt="Ember" width={320} height={88} className="h-8 w-auto sm:h-9" />
               </div>
               <p className="text-sm text-gray-500">
                 Supercharging teachers to 2x student learning through real-time misconception detection.
