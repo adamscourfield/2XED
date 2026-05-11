@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, type KeyboardEvent as ReactKeyboardEvent } from 'react';
+import { useCallback, useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react';
 
 type Props = {
   open: boolean;
@@ -34,6 +34,9 @@ export function EndSessionDialog({
 }: Props) {
   const panelRef = useRef<HTMLDivElement>(null);
   const previouslyFocusedRef = useRef<HTMLElement | null>(null);
+  // L1: prevent double-confirm — a second click after the first triggers onConfirm
+  // (which often navigates away) while React hasn't yet unmounted the dialog.
+  const [confirming, setConfirming] = useState(false);
 
   useEffect(() => {
     if (!open) return;
@@ -115,11 +118,16 @@ export function EndSessionDialog({
           </button>
           <button
             type="button"
-            onClick={onConfirm}
-            className="anx-btn-primary px-4 py-2 text-sm"
+            disabled={confirming}
+            onClick={() => {
+              if (confirming) return;
+              setConfirming(true);
+              onConfirm();
+            }}
+            className="anx-btn-primary px-4 py-2 text-sm disabled:opacity-60 disabled:cursor-not-allowed"
             style={{ background: 'var(--anx-danger-text)' }}
           >
-            {confirmLabel}
+            {confirming ? 'Ending…' : confirmLabel}
           </button>
         </div>
       </div>

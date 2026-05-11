@@ -384,7 +384,23 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
 
     return () => {
       sseRef.current?.close();
-      if (fallbackRef.current) clearInterval(fallbackRef.current);
+      sseRef.current = null;
+      if (fallbackRef.current) {
+        clearInterval(fallbackRef.current);
+        // C3: reset to null so the startPolling guard works correctly if the effect
+        // ever re-runs (stable deps, but belt-and-suspenders for HMR / strict mode).
+        fallbackRef.current = null;
+      }
+      // C2: clear the pending broadcast debounce and toast timers on unmount
+      // so we never call setState on an unmounted component.
+      if (broadcastTimerRef.current) {
+        clearTimeout(broadcastTimerRef.current);
+        broadcastTimerRef.current = null;
+      }
+      if (toastTimerRef.current) {
+        clearTimeout(toastTimerRef.current);
+        toastTimerRef.current = null;
+      }
     };
   }, [sessionId, fetchSnapshot]);
 
@@ -514,7 +530,10 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
 
   // ── Emergency controls (#26) ──────────────────────────────────────────────
   /** Restart the active explanation from step 0 */
-  function replayExplanation() {
+  // C4: useCallback so that the JSX reference is stable and avoids re-creating the
+  // closure on every render. activeExplanation is listed as a dep because we read
+  // .route.id from it — without this the stale closure would replay the wrong route.
+  const replayExplanation = useCallback(() => {
     if (!activeExplanation) return;
     setActiveExplanation((prev) => (prev ? { ...prev, stepIndex: 0 } : null));
     void fetch(`/api/live-sessions/${sessionId}/broadcast`, {
@@ -526,7 +545,7 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
         stepIndex: 0,
       }),
     }).catch(() => void 0);
-  }
+  }, [sessionId, activeExplanation]);
 
   /** Navigate to previous or next lesson phase */
   async function navigatePhase(delta: -1 | 1) {
@@ -1135,7 +1154,12 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
         paused={paused}
         screensLocked={screensLocked}
         onTogglePause={() => setStatus(paused ? 'ACTIVE' : 'PAUSED')}
-        onStudentsView={() => window.open('/student/live', '_blank', 'noopener')}
+        onStudentsView={() => {
+          // Pass the join code so the student view auto-fills and skips the join screen.
+          const code = snapshot?.joinCode;
+          const url = code ? `/student/live?code=${code}` : '/student/live';
+          window.open(url, '_blank', 'noopener');
+        }}
         onLockScreens={() => {
           const next = !screensLocked;
           setScreensLocked(next);

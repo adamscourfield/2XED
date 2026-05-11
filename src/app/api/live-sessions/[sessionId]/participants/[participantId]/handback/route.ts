@@ -27,10 +27,13 @@ export async function POST(_req: NextRequest, { params }: Props) {
   const userId = (session.user as { id: string }).id;
   const { sessionId, participantId } = await params;
 
-  // Verify teacher owns the session
+  // Verify teacher owns the session. ADMINs are allowed to hand back students
+  // in any session — their userId won't match teacherUserId, so skip the check.
   const liveSession = await prisma.liveSession.findUnique({ where: { id: sessionId } });
   if (!liveSession) return NextResponse.json({ error: 'Session not found' }, { status: 404 });
-  if (liveSession.teacherUserId !== userId) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  if (liveSession.teacherUserId !== userId && role !== 'ADMIN') {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
 
   // Verify participant exists in this session
   const participant = await prisma.liveParticipant.findUnique({

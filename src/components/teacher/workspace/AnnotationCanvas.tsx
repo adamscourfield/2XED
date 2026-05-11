@@ -178,6 +178,10 @@ export const AnnotationCanvas = forwardRef<AnnotationCanvasHandle, Props>(functi
   const hostRef = useRef<HTMLDivElement>(null);
   const [ringPos, setRingPos] = useState<{ x: number; y: number } | null>(null);
   const [state, setState] = useState<AnnotationCanvasState>(emptyState);
+  // M5: inline text-entry overlay — replaces window.prompt which is blocked on iOS Safari.
+  // Stores the canvas-coordinate click position; a floating <input> is rendered there.
+  const [pendingText, setPendingText] = useState<{ canvasX: number; canvasY: number; screenX: number; screenY: number } | null>(null);
+  const textInputRef = useRef<HTMLInputElement>(null);
   const versionRef = useRef(0);
   const historyRef = useRef<AnnotationCanvasState[]>([emptyState()]);
   const futureRef = useRef<AnnotationCanvasState[]>([]);
@@ -362,19 +366,37 @@ export const AnnotationCanvas = forwardRef<AnnotationCanvasHandle, Props>(functi
     }
 
     if (tool === 'text') {
-      const value = window.prompt('Type text to drop on the canvas');
-      if (value && value.trim()) {
-        const next: AnnotationCanvasState = {
-          ...state,
-          texts: [
-            ...state.texts,
-            { id: `t-${Date.now()}`, x: pt.x, y: pt.y, text: value, color },
-          ],
-        };
-        commit(next);
-      }
+      // M5: open an inline overlay instead of window.prompt (blocked on iOS).
+      // Store both canvas coords (for text placement) and screen coords (for overlay position).
+      const canvas = canvasRef.current!;
+      const rect = canvas.getBoundingClientRect();
+      const screenX = e.clientX - rect.left;
+      const screenY = e.clientY - rect.top;
+      setPendingText({ canvasX: pt.x, canvasY: pt.y, screenX, screenY });
+      // Focus will fire after render via the textInputRef effect below.
     }
   }
+
+  function commitPendingText(value: string) {
+    if (!pendingText) return;
+    setPendingText(null);
+    if (!value.trim()) return;
+    const next: AnnotationCanvasState = {
+      ...state,
+      texts: [
+        ...state.texts,
+        { id: `t-${Date.now()}`, x: pendingText.canvasX, y: pendingText.canvasY, text: value.trim(), color },
+      ],
+    };
+    commit(next);
+  }
+
+  // Auto-focus the inline text overlay when it appears.
+  useEffect(() => {
+    if (pendingText) {
+      textInputRef.current?.focus();
+    }
+  }, [pendingText]);
 
   function handlePointerMove(e: ReactPointerEvent<HTMLCanvasElement>) {
     if (!isDrawing.current) return;
@@ -520,6 +542,30 @@ export const AnnotationCanvas = forwardRef<AnnotationCanvasHandle, Props>(functi
         onPointerLeave={endStroke}
         onPointerCancel={endStroke}
       />
+      {/* M5: inline text input — replaces window.prompt which is blocked on iOS Safari */}
+      {pendingText && (
+        <input
+          ref={textInputRef}
+          type="text"
+          placeholder="Type then press Enter"
+          className="absolute z-[20] min-w-[180px] max-w-[260px] rounded-lg border bg-white px-3 py-1.5 text-sm shadow-lg outline-none ring-2 ring-[var(--anx-primary)]"
+          style={{
+            left: Math.min(pendingText.screenX, (hostRef.current?.clientWidth ?? 0) - 268),
+            top: Math.max(0, pendingText.screenY - 20),
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              commitPendingText((e.target as HTMLInputElement).value);
+            }
+            if (e.key === 'Escape') {
+              e.preventDefault();
+              setPendingText(null);
+            }
+          }}
+          onBlur={(e) => commitPendingText(e.target.value)}
+        />
+      )}
     </div>
   );
 });

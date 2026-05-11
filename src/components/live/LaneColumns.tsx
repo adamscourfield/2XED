@@ -1,20 +1,16 @@
 'use client';
 
-type EscalationReason =
-  | 'SHADOW_CHECK_FAILED'
-  | 'ANCHOR_FAILED'
-  | 'MISCONCEPTION_FAILED'
-  | 'SCAFFOLDED_CORRECT'
-  | 'MANUAL_TEACHER'
-  | 'HINTS_USED';
-
+// H9: EscalationReason kept as string so this type is compatible with the
+// useLiveLanes hook — the hook uses string | null, a wider type than the
+// original union. LaneColumns doesn't render escalationReason, so the
+// widened type causes no behavioural change.
 interface LaneStudent {
   participantId: string;
   studentUserId: string;
   studentName: string;
   masteryProbability: number;
   currentExplanationRouteType: string | null;
-  escalationReason: EscalationReason | null;
+  escalationReason: string | null;
   isUnexpectedFailure: boolean;
   waitingMinutes: number;
   holdingAtFinalCheck: boolean;
@@ -28,7 +24,9 @@ interface LaneGroup {
 interface LaneColumnsProps {
   lane1: LaneGroup;
   lane2: LaneGroup;
-  lane3: LaneGroup;
+  // lane3 may carry extra reteach fields from the hook; LaneGroup is the
+  // minimum contract this component needs — extra props are simply ignored.
+  lane3: LaneGroup & { reteachAlert?: boolean; reteachMessage?: string | null };
   onHandback?: (participantId: string) => void;
   actingOnIds?: Set<string>;
 }
@@ -46,6 +44,7 @@ export function LaneColumns({ lane1, lane2, lane3, onHandback, actingOnIds }: La
   return (
     <div className="grid grid-cols-3 gap-4">
       {/* Lane 1 — Got it */}
+      {/* H9: show individual student names so teachers know who is in each lane */}
       <div className="rounded-lg border border-green-200 bg-white p-4">
         <div className="mb-3 flex items-center justify-between">
           <h3 className="text-lg font-bold text-green-800">Got it</h3>
@@ -53,7 +52,20 @@ export function LaneColumns({ lane1, lane2, lane3, onHandback, actingOnIds }: La
             {lane1.count}
           </span>
         </div>
-        <p className="text-sm text-muted">Moving forward independently</p>
+        {lane1.students.length === 0 ? (
+          <p className="text-sm text-muted">No students here yet</p>
+        ) : (
+          <div className="space-y-1.5">
+            {lane1.students.map((student) => (
+              <div
+                key={student.studentUserId}
+                className="rounded-md border border-outline-variant bg-surface-container-low px-3 py-2"
+              >
+                <span className="text-sm font-medium text-on-surface">{student.studentName}</span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Lane 2 — Nearly there */}
@@ -64,7 +76,23 @@ export function LaneColumns({ lane1, lane2, lane3, onHandback, actingOnIds }: La
             {lane2.count}
           </span>
         </div>
-        <p className="text-sm text-muted">App is working with them</p>
+        {lane2.students.length === 0 ? (
+          <p className="text-sm text-muted">No students in support yet</p>
+        ) : (
+          <div className="space-y-1.5">
+            {lane2.students.map((student) => (
+              <div
+                key={student.studentUserId}
+                className="rounded-md border border-outline-variant bg-surface-container-low px-3 py-2"
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-sm font-medium text-on-surface">{student.studentName}</span>
+                  {student.waitingMinutes > 0 && <WaitingBadge minutes={student.waitingMinutes} />}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Lane 3 — Needs teacher */}

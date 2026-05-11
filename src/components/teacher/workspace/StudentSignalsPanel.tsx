@@ -330,8 +330,11 @@ export function StudentSignalsPanel({
       )}
 
       {studentMessages && studentMessages.length > 0 && (() => {
-        const visibleMessages = studentMessages.filter(
-          (entry) => !dismissedMessageKeys.has(`${entry.kind}-${entry.studentUserId}-${entry.createdAt}`)
+        // M7: normalise createdAt to a numeric timestamp before building the key so
+      // that dismissed messages don't reappear when the SSE snapshot serialises the
+      // same Date in a slightly different ISO string (e.g. trailing 'Z' vs '+00:00').
+      const visibleMessages = studentMessages.filter(
+          (entry) => !dismissedMessageKeys.has(`${entry.kind}-${entry.studentUserId}-${new Date(entry.createdAt).getTime()}`)
         );
         if (visibleMessages.length === 0) return null;
         return (
@@ -340,7 +343,7 @@ export function StudentSignalsPanel({
               Student messages
             </p>
             {visibleMessages.map((entry) => {
-              const msgKey = `${entry.kind}-${entry.studentUserId}-${entry.createdAt}`;
+              const msgKey = `${entry.kind}-${entry.studentUserId}-${new Date(entry.createdAt).getTime()}`;
               return (
                 <div
                   key={msgKey}

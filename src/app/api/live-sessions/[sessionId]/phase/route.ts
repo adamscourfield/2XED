@@ -37,7 +37,14 @@ export async function PATCH(req: NextRequest, { params }: Props) {
   const phases = (liveSession.phases as Array<unknown>) ?? [];
   const nextIndex = parsed.data.phaseIndex ?? (liveSession.currentPhaseIndex + 1);
 
-  if (nextIndex >= phases.length && phases.length > 0) {
+  // C5: reject navigation when the session has no phases at all — previously
+  // the guard `phases.length > 0` allowed arbitrary phaseIndex writes on
+  // phase-free sessions, corrupting currentPhaseIndex and currentContent.
+  if (phases.length === 0) {
+    return NextResponse.json({ error: 'This session has no phases.' }, { status: 400 });
+  }
+
+  if (nextIndex >= phases.length) {
     return NextResponse.json({ error: 'Already at last phase' }, { status: 400 });
   }
 

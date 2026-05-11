@@ -70,6 +70,8 @@ export function useLiveLanes(sessionId: string, pollIntervalMs = 4000) {
   const handback = useCallback(
     async (participantId: string) => {
       setActingOnIds((s) => new Set(s).add(participantId));
+      // H8: catch errors inside the hook so an unhandled rejection never propagates
+      // to LaneColumns — instead the shared `error` state surfaces the message.
       try {
         const res = await fetch(
           `/api/live-sessions/${sessionId}/participants/${participantId}/handback`,
@@ -80,6 +82,8 @@ export function useLiveLanes(sessionId: string, pollIntervalMs = 4000) {
           throw new Error((body as { error?: string }).error ?? 'Handback failed');
         }
         await fetchLanes();
+      } catch (e) {
+        setError(e instanceof Error ? e.message : 'Handback failed');
       } finally {
         setActingOnIds((s) => {
           const next = new Set(s);

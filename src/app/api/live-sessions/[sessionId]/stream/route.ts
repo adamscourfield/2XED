@@ -1,3 +1,7 @@
+// C1: force Node.js runtime — setInterval inside ReadableStream.start() is frozen
+// on serverless/edge runtimes, which silently stops SSE delivery mid-session.
+export const runtime = 'nodejs';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/features/auth/authOptions';
