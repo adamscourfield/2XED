@@ -22,7 +22,8 @@ export async function GET(_req: NextRequest, { params }: Props) {
 
   const liveSession = await prisma.liveSession.findUnique({ where: { id: sessionId } });
   if (!liveSession) return NextResponse.json({ error: 'Session not found' }, { status: 404 });
-  if (liveSession.teacherUserId !== userId) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  // L10: ADMIN can view lanes for any session (mirrors the same bypass in handback/route.ts).
+  if (liveSession.teacherUserId !== userId && role !== 'ADMIN') return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
   const laneView = await getLaneView(sessionId);
 

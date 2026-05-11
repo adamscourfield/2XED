@@ -57,7 +57,7 @@ export async function GET(_req: NextRequest, { params }: Props) {
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const role = (session.user as { role?: string }).role;
-  if (role !== 'TEACHER') return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  if (role !== 'TEACHER' && role !== 'ADMIN') return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
   const userId = (session.user as { id: string }).id;
   const { sessionId } = await params;
@@ -102,7 +102,8 @@ export async function GET(_req: NextRequest, { params }: Props) {
   };
 
   if (!liveSession) return NextResponse.json({ error: 'Session not found' }, { status: 404 });
-  if (liveSession.teacherUserId !== userId) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  // L10: ADMIN can observe any session without being its owner.
+  if (liveSession.teacherUserId !== userId && role !== 'ADMIN') return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
   for (const p of liveSession.participants) {
     if (p.isActive) {

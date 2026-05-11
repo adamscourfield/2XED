@@ -304,7 +304,13 @@ export async function POST(req: NextRequest, { params }: Props) {
   }
 
   if (!nextItem) {
-    const sessionSkillId = liveSession.skillId ?? skillId;
+    // Use the current phase's skill if available — a multi-phase session may have advanced
+    // past the primary skill, so falling back to liveSession.skillId would serve items for
+    // the wrong phase. Falls back to the primary skill, then to the submitted skillId.
+    const phaseSkillId = Array.isArray(liveSession.phases) && liveSession.phases.length > 0
+      ? ((liveSession.phases[liveSession.currentPhaseIndex] as { skillId?: string } | undefined)?.skillId ?? null)
+      : null;
+    const sessionSkillId = phaseSkillId ?? liveSession.skillId ?? skillId;
     let poolItem = await prisma.item.findFirst({
       where: {
         id: { notIn: Array.from(answeredSet) },
