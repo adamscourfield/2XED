@@ -426,13 +426,29 @@ export function AppChrome({
   const homeHref = variant === "teacher" ? "/teacher/dashboard" : "/dashboard";
   const studentTagline = "Your learning hub";
 
-  const teacherNavPrimary: NavItem[] = [
-    { href: "/teacher/dashboard", label: "Dashboard", icon: "home" },
-    { href: "/teacher/curriculum", label: "Curriculum", icon: "stackedPages" },
-    { href: "/teacher/lessons", label: "Lessons", icon: "bookOpen" },
-    { href: "/teacher/live", label: "Live", icon: "bolt" },
-    { href: "/teacher/reports", label: "Reports", icon: "chart" },
-    { href: "/teacher/settings", label: "Settings", icon: "gear" },
+  const teacherNavDashboard: NavItem = {
+    href: "/teacher/dashboard",
+    label: "Dashboard",
+    icon: "dashboard",
+  };
+
+  const teacherNavSections: { title: string; items: NavItem[] }[] = [
+    {
+      title: "TEACHING",
+      items: [
+        { href: "/teacher/curriculum", label: "Curriculum", icon: "stackedPages" },
+        { href: "/teacher/lessons", label: "Lessons", icon: "bookOpen" },
+        { href: "/teacher/live", label: "Live", icon: "bolt" },
+      ],
+    },
+    {
+      title: "INSIGHTS",
+      items: [{ href: "/teacher/reports", label: "Reports", icon: "chart" }],
+    },
+    {
+      title: "SYSTEM",
+      items: [{ href: "/teacher/settings", label: "Settings", icon: "gear" }],
+    },
   ];
 
   const teacherNavSecondary: NavItem[] = [{ href: "/teacher/help", label: "Help Centre", icon: "help" }];
@@ -461,7 +477,7 @@ export function AppChrome({
       case "TEACHER":
         return "Teacher";
       case "ADMIN":
-        return "Admin";
+        return "Administrator";
       case "LEADERSHIP":
         return "Leadership";
       default:
@@ -497,8 +513,8 @@ export function AppChrome({
           teacher
             ? `group relative flex items-center gap-3 rounded-xl px-3 py-3 transition-colors duration-150 ${
                 active
-                  ? "bg-[#F3F4FF] text-[#5D5FEF]"
-                  : "text-[#2D3748] hover:bg-[#F9FAFB]"
+                  ? "bg-[#F3F0FF] text-[#5E44FF]"
+                  : "text-[#2D3748] hover:bg-[#F3F3F5]"
               }`
             : `group relative flex items-center gap-3 rounded-2xl px-3 py-2.5 pl-3 transition-colors duration-150 ${
                 active
@@ -519,7 +535,7 @@ export function AppChrome({
             className={`block text-[0.9375rem] font-semibold leading-snug tracking-tight ${
               teacher
                 ? active
-                  ? "text-[#5D5FEF]"
+                  ? "text-[#5E44FF]"
                   : "text-[#2D3748]"
                 : active
                   ? "text-[#312e81]"
@@ -533,7 +549,7 @@ export function AppChrome({
               className={`mt-0.5 block text-xs leading-relaxed ${
                 teacher
                   ? active
-                    ? "text-[#5D5FEF]/90"
+                    ? "text-[#5E44FF]/90"
                     : "text-[#718096]"
                   : active
                     ? "text-[#4f46e5]/90"
@@ -625,27 +641,46 @@ export function AppChrome({
   }
 
   function TeacherNav({ onNavigate }: { onNavigate?: () => void }) {
+    const dashActive = isNavActive(pathname, teacherNavDashboard.href);
     return (
-      <div className="flex flex-col gap-8 px-3 py-5">
-        <nav className="flex flex-col gap-1.5" aria-label="Primary">
-          {teacherNavPrimary.map((item) => {
-            const active = isNavActive(pathname, item.href);
-            return (
-              <NavRow
-                key={item.href}
-                href={item.href}
-                label={item.label}
-                description={item.description}
-                iconKind={item.icon}
-                active={active}
-                onNavigate={onNavigate}
-                variant="teacher"
-              />
-            );
-          })}
+      <div className="flex flex-col gap-7 px-3 py-5">
+        <nav className="flex flex-col gap-1.5" aria-label="Dashboard">
+          <NavRow
+            href={teacherNavDashboard.href}
+            label={teacherNavDashboard.label}
+            description={teacherNavDashboard.description}
+            iconKind={teacherNavDashboard.icon}
+            active={dashActive}
+            onNavigate={onNavigate}
+            variant="teacher"
+          />
         </nav>
+        {teacherNavSections.map((section) => (
+          <div key={section.title}>
+            <p className="mb-2 px-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9CA3AF]">
+              {section.title}
+            </p>
+            <nav className="flex flex-col gap-1.5" aria-label={section.title}>
+              {section.items.map((item) => {
+                const active = isNavActive(pathname, item.href);
+                return (
+                  <NavRow
+                    key={item.href}
+                    href={item.href}
+                    label={item.label}
+                    description={item.description}
+                    iconKind={item.icon}
+                    active={active}
+                    onNavigate={onNavigate}
+                    variant="teacher"
+                  />
+                );
+              })}
+            </nav>
+          </div>
+        ))}
         <div className="mx-1 border-t border-[#E8EAEF]" />
-        <nav className="flex flex-col gap-1.5" aria-label="Secondary">
+        <nav className="flex flex-col gap-1.5" aria-label="Help">
           {teacherNavSecondary.map((item) => {
             const active = isNavActive(pathname, item.href);
             return (
@@ -667,25 +702,24 @@ export function AppChrome({
   }
 
   const teacherBrandInner = (
-    <>
-      <Image
-        src="/Ember_logo_icon.png"
-        alt=""
-        width={512}
-        height={512}
-        className="h-14 w-14 shrink-0 sm:h-16 sm:w-16"
+    <span className="flex items-center gap-2.5">
+      <span
+        className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-gradient-to-br from-[#FF9F6A] via-[#C4A3FF] to-[#5E44FF] p-px shadow-sm"
         aria-hidden
-        priority
-      />
-      <Image
-        src="/Ember_logo_text.png"
-        alt="Ember"
-        width={512}
-        height={128}
-        className="h-9 w-auto max-w-[min(11rem,52vw)] shrink-0 object-contain object-left sm:h-10"
-        priority
-      />
-    </>
+      >
+        <span className="flex h-full w-full items-center justify-center overflow-hidden rounded-[9px] bg-white">
+          <Image
+            src="/Ember_logo_icon.png"
+            alt=""
+            width={64}
+            height={64}
+            className="h-6 w-6 object-contain"
+            priority
+          />
+        </span>
+      </span>
+      <span className="text-[1.25rem] font-bold lowercase leading-none tracking-tight text-[#111827]">ember</span>
+    </span>
   );
 
   const brandBlock = (
@@ -693,13 +727,16 @@ export function AppChrome({
       href={homeHref}
       className={`flex items-center gap-3 rounded-2xl p-2 outline-none transition-colors focus-visible:ring-2 ${
         variant === "teacher"
-          ? "hover:bg-[#F6F7FB] focus-visible:ring-[#5D5FEF]/25"
+          ? "hover:bg-white/60 focus-visible:ring-[#5E44FF]/25"
           : "hover:bg-[var(--anx-surface-hover)] focus-visible:ring-[var(--anx-primary-glow)]"
       }`}
       onClick={() => setMenuOpen(false)}
     >
       {variant === "teacher" ? (
-        teacherBrandInner
+        <>
+          {teacherBrandInner}
+          <span className="sr-only">Ember home</span>
+        </>
       ) : (
         <>
           <LogoImage className="h-11 w-auto shrink-0 sm:h-12" />
@@ -811,20 +848,20 @@ export function AppChrome({
         id="app-chrome-drawer"
         className={`fixed inset-y-0 left-0 z-50 flex w-[min(18rem,88vw)] flex-col border-r shadow-[var(--anx-shadow-lg)] transition-transform duration-200 ease-out lg:static lg:z-0 lg:w-[min(17.5rem,20vw)] lg:max-w-[280px] lg:translate-x-0 lg:shadow-none ${
           variant === "teacher"
-            ? "border-[#E8EAEF] bg-white lg:border-[#E8EAEF] lg:shadow-[1px_0_0_rgba(45,55,72,0.06)]"
+            ? "border-[#E8EAEF] bg-[#F7F7F8] lg:border-[#E8EAEF] lg:shadow-[1px_0_0_rgba(45,55,72,0.05)]"
             : "border-[var(--anx-outline-variant)] bg-[color:var(--anx-surface-raised)] lg:shadow-none"
         } ${menuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
       >
         <div
           className={`hidden p-4 lg:block ${
-            variant === "teacher" ? "border-b border-[#E8EAEF]" : "border-b border-[var(--anx-outline-variant)]"
+            variant === "teacher" ? "border-b border-[#E8EAEF] bg-[#F7F7F8]" : "border-b border-[var(--anx-outline-variant)]"
           }`}
         >
           {brandBlock}
         </div>
         <div
           className={`p-3 lg:hidden ${
-            variant === "teacher" ? "border-b border-[#E8EAEF]" : "border-b border-[var(--anx-outline-variant)]"
+            variant === "teacher" ? "border-b border-[#E8EAEF] bg-[#F7F7F8]" : "border-b border-[var(--anx-outline-variant)]"
           }`}
         >
           {brandBlock}
@@ -841,7 +878,7 @@ export function AppChrome({
 
         <div
           className={`p-4 ${
-            variant === "teacher" ? "border-t border-[#E8EAEF] bg-white" : "border-t border-[var(--anx-outline-variant)]"
+            variant === "teacher" ? "border-t border-[#E8EAEF] bg-[#F7F7F8]" : "border-t border-[var(--anx-outline-variant)]"
           }`}
         >
           {variant === "teacher" ? (
@@ -852,13 +889,14 @@ export function AppChrome({
             >
               <div
                 className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white"
-                style={{ backgroundColor: "#5D5FEF" }}
+                style={{ backgroundColor: "#5E44FF" }}
                 aria-hidden
               >
                 {teacherInitials}
               </div>
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-semibold text-[#2D3748]">{userName}</p>
+                <p className="truncate text-xs text-[#718096]">{roleFooterLabel()}</p>
               </div>
               <span className="shrink-0 text-[#718096]" aria-hidden>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
@@ -897,7 +935,7 @@ export function AppChrome({
             onClick={() => signOut({ callbackUrl: "/login" })}
             className={`mt-4 flex w-full items-center gap-2.5 rounded-xl px-2 py-2.5 text-sm font-medium transition ${
               variant === "teacher"
-                ? "justify-start text-left text-[#718096] hover:bg-[#F9FAFB] hover:text-[#5D5FEF]"
+                ? "justify-start text-left text-[#718096] hover:bg-[#F3F3F5] hover:text-[#5E44FF]"
                 : "justify-center text-center text-[color:var(--anx-text-muted)] hover:text-[color:var(--anx-text)]"
             }`}
           >

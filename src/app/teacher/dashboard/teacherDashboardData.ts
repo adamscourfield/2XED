@@ -150,8 +150,9 @@ export async function countLiveSessionsThisTermForClassrooms(teacherUserId: stri
 export async function loadTeacherHomeData(userId: string) {
   const now = new Date();
   const termStart = new Date(now.getFullYear(), Math.floor(now.getMonth() / 3) * 3, 1);
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-  const [activeSessions, recentSessions, lessonCount, sessionsThisTerm] = await Promise.all([
+  const [activeSessions, recentSessions, lessonCount, sessionsThisTerm, sessionsToday] = await Promise.all([
     prisma.liveSession.findMany({
       where: { teacherUserId: userId, status: { in: ['ACTIVE', 'LOBBY', 'PAUSED'] } },
       include: {
@@ -182,9 +183,16 @@ export async function loadTeacherHomeData(userId: string) {
         status: { in: ['COMPLETED', 'ACTIVE', 'LOBBY', 'PAUSED'] },
       },
     }),
+    prisma.liveSession.count({
+      where: {
+        teacherUserId: userId,
+        createdAt: { gte: startOfToday },
+        status: { in: ['COMPLETED', 'ACTIVE', 'LOBBY', 'PAUSED'] },
+      },
+    }),
   ]);
 
-  return { activeSessions, recentSessions, lessonCount, sessionsThisTerm };
+  return { activeSessions, recentSessions, lessonCount, sessionsThisTerm, sessionsToday };
 }
 
 export async function loadTeacherDashboardData(userId: string, days: number) {

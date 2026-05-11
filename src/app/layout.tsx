@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Inter, Plus_Jakarta_Sans, Manrope, Space_Grotesk } from 'next/font/google';
+import { Fraunces, Inter, Plus_Jakarta_Sans, Manrope, Space_Grotesk } from 'next/font/google';
 import './globals.css';
 import { Providers } from './providers';
 
@@ -25,6 +25,12 @@ const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-space-grotesk',
+});
+
+const fraunces = Fraunces({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-fraunces',
 });
 
 export const metadata: Metadata = {
@@ -53,7 +59,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${plusJakarta.variable} ${manrope.variable} ${spaceGrotesk.variable}`}>
+    <html
+      lang="en"
+      className={`${inter.variable} ${plusJakarta.variable} ${manrope.variable} ${spaceGrotesk.variable} ${fraunces.variable}`}
+    >
       <body className={`${manrope.className} bg-surface text-on-surface antialiased`}>
         <Providers>{children}</Providers>
       </body>
