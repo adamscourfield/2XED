@@ -429,6 +429,7 @@ export default async function LeadershipDashboardPage({ searchParams }: Props) {
                     {group.classrooms.map((cls) => (
                       <LeadershipClassStudentPanel
                         key={cls.id}
+                        classroomId={cls.id}
                         storageKey={`leadership-class-students:${cls.id}`}
                         defaultOpen={cls.atRisk > 0 || cls.amber > 0}
                         windowDays={days}

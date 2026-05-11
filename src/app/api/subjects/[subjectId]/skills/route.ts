@@ -5,8 +5,9 @@ import { prisma } from '@/db/prisma';
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { subjectId: string } }
+  { params }: { params: Promise<{ subjectId: string }> }
 ) {
+  const { subjectId } = await params;
   const session = await getServerSession(authOptions);
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const role = (session.user as { role?: string }).role;
@@ -15,7 +16,7 @@ export async function GET(
   }
 
   const skills = await prisma.skill.findMany({
-    where: { subjectId: params.subjectId },
+    where: { subjectId },
     orderBy: [{ strand: 'asc' }, { sortOrder: 'asc' }],
     select: { id: true, code: true, name: true, strand: true, sortOrder: true },
   });

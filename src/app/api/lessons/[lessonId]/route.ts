@@ -15,7 +15,8 @@ async function authorize(lessonId: string, userId: string, role: string) {
   return lesson;
 }
 
-export async function GET(_req: NextRequest, { params }: { params: { lessonId: string } }) {
+export async function GET(_req: NextRequest, { params }: { params: Promise<{ lessonId: string }> }) {
+  const { lessonId } = await params;
   const session = await getServerSession(authOptions);
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const user = session.user as { id: string; role?: string };
@@ -25,7 +26,7 @@ export async function GET(_req: NextRequest, { params }: { params: { lessonId: s
   if (!lessonModel) return NextResponse.json({ error: 'Model unavailable' }, { status: 503 });
 
   const lesson = await lessonModel.findUnique({
-    where: { id: params.lessonId },
+    where: { id: lessonId },
     include: {
       subject: { select: { id: true, title: true, slug: true } },
       curriculumUnit: { select: { id: true, title: true } },
@@ -65,12 +66,13 @@ const patchSchema = z.object({
   curriculumPromptDismissed: z.boolean().optional(),
 });
 
-export async function PATCH(req: NextRequest, { params }: { params: { lessonId: string } }) {
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ lessonId: string }> }) {
+  const { lessonId } = await params;
   const session = await getServerSession(authOptions);
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const user = session.user as { id: string; role?: string };
 
-  const lesson = await authorize(params.lessonId, user.id, user.role ?? '');
+  const lesson = await authorize(lessonId, user.id, user.role ?? '');
   if (!lesson) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
   const body = await req.json();
@@ -79,7 +81,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { lessonId: 
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const updated = await (prisma as any).lesson.update({
-    where: { id: params.lessonId },
+    where: { id: lessonId },
     data: parsed.data,
     select: { id: true, title: true, topic: true, isPublished: true, curriculumUnitId: true, updatedAt: true },
   });
@@ -87,16 +89,17 @@ export async function PATCH(req: NextRequest, { params }: { params: { lessonId: 
   return NextResponse.json(updated);
 }
 
-export async function DELETE(_req: NextRequest, { params }: { params: { lessonId: string } }) {
+export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ lessonId: string }> }) {
+  const { lessonId } = await params;
   const session = await getServerSession(authOptions);
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const user = session.user as { id: string; role?: string };
 
-  const lesson = await authorize(params.lessonId, user.id, user.role ?? '');
+  const lesson = await authorize(lessonId, user.id, user.role ?? '');
   if (!lesson) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  await (prisma as any).lesson.delete({ where: { id: params.lessonId } });
+  await (prisma as any).lesson.delete({ where: { id: lessonId } });
 
   return NextResponse.json({ ok: true });
 }

@@ -265,7 +265,19 @@ export function buildGateMetrics(parsed: ParsedAttempt[], config: EffectiveRetea
 export function applyGatePolicy(
   metrics: ReturnType<typeof buildGateMetrics>,
   config: EffectiveReteachConfig
-): { decision: GateDecision; decisionReason: GateDecisionReason } {
+): {
+  decision: GateDecision;
+  decisionReason: GateDecisionReason;
+  rules: {
+    masteryGateMet: boolean;
+    lowHintReliance: boolean;
+    attemptsWithinBudget: boolean;
+    trendIsRecovering: boolean;
+    hardEscalationByHistory: boolean;
+    hardEscalationByAttempts: boolean;
+    hardEscalationByDependence: boolean;
+  };
+} {
   const rules = {
     masteryGateMet:
       metrics.consecutiveIndependentCorrect >= Math.max(1, Math.round(config.gateConsecutiveIndependentCorrect)) &&

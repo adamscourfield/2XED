@@ -83,7 +83,7 @@ function ModelMode() {
       <div>
         <h3 className="text-base font-bold" style={{ color: 'var(--anx-text)' }}>Worked Example</h3>
         <p className="mt-1 text-sm" style={{ color: 'var(--anx-text-muted)' }}>
-          Students follow your canvas. Annotate freely — they'll see your strokes and notes.
+          Students follow your canvas. Annotate freely — they&apos;ll see your strokes and notes.
         </p>
       </div>
       <div className="anx-callout-info text-sm">

@@ -49,6 +49,12 @@ type Props = {
   primarySubjectSlug: string | null;
 };
 
+function normalizeStudentHref(href: string | null | undefined): string {
+  if (!href) return '/student/live';
+  if (href.startsWith('/learn/')) return '/student/live';
+  return href;
+}
+
 export function StudentDashboardView({
   displayName,
   gamification,
@@ -68,7 +74,7 @@ export function StudentDashboardView({
     background: `conic-gradient(var(--anx-primary) ${practiceDaysRingDeg}deg, var(--anx-surface-container-high) 0)`,
   };
 
-  const timetableHref = primarySubjectSlug ? `/learn/${primarySubjectSlug}` : '/dashboard';
+  const timetableHref = primarySubjectSlug ? '/student/live' : '/dashboard';
 
   return (
     <div className="stu-dash">
@@ -145,7 +151,7 @@ export function StudentDashboardView({
                   const skillTitleOk = Boolean(s.nextSkillName?.trim());
                   const showFallbackChips = !skillTitleOk || !s.emoji?.trim();
                   return (
-                    <Link key={s.id} href={s.nextHref} className="stu-dash-tile">
+                    <Link key={s.id} href={normalizeStudentHref(s.nextHref)} className="stu-dash-tile">
                       <span className="stu-dash-tile-icon" style={{ background: accent.bg, color: accent.icon }}>
                         {s.emoji?.trim() ? s.emoji : s.title.slice(0, 2)}
                       </span>

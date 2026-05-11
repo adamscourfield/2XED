@@ -8,10 +8,11 @@ import { PlanDetail } from './PlanDetail';
 import type { CurriculumPlanDetail } from '@/app/api/curriculum-plans/[planId]/route';
 
 interface Props {
-  params: { planId: string };
+  params: Promise<{ planId: string }>;
 }
 
 export default async function CurriculumPlanPage({ params }: Props) {
+  const { planId } = await params;
   const session = await getServerSession(authOptions);
   if (!session?.user) redirect('/login');
   const user = session.user as { id: string; role?: string };
@@ -22,7 +23,7 @@ export default async function CurriculumPlanPage({ params }: Props) {
   if (!planModel) notFound();
 
   const raw = await planModel.findUnique({
-    where: { id: params.planId },
+    where: { id: planId },
     include: {
       subject: { select: { id: true, title: true } },
       units: {

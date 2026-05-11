@@ -4,9 +4,9 @@ import { useState, useCallback } from 'react';
 import type {
   QuestionBlock as QuestionBlockType,
   SubQuestion,
-  MarkResult,
 } from '@/features/content/types';
 import { CanvasInput, type CanvasInputData } from '@/components/question/CanvasInput';
+import type { MarkResult } from '@/features/qa/AIMarkingService';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -56,6 +56,7 @@ function localMark(sub: SubQuestion, answer: string): MarkResult {
   return {
     correct,
     score: correct ? 1 : 0,
+    criteria: [],
     feedback: correct ? 'Correct.' : 'Incorrect — check your answer.',
     wtm: correct ? 'You selected the right answer.' : '',
     ebi: correct ? '' : `The correct answer is: ${sub.acceptedAnswers?.[0] ?? ''}`,

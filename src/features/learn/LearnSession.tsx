@@ -77,7 +77,7 @@ interface Props {
   subject: Subject;
   skill: Skill;
   items: Item[];
-  retryItems: Item[];
+  retryItems?: Item[];
   userId: string;
   gamification?: GamificationSummary;
   hadRecentRepeatFailure?: boolean;
@@ -89,7 +89,7 @@ type RecoveryState = 'recovered' | 'improving' | 'still_needs_support';
 
 const SHOW_DEBUG = process.env.NEXT_PUBLIC_SHOW_DEBUG === 'true';
 
-export function LearnSession({ subject, skill, items, retryItems, userId, gamification, hadRecentRepeatFailure = false, explanationRoute }: Props) {
+export function LearnSession({ subject, skill, items, retryItems = [], userId, gamification, hadRecentRepeatFailure = false, explanationRoute }: Props) {
   const [phase, setPhase] = useState<Phase>('intro');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState('');

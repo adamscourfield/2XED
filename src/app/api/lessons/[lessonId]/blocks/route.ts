@@ -13,7 +13,8 @@ const createSchema = z.object({
   sortOrder: z.number().int().min(0).optional(),
 });
 
-export async function POST(req: NextRequest, { params }: { params: { lessonId: string } }) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ lessonId: string }> }) {
+  const { lessonId } = await params;
   const session = await getServerSession(authOptions);
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const user = session.user as { id: string; role?: string };
@@ -24,7 +25,7 @@ export async function POST(req: NextRequest, { params }: { params: { lessonId: s
   const blockModel = (prisma as any).lessonBlock;
   if (!lessonModel || !blockModel) return NextResponse.json({ error: 'Model unavailable' }, { status: 503 });
 
-  const lesson = await lessonModel.findUnique({ where: { id: params.lessonId }, select: { teacherUserId: true } });
+  const lesson = await lessonModel.findUnique({ where: { id: lessonId }, select: { teacherUserId: true } });
   if (!lesson) return NextResponse.json({ error: 'Not found' }, { status: 404 });
   if (lesson.teacherUserId !== user.id && user.role !== 'ADMIN') {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
@@ -38,7 +39,7 @@ export async function POST(req: NextRequest, { params }: { params: { lessonId: s
   let sortOrder = parsed.data.sortOrder;
   if (sortOrder === undefined) {
     const last = await blockModel.findFirst({
-      where: { lessonId: params.lessonId },
+      where: { lessonId },
       orderBy: { sortOrder: 'desc' as const },
       select: { sortOrder: true },
     });
@@ -47,7 +48,7 @@ export async function POST(req: NextRequest, { params }: { params: { lessonId: s
 
   const block = await blockModel.create({
     data: {
-      lessonId: params.lessonId,
+      lessonId,
       type: parsed.data.type,
       title: parsed.data.title ?? null,
       sortOrder,

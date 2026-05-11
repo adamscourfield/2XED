@@ -7,8 +7,9 @@ import { z } from 'zod';
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { lessonId: string; blockId: string } }
+  { params }: { params: Promise<{ lessonId: string; blockId: string }> }
 ) {
+  const { lessonId, blockId } = await params;
   const session = await getServerSession(authOptions);
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const user = session.user as { id: string; role?: string };
@@ -18,10 +19,10 @@ export async function PUT(
   if (!blockModel) return NextResponse.json({ error: 'Model unavailable' }, { status: 503 });
 
   const block = await blockModel.findUnique({
-    where: { id: params.blockId },
+    where: { id: blockId },
     include: { lesson: { select: { teacherUserId: true } } },
   });
-  if (!block || block.lessonId !== params.lessonId) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  if (!block || block.lessonId !== lessonId) return NextResponse.json({ error: 'Not found' }, { status: 404 });
   if (block.lesson.teacherUserId !== user.id && user.role !== 'ADMIN') {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
@@ -34,7 +35,7 @@ export async function PUT(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const itemModel = (prisma as any).lessonItem;
   const ownedItems = await itemModel.findMany({
-    where: { id: { in: parsed.data.itemIds }, blockId: params.blockId },
+    where: { id: { in: parsed.data.itemIds }, blockId },
     select: { id: true },
   });
   if (ownedItems.length !== parsed.data.itemIds.length) {

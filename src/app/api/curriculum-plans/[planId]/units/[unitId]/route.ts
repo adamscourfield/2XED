@@ -37,13 +37,14 @@ const UNIT_INCLUDE = {
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { planId: string; unitId: string } },
+  { params }: { params: Promise<{ planId: string; unitId: string }> },
 ) {
+  const { planId, unitId } = await params;
   const session = await getServerSession(authOptions);
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const user = session.user as { id: string; role?: string };
 
-  const unit = await resolveUnit(params.unitId, params.planId, user.id, user.role ?? '');
+  const unit = await resolveUnit(unitId, planId, user.id, user.role ?? '');
   if (!unit) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
   const parsed = patchSchema.safeParse(await req.json());
@@ -71,9 +72,9 @@ export async function PATCH(
   // C1: wrap skill replacement in a transaction to prevent partial-update corruption
   if (skillIds !== undefined) {
     const [, updated] = await (prisma as any).$transaction([
-      (prisma as any).curriculumUnitSkill.deleteMany({ where: { unitId: params.unitId } }),
+      (prisma as any).curriculumUnitSkill.deleteMany({ where: { unitId } }),
       unitModel.update({
-        where: { id: params.unitId },
+        where: { id: unitId },
         data: { ...data, skills: { create: skillIds.map((skillId: string) => ({ skillId })) } },
         include: UNIT_INCLUDE,
       }),
@@ -82,7 +83,7 @@ export async function PATCH(
   }
 
   const updated = await unitModel.update({
-    where: { id: params.unitId },
+    where: { id: unitId },
     data,
     include: UNIT_INCLUDE,
   });
@@ -94,16 +95,17 @@ export async function PATCH(
 
 export async function DELETE(
   _req: NextRequest,
-  { params }: { params: { planId: string; unitId: string } },
+  { params }: { params: Promise<{ planId: string; unitId: string }> },
 ) {
+  const { planId, unitId } = await params;
   const session = await getServerSession(authOptions);
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const user = session.user as { id: string; role?: string };
 
-  const unit = await resolveUnit(params.unitId, params.planId, user.id, user.role ?? '');
+  const unit = await resolveUnit(unitId, planId, user.id, user.role ?? '');
   if (!unit) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  await (prisma as any).curriculumUnit.delete({ where: { id: params.unitId } });
+  await (prisma as any).curriculumUnit.delete({ where: { id: unitId } });
   return new NextResponse(null, { status: 204 });
 }

@@ -60,7 +60,7 @@ export default async function CurriculumPage() {
     : [];
 
   return (
-    <LearningPageShell appChrome="teacher" hideHeader maxWidthClassName="max-w-3xl">
+    <LearningPageShell title="Curriculum" appChrome="teacher" hideHeader maxWidthClassName="max-w-3xl">
       <CurriculumPlanner plans={plans} subjects={subjects} />
     </LearningPageShell>
   );

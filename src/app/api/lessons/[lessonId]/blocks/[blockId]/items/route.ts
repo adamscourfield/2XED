@@ -32,13 +32,14 @@ const createSchema = z.object({
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { lessonId: string; blockId: string } }
+  { params }: { params: Promise<{ lessonId: string; blockId: string }> }
 ) {
+  const { lessonId, blockId } = await params;
   const session = await getServerSession(authOptions);
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const user = session.user as { id: string; role?: string };
 
-  const block = await authorizeBlock(params.lessonId, params.blockId, user.id, user.role ?? '');
+  const block = await authorizeBlock(lessonId, blockId, user.id, user.role ?? '');
   if (!block) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -82,7 +83,7 @@ export async function POST(
   let sortOrder = parsed.data.sortOrder;
   if (sortOrder === undefined) {
     const last = await itemModel.findFirst({
-      where: { blockId: params.blockId },
+      where: { blockId },
       orderBy: { sortOrder: 'desc' as const },
       select: { sortOrder: true },
     });
@@ -91,7 +92,7 @@ export async function POST(
 
   const item = await itemModel.create({
     data: {
-      blockId: params.blockId,
+      blockId,
       itemType: parsed.data.itemType,
       answerMode: parsed.data.answerMode ?? null,
       content: parsed.data.content,

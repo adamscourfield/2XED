@@ -7,7 +7,8 @@ import { AppChrome } from '@/components/AppChrome';
 import { LessonBuilder } from '@/app/teacher/lessons/[lessonId]/LessonBuilder';
 import type { LessonBuilderData } from '@/app/teacher/lessons/[lessonId]/LessonBuilder';
 
-export default async function LessonBuilderPage({ params }: { params: { lessonId: string } }) {
+export default async function LessonBuilderPage({ params }: { params: Promise<{ lessonId: string }> }) {
+  const { lessonId } = await params;
   const session = await getServerSession(authOptions);
   if (!session?.user) redirect('/login');
 
@@ -29,7 +30,7 @@ export default async function LessonBuilderPage({ params }: { params: { lessonId
   }
 
   const lesson = await lessonModel.findUnique({
-    where: { id: params.lessonId },
+    where: { id: lessonId },
     include: {
       subject: { select: { id: true, title: true, slug: true } },
       curriculumUnit: { select: { id: true, title: true } },

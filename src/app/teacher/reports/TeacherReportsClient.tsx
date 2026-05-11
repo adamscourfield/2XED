@@ -1,7 +1,12 @@
 "use client";
 
-import { useId, useState, type ReactNode } from "react";
+import { useId, useState, type CSSProperties, type ReactNode } from "react";
 import Link from "next/link";
+
+type IconProps = {
+  className?: string;
+  style?: CSSProperties;
+};
 
 const REPORT_TABS = [
   { id: "dle", label: "DLE overview" },
@@ -106,16 +111,16 @@ function IconBell({ className }: { className?: string }) {
   );
 }
 
-function IconStar({ className, filled }: { className?: string; filled?: boolean }) {
+function IconStar({ className, style, filled }: IconProps & { filled?: boolean }) {
   if (filled) {
     return (
-      <svg className={className} width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <svg className={className} style={style} width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
         <path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7L12 17.8 5.7 21 8 14 2 9.4h7.6L12 2Z" />
       </svg>
     );
   }
   return (
-    <svg className={className} width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
+    <svg className={className} style={style} width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
       <path
         d="M12 2l2.4 7.4H22l-6 4.6 2.3 7L12 17.8 5.7 21 8 14 2 9.4h7.6L12 2Z"
         stroke="currentColor"
@@ -126,9 +131,9 @@ function IconStar({ className, filled }: { className?: string; filled?: boolean 
   );
 }
 
-function IconBrain({ className }: { className?: string }) {
+function IconBrain({ className, style }: IconProps) {
   return (
-    <svg className={className} width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
+    <svg className={className} style={style} width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
       <path
         d="M12 5a3 3 0 0 0-3 3v1a3 3 0 1 0 6 0V8a3 3 0 0 0-3-3Z"
         stroke="currentColor"
@@ -146,9 +151,9 @@ function IconBrain({ className }: { className?: string }) {
   );
 }
 
-function IconClock({ className }: { className?: string }) {
+function IconClock({ className, style }: IconProps) {
   return (
-    <svg className={className} width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
+    <svg className={className} style={style} width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
       <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.75" />
       <path d="M12 7v5l3 2" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
     </svg>

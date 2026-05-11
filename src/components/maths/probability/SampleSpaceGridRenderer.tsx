@@ -11,6 +11,7 @@ export function SampleSpaceGridRenderer({ visual, maxWidth = 520 }: Props) {
   const { rowLabels, columnLabels, cells } = visual;
   const base = Math.min(maxWidth, 520);
   const labelColW = Math.max(36, Math.min(72, base * 0.14));
+  const colCount = columnLabels.length;
   const cellMin = colCount > 6 ? 44 : 52;
 
   return (

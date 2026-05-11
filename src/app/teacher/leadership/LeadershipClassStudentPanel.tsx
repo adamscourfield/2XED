@@ -38,6 +38,7 @@ type Props = {
 
 export function LeadershipClassStudentPanel({
   storageKey,
+  classroomId,
   defaultOpen,
   windowDays = 30,
   classSummary,

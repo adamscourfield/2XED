@@ -84,8 +84,9 @@ async function callAnthropic(apiKey: string, prompt: string, count: number): Pro
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { lessonId: string; blockId: string } }
+  { params }: { params: Promise<{ lessonId: string; blockId: string }> }
 ) {
+  const { lessonId, blockId } = await params;
   const session = await getServerSession(authOptions);
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const user = session.user as { id: string; role?: string };
@@ -95,11 +96,11 @@ export async function POST(
   if (!blockModel) return NextResponse.json({ error: 'Model unavailable' }, { status: 503 });
 
   const block = await blockModel.findUnique({
-    where: { id: params.blockId },
+    where: { id: blockId },
     include: { lesson: { select: { teacherUserId: true, id: true } } },
   });
 
-  if (!block || block.lessonId !== params.lessonId)
+  if (!block || block.lessonId !== lessonId)
     return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
   if (block.lesson.teacherUserId !== user.id && user.role !== 'ADMIN')

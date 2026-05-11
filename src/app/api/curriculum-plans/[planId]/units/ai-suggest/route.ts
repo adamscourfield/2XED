@@ -139,8 +139,9 @@ async function callAnthropic(prompt: string): Promise<UnitAiSuggestion> {
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { planId: string } },
+  { params }: { params: Promise<{ planId: string }> },
 ) {
+  const { planId } = await params;
   const session = await getServerSession(authOptions);
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const user = session.user as { id: string; role?: string };
@@ -162,7 +163,7 @@ export async function POST(
   if (!planModel) return NextResponse.json({ error: 'Model unavailable' }, { status: 503 });
 
   const plan = await planModel.findUnique({
-    where: { id: params.planId },
+    where: { id: planId },
     select: { teacherUserId: true, subjectId: true },
   });
   if (!plan || plan.teacherUserId !== user.id) {

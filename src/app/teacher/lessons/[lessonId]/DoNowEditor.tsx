@@ -125,7 +125,7 @@ function CurriculumBanner({
         </svg>
         <p className="text-sm text-[#065f46]">
           Curriculum context: <strong>{curriculumUnit.title}</strong>
-          <span className="ml-1.5 text-[#047857] font-normal">— AI suggestions are targeted at this unit's prerequisites</span>
+          <span className="ml-1.5 font-normal text-[#047857]">— AI suggestions are targeted at this unit&apos;s prerequisites</span>
         </p>
       </div>
     );

@@ -15,7 +15,7 @@
  *     --compiler-options '{"module":"CommonJS"}' scripts/generate-english-animations.ts --route A
  */
 
-import { PrismaClient } from '@prisma/client';
+import { Prisma, PrismaClient } from '@prisma/client';
 import { z } from 'zod';
 
 const prisma = new PrismaClient();
@@ -362,7 +362,7 @@ async function main() {
     return;
   }
 
-  const where: Parameters<typeof prisma.explanationRoute.findMany>[0]['where'] = {
+  const where: Prisma.ExplanationRouteWhereInput = {
     isActive: true,
     animationGeneratedAt: null,
     skill: {

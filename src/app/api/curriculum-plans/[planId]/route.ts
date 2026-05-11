@@ -85,13 +85,14 @@ async function resolvePlan(planId: string, userId: string, role: string) {
 
 export async function GET(
   _req: NextRequest,
-  { params }: { params: { planId: string } },
+  { params }: { params: Promise<{ planId: string }> },
 ) {
+  const { planId } = await params;
   const session = await getServerSession(authOptions);
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const user = session.user as { id: string; role?: string };
 
-  const plan = await resolvePlan(params.planId, user.id, user.role ?? '');
+  const plan = await resolvePlan(planId, user.id, user.role ?? '');
   if (!plan) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
   const detail: CurriculumPlanDetail = {
@@ -130,13 +131,14 @@ export async function GET(
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { planId: string } },
+  { params }: { params: Promise<{ planId: string }> },
 ) {
+  const { planId } = await params;
   const session = await getServerSession(authOptions);
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const user = session.user as { id: string; role?: string };
 
-  const plan = await resolvePlan(params.planId, user.id, user.role ?? '');
+  const plan = await resolvePlan(planId, user.id, user.role ?? '');
   if (!plan) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
   const parsed = patchSchema.safeParse(await req.json());
@@ -145,28 +147,29 @@ export async function PATCH(
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   await (prisma as any).curriculumPlan.update({
-    where: { id: params.planId },
+    where: { id: planId },
     data: parsed.data,
   });
 
   // Return a clean DTO, not the raw Prisma object
-  return NextResponse.json({ id: params.planId, ...parsed.data });
+  return NextResponse.json({ id: planId, ...parsed.data });
 }
 
 // ── DELETE /api/curriculum-plans/[planId] ────────────────────────────────────
 
 export async function DELETE(
   _req: NextRequest,
-  { params }: { params: { planId: string } },
+  { params }: { params: Promise<{ planId: string }> },
 ) {
+  const { planId } = await params;
   const session = await getServerSession(authOptions);
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const user = session.user as { id: string; role?: string };
 
-  const plan = await resolvePlan(params.planId, user.id, user.role ?? '');
+  const plan = await resolvePlan(planId, user.id, user.role ?? '');
   if (!plan) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  await (prisma as any).curriculumPlan.delete({ where: { id: params.planId } });
+  await (prisma as any).curriculumPlan.delete({ where: { id: planId } });
   return new NextResponse(null, { status: 204 });
 }

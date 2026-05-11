@@ -28,13 +28,14 @@ const patchSchema = z.object({
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { lessonId: string; blockId: string } }
+  { params }: { params: Promise<{ lessonId: string; blockId: string }> }
 ) {
+  const { lessonId, blockId } = await params;
   const session = await getServerSession(authOptions);
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const user = session.user as { id: string; role?: string };
 
-  const block = await authorizeBlock(params.lessonId, params.blockId, user.id, user.role ?? '');
+  const block = await authorizeBlock(lessonId, blockId, user.id, user.role ?? '');
   if (!block) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
   const body = await req.json();
@@ -43,7 +44,7 @@ export async function PATCH(
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const updated = await (prisma as any).lessonBlock.update({
-    where: { id: params.blockId },
+    where: { id: blockId },
     data: parsed.data,
     include: { items: { orderBy: { sortOrder: 'asc' as const } } },
   });
@@ -53,17 +54,18 @@ export async function PATCH(
 
 export async function DELETE(
   _req: NextRequest,
-  { params }: { params: { lessonId: string; blockId: string } }
+  { params }: { params: Promise<{ lessonId: string; blockId: string }> }
 ) {
+  const { lessonId, blockId } = await params;
   const session = await getServerSession(authOptions);
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const user = session.user as { id: string; role?: string };
 
-  const block = await authorizeBlock(params.lessonId, params.blockId, user.id, user.role ?? '');
+  const block = await authorizeBlock(lessonId, blockId, user.id, user.role ?? '');
   if (!block) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  await (prisma as any).lessonBlock.delete({ where: { id: params.blockId } });
+  await (prisma as any).lessonBlock.delete({ where: { id: blockId } });
 
   return NextResponse.json({ ok: true });
 }

@@ -10,7 +10,8 @@ const schema = z.object({
   blockIds: z.array(z.string()).min(1),
 });
 
-export async function PUT(req: NextRequest, { params }: { params: { lessonId: string } }) {
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ lessonId: string }> }) {
+  const { lessonId } = await params;
   const session = await getServerSession(authOptions);
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const user = session.user as { id: string; role?: string };
@@ -21,7 +22,7 @@ export async function PUT(req: NextRequest, { params }: { params: { lessonId: st
   const blockModel = (prisma as any).lessonBlock;
   if (!lessonModel || !blockModel) return NextResponse.json({ error: 'Model unavailable' }, { status: 503 });
 
-  const lesson = await lessonModel.findUnique({ where: { id: params.lessonId }, select: { teacherUserId: true } });
+  const lesson = await lessonModel.findUnique({ where: { id: lessonId }, select: { teacherUserId: true } });
   if (!lesson) return NextResponse.json({ error: 'Not found' }, { status: 404 });
   if (lesson.teacherUserId !== user.id && user.role !== 'ADMIN') {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
@@ -33,7 +34,7 @@ export async function PUT(req: NextRequest, { params }: { params: { lessonId: st
 
   // SEC-1: Verify all submitted blockIds actually belong to this lesson
   const ownedBlocks = await blockModel.findMany({
-    where: { id: { in: parsed.data.blockIds }, lessonId: params.lessonId },
+    where: { id: { in: parsed.data.blockIds }, lessonId },
     select: { id: true },
   });
   if (ownedBlocks.length !== parsed.data.blockIds.length) {

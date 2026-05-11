@@ -26,13 +26,14 @@ async function verifyOwner(planId: string, userId: string): Promise<boolean> {
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { planId: string } },
+  { params }: { params: Promise<{ planId: string }> },
 ) {
+  const { planId } = await params;
   const session = await getServerSession(authOptions);
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const user = session.user as { id: string; role?: string };
 
-  const owned = await verifyOwner(params.planId, user.id);
+  const owned = await verifyOwner(planId, user.id);
   if (!owned) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
   const parsed = createSchema.safeParse(await req.json());
@@ -51,7 +52,7 @@ export async function POST(
 
   // Calculate next sortOrder
   const maxUnit = await unitModel.findFirst({
-    where: { planId: params.planId },
+    where: { planId },
     orderBy: { sortOrder: 'desc' as const },
     select: { sortOrder: true },
   });
@@ -62,7 +63,7 @@ export async function POST(
   const unit = await unitModel.create({
     data: {
       ...rest,
-      planId: params.planId,
+      planId,
       sortOrder: nextSort,
       dateStart: dateStart ? new Date(dateStart) : null,
       dateEnd: dateEnd ? new Date(dateEnd) : null,
