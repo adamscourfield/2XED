@@ -93,17 +93,19 @@ export function LiveWhiteboardViewer({ logicalWidth, logicalHeight, strokes, cla
     ctx.scale(cw / logicalWidth, ch / logicalHeight);
     paint(ctx, strokes, logicalWidth, logicalHeight, transparent);
     ctx.restore();
-  }, [logicalWidth, logicalHeight, strokes]);
+  // H3: transparent must be in deps — background rendering changes when it flips.
+  }, [logicalWidth, logicalHeight, strokes, transparent]);
 
   return (
     <div ref={wrapRef} className={`flex min-h-0 w-full flex-1 flex-col items-center justify-center ${className ?? ''}`}>
+      {/* L5: role + aria-label so screen readers know what the canvas contains. */}
       <canvas
         ref={canvasRef}
+        role="img"
+        aria-label="Teacher whiteboard"
         className="touch-none rounded-lg shadow-lg"
         style={{ maxWidth: '100%', maxHeight: '100%', background: transparent ? 'transparent' : undefined }}
-      >
-        Whiteboard unavailable
-      </canvas>
+      />
     </div>
   );
 }

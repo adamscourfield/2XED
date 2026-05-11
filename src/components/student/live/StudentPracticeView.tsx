@@ -101,7 +101,16 @@ export function StudentPracticeView({
     };
   }, []);
 
-  useLivePhasePrimaryFocus(`${question.id}-${questionNumber}`);
+  // M2: reset answer and confidence when question.id changes within a multi-question sequence.
+  useEffect(() => {
+    setAnswer(initialAnswer);
+    setConfidence(null);
+    setCanvasData(null);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [question.id]);
+
+  // M1: skip focus management when parent unified shell is already handling it.
+  useLivePhasePrimaryFocus(embedChromeless ? '' : `${question.id}-${questionNumber}`);
 
   const isCanvasInput = question.type === 'CANVAS_INPUT';
   const isExtendedWriting = question.type === 'EXTENDED_WRITING';

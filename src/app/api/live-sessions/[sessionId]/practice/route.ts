@@ -151,13 +151,22 @@ export async function POST(req: NextRequest, { params }: Props) {
       return NextResponse.json({ error: 'Unable to select practice items for the targeted students.' }, { status: 404 });
     }
 
+    // L6: filter out null-item selections before building assignments — students who have
+    // answered all available items get no item rather than a runtime crash from null!.
     const resolvedAssignments: Array<[string, Awaited<ReturnType<typeof selectLiveItem>>]> =
-      batchResults.map(({ studentUserId, selection }) => [studentUserId, selection]);
+      batchResults
+        .filter(({ selection }) => selection.item !== null)
+        .map(({ studentUserId, selection }) => [studentUserId, selection]);
+
+    if (resolvedAssignments.length === 0) {
+      return NextResponse.json({ error: 'No practice items available — students may have answered everything.' }, { status: 404 });
+    }
 
     const individualAssignments = Object.fromEntries(
       resolvedAssignments.map(([studentUserId, selection]) => [
         studentUserId,
         {
+          // Safe cast: we filtered null items above.
           item: buildPracticeItemPayload(selection.item!),
           selectionReason: selection.selectionReason,
           score: selection.score,

@@ -106,17 +106,36 @@ export async function POST(req: NextRequest, { params }: Props) {
 
   // Idempotency guard — if this exact item was already submitted in this session
   // (e.g. rapid double-tap), return the earlier result rather than creating a duplicate.
+  // H5: re-derive nextItem on the duplicate path so the student isn't stranded mid-queue.
   const existing = await prisma.liveAttempt.findFirst({
     where: { liveSessionId: sessionId, studentUserId: userId, itemId },
     select: { correct: true, markingResult: true },
     orderBy: { createdAt: 'asc' },
   });
   if (existing) {
+    // Re-derive queue position so nextItem is correct for the idempotent response.
+    const participantNow = await prisma.liveParticipant.findUnique({
+      where: { id: participant.id },
+      select: { openingCheckQueue: true, openingCheckIndex: true },
+    });
+    const queueNow = parseOpeningCheckQueue(participantNow?.openingCheckQueue);
+    const idxNow = participantNow?.openingCheckIndex ?? 0;
+    const nextOpeningNow = queueNow[idxNow];
+    let idempotentNextItem: { id: string; question: string; type: string; options: unknown; skillId: string } | null = null;
+    if (nextOpeningNow) {
+      const openingItem = await prisma.item.findUnique({
+        where: { id: nextOpeningNow.itemId },
+        select: { id: true, question: true, type: true, options: true },
+      });
+      if (openingItem) idempotentNextItem = { ...openingItem, skillId: nextOpeningNow.skillId };
+    }
     return NextResponse.json({
       correct: existing.correct,
       markingResult: existing.markingResult,
-      nextItem: null,
-      poolExhausted: false,
+      nextItem: idempotentNextItem,
+      questionNumber: Math.min(idxNow + 1, queueNow.length) || 1,
+      totalQuestions: queueNow.length || 1,
+      poolExhausted: idempotentNextItem === null,
       recheckOutcome: null,
       laneAfterAttempt: participant.currentLane,
     });
@@ -328,6 +347,10 @@ export async function POST(req: NextRequest, { params }: Props) {
     }
   }
 
+  // H7: return queue position so the client can show "Question N of M" for opening-check queues.
+  const queueFinal = parseOpeningCheckQueue(participantAfter?.openingCheckQueue);
+  const idxFinal = participantAfter?.openingCheckIndex ?? 0;
+
   return NextResponse.json({
     correct,
     markingResult,
@@ -340,6 +363,10 @@ export async function POST(req: NextRequest, { params }: Props) {
           skillId: nextItem.skillId,
         }
       : null,
+    // questionNumber is the position just answered (1-based); totalQuestions is queue size.
+    // Falls back to 1/1 for broadcast checks which have no queue.
+    questionNumber: queueFinal.length > 1 ? Math.min(idxFinal, queueFinal.length) : 1,
+    totalQuestions: queueFinal.length > 1 ? queueFinal.length : 1,
     poolExhausted: nextItem === null,
     recheckOutcome,
     laneAfterAttempt,

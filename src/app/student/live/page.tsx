@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
-import { redirect } from 'next/navigation';
+import { redirect, useSearchParams } from 'next/navigation';
 import { AppChrome } from '@/components/AppChrome';
 import { StudentFlowHero } from '@/components/student/StudentFlowHero';
 import { StudentLiveView, type StudentLiveScreen } from '@/components/student/live/StudentLiveView';
@@ -93,10 +93,17 @@ type AppState =
   | { phase: 'feedback'; session: JoinedSession; correct: boolean; nextItem: (Item & { skillId?: string }) | null; index: number; total: number }
   | { phase: 'done'; session: JoinedSession };
 
+// M8: Treat unassigned students (null lane) as LANE_1 for targeted practice/explanation,
+// but let them receive all messages and whiteboards.
 function broadcastTargetsStudentLane(content: CurrentContent, studentLane: string | null | undefined): boolean {
   const lanes = content.targetLanes;
   if (!lanes || lanes.length === 0) return true;
-  if (!studentLane) return true;
+  if (!studentLane) {
+    if (content.contentType === 'PRACTICE' || content.contentType === 'EXPLANATION') {
+      return lanes.includes('LANE_1');
+    }
+    return true;
+  }
   return lanes.includes(studentLane);
 }
 
@@ -191,22 +198,25 @@ const FEEDBACK_INCORRECT_LINES = [
 const FEEDBACK_CORRECT_TITLES = ['Nice one!', 'Got it!', 'Spot on!'] as const;
 const FEEDBACK_INCORRECT_TITLES = ['Not quite…', 'Almost…', 'Keep thinking…'] as const;
 
-export default function StudentLivePage() {
+// ── Inner page (uses useSearchParams — must be inside Suspense) ──────────────
+function StudentLivePageInner() {
   const { data: authSession, status } = useSession();
-  const isPracticeMode = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('mode') === 'practice';
-
-  const initialCode =
-    typeof window !== 'undefined'
-      ? new URLSearchParams(window.location.search).get('code')?.toUpperCase().slice(0, 6) ?? ''
-      : '';
+  // H1: use useSearchParams() so ?code= deep-links and ?mode=practice work correctly.
+  const searchParams = useSearchParams();
+  const isPracticeMode = searchParams.get('mode') === 'practice';
+  const initialCode = (searchParams.get('code') ?? '').toUpperCase().slice(0, 6);
 
   const [joinCode, setJoinCode] = useState(initialCode);
   const [joinCodeFlash, setJoinCodeFlash] = useState(false);
   const [appState, setAppState] = useState<AppState>({ phase: 'join' });
-  const [loading, setLoading] = useState(false);
+  // C3: separate loading flags so join and submit don't interfere.
+  const [joinLoading, setJoinLoading] = useState(false);
+  const [submitBusy, setSubmitBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const [pollSlowSince, setPollSlowSince] = useState<number | null>(null);
+  const [pollErrorCount, setPollErrorCount] = useState(0);
+  // M3: only show "Updating…" after 2 consecutive slow polls.
+  const [slowPollVisible, setSlowPollVisible] = useState(false);
 
   const lastPhaseIndexRef = useRef<number>(-1);
   const lastBroadcastAtRef = useRef<string | null>(null);
@@ -215,9 +225,30 @@ export default function StudentLivePage() {
   const sessionRef = useRef<JoinedSession | null>(null);
   const liveWhiteboardRef = useRef<LiveWhiteboardPayload | null>(null);
   const lastExplanationTelemetryIdRef = useRef<string | null>(null);
-  // Tracks when the current question was shown so responseTimeMs is accurate.
   const questionStartRef = useRef<number>(Date.now());
-  const [pollErrorCount, setPollErrorCount] = useState(0);
+  // H6: prevents trailing poll from pulling student back out of 'done'.
+  const stoppedRef = useRef(false);
+  // M3/M6: track consecutive slow polls and consecutive successes.
+  const consecutiveSlowRef = useRef(0);
+  const consecutiveSuccessRef = useRef(0);
+  // L4: abort in-flight submit on Leave.
+  const submitAbortRef = useRef<AbortController | null>(null);
+  // C3: unmount guard so no setAppState calls after unmount.
+  const aliveRef = useRef(true);
+  useEffect(() => () => { aliveRef.current = false; }, []);
+
+  // M4: confetti latch — stays true for 700ms after leaving feedback so animation completes.
+  const [confettiLatch, setConfettiLatch] = useState(false);
+  const isFeedbackCorrect = appState.phase === 'feedback' && appState.correct;
+  useEffect(() => {
+    if (isFeedbackCorrect) {
+      setConfettiLatch(true);
+    } else if (confettiLatch) {
+      const t = setTimeout(() => setConfettiLatch(false), 700);
+      return () => clearTimeout(t);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isFeedbackCorrect]);
 
   useEffect(() => {
     if (joinCode.length === 6) {
@@ -241,8 +272,6 @@ export default function StudentLivePage() {
     }
   }, [appState]);
 
-  // Reset question timer whenever a new item is shown so responseTimeMs
-  // measures the student's actual thinking time, not the fetch round-trip.
   const currentItemId =
     appState.phase === 'question' ? appState.item.id :
     appState.phase === 'practice' ? appState.item.id :
@@ -254,7 +283,8 @@ export default function StudentLivePage() {
   useEffect(() => {
     const isInSession = appState.phase !== 'join' && appState.phase !== 'done';
     if (!isInSession) {
-      setPollSlowSince(null);
+      consecutiveSlowRef.current = 0;
+      setSlowPollVisible(false);
       if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; }
       return;
     }
@@ -263,16 +293,45 @@ export default function StudentLivePage() {
     if (!sessionId) return;
 
     async function pollSession() {
+      // H6: stop if we've already landed on 'done' or unmounted.
+      if (stoppedRef.current || !aliveRef.current) return;
       const sid = sessionRef.current?.sessionId;
       if (!sid) return;
+
       const pollStartedAt = typeof performance !== 'undefined' ? performance.now() : Date.now();
       try {
         const res = await fetch(`/api/live-sessions/${sid}/student-state`);
-        if (!res.ok) return;
+
+        // C4: handle HTTP errors explicitly rather than silently returning.
+        if (!res.ok) {
+          if (res.status === 401 || res.status === 403) {
+            // Session expired or forbidden — stop polling and show rejoin prompt.
+            if (stoppedRef.current || !aliveRef.current) return;
+            stoppedRef.current = true;
+            setAppState({ phase: 'join' });
+            setError('Your session expired. Please rejoin with a new code.');
+            setPollErrorCount(0);
+          } else {
+            // 5xx or other — count as a network error.
+            setPollErrorCount((n) => n + 1);
+            consecutiveSuccessRef.current = 0;
+          }
+          return;
+        }
+
         const data: SessionPoll = await res.json();
-        setPollErrorCount(0);
+
+        if (stoppedRef.current || !aliveRef.current) return;
+
+        // M6: require 2 consecutive successes before clearing error count.
+        consecutiveSuccessRef.current += 1;
+        if (consecutiveSuccessRef.current >= 2) {
+          setPollErrorCount(0);
+          consecutiveSuccessRef.current = 0;
+        }
 
         if (data.status === 'COMPLETED') {
+          stoppedRef.current = true;
           const sess = sessionRef.current;
           if (sess) setAppState({ phase: 'done', session: sess });
           return;
@@ -287,12 +346,16 @@ export default function StudentLivePage() {
 
         if (data.pendingRecheckItem) {
           const sess = sessionRef.current;
-          const skipRecheckPull =
-            appState.phase === 'question' || appState.phase === 'explanation' || appState.phase === 'feedback';
-          if (sess && !skipRecheckPull) {
-            setAppState({ phase: 'question', session: sess, item: data.pendingRecheckItem, source: 'targeted' });
-            return;
-          }
+          // C1: read the live phase inside a functional updater to avoid stale closure.
+          setAppState((prev) => {
+            const skipRecheckPull =
+              prev.phase === 'question' || prev.phase === 'explanation' || prev.phase === 'feedback';
+            if (sess && !skipRecheckPull && data.pendingRecheckItem) {
+              return { phase: 'question', session: sess, item: data.pendingRecheckItem, source: 'targeted' };
+            }
+            return prev;
+          });
+          if (data.pendingRecheckItem) return;
         }
 
         if (newBroadcast && data.currentContent) {
@@ -318,13 +381,17 @@ export default function StudentLivePage() {
             if (wb.action === 'hide') {
               lastWhiteboardVersionRef.current = wb.version;
               liveWhiteboardRef.current = null;
-              setAppState({ phase: 'waiting', session: sess });
+              // H4: only transition to waiting if we're actually on the whiteboard screen —
+              // don't wipe an in-progress check question.
+              setAppState((prev) =>
+                prev.phase === 'whiteboard'
+                  ? { phase: 'waiting', session: sess }
+                  : prev
+              );
             } else if (wb.action === 'show' || wb.action === 'clear') {
               if (wb.version >= lastWhiteboardVersionRef.current) {
                 lastWhiteboardVersionRef.current = wb.version;
                 liveWhiteboardRef.current = wb;
-                // Stay in explanation phase on 'show' (incremental annotation).
-                // On 'clear' the teacher is resetting the board — exit explanation.
                 setAppState((prev) => {
                   if (prev.phase === 'explanation' && wb.action === 'show') return { ...prev, whiteboard: wb };
                   return { phase: 'whiteboard', session: sess, whiteboard: wb };
@@ -365,23 +432,32 @@ export default function StudentLivePage() {
           lastBroadcastAtRef.current = data.currentContent.broadcastAt;
         }
       } catch {
+        if (!aliveRef.current) return;
         setPollErrorCount((n) => n + 1);
+        consecutiveSuccessRef.current = 0;
       } finally {
+        if (!aliveRef.current) return;
         const elapsed =
           typeof performance !== 'undefined'
             ? performance.now() - pollStartedAt
             : Date.now() - pollStartedAt;
+        // M3: only show "Updating…" after 2 consecutive slow polls to avoid flickering.
         if (elapsed >= 1800) {
-          setPollSlowSince((prev) => prev ?? Date.now());
+          consecutiveSlowRef.current += 1;
+          if (consecutiveSlowRef.current >= 2) setSlowPollVisible(true);
         } else {
-          setPollSlowSince(null);
+          consecutiveSlowRef.current = 0;
+          setSlowPollVisible(false);
         }
       }
     }
 
+    stoppedRef.current = false;
     const pollMs = appState.phase === 'whiteboard' || appState.phase === 'explanation' ? 1500 : 3000;
     pollRef.current = setInterval(pollSession, pollMs);
-    return () => { if (pollRef.current) clearInterval(pollRef.current); };
+    return () => {
+      if (pollRef.current) clearInterval(pollRef.current);
+    };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appState.phase]);
 
@@ -390,14 +466,17 @@ export default function StudentLivePage() {
 
   useLivePhasePrimaryFocus(unifiedSceneKey);
 
+  // H2: narrow memo deps to primitive fields to prevent feedback title flickering.
+  const feedbackSessionId = appState.phase === 'feedback' ? appState.session.sessionId : null;
+  const feedbackCorrect = appState.phase === 'feedback' ? appState.correct : null;
+  const feedbackIndex = appState.phase === 'feedback' ? appState.index : null;
   const feedbackVariantIdx = useMemo(() => {
-    if (appState.phase !== 'feedback') return 0;
+    if (feedbackSessionId === null || feedbackCorrect === null || feedbackIndex === null) return 0;
     let h = 0;
-    const id = appState.session.sessionId;
-    for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) | 0;
-    h = (h + (appState.correct ? 7919 : 9973) + appState.index * 17) | 0;
+    for (let i = 0; i < feedbackSessionId.length; i++) h = (h * 31 + feedbackSessionId.charCodeAt(i)) | 0;
+    h = (h + (feedbackCorrect ? 7919 : 9973) + feedbackIndex * 17) | 0;
     return Math.abs(h);
-  }, [appState]);
+  }, [feedbackSessionId, feedbackCorrect, feedbackIndex]);
 
   const feedbackTitle =
     appState.phase === 'feedback'
@@ -442,7 +521,7 @@ export default function StudentLivePage() {
   async function handleJoin(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
-    setLoading(true);
+    setJoinLoading(true);
     try {
       const res = await fetch('/api/live-sessions/join', {
         method: 'POST',
@@ -459,11 +538,12 @@ export default function StudentLivePage() {
       lastBroadcastAtRef.current = null;
       lastWhiteboardVersionRef.current = -1;
       lastExplanationTelemetryIdRef.current = null;
-      setAppState({ phase: 'waiting', session });
+      stoppedRef.current = false;
+      if (aliveRef.current) setAppState({ phase: 'waiting', session });
     } catch {
-      setError('Network error. Please try again.');
+      if (aliveRef.current) setError('Network error. Please try again.');
     } finally {
-      setLoading(false);
+      if (aliveRef.current) setJoinLoading(false);
     }
   }
 
@@ -474,37 +554,47 @@ export default function StudentLivePage() {
     const skillId = item.skillId ?? session.skill?.id;
     if (!skillId) { setSubmitError('No skill associated with this session.'); return; }
 
-    setLoading(true);
+    // L4: abort any previous in-flight submit.
+    submitAbortRef.current?.abort();
+    const controller = new AbortController();
+    submitAbortRef.current = controller;
+
+    setSubmitBusy(true);
     try {
       const responseTimeMs = Date.now() - questionStartRef.current;
       const res = await fetch(`/api/live-sessions/${session.sessionId}/attempts`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          itemId: item.id,
-          skillId,
-          answer,
-          responseTimeMs,
-        }),
+        body: JSON.stringify({ itemId: item.id, skillId, answer, responseTimeMs }),
+        signal: controller.signal,
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        setSubmitError(data.error ?? 'Failed to submit answer.');
+        if (aliveRef.current) setSubmitError(data.error ?? 'Failed to submit answer.');
         return;
       }
-      const result: { correct: boolean; nextItem: (Item & { skillId?: string }) | null } = await res.json();
-      setAppState({
-        phase: 'feedback',
-        session,
-        correct: result.correct,
-        nextItem: source === 'broadcast' ? null : result.nextItem,
-        index: 1,
-        total: 1,
-      });
-    } catch {
-      setSubmitError('Network error. Please try again.');
+      // H7: server now returns questionNumber + totalQuestions for opening-check queues.
+      const result: {
+        correct: boolean;
+        nextItem: (Item & { skillId?: string }) | null;
+        questionNumber?: number;
+        totalQuestions?: number;
+      } = await res.json();
+      if (aliveRef.current) {
+        setAppState({
+          phase: 'feedback',
+          session,
+          correct: result.correct,
+          nextItem: source === 'broadcast' ? null : result.nextItem,
+          index: result.questionNumber ?? 1,
+          total: result.totalQuestions ?? 1,
+        });
+      }
+    } catch (err) {
+      if ((err as Error).name === 'AbortError') return;
+      if (aliveRef.current) setSubmitError('Network error. Please try again.');
     } finally {
-      setLoading(false);
+      if (aliveRef.current) setSubmitBusy(false);
     }
   }
 
@@ -515,7 +605,12 @@ export default function StudentLivePage() {
     const skillId = item.skillId ?? session.skill?.id;
     if (!skillId) { setSubmitError('No skill associated with this session.'); return; }
 
-    setLoading(true);
+    // L4: abort any previous in-flight submit.
+    submitAbortRef.current?.abort();
+    const controller = new AbortController();
+    submitAbortRef.current = controller;
+
+    setSubmitBusy(true);
     try {
       const responseTimeMs = Date.now() - questionStartRef.current;
       const res = await fetch(`/api/live-sessions/${session.sessionId}/attempts`, {
@@ -535,24 +630,36 @@ export default function StudentLivePage() {
           responseTimeMs,
           ...(confidence ? { confidence } : {}),
         }),
+        signal: controller.signal,
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        setSubmitError(data.error ?? 'Failed to submit answer.');
+        if (aliveRef.current) setSubmitError(data.error ?? 'Failed to submit answer.');
         return;
       }
       const result: { correct: boolean; nextItem: Item | null } = await res.json();
-      setAppState({ phase: 'feedback', session, correct: result.correct, nextItem: result.nextItem, index, total });
-    } catch {
-      setSubmitError('Network error. Please try again.');
+      if (aliveRef.current) {
+        setAppState({ phase: 'feedback', session, correct: result.correct, nextItem: result.nextItem, index, total });
+      }
+    } catch (err) {
+      if ((err as Error).name === 'AbortError') return;
+      if (aliveRef.current) setSubmitError('Network error. Please try again.');
     } finally {
-      setLoading(false);
+      if (aliveRef.current) setSubmitBusy(false);
     }
   }
 
   const session = appState.phase !== 'join' ? (appState as { session: JoinedSession }).session : null;
   const lessonTitle = session?.skill?.name ?? session?.subject.title ?? '';
-  const classLabel = session?.skill?.code ?? session?.subject.title ?? '';
+  // M5: when no skill is linked, avoid duplicating lessonTitle in classLabel.
+  // When skill is linked, show the subject title as context (e.g. "Mathematics" under "Solving linear equations").
+  const classLabel = session ? (session.skill ? session.subject.title : '') : '';
+
+  function handleLeave() {
+    // L4: abort any in-flight submit when the student leaves.
+    submitAbortRef.current?.abort();
+    submitAbortRef.current = null;
+  }
 
   // ── Join screen ─────────────────────────────────────────────────────────
   if (appState.phase === 'join') {
@@ -591,8 +698,8 @@ export default function StudentLivePage() {
                       Codes are not case-sensitive. You need all six characters before joining.
                     </p>
                   </div>
-                  <button type="submit" disabled={loading || joinCode.length !== 6} className="anx-btn-primary w-full py-3.5">
-                    {loading ? 'Joining…' : 'Join lesson'}
+                  <button type="submit" disabled={joinLoading || joinCode.length !== 6} className="anx-btn-primary w-full py-3.5">
+                    {joinLoading ? 'Joining…' : 'Join lesson'}
                   </button>
                 </form>
               </div>
@@ -619,8 +726,10 @@ export default function StudentLivePage() {
       kind: 'check',
       whiteboard: liveWhiteboardRef.current,
       questionStem: stem,
+      // C2: key is passed through so CheckAnswerCard can be keyed per question.
+      questionId: appState.item.id,
       options: opts.length > 0 ? opts : undefined,
-      busy: loading,
+      busy: submitBusy,
       error: submitError,
       onSubmit: submitCheckAnswer,
     };
@@ -646,13 +755,14 @@ export default function StudentLivePage() {
         phaseHint={shellPhaseHint(appState)}
         phaseHintSuffix={
           pollErrorCount >= 2 ? 'Reconnecting…' :
-          pollSlowSince != null ? 'Updating…' :
+          slowPollVisible ? 'Updating…' :
           undefined
         }
         onLeave={
           appState.phase === 'done'
             ? undefined
             : () => {
+                handleLeave();
                 if (appState.phase === 'practice' || appState.phase === 'explanation') {
                   setAppState({ phase: 'waiting', session });
                   return;
@@ -664,7 +774,8 @@ export default function StudentLivePage() {
         <StudentLiveSceneShell sceneKey={unifiedSceneKey}>
           {appState.phase === 'feedback' ? (
             <main className="relative flex flex-1 items-center justify-center px-4 py-10">
-              <StudentFeedbackConfetti active={appState.correct} />
+              {/* M4: confettiLatch stays true for 700ms after leaving feedback */}
+              <StudentFeedbackConfetti active={confettiLatch} />
               <div className="anx-card relative w-full max-w-md space-y-5 p-8 text-center">
                 <div
                   className={`text-5xl ${appState.correct ? 'animate-[anxPulseCorrect_220ms_ease-out]' : 'animate-[anxShakeIncorrect_260ms_ease-out]'}`}
@@ -790,10 +901,13 @@ export default function StudentLivePage() {
                     question={question}
                     questionNumber={appState.index}
                     totalQuestions={appState.total}
-                    busy={loading}
+                    busy={submitBusy}
                     error={submitError}
                     onSubmit={submitPracticeAnswer}
-                    onLeave={() => setAppState({ phase: 'waiting', session: appState.session })}
+                    onLeave={() => {
+                      handleLeave();
+                      setAppState({ phase: 'waiting', session: appState.session });
+                    }}
                     onMessageTeacher={(msg) => coreEscalate({ reason: 'student_message', message: msg })}
                     onNeedHelp={() => coreEscalate({ reason: 'student_help_request' })}
                   />
@@ -811,7 +925,10 @@ export default function StudentLivePage() {
               stepIndex={appState.stepIndex}
               totalSteps={appState.totalSteps}
               whiteboard={appState.whiteboard}
-              onLeave={() => setAppState({ phase: 'waiting', session })}
+              onLeave={() => {
+                handleLeave();
+                setAppState({ phase: 'waiting', session });
+              }}
               onNeedHelp={() => coreEscalate({ reason: 'student_help_request' })}
             />
           ) : null}
@@ -825,7 +942,10 @@ export default function StudentLivePage() {
               lessonTitle={lessonTitle}
               classLabel={classLabel}
               screen={screen}
-              onLeave={() => setAppState({ phase: 'done', session })}
+              onLeave={() => {
+                handleLeave();
+                setAppState({ phase: 'done', session });
+              }}
               onNeedHelp={() => coreEscalate({ reason: 'student_help_request' })}
               onMessageTeacher={(msg) => coreEscalate({ reason: 'student_message', message: msg })}
             />
@@ -833,5 +953,22 @@ export default function StudentLivePage() {
         </StudentLiveSceneShell>
       </StudentLiveUnifiedShell>
     </div>
+  );
+}
+
+// H1: Suspense boundary required by Next.js App Router when using useSearchParams().
+export default function StudentLivePage() {
+  return (
+    <Suspense
+      fallback={
+        <AppChrome variant="student">
+          <main className="anx-shell anx-scene flex flex-1 flex-col items-center justify-center px-4 py-12">
+            <div className="h-11 w-11 animate-spin rounded-full border-4 border-[var(--anx-surface-container-high)] border-t-[var(--anx-primary)]" />
+          </main>
+        </AppChrome>
+      }
+    >
+      <StudentLivePageInner />
+    </Suspense>
   );
 }

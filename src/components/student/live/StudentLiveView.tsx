@@ -35,6 +35,8 @@ export type StudentLiveScreen =
     }
   | {
       kind: 'check';
+      /** C2: used as the React key so CheckAnswerCard state resets between questions. */
+      questionId?: string;
       whiteboard?: LiveWhiteboardPayload | null;
       questionStem: string;
       options?: string[];
@@ -111,6 +113,12 @@ function SidePanel({
   const [draft, setDraft] = useState('');
   const [sentFlash, setSentFlash] = useState(false);
   const sentFlashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // L2: reset draft and close composer when the phase changes so stale text doesn't reappear.
+  useEffect(() => {
+    setDraft('');
+    setMessageOpen(false);
+  }, [guidanceSlotKey]);
 
   useEffect(() => {
     return () => {
@@ -312,7 +320,8 @@ export function StudentLiveView({
   const stripActive = livePhaseToStripStep(screen.kind);
   const phaseHint = phaseHintFor(screen);
   const transitionKey = `${screen.kind}-${screen.kind === 'message' ? screen.message : ''}`;
-  useLivePhasePrimaryFocus(transitionKey);
+  // M1: skip focus management when parent already handles it (unified shell).
+  useLivePhasePrimaryFocus(embedChromeless ? '' : transitionKey);
 
   return (
     <div
@@ -441,9 +450,10 @@ export function StudentLiveView({
                       )}
                     </div>
                   )}
+                  {/* M7: defensive no-op guard in case onDismiss is not provided. */}
                   <button
                     type="button"
-                    onClick={screen.onDismiss}
+                    onClick={screen.onDismiss ?? (() => {})}
                     data-live-primary-focus=""
                     className="anx-btn-primary w-full py-3 text-sm transition-transform active:scale-[0.99]"
                   >
@@ -464,7 +474,9 @@ export function StudentLiveView({
           {screen.kind === 'check' && (
             <>
               <div className="flex min-h-0 flex-col gap-4">
+                {/* C2: keyed on questionId so answer state resets between questions. */}
                 <CheckAnswerCard
+                  key={screen.questionId ?? screen.questionStem}
                   questionStem={screen.questionStem}
                   options={screen.options}
                   busy={screen.busy}
@@ -507,7 +519,7 @@ function WaitingTip() {
         type="button"
         className="ml-2 text-xs font-semibold underline decoration-dotted underline-offset-2"
         style={{ color: 'var(--anx-primary)' }}
-        onClick={() => setI((x) => x + 1)}
+        onClick={() => setI((x) => (x + 1) % WAITING_TIPS.length)}
       >
         Another tip
       </button>
