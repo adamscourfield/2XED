@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import SplashScreen from '@/components/SplashScreen';
 
 const ink = '#2D236E';
 const subhead = '#7C7199';
@@ -130,6 +131,7 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [logoOk, setLogoOk] = useState(true);
   const [remember, setRemember] = useState(false);
+  const [showSplash, setShowSplash] = useState(true);
 
   function routeForRole(role?: string) {
     if (role === 'ADMIN' || role === 'TEACHER' || role === 'LEADERSHIP') return '/teacher/dashboard';
@@ -170,11 +172,13 @@ export default function LoginPage() {
     'flex min-h-[3.5rem] items-center gap-3 rounded-2xl border bg-white px-3 py-2 transition-shadow focus-within:border-[#B8B9E5] focus-within:shadow-[0_0_0_3px_rgba(62,41,211,0.15)]';
 
   return (
-    <main
-      className="relative isolate flex min-h-[100dvh] w-full flex-col items-center justify-center overflow-x-hidden px-5 py-10 sm:px-6"
-      style={{ color: ink }}
-    >
-      <LoginBackdrop />
+    <>
+      {showSplash && <SplashScreen onComplete={() => setShowSplash(false)} />}
+      <main
+        className="relative isolate flex min-h-[100dvh] w-full flex-col items-center justify-center overflow-x-hidden px-5 py-10 sm:px-6"
+        style={{ color: ink }}
+      >
+        <LoginBackdrop />
 
       <div className="relative z-[1] w-full max-w-[420px]">
         <header className="flex flex-col items-center text-center">
@@ -330,5 +334,6 @@ export default function LoginPage() {
         </p>
       </div>
     </main>
+    </>
   );
 }
