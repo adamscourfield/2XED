@@ -1,4 +1,5 @@
 import type { Config } from 'tailwindcss';
+import colors from 'tailwindcss/colors';
 
 const config: Config = {
   content: [
@@ -13,6 +14,7 @@ const config: Config = {
         sans:      ['var(--font-manrope)', 'Manrope', 'system-ui', '-apple-system', 'sans-serif'],
         display:   ['var(--font-jakarta)', 'Plus Jakarta Sans', 'system-ui', '-apple-system', 'sans-serif'],
         landing:   ['var(--font-inter)', 'Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        marketing: ['var(--font-space-grotesk)', 'Space Grotesk', 'system-ui', 'sans-serif'],
       },
       colors: {
         /* Surface hierarchy — 2XED */
@@ -60,6 +62,13 @@ const config: Config = {
         error:        'var(--anx-danger)',
         borderHover:  'var(--anx-border-hover)',
         accentSurface:'var(--anx-primary-soft)',
+
+        /* Ember marketing landing (override Tailwind purple scale selectively) */
+        purple: {
+          ...colors.purple,
+          700: '#5D3A9B',
+          800: '#3B1F7A',
+        },
 
         /* Status colors */
         coral: '#b41340',

@@ -4,6 +4,15 @@ const path = require('node:path');
 const nextConfig = {
   // Explicit root keeps tracing stable across workspace/tooling contexts.
   outputFileTracingRoot: path.join(__dirname),
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'i.pravatar.cc',
+        pathname: '/150/**',
+      },
+    ],
+  },
   allowedDevOrigins: [
     '*.replit.dev',
     '*.janeway.replit.dev',

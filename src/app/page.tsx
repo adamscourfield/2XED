@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import HomePageClient from '@/components/HomePageClient';
+import LandingPage from '@/components/marketing/LandingPage';
 
 export const dynamic = 'force-dynamic';
 
@@ -23,5 +23,5 @@ export const metadata: Metadata = {
 };
 
 export default function HomePage() {
-  return <HomePageClient />;
+  return <LandingPage />;
 }
