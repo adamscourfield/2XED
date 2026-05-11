@@ -673,7 +673,7 @@ export function AppChrome({
         alt=""
         width={512}
         height={512}
-        className="h-9 w-9 shrink-0 sm:h-10 sm:w-10"
+        className="h-14 w-14 shrink-0 sm:h-16 sm:w-16"
         aria-hidden
         priority
       />
@@ -682,7 +682,7 @@ export function AppChrome({
         alt="Ember"
         width={512}
         height={128}
-        className="h-[1.375rem] w-auto shrink-0 sm:h-6"
+        className="h-9 w-auto max-w-[min(11rem,52vw)] shrink-0 object-contain object-left sm:h-10"
         priority
       />
     </>
@@ -702,7 +702,7 @@ export function AppChrome({
         teacherBrandInner
       ) : (
         <>
-          <LogoImage className="h-8 w-auto shrink-0 sm:h-9" />
+          <LogoImage className="h-11 w-auto shrink-0 sm:h-12" />
           <div className="min-w-0 text-left">
             <p className="truncate text-xs font-medium text-[color:var(--anx-text-muted)]">{studentTagline}</p>
           </div>
@@ -717,7 +717,7 @@ export function AppChrome({
       className="flex shrink-0 items-center rounded-xl p-1 outline-none transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-[var(--anx-primary-glow)]"
       aria-label="Home"
     >
-      <LogoImage className="h-7 w-auto sm:h-8" />
+      <LogoImage className="h-9 w-auto sm:h-10" />
     </Link>
   );
 
