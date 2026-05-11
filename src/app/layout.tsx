@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Inter, Plus_Jakarta_Sans, Manrope } from 'next/font/google';
+import { Inter, Plus_Jakarta_Sans, Manrope, Space_Grotesk } from 'next/font/google';
 import './globals.css';
 import { Providers } from './providers';
 
@@ -19,6 +19,12 @@ const manrope = Manrope({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-manrope',
+});
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-space-grotesk',
 });
 
 export const metadata: Metadata = {
@@ -47,7 +53,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${plusJakarta.variable} ${manrope.variable}`}>
+    <html lang="en" className={`${inter.variable} ${plusJakarta.variable} ${manrope.variable} ${spaceGrotesk.variable}`}>
       <body className={`${manrope.className} bg-surface text-on-surface antialiased`}>
         <Providers>{children}</Providers>
       </body>
