@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, type FormEvent } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { LucideIcon } from 'lucide-react';
@@ -120,10 +121,18 @@ const staggerContainer = {
   visible: { transition: { staggerChildren: 0.1 } },
 };
 
+function routeForRole(role?: string) {
+  if (role === 'ADMIN' || role === 'TEACHER' || role === 'LEADERSHIP') return '/teacher/dashboard';
+  return '/dashboard';
+}
+
 export default function LandingPage() {
   const router = useRouter();
   const [showSplash, setShowSplash] = useState(true);
   const [signInOpen, setSignInOpen] = useState(false);
+  const [signInLoading, setSignInLoading] = useState(false);
+  const [signInError, setSignInError] = useState<string | null>(null);
+  const [rememberMe, setRememberMe] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [selectedStudentId, setSelectedStudentId] = useState<number | null>(null);
   const [selectedRouteIndex, setSelectedRouteIndex] = useState<number | null>(null);
@@ -141,13 +150,52 @@ export default function LandingPage() {
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        setSignInOpen(false);
+        if (!signInLoading) setSignInOpen(false);
         setMobileMenuOpen(false);
       }
     };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
-  }, []);
+  }, [signInLoading]);
+
+  useEffect(() => {
+    if (signInOpen) {
+      setSignInError(null);
+      setSignInLoading(false);
+    }
+  }, [signInOpen]);
+
+  async function handleLandingSignIn(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setSignInLoading(true);
+    setSignInError(null);
+
+    const form = new FormData(e.currentTarget);
+    const email = String(form.get('email') || '');
+    const password = String(form.get('password') || '');
+
+    const result = await signIn('credentials', {
+      email,
+      password,
+      remember: rememberMe ? 'true' : 'false',
+      redirect: false,
+    });
+
+    if (result?.error) {
+      setSignInError('Invalid email or password. Please try again.');
+      setSignInLoading(false);
+      return;
+    }
+
+    const sessionRes = await fetch('/api/auth/session');
+    const session = await sessionRes.json().catch(() => null);
+    const role = session?.user?.role as string | undefined;
+
+    setSignInOpen(false);
+    setSignInLoading(false);
+    router.push(routeForRole(role));
+    router.refresh();
+  }
 
   const showToast = useCallback((message: string) => {
     setToast({ message, visible: true });
@@ -232,7 +280,9 @@ export default function LandingPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              onClick={() => setSignInOpen(false)}
+              onClick={() => {
+                if (!signInLoading) setSignInOpen(false);
+              }}
             />
             <div className="absolute inset-0 flex items-center justify-center p-4">
               <motion.div
@@ -248,9 +298,12 @@ export default function LandingPage() {
               >
                 <button
                   type="button"
-                  onClick={() => setSignInOpen(false)}
-                  className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 transition-colors hover:bg-gray-200"
+                  onClick={() => {
+                    if (!signInLoading) setSignInOpen(false);
+                  }}
+                  className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 transition-colors hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50"
                   aria-label="Close"
+                  disabled={signInLoading}
                 >
                   <X className="h-4 w-4 text-gray-600" />
                 </button>
@@ -264,24 +317,20 @@ export default function LandingPage() {
                   </h2>
                   <p className="mt-1 text-sm text-gray-500">Sign in to your Ember dashboard</p>
                 </div>
-                <form
-                  className="space-y-4"
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    setSignInOpen(false);
-                    router.push('/login');
-                  }}
-                >
+                <form className="space-y-4" onSubmit={handleLandingSignIn}>
                   <div>
                     <label htmlFor="landing-signin-email" className="mb-1.5 block text-sm font-medium text-gray-700">
                       Email
                     </label>
                     <input
                       id="landing-signin-email"
+                      name="email"
                       type="email"
                       placeholder="teacher@school.edu"
                       autoComplete="email"
-                      className="w-full rounded-xl border-2 border-gray-200 px-4 py-3 text-gray-700 transition-colors focus:border-purple-800 focus:outline-none"
+                      required
+                      disabled={signInLoading}
+                      className="w-full rounded-xl border-2 border-gray-200 px-4 py-3 text-gray-700 transition-colors focus:border-purple-800 focus:outline-none disabled:opacity-60"
                     />
                   </div>
                   <div>
@@ -290,26 +339,41 @@ export default function LandingPage() {
                     </label>
                     <input
                       id="landing-signin-password"
+                      name="password"
                       type="password"
                       placeholder="••••••••"
                       autoComplete="current-password"
-                      className="w-full rounded-xl border-2 border-gray-200 px-4 py-3 text-gray-700 transition-colors focus:border-purple-800 focus:outline-none"
+                      required
+                      disabled={signInLoading}
+                      className="w-full rounded-xl border-2 border-gray-200 px-4 py-3 text-gray-700 transition-colors focus:border-purple-800 focus:outline-none disabled:opacity-60"
                     />
                   </div>
                   <div className="flex items-center justify-between text-sm">
                     <label className="flex cursor-pointer items-center gap-2">
-                      <input type="checkbox" className="h-4 w-4 rounded border-gray-300 text-purple-800 focus:ring-purple-800" />
+                      <input
+                        type="checkbox"
+                        checked={rememberMe}
+                        onChange={(ev) => setRememberMe(ev.target.checked)}
+                        disabled={signInLoading}
+                        className="h-4 w-4 rounded border-gray-300 text-purple-800 focus:ring-purple-800 disabled:opacity-60"
+                      />
                       <span className="text-gray-600">Remember me</span>
                     </label>
                     <Link href="mailto:admin@ember.local?subject=Password%20reset%20request" className="font-medium text-purple-800 hover:underline">
                       Forgot password?
                     </Link>
                   </div>
+                  {signInError ? (
+                    <div className="rounded-xl border border-red-200 bg-red-50 px-3 py-2.5 text-sm text-red-900" role="alert">
+                      {signInError}
+                    </div>
+                  ) : null}
                   <button
                     type="submit"
-                    className="w-full rounded-xl bg-gradient-to-r from-purple-800 via-purple-600 to-red-400 py-3.5 font-semibold text-white transition-all hover:shadow-lg hover:shadow-purple-500/30"
+                    disabled={signInLoading}
+                    className="w-full rounded-xl bg-gradient-to-r from-purple-800 via-purple-600 to-red-400 py-3.5 font-semibold text-white transition-all hover:shadow-lg hover:shadow-purple-500/30 disabled:cursor-not-allowed disabled:opacity-55"
                   >
-                    Sign In
+                    {signInLoading ? 'Signing in…' : 'Sign In'}
                   </button>
                 </form>
                 <div className="mt-6 text-center">
