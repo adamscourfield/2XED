@@ -441,17 +441,7 @@ export function AppChrome({
         { href: "/teacher/live", label: "Live", icon: "bolt" },
       ],
     },
-    {
-      title: "INSIGHTS",
-      items: [{ href: "/teacher/reports", label: "Reports", icon: "chart" }],
-    },
-    {
-      title: "SYSTEM",
-      items: [{ href: "/teacher/settings", label: "Settings", icon: "gear" }],
-    },
   ];
-
-  const teacherNavSecondary: NavItem[] = [{ href: "/teacher/help", label: "Help Centre", icon: "help" }];
 
   const liveStudentItem: NavItem = {
     href: "/student/live",
@@ -679,24 +669,6 @@ export function AppChrome({
             </nav>
           </div>
         ))}
-        <div className="mx-1 border-t border-[#E8EAEF]" />
-        <nav className="flex flex-col gap-1.5" aria-label="Help">
-          {teacherNavSecondary.map((item) => {
-            const active = isNavActive(pathname, item.href);
-            return (
-              <NavRow
-                key={item.href}
-                href={item.href}
-                label={item.label}
-                description={item.description}
-                iconKind={item.icon}
-                active={active}
-                onNavigate={onNavigate}
-                variant="teacher"
-              />
-            );
-          })}
-        </nav>
       </div>
     );
   }

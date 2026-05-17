@@ -104,6 +104,15 @@ export async function POST(req: NextRequest, { params }: Props) {
   }
   if (!item) return NextResponse.json({ error: 'Item not found' }, { status: 404 });
 
+  // Validate that the submitted skillId belongs to this session's subject to prevent
+  // a student from recording attempts against arbitrary skills.
+  const skillBelongsToSubject = await prisma.skill.count({
+    where: { id: skillId, subjectId: liveSession.subjectId },
+  });
+  if (!skillBelongsToSubject) {
+    return NextResponse.json({ error: 'Invalid skillId for this session' }, { status: 400 });
+  }
+
   // Idempotency guard — if this exact item was already submitted in this session
   // (e.g. rapid double-tap), return the earlier result rather than creating a duplicate.
   // H5: re-derive nextItem on the duplicate path so the student isn't stranded mid-queue.

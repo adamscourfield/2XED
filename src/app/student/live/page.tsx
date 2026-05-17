@@ -672,7 +672,7 @@ function StudentLivePageInner() {
                 variant="compact"
                 eyebrow="Live lesson"
                 title="Join your class"
-                lead="Enter the six-letter code your teacher shows on the board."
+                lead="Your teacher will share a six-character code when the session starts."
               />
               <div className="anx-card space-y-5 p-6 sm:p-8">
                 {error ? <div className="anx-callout-danger text-sm">{error}</div> : null}
@@ -695,7 +695,7 @@ function StudentLivePageInner() {
                       spellCheck={false}
                     />
                     <p className="mt-2 text-xs leading-relaxed" style={{ color: 'var(--anx-text-muted)' }}>
-                      Codes are not case-sensitive. You need all six characters before joining.
+                      Not case-sensitive — enter all six characters to join.
                     </p>
                   </div>
                   <button type="submit" disabled={joinLoading || joinCode.length !== 6} className="anx-btn-primary w-full py-3.5">
