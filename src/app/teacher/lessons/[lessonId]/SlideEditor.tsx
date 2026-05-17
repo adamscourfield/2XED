@@ -653,9 +653,17 @@ interface SlideBlockEditorProps {
   lessonId: string;
   items: LessonItem[];
   blockVariant: 'explain' | 'model';
+  lessonTopic?: string;
+  lessonSubjectTitle?: string;
+  blockTitle?: string | null;
   onItemCreated: (item: LessonItem) => void;
   onItemUpdated: (item: LessonItem) => void;
   onItemDeleted: (itemId: string) => void;
+}
+
+interface AiSlide {
+  body: string;
+  speakerNote?: string;
 }
 
 function SlideBlockEditor({
@@ -663,6 +671,9 @@ function SlideBlockEditor({
   lessonId,
   items,
   blockVariant,
+  lessonTopic = '',
+  lessonSubjectTitle = '',
+  blockTitle,
   onItemCreated,
   onItemUpdated,
   onItemDeleted,
@@ -671,6 +682,61 @@ function SlideBlockEditor({
   const [adding, setAdding] = useState(false);
   // High #5: ConfirmModal state
   const [confirmDelete, setConfirmDelete] = useState<{ itemId: string } | null>(null);
+
+  // AI slide generation state
+  const [aiGenerating, setAiGenerating] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
+  const [aiSuggestions, setAiSuggestions] = useState<AiSlide[] | null>(null);
+  const [aiAccepting, setAiAccepting] = useState<Set<number>>(new Set());
+
+  const generateSlides = useCallback(async () => {
+    setAiGenerating(true);
+    setAiError(null);
+    try {
+      const res = await fetch(`/api/lessons/${lessonId}/blocks/${blockId}/slides-ai`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          topic: lessonTopic,
+          subjectTitle: lessonSubjectTitle,
+          blockTitle: blockTitle ?? undefined,
+          variant: blockVariant,
+          count: 3,
+        }),
+      });
+      if (!res.ok) {
+        const body = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(body.error ?? `HTTP ${res.status}`);
+      }
+      const data = (await res.json()) as { slides: AiSlide[] };
+      setAiSuggestions(data.slides);
+    } catch (e) {
+      setAiError(e instanceof Error ? e.message : 'Generation failed');
+    } finally {
+      setAiGenerating(false);
+    }
+  }, [lessonId, blockId, lessonTopic, lessonSubjectTitle, blockTitle, blockVariant]);
+
+  const acceptAiSlide = useCallback(async (i: number, slide: AiSlide) => {
+    setAiAccepting((prev) => new Set(prev).add(i));
+    try {
+      const res = await fetch(`/api/lessons/${lessonId}/blocks/${blockId}/items`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          itemType: 'SLIDE',
+          content: { body: slide.body, speakerNote: slide.speakerNote, annotations: [] },
+        }),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const newItem = (await res.json()) as LessonItem;
+      onItemCreated(newItem);
+      setSelectedId(newItem.id);
+      setAiSuggestions((prev) => prev?.filter((_, idx) => idx !== i) ?? null);
+    } finally {
+      setAiAccepting((prev) => { const s = new Set(prev); s.delete(i); return s; });
+    }
+  }, [lessonId, blockId, onItemCreated]);
 
   const noun = blockVariant === 'model' ? 'step' : 'stage';
 
@@ -736,25 +802,87 @@ function SlideBlockEditor({
     });
   }, [lessonId, blockId, onItemDeleted]);
 
+  const aiPanel = (
+    <div className="rounded-xl border border-[#e5e7eb] bg-[#f9fafb] p-4">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-semibold text-[#374151]">Generate with AI</p>
+          <p className="mt-0.5 text-xs text-[#6b7280]">
+            {blockVariant === 'model'
+              ? 'Get a step-by-step worked example drafted by Claude, then edit to suit.'
+              : 'Get a structured explanation drafted by Claude, then edit to suit.'}
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => void generateSlides()}
+          disabled={aiGenerating}
+          className="shrink-0 inline-flex items-center gap-1.5 rounded-lg bg-[#5850ec] px-3 py-2 text-xs font-semibold text-white shadow transition hover:bg-[#4338ca] disabled:opacity-50"
+        >
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" className="shrink-0" aria-hidden>
+            <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6L12 2Z" fill="currentColor" />
+          </svg>
+          {aiGenerating ? 'Generating…' : 'Generate slides'}
+        </button>
+      </div>
+      {aiError && (
+        <p className="mt-2 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-600">{aiError}</p>
+      )}
+      {aiSuggestions && aiSuggestions.length > 0 && (
+        <div className="mt-3 space-y-2">
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-[#6b7280]">
+            Suggestions — click + Add to include
+          </p>
+          {aiSuggestions.map((slide, i) => (
+            <div key={i} className="flex items-start gap-3 rounded-xl border border-[#c7d2fe] bg-white px-3.5 py-3 shadow-sm">
+              <div className="min-w-0 flex-1">
+                <p className="text-sm text-[#374151]">{slide.body}</p>
+                {slide.speakerNote && (
+                  <p className="mt-1 text-[11px] text-[#6b7280]">
+                    <span className="font-semibold">Note:</span> {slide.speakerNote}
+                  </p>
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={() => void acceptAiSlide(i, slide)}
+                disabled={aiAccepting.has(i)}
+                className="shrink-0 inline-flex items-center gap-1 rounded-lg bg-[#5850ec] px-2.5 py-1.5 text-[11px] font-semibold text-white shadow-sm transition hover:bg-[#4338ca] disabled:opacity-50"
+              >
+                {aiAccepting.has(i) ? '…' : '+ Add'}
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+      {aiSuggestions && aiSuggestions.length === 0 && (
+        <p className="mt-3 text-xs text-[#9ca3af]">All suggestions added ✓</p>
+      )}
+    </div>
+  );
+
   // Empty state
   if (items.length === 0 && !adding) {
     return (
-      <div className="rounded-xl border-2 border-dashed border-[#e5e7eb] px-6 py-10 text-center">
-        <p className="text-sm font-medium text-[#374151]">
-          {blockVariant === 'model' ? 'No steps yet' : 'No stages yet'}
-        </p>
-        <p className="mt-1 max-w-xs mx-auto text-xs text-[#6b7280]">
-          {blockVariant === 'model'
-            ? 'Build your worked example step by step. Each step reveals the next layer of the solution.'
-            : 'Build your explanation stage by stage. Students see each stage revealed in sequence.'}
-        </p>
-        <button
-          type="button"
-          onClick={addStage}
-          className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-[#5850ec] px-4 py-2 text-sm font-semibold text-white shadow transition hover:bg-[#4338ca]"
-        >
-          + Add first {noun}
-        </button>
+      <div className="space-y-4">
+        {aiPanel}
+        <div className="rounded-xl border-2 border-dashed border-[#e5e7eb] px-6 py-6 text-center">
+          <p className="text-sm font-medium text-[#374151]">
+            {blockVariant === 'model' ? 'No steps yet' : 'No stages yet'}
+          </p>
+          <p className="mt-1 max-w-xs mx-auto text-xs text-[#6b7280]">
+            {blockVariant === 'model'
+              ? 'Build your worked example step by step. Each step reveals the next layer of the solution.'
+              : 'Build your explanation stage by stage. Students see each stage revealed in sequence.'}
+          </p>
+          <button
+            type="button"
+            onClick={addStage}
+            className="mt-4 inline-flex items-center gap-1.5 rounded-lg border border-[#5850ec] bg-white px-4 py-2 text-sm font-semibold text-[#5850ec] shadow transition hover:bg-[#f5f3ff]"
+          >
+            + Add first {noun} manually
+          </button>
+        </div>
       </div>
     );
   }
@@ -773,6 +901,8 @@ function SlideBlockEditor({
           onCancel={() => setConfirmDelete(null)}
         />
       )}
+
+      <div className="mb-4">{aiPanel}</div>
 
       <div className="grid grid-cols-[160px_1fr] gap-4 lg:grid-cols-[180px_1fr]">
         {/* Stage list */}
@@ -811,14 +941,10 @@ function SlideBlockEditor({
 
 // ─── Public exports ───────────────────────────────────────────────────────────
 
-export function ExplainBlockEditor(
-  props: Omit<SlideBlockEditorProps, 'blockVariant'>
-) {
+export function ExplainBlockEditor(props: Omit<SlideBlockEditorProps, 'blockVariant'>) {
   return <SlideBlockEditor {...props} blockVariant="explain" />;
 }
 
-export function ModelBlockEditor(
-  props: Omit<SlideBlockEditorProps, 'blockVariant'>
-) {
+export function ModelBlockEditor(props: Omit<SlideBlockEditorProps, 'blockVariant'>) {
   return <SlideBlockEditor {...props} blockVariant="model" />;
 }

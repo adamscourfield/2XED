@@ -328,6 +328,9 @@ function BlockEditor({
           lessonId={lessonId}
           subjectId={lessonSubjectId}
           item={block.items[0] ?? null}
+          lessonTopic={lessonTopic}
+          lessonSubjectTitle={lessonSubjectTitle}
+          blockTitle={block.title}
           onItemCreated={onItemCreated}
           onItemUpdated={onItemUpdated}
           onItemDeleted={onItemDeleted}
@@ -347,6 +350,9 @@ function BlockEditor({
           blockId={block.id}
           lessonId={lessonId}
           items={block.items}
+          lessonTopic={lessonTopic}
+          lessonSubjectTitle={lessonSubjectTitle}
+          blockTitle={block.title}
           onItemCreated={onItemCreated}
           onItemUpdated={onItemUpdated}
           onItemDeleted={onItemDeleted}
@@ -356,6 +362,9 @@ function BlockEditor({
           blockId={block.id}
           lessonId={lessonId}
           items={block.items}
+          lessonTopic={lessonTopic}
+          lessonSubjectTitle={lessonSubjectTitle}
+          blockTitle={block.title}
           onItemCreated={onItemCreated}
           onItemUpdated={onItemUpdated}
           onItemDeleted={onItemDeleted}
@@ -381,6 +390,14 @@ function BlockEditor({
 }
 
 // ─── Student preview panel ───────────────────────────────────────────────────
+
+function extractItemPreview(item: LessonItem): string | null {
+  if (!item.content || typeof item.content !== 'object') return null;
+  const c = item.content as Record<string, unknown>;
+  if (item.itemType === 'SLIDE' && typeof c.body === 'string' && c.body.trim()) return c.body.trim();
+  if (item.itemType === 'QUESTION' && typeof c.question === 'string' && c.question.trim()) return c.question.trim();
+  return null;
+}
 
 function StudentPreviewContent({ block, lessonTitle }: { block: LessonBlock | null; lessonTitle: string }) {
   return (
@@ -423,11 +440,19 @@ function StudentPreviewContent({ block, lessonTitle }: { block: LessonBlock | nu
                 </div>
               ) : (
                 <div className="space-y-2">
-                  {block.items.slice(0, 3).map((item, i) => (
-                    <div key={item.id} className="rounded-lg border border-[#e5e7eb] bg-white p-2.5">
-                      <p className="text-[11px] font-semibold text-[#9ca3af]">Item {i + 1} · {item.itemType}</p>
-                    </div>
-                  ))}
+                  {block.items.slice(0, 3).map((item, i) => {
+                    const preview = extractItemPreview(item);
+                    return (
+                      <div key={item.id} className="rounded-lg border border-[#e5e7eb] bg-white p-2.5">
+                        <p className="text-[11px] font-semibold text-[#9ca3af]">
+                          {item.itemType === 'SLIDE' ? 'Slide' : item.itemType === 'QUESTION' ? 'Question' : item.itemType} {i + 1}
+                        </p>
+                        {preview && (
+                          <p className="mt-0.5 line-clamp-3 text-[11px] leading-snug text-[#374151]">{preview}</p>
+                        )}
+                      </div>
+                    );
+                  })}
                   {block.items.length > 3 && (
                     <p className="text-center text-[11px] text-[#9ca3af]">+{block.items.length - 3} more</p>
                   )}
@@ -877,6 +902,7 @@ export function LessonBuilder({ lesson: initialLesson }: { lesson: LessonBuilder
                 <AiLessonBuilder
                   subjectId={lesson.subject.id}
                   subjectTitle={lesson.subject.title}
+                  initialTopic={lesson.topic}
                   onPlanGenerated={handlePlanGenerated}
                   onClose={() => setShowAiBuilder(false)}
                 />

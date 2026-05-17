@@ -618,11 +618,21 @@ export function QuestionForm({
 
 // ─── Check block question editor (single question) ───────────────────────────
 
+interface CheckAiQuestion {
+  stem: string;
+  type: 'MCQ';
+  options: string[];
+  answer: string;
+}
+
 interface CheckBlockEditorProps {
   blockId: string;
   lessonId: string;
   subjectId: string;
   item: LessonItem | null;
+  lessonTopic?: string;
+  lessonSubjectTitle?: string;
+  blockTitle?: string | null;
   onItemCreated: (item: LessonItem) => void;
   onItemUpdated: (item: LessonItem) => void;
   onItemDeleted: (itemId: string) => void;
@@ -633,6 +643,9 @@ export function CheckBlockEditor({
   lessonId,
   subjectId,
   item,
+  lessonTopic = '',
+  lessonSubjectTitle = '',
+  blockTitle,
   onItemCreated,
   onItemUpdated,
   onItemDeleted,
@@ -640,6 +653,65 @@ export function CheckBlockEditor({
   const [creating, setCreating] = useState(false);
   // High #8: bank picker
   const [showPicker, setShowPicker] = useState(false);
+
+  // AI suggestion state
+  const [aiGenerating, setAiGenerating] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
+  const [aiSuggestions, setAiSuggestions] = useState<CheckAiQuestion[] | null>(null);
+  const [aiAccepting, setAiAccepting] = useState<Set<number>>(new Set());
+
+  const generateCheckQuestion = useCallback(async () => {
+    setAiGenerating(true);
+    setAiError(null);
+    try {
+      const res = await fetch(`/api/lessons/${lessonId}/blocks/${blockId}/check-ai`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          topic: lessonTopic,
+          subjectTitle: lessonSubjectTitle,
+          blockTitle: blockTitle ?? undefined,
+          count: 3,
+        }),
+      });
+      if (!res.ok) {
+        const body = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(body.error ?? `HTTP ${res.status}`);
+      }
+      const data = (await res.json()) as { questions: CheckAiQuestion[] };
+      setAiSuggestions(data.questions);
+    } catch (e) {
+      setAiError(e instanceof Error ? e.message : 'Generation failed');
+    } finally {
+      setAiGenerating(false);
+    }
+  }, [lessonId, blockId, lessonTopic, lessonSubjectTitle, blockTitle]);
+
+  const useAiSuggestion = useCallback(async (i: number, q: CheckAiQuestion) => {
+    setAiAccepting((prev) => new Set(prev).add(i));
+    try {
+      const correctIndex = q.options.indexOf(q.answer);
+      const res = await fetch(`/api/lessons/${lessonId}/blocks/${blockId}/items`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          itemType: 'QUESTION',
+          answerMode: 'MCQ',
+          content: {
+            question: q.stem,
+            options: q.options,
+            correctIndex: correctIndex >= 0 ? correctIndex : 0,
+          },
+        }),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const newItem = (await res.json()) as LessonItem;
+      onItemCreated(newItem);
+      setAiSuggestions(null);
+    } finally {
+      setAiAccepting((prev) => { const s = new Set(prev); s.delete(i); return s; });
+    }
+  }, [lessonId, blockId, onItemCreated]);
 
   const createItem = useCallback(async () => {
     setCreating(true);
@@ -692,7 +764,70 @@ export function CheckBlockEditor({
             onClose={() => setShowPicker(false)}
           />
         )}
-        <div className="rounded-xl border-2 border-dashed border-[#e5e7eb] px-6 py-10 text-center">
+
+        {/* AI check question suggestions */}
+        <div className="rounded-xl border border-[#e5e7eb] bg-[#f9fafb] p-4">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold text-[#374151]">Generate with AI</p>
+              <p className="mt-0.5 text-xs text-[#6b7280]">
+                Get 3 check question options from Claude — pick the best one.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => void generateCheckQuestion()}
+              disabled={aiGenerating}
+              className="shrink-0 inline-flex items-center gap-1.5 rounded-lg bg-[#10b981] px-3 py-2 text-xs font-semibold text-white shadow transition hover:bg-[#059669] disabled:opacity-50"
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" className="shrink-0" aria-hidden>
+                <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6L12 2Z" fill="currentColor" />
+              </svg>
+              {aiGenerating ? 'Generating…' : 'Suggest questions'}
+            </button>
+          </div>
+          {aiError && (
+            <p className="mt-2 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-600">{aiError}</p>
+          )}
+          {aiSuggestions && aiSuggestions.length > 0 && (
+            <div className="mt-3 space-y-2">
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-[#6b7280]">
+                Suggestions — click Use to select one
+              </p>
+              {aiSuggestions.map((q, i) => (
+                <div key={i} className="flex items-start gap-3 rounded-xl border border-[#a7f3d0] bg-white px-3.5 py-3 shadow-sm">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm text-[#374151]">{q.stem}</p>
+                    <div className="mt-1.5 flex flex-wrap gap-1">
+                      {q.options.map((opt, oi) => (
+                        <span
+                          key={oi}
+                          className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${
+                            opt === q.answer
+                              ? 'bg-green-100 text-green-700'
+                              : 'bg-[#f3f4f6] text-[#6b7280]'
+                          }`}
+                        >
+                          {opt === q.answer && '✓ '}{opt}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => void useAiSuggestion(i, q)}
+                    disabled={aiAccepting.has(i)}
+                    className="shrink-0 inline-flex items-center gap-1 rounded-lg bg-[#10b981] px-2.5 py-1.5 text-[11px] font-semibold text-white shadow-sm transition hover:bg-[#059669] disabled:opacity-50"
+                  >
+                    {aiAccepting.has(i) ? '…' : 'Use'}
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="rounded-xl border-2 border-dashed border-[#e5e7eb] px-6 py-6 text-center">
           <p className="text-sm font-medium text-[#374151]">No question yet</p>
           <p className="mt-1 text-xs text-[#6b7280]">
             A Check block has one question that everyone answers at the same time.
@@ -702,9 +837,9 @@ export function CheckBlockEditor({
               type="button"
               onClick={createItem}
               disabled={creating}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-[#10b981] px-4 py-2 text-sm font-semibold text-white shadow transition hover:bg-[#059669] disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-[#e5e7eb] bg-white px-4 py-2 text-sm font-semibold text-[#374151] shadow transition hover:bg-[#f3f4f6] disabled:opacity-50"
             >
-              {creating ? 'Creating…' : '+ New question'}
+              {creating ? 'Creating…' : '+ Write manually'}
             </button>
             <button
               type="button"

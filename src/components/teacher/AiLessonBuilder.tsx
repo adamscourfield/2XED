@@ -21,6 +21,7 @@ import type { AiLessonPlanResponse, AiMatchedSkill, SseEvent } from '@/app/api/t
 interface Props {
   subjectId: string;
   subjectTitle?: string;
+  initialTopic?: string;
   onPlanGenerated: (plan: AiLessonPlanResponse) => void;
   onClose: () => void;
 }
@@ -409,13 +410,13 @@ const DESCRIBE_STEPS: Array<{
 
 type Tab = 'describe' | 'upload';
 
-export function AiLessonBuilder({ subjectId, subjectTitle, onPlanGenerated, onClose }: Props) {
+export function AiLessonBuilder({ subjectId, subjectTitle, initialTopic, onPlanGenerated, onClose }: Props) {
   const [activeTab, setActiveTab] = useState<Tab>('describe');
 
   // Describe-mode state
   const [describeStep, setDescribeStep] = useState(0);
   const [describeForm, setDescribeForm] = useState<DescribeForm>({
-    topic: '',
+    topic: initialTopic ?? '',
     yearGroup: '',
     priorKnowledge: '',
     goal: '',
@@ -507,7 +508,7 @@ export function AiLessonBuilder({ subjectId, subjectTitle, onPlanGenerated, onCl
     setActiveDetail(undefined);
     setCompletedStages([]);
     setDescribeStep(0);
-    setDescribeForm({ topic: '', yearGroup: '', priorKnowledge: '', goal: '' });
+    setDescribeForm({ topic: initialTopic ?? '', yearGroup: '', priorKnowledge: '', goal: '' });
     setFile(null);
     setTopicHint('');
   }
