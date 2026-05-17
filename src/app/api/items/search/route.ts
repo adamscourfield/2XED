@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
   const difficulty = searchParams.get('difficulty'); // EASIER | CORE | CHALLENGE
   const search = searchParams.get('search')?.trim() ?? '';
   const take = Math.min(parseInt(searchParams.get('take') ?? String(TAKE_DEFAULT), 10), TAKE_MAX);
-  const skip = Math.max(parseInt(searchParams.get('skip') ?? '0', 10), 0);
+  const skip = Math.min(Math.max(parseInt(searchParams.get('skip') ?? '0', 10), 0), 5_000);
 
   const skillIds = skillIdsParam ? skillIdsParam.split(',').map((s) => s.trim()).filter(Boolean) : [];
 

@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/features/auth/authOptions';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 import { prisma } from '@/db/prisma';
+import { checkRateLimit } from '@/lib/rateLimit';
 
 interface CheckQuestion {
   stem: string;
@@ -100,6 +101,10 @@ export async function POST(
   const session = await getServerSession(authOptions);
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const user = session.user as { id: string; role?: string };
+
+  if (!checkRateLimit(`check-ai:${user.id}`, 20, 60_000)) {
+    return NextResponse.json({ error: 'Too many requests — please wait before generating again.' }, { status: 429 });
+  }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const blockModel = (prisma as any).lessonBlock;

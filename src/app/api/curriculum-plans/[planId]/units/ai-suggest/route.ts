@@ -18,6 +18,7 @@ import { authOptions } from '@/features/auth/authOptions';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 import { prisma } from '@/db/prisma';
 import { extractTextFromFile, FILE_TEXT_LIMIT } from '@/lib/ai/fileExtractor';
+import { checkRateLimit } from '@/lib/rateLimit';
 
 // ── Public types ──────────────────────────────────────────────────────────────
 
@@ -72,24 +73,6 @@ Rules:
 - suggestedSkillCodes: only codes from AVAILABLE SKILL CODES — never invent new codes
 - If the resource/description covers multiple topics, focus on the most prominent ones
 - Keep language clear and teacher-facing`;
-}
-
-// ── Rate limiting ─────────────────────────────────────────────────────────────
-
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
-const RATE_LIMIT_MAX = 10;
-const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute
-
-function checkRateLimit(userId: string): boolean {
-  const now = Date.now();
-  const entry = rateLimitMap.get(userId);
-  if (!entry || now >= entry.resetAt) {
-    rateLimitMap.set(userId, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
-    return true;
-  }
-  if (entry.count >= RATE_LIMIT_MAX) return false;
-  entry.count++;
-  return true;
 }
 
 // ── Anthropic call ────────────────────────────────────────────────────────────
@@ -149,8 +132,7 @@ export async function POST(
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
-  // L4: per-user rate limiting
-  if (!checkRateLimit(user.id)) {
+  if (!checkRateLimit(`unit-ai-suggest:${user.id}`, 10, 60_000)) {
     return NextResponse.json(
       { error: 'Too many requests — please wait a minute before generating again.' },
       { status: 429 },
@@ -214,7 +196,7 @@ export async function POST(
       uploadedFileType = file.type;
       tmpFilePath = path.join(
         os.tmpdir(),
-        `unit_${Date.now()}_${file.name.replace(/[^a-z0-9._-]/gi, '_')}`,
+        `unit_${crypto.randomUUID()}_${file.name.replace(/[^a-z0-9._-]/gi, '_')}`,
       );
       await writeFile(tmpFilePath, Buffer.from(await file.arrayBuffer()));
       description = await extractTextFromFile(tmpFilePath, uploadedFileType, uploadedFileName);

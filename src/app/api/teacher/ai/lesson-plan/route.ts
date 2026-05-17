@@ -211,7 +211,7 @@ export async function POST(req: NextRequest) {
     uploadedFileType = file.type;
     tmpFilePath = path.join(
       os.tmpdir(),
-      `lb_${Date.now()}_${file.name.replace(/[^a-z0-9._-]/gi, '_')}`,
+      `lb_${crypto.randomUUID()}_${file.name.replace(/[^a-z0-9._-]/gi, '_')}`,
     );
     await writeFile(tmpFilePath, Buffer.from(await file.arrayBuffer()));
   } else {
