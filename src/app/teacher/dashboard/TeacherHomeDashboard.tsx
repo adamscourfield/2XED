@@ -79,62 +79,7 @@ function sessionSubtitle(
 }
 
 const accent = '#5E44FF';
-const accentSoft = '#F3F0FF';
 const cardShadow = 'shadow-[0_4px_32px_-10px_rgba(17,24,39,0.08),0_2px_12px_-6px_rgba(94,68,255,0.06)]';
-
-function StatIconBook() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" className="text-[#5E44FF]" aria-hidden>
-      <path
-        d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"
-        stroke="currentColor"
-        strokeWidth="1.75"
-        strokeLinecap="round"
-      />
-      <path
-        d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"
-        stroke="currentColor"
-        strokeWidth="1.75"
-        strokeLinejoin="round"
-      />
-      <path d="M8 7h8M8 11h6" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function StatIconPeople() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" className="text-[#5E44FF]" aria-hidden>
-      <path
-        d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"
-        stroke="currentColor"
-        strokeWidth="1.75"
-        strokeLinecap="round"
-      />
-      <circle cx="9" cy="7" r="4" stroke="currentColor" strokeWidth="1.75" />
-      <path
-        d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"
-        stroke="currentColor"
-        strokeWidth="1.75"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-
-function StatIconPulse() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" className="text-[#5E44FF]" aria-hidden>
-      <path
-        d="M4 12h3l2-6 4 12 3-6h4"
-        stroke="currentColor"
-        strokeWidth="1.75"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
 
 function CreateLessonMenu() {
   return (
@@ -223,7 +168,7 @@ function SessionsEmptyIllustration() {
 }
 
 export function TeacherHomeDashboard({ data, displayName, greeting }: Props) {
-  const { activeSessions, recentSessions, lessonCount, sessionsToday } = data;
+  const { activeSessions, recentSessions } = data;
 
   return (
     <div className="relative -mx-4 overflow-hidden px-4 pb-12 pt-6 sm:-mx-6 sm:px-6 sm:pb-14 sm:pt-8">
@@ -238,16 +183,13 @@ export function TeacherHomeDashboard({ data, displayName, greeting }: Props) {
 
       <div className="relative space-y-10">
         <header className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
-          <div className="min-w-0 space-y-2">
+          <div className="min-w-0">
             <h1
               className="text-[1.75rem] font-semibold leading-tight tracking-tight text-[#111827] sm:text-[2.125rem] sm:leading-tight"
               style={{ fontFamily: 'var(--font-fraunces), Georgia, "Times New Roman", serif' }}
             >
               {greeting}, {displayName} 👋
             </h1>
-            <p className="max-w-xl text-sm leading-relaxed text-[#6B7280] sm:text-base">
-              Here&apos;s what&apos;s happening in your teaching space.
-            </p>
           </div>
           <CreateLessonMenu />
         </header>
@@ -293,75 +235,6 @@ export function TeacherHomeDashboard({ data, displayName, greeting }: Props) {
             </div>
           </section>
         )}
-
-        <section aria-label="Summary stats">
-          <div
-            className={`grid grid-cols-1 divide-y divide-[#EEF0F4] rounded-2xl border border-white/90 bg-white sm:grid-cols-3 sm:divide-x sm:divide-y-0 ${cardShadow}`}
-          >
-            <div className="flex gap-4 p-6 sm:p-8">
-              <div
-                className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full ring-1 ring-inset ring-[#EDE9FE]"
-                style={{ backgroundColor: accentSoft }}
-              >
-                <StatIconBook />
-              </div>
-              <div className="min-w-0">
-                <p className="text-lg font-bold tracking-tight text-[#111827] sm:text-xl">
-                  {lessonCount} Lesson{lessonCount === 1 ? '' : 's'} built
-                </p>
-                <p className="mt-1.5 text-sm text-[#6B7280]">
-                  {lessonCount === 0 ? 'Start building your first lesson.' : 'In your lesson library.'}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex gap-4 p-6 sm:p-8">
-              <div
-                className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full ring-1 ring-inset ring-[#EDE9FE]"
-                style={{ backgroundColor: accentSoft }}
-              >
-                <StatIconPeople />
-              </div>
-              <div className="min-w-0">
-                <p className="text-lg font-bold tracking-tight text-[#111827] sm:text-xl">
-                  {sessionsToday} Live session{sessionsToday === 1 ? '' : 's'}
-                </p>
-                <p className="mt-1.5 text-sm text-[#6B7280]">
-                  {sessionsToday === 0 ? 'No sessions yet today.' : 'Sessions started today.'}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex gap-4 p-6 sm:p-8">
-              <div
-                className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full ring-1 ring-inset ring-[#EDE9FE]"
-                style={{ backgroundColor: accentSoft }}
-              >
-                <StatIconPulse />
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#9CA3AF]">Status</p>
-                {activeSessions.length > 0 ? (
-                  <>
-                    <p className="mt-1 text-lg font-bold text-[#111827]">{activeSessions.length} live</p>
-                    <Link
-                      href={`/teacher/live/${activeSessions[0].id}`}
-                      className="mt-1 inline-block text-xs font-semibold hover:underline"
-                      style={{ color: accent }}
-                    >
-                      Open session →
-                    </Link>
-                  </>
-                ) : (
-                  <>
-                    <p className="mt-1 text-lg font-bold text-[#22C55E]">Ready to teach</p>
-                    <p className="mt-0.5 text-sm text-[#6B7280]">All systems go.</p>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-        </section>
 
         <section aria-label="Quick actions" className="grid grid-cols-1 gap-5 lg:grid-cols-2">
           <Link
