@@ -688,6 +688,7 @@ function SlideBlockEditor({
   const [aiError, setAiError] = useState<string | null>(null);
   const [aiSuggestions, setAiSuggestions] = useState<AiSlide[] | null>(null);
   const [aiAccepting, setAiAccepting] = useState<Set<number>>(new Set());
+  const [showAiPanel, setShowAiPanel] = useState(false);
 
   const generateSlides = useCallback(async () => {
     setAiGenerating(true);
@@ -902,7 +903,29 @@ function SlideBlockEditor({
         />
       )}
 
-      <div className="mb-4">{aiPanel}</div>
+      <div className="mb-4">
+        <button
+          type="button"
+          onClick={() => setShowAiPanel((v) => !v)}
+          className="flex items-center gap-1.5 rounded-lg border border-[#c7d2fe] bg-[#f5f3ff] px-3 py-1.5 text-xs font-semibold text-[#5850ec] transition hover:bg-[#ede9fe]"
+        >
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" className="shrink-0" aria-hidden>
+            <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6L12 2Z" fill="currentColor" />
+          </svg>
+          {showAiPanel ? 'Hide AI panel' : `More ${noun}s with AI`}
+          <svg
+            width="10"
+            height="10"
+            viewBox="0 0 24 24"
+            fill="none"
+            className={`ml-0.5 transition-transform ${showAiPanel ? 'rotate-180' : ''}`}
+            aria-hidden
+          >
+            <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
+        {showAiPanel && <div className="mt-3">{aiPanel}</div>}
+      </div>
 
       <div className="grid grid-cols-[160px_1fr] gap-4 lg:grid-cols-[180px_1fr]">
         {/* Stage list */}
