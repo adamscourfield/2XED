@@ -47,6 +47,8 @@ export interface AiDoNowItem {
   skillId: string;
   itemId: string;
   stemPreview: string;
+  answerMode: 'MCQ' | 'SHORT_ANSWER';
+  content: Record<string, unknown>;
 }
 
 export interface AiLessonPlanResponse {
@@ -393,13 +395,25 @@ export async function POST(req: NextRequest) {
                 });
               }),
             );
-            doNowItems = created.map((item, i) => ({
-              skillId: itemInputs[i]!.resolvedSkillId,
-              itemId: item.id,
-              stemPreview:
-                itemInputs[i]!.q.stem.slice(0, 100) +
-                (itemInputs[i]!.q.stem.length > 100 ? '…' : ''),
-            }));
+            doNowItems = created.map((item, i) => {
+              const q = itemInputs[i]!.q;
+              const isMcq = q.type === 'MCQ' && Array.isArray(q.options) && q.options.length === 4;
+              const answerMode: 'MCQ' | 'SHORT_ANSWER' = isMcq ? 'MCQ' : 'SHORT_ANSWER';
+              const content: Record<string, unknown> = isMcq
+                ? {
+                    question: q.stem,
+                    options: q.options!,
+                    correctIndex: Math.max(0, q.options!.indexOf(q.answer ?? '')),
+                  }
+                : { question: q.stem, answer: q.answer ?? '' };
+              return {
+                skillId: itemInputs[i]!.resolvedSkillId,
+                itemId: item.id,
+                stemPreview: q.stem.slice(0, 100) + (q.stem.length > 100 ? '…' : ''),
+                answerMode,
+                content,
+              };
+            });
           } catch (err) {
             console.warn('[lesson-plan/route] Failed to persist Do Now items:', err);
           }

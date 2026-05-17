@@ -7,6 +7,8 @@ import { CheckBlockEditor, PracticeBlockEditor } from './QuestionEditor';
 import { ExplainBlockEditor, ModelBlockEditor } from './SlideEditor';
 import { DoNowBlockEditor } from './DoNowEditor';
 import { GoLiveModal } from './GoLiveModal';
+import { AiLessonBuilder } from '@/components/teacher/AiLessonBuilder';
+import type { AiLessonPlanResponse } from '@/app/api/teacher/ai/lesson-plan/route';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -488,6 +490,9 @@ export function LessonBuilder({ lesson: initialLesson }: { lesson: LessonBuilder
   const [showGoLive, setShowGoLive] = useState(false);
   const [showPreviewModal, setShowPreviewModal] = useState(false);  // UX-10
 
+  // Show AI builder by default when the lesson has no blocks yet.
+  const [showAiBuilder, setShowAiBuilder] = useState(initialLesson.blocks.length === 0);
+
   // UX-8: confirm modal state
   const [confirmModal, setConfirmModal] = useState<{ message: string; onConfirm: () => void } | null>(null);
 
@@ -664,6 +669,23 @@ export function LessonBuilder({ lesson: initialLesson }: { lesson: LessonBuilder
     }, 600);
   }, [lesson.id]);
 
+  const handlePlanGenerated = useCallback(async (plan: AiLessonPlanResponse) => {
+    try {
+      const res = await fetch(`/api/lessons/${lesson.id}/apply-plan`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan }),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const { title, blocks } = (await res.json()) as { title: string; blocks: LessonBlock[] };
+      setLesson((prev) => ({ ...prev, title: title || prev.title, blocks }));
+      setSelectedBlockId(blocks[0]?.id ?? null);
+      setShowAiBuilder(false);
+    } catch (e) {
+      setSaveError(e instanceof Error ? e.message : 'Failed to apply plan');
+    }
+  }, [lesson.id]);
+
   const selectedBlock = lesson.blocks.find((b) => b.id === selectedBlockId) ?? null;
 
   return (
@@ -722,6 +744,20 @@ export function LessonBuilder({ lesson: initialLesson }: { lesson: LessonBuilder
           <span className="hidden rounded-full border border-[#e5e7eb] bg-white px-2.5 py-0.5 text-xs font-semibold text-[#6b7280] sm:inline-flex">
             {lesson.subject.title}
           </span>
+
+          {/* AI builder toggle */}
+          <button
+            type="button"
+            onClick={() => { setShowAiBuilder((v) => !v); setSelectedBlockId(null); }}
+            className={`hidden items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-semibold transition sm:inline-flex ${
+              showAiBuilder
+                ? 'border-[#5850ec]/40 bg-[#f5f3ff] text-[#5850ec]'
+                : 'border-[#e5e7eb] bg-white text-[#6b7280] hover:border-[#5850ec]/30 hover:text-[#5850ec]'
+            }`}
+            aria-pressed={showAiBuilder}
+          >
+            ✨ AI
+          </button>
 
           {/* Save status */}
           <span className="text-xs text-[#9ca3af]">
@@ -835,24 +871,46 @@ export function LessonBuilder({ lesson: initialLesson }: { lesson: LessonBuilder
         {/* ── Centre: block editor ── */}
         <main className="min-w-0 flex-1 overflow-y-auto p-6 lg:p-8">
           {!selectedBlock ? (
-            <div className="flex h-full items-center justify-center">
-              <div className="text-center">
-                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#f5f3ff] text-[#5850ec]">
-                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden>
-                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
-                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z" stroke="currentColor" strokeWidth="1.75" strokeLinejoin="round" />
-                  </svg>
-                </div>
-                <p className="font-semibold text-[#374151]">
-                  {lesson.blocks.length === 0 ? 'Add your first block' : 'Select a block to edit'}
-                </p>
-                <p className="mt-1 text-sm text-[#9ca3af]">
-                  {lesson.blocks.length === 0
-                    ? 'Use the + button in the sidebar to add a block.'
-                    : 'Click a block in the left panel.'}
-                </p>
+            showAiBuilder ? (
+              /* AI lesson builder — shown when no block selected and AI mode is active */
+              <div className="mx-auto max-w-md">
+                <AiLessonBuilder
+                  subjectId={lesson.subject.id}
+                  subjectTitle={lesson.subject.title}
+                  onPlanGenerated={handlePlanGenerated}
+                  onClose={() => setShowAiBuilder(false)}
+                />
               </div>
-            </div>
+            ) : (
+              /* Generic empty state */
+              <div className="flex h-full items-center justify-center">
+                <div className="text-center">
+                  <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#f5f3ff] text-[#5850ec]">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden>
+                      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
+                      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z" stroke="currentColor" strokeWidth="1.75" strokeLinejoin="round" />
+                    </svg>
+                  </div>
+                  <p className="font-semibold text-[#374151]">
+                    {lesson.blocks.length === 0 ? 'Add your first block' : 'Select a block to edit'}
+                  </p>
+                  <p className="mt-1 text-sm text-[#9ca3af]">
+                    {lesson.blocks.length === 0
+                      ? 'Use the + button in the sidebar to add a block.'
+                      : 'Click a block in the left panel.'}
+                  </p>
+                  {lesson.blocks.length === 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setShowAiBuilder(true)}
+                      className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-[#5850ec] px-4 py-2 text-sm font-semibold text-white shadow transition hover:bg-[#4338ca]"
+                    >
+                      ✨ Build with AI
+                    </button>
+                  )}
+                </div>
+              </div>
+            )
           ) : (
             <BlockEditor
               block={selectedBlock}
