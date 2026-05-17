@@ -25,11 +25,6 @@ function getAttemptOutcome(attempt: { correct: boolean; markingResult: unknown }
   return attempt.correct ? 'correct' : 'incorrect';
 }
 
-function pct(n: number, d: number): string {
-  if (d === 0) return '—';
-  return `${Math.round((n / d) * 100)}%`;
-}
-
 function laneLabel(lane: string): string {
   if (lane === 'LANE_1') return 'Independent';
   if (lane === 'LANE_2') return 'Emerging';
@@ -50,16 +45,6 @@ function LaneBadge({ lane }: { lane: string }) {
   );
 }
 
-function OutcomeDot({ outcome }: { outcome: 'correct' | 'partial' | 'incorrect' | null }) {
-  if (!outcome) return <span className="text-xs text-[var(--anx-text-muted)]">—</span>;
-  const map = {
-    correct: 'text-[var(--anx-success)]',
-    partial: 'text-[var(--anx-warning,#b45309)]',
-    incorrect: 'text-[var(--anx-danger-text,#b91c1c)]',
-  };
-  const label = { correct: 'Correct', partial: 'Partial', incorrect: 'Incorrect' };
-  return <span className={`text-xs font-semibold ${map[outcome]}`}>{label[outcome]}</span>;
-}
 
 export default async function SessionReviewPage({ params }: Props) {
   const session = await getServerSession(authOptions);
@@ -116,53 +101,19 @@ export default async function SessionReviewPage({ params }: Props) {
 
   // Attempt aggregation
   let totalAttempts = 0;
-  let totalCorrect = 0;
-  const studentAttemptMap = new Map<
-    string,
-    { total: number; correct: number; partial: number; lastOutcome: 'correct' | 'partial' | 'incorrect' | null }
-  >();
+  const studentAttemptMap = new Map<string, boolean>();
 
   for (const attempt of liveSession.liveAttempts) {
     totalAttempts++;
-    const outcome = getAttemptOutcome(attempt);
-    if (outcome === 'correct') totalCorrect++;
-    const entry = studentAttemptMap.get(attempt.studentUserId) ?? {
-      total: 0,
-      correct: 0,
-      partial: 0,
-      lastOutcome: null,
-    };
-    entry.total += 1;
-    if (outcome === 'correct') entry.correct += 1;
-    if (outcome === 'partial') entry.partial += 1;
-    entry.lastOutcome = outcome;
-    studentAttemptMap.set(attempt.studentUserId, entry);
-  }
-
-  const overallCorrectRate = totalAttempts > 0 ? totalCorrect / totalAttempts : null;
-
-  // Final lane counts
-  const laneCounts = { LANE_1: 0, LANE_2: 0, LANE_3: 0 };
-  for (const p of liveSession.participants) {
-    if (p.isActive && p.currentLane in laneCounts) {
-      laneCounts[p.currentLane as keyof typeof laneCounts]++;
-    }
+    studentAttemptMap.set(attempt.studentUserId, true);
   }
 
   // Transition summary
-  let escalationCount = 0;
-  let resolutionCount = 0;
   const everEscalated = new Set<string>();
   const resolvedStudents = new Set<string>();
   for (const t of liveSession.transitions) {
-    if (t.transitionType === 'ESCALATED') {
-      escalationCount++;
-      everEscalated.add(t.studentUserId);
-    }
-    if (t.transitionType === 'RESOLVED') {
-      resolutionCount++;
-      resolvedStudents.add(t.studentUserId);
-    }
+    if (t.transitionType === 'ESCALATED') everEscalated.add(t.studentUserId);
+    if (t.transitionType === 'RESOLVED') resolvedStudents.add(t.studentUserId);
   }
 
   const participantCount = liveSession.participants.filter((p) => p.isActive).length;
@@ -181,17 +132,14 @@ export default async function SessionReviewPage({ params }: Props) {
         studentId: p.studentUserId,
         name: p.student.name ?? p.student.email,
         finalLane: p.currentLane,
-        attemptCount: attempts.total,
-        correctCount: attempts.correct,
-        partialCount: attempts.partial,
-        lastOutcome: attempts.lastOutcome,
         wasEscalated: everEscalated.has(p.studentUserId),
         resolved: resolvedStudents.has(p.studentUserId),
       };
     })
+    // Students needing support first, then emerging, then independent
     .sort(
       (a, b) =>
-        a.finalLane.localeCompare(b.finalLane) || (a.name ?? '').localeCompare(b.name ?? ''),
+        b.finalLane.localeCompare(a.finalLane) || (a.name ?? '').localeCompare(b.name ?? ''),
     );
 
   // Misconception signals
@@ -309,73 +257,6 @@ export default async function SessionReviewPage({ params }: Props) {
           </div>
         </div>
 
-        {/* Summary cards */}
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-          <div className="anx-card p-5 text-center">
-            <p className="text-3xl font-bold" style={{ color: 'var(--anx-primary)' }}>
-              {overallCorrectRate !== null ? `${Math.round(overallCorrectRate * 100)}%` : '—'}
-            </p>
-            <p className="mt-1 text-xs font-medium uppercase tracking-wide" style={{ color: 'var(--anx-text-muted)' }}>
-              Overall correct
-            </p>
-          </div>
-          <div className="anx-card p-5 text-center">
-            <p className="text-3xl font-bold" style={{ color: 'var(--anx-success)' }}>
-              {laneCounts.LANE_1}
-            </p>
-            <p className="mt-1 text-xs font-medium uppercase tracking-wide" style={{ color: 'var(--anx-text-muted)' }}>
-              Independent
-            </p>
-          </div>
-          <div className="anx-card p-5 text-center">
-            <p className="text-3xl font-bold" style={{ color: 'var(--anx-warning,#b45309)' }}>
-              {laneCounts.LANE_2}
-            </p>
-            <p className="mt-1 text-xs font-medium uppercase tracking-wide" style={{ color: 'var(--anx-text-muted)' }}>
-              Emerging
-            </p>
-          </div>
-          <div className="anx-card p-5 text-center">
-            <p className="text-3xl font-bold" style={{ color: 'var(--anx-danger-text,#b91c1c)' }}>
-              {laneCounts.LANE_3}
-            </p>
-            <p className="mt-1 text-xs font-medium uppercase tracking-wide" style={{ color: 'var(--anx-text-muted)' }}>
-              Needs support
-            </p>
-          </div>
-        </div>
-
-        {/* Lane journey */}
-        {(escalationCount > 0 || resolutionCount > 0) && (
-          <div className="anx-card p-5">
-            <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--anx-text-muted)' }}>
-              In-lesson journeys
-            </p>
-            <div className="mt-3 flex flex-wrap gap-6">
-              {escalationCount > 0 && (
-                <div>
-                  <p className="text-2xl font-bold" style={{ color: 'var(--anx-danger-text,#b91c1c)' }}>
-                    {escalationCount}
-                  </p>
-                  <p className="text-sm" style={{ color: 'var(--anx-text-muted)' }}>
-                    student{escalationCount !== 1 ? 's' : ''} escalated to reteach lane
-                  </p>
-                </div>
-              )}
-              {resolutionCount > 0 && (
-                <div>
-                  <p className="text-2xl font-bold" style={{ color: 'var(--anx-success)' }}>
-                    {resolutionCount}
-                  </p>
-                  <p className="text-sm" style={{ color: 'var(--anx-text-muted)' }}>
-                    student{resolutionCount !== 1 ? 's' : ''} resolved — rejoined independent lane
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
         {/* Misconception signals */}
         {misconceptionSignals.length > 0 && (
           <div>
@@ -449,10 +330,7 @@ export default async function SessionReviewPage({ params }: Props) {
                 <thead>
                   <tr className="border-b" style={{ borderColor: 'var(--anx-outline-variant)' }}>
                     <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--anx-text-muted)' }}>Student</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--anx-text-muted)' }}>Final lane</th>
-                    <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--anx-text-muted)' }}>Attempts</th>
-                    <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--anx-text-muted)' }}>Correct</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--anx-text-muted)' }}>Last outcome</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--anx-text-muted)' }}>Where they finished</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--anx-text-muted)' }}>Journey</th>
                   </tr>
                 </thead>
@@ -469,20 +347,11 @@ export default async function SessionReviewPage({ params }: Props) {
                       <td className="px-4 py-3">
                         <LaneBadge lane={s.finalLane} />
                       </td>
-                      <td className="px-4 py-3 text-right tabular-nums" style={{ color: 'var(--anx-text-secondary)' }}>
-                        {s.attemptCount}
-                      </td>
-                      <td className="px-4 py-3 text-right tabular-nums" style={{ color: 'var(--anx-text-secondary)' }}>
-                        {pct(s.correctCount, s.attemptCount)}
-                      </td>
-                      <td className="px-4 py-3">
-                        <OutcomeDot outcome={s.lastOutcome} />
-                      </td>
                       <td className="px-4 py-3 text-xs" style={{ color: 'var(--anx-text-muted)' }}>
                         {s.resolved
                           ? '✓ Resolved'
                           : s.wasEscalated
-                          ? 'Escalated'
+                          ? 'Needed reteach'
                           : '—'}
                       </td>
                     </tr>

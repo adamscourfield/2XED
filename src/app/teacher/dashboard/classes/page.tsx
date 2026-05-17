@@ -2,7 +2,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/features/auth/authOptions';
 import { redirect } from 'next/navigation';
 import { LearningPageShell } from '@/components/LearningPageShell';
-import { countLiveSessionsThisTermForClassrooms, loadTeacherClassesPageData } from '@/app/teacher/dashboard/teacherDashboardData';
+import { loadTeacherClassesPageData } from '@/app/teacher/dashboard/teacherDashboardData';
 import { TeacherClassesHub, type TeacherClassesHubRow } from '@/app/teacher/dashboard/TeacherClassesHub';
 import { TeacherClassesPageActions } from '@/app/teacher/dashboard/TeacherClassesPageActions';
 import { classCodeLabel, formatSessionTime, iconHue } from '@/app/teacher/dashboard/TeacherHomeDashboard';
@@ -64,7 +64,7 @@ export default async function TeacherDashboardClassesPage({ searchParams }: Prop
     );
   }
 
-  const { teacherProfile, lastLiveSessionByClassroomId, liveSessionsThisTerm, subjectTitleBySlug } = data;
+  const { teacherProfile, lastLiveSessionByClassroomId, subjectTitleBySlug } = data;
   const displayName = user.name?.trim() || user.email?.split('@')[0] || 'there';
 
   const scopeTokens = new Map<string, { yearGroup: string | null; subjectSlug: string | null }>();
@@ -110,11 +110,6 @@ export default async function TeacherDashboardClassesPage({ searchParams }: Prop
   const hubRows: TeacherClassesHubRow[] = scopedClassrooms.map((tc) => {
     const cls = tc.classroom;
     const classStudents = cls.enrollments.map((e) => e.student);
-    const avgMasteryVals = classStudents.flatMap((s) => s.skillMasteries.map((m) => m.mastery));
-    const avgUnderstandingPct = avgMasteryVals.length
-      ? Math.round((avgMasteryVals.reduce((a, b) => a + b, 0) / avgMasteryVals.length) * 100)
-      : 0;
-
     const last = lastLiveSessionByClassroomId.get(cls.id);
     const lastAt = last ? (last.endedAt ?? last.startedAt ?? last.createdAt) : null;
     const lastLive =
@@ -133,31 +128,9 @@ export default async function TeacherDashboardClassesPage({ searchParams }: Prop
       hue: iconHue(cls.id),
       yearGroup: cls.yearGroup,
       studentCount: classStudents.length,
-      avgUnderstandingPct,
       lastLive,
     };
   });
-
-  const statClassCount = hubRows.length;
-  const statStudentIds = new Set<string>();
-  for (const tc of scopedClassrooms) {
-    for (const e of tc.classroom.enrollments) {
-      statStudentIds.add(e.studentUserId);
-    }
-  }
-  const statStudentCount = statStudentIds.size;
-
-  let statAvgUnderstandingPct: number | null = null;
-  if (hubRows.length > 0) {
-    const weighted = hubRows.reduce((s, r) => s + r.avgUnderstandingPct * r.studentCount, 0);
-    const n = hubRows.reduce((s, r) => s + r.studentCount, 0);
-    statAvgUnderstandingPct = n > 0 ? Math.round(weighted / n) : Math.round(hubRows.reduce((s, r) => s + r.avgUnderstandingPct, 0) / hubRows.length);
-  }
-
-  const classroomIdsInScope = scopedClassrooms.map((tc) => tc.classroomId);
-  const statLiveLessonsThisTerm = scopeFilter
-    ? await countLiveSessionsThisTermForClassrooms(user.id, classroomIdsInScope)
-    : liveSessionsThisTerm;
 
   return (
     <LearningPageShell
@@ -171,10 +144,6 @@ export default async function TeacherDashboardClassesPage({ searchParams }: Prop
       <TeacherClassesHub
         rows={hubRows}
         teacherDisplayName={displayName}
-        statClassCount={statClassCount}
-        statStudentCount={statStudentCount}
-        statAvgUnderstandingPct={statAvgUnderstandingPct}
-        statLiveLessonsThisTerm={statLiveLessonsThisTerm}
       />
     </LearningPageShell>
   );
