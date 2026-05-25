@@ -687,7 +687,7 @@ export function CheckBlockEditor({
     }
   }, [lessonId, blockId, lessonTopic, lessonSubjectTitle, blockTitle]);
 
-  const useAiSuggestion = useCallback(async (i: number, q: CheckAiQuestion) => {
+  const acceptAiSuggestion = useCallback(async (i: number, q: CheckAiQuestion) => {
     setAiAccepting((prev) => new Set(prev).add(i));
     try {
       const correctIndex = q.options.indexOf(q.answer);
@@ -815,7 +815,7 @@ export function CheckBlockEditor({
                   </div>
                   <button
                     type="button"
-                    onClick={() => void useAiSuggestion(i, q)}
+                    onClick={() => void acceptAiSuggestion(i, q)}
                     disabled={aiAccepting.has(i)}
                     className="shrink-0 inline-flex items-center gap-1 rounded-lg bg-[#10b981] px-2.5 py-1.5 text-[11px] font-semibold text-white shadow-sm transition hover:bg-[#059669] disabled:opacity-50"
                   >

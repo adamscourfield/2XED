@@ -46,6 +46,7 @@ export interface AiMatchedSkill {
 export interface AiDoNowItem {
   skillId: string;
   itemId: string;
+  sourceItemId?: string | null;
   stemPreview: string;
   answerMode: 'MCQ' | 'SHORT_ANSWER';
   content: Record<string, unknown>;
@@ -69,6 +70,19 @@ export type SseEvent =
   | { stage: 'error';       message: string };
 
 // ── Text extraction helpers ───────────────────────────────────────────────────
+
+const MAX_UPLOAD_BYTES = 15 * 1024 * 1024;
+const SUPPORTED_RESOURCE_EXTENSIONS = new Set(['.pdf', '.pptx', '.docx']);
+
+function isSupportedResource(fileName: string, mimeType: string): boolean {
+  const ext = path.extname(fileName).toLowerCase();
+  return (
+    SUPPORTED_RESOURCE_EXTENSIONS.has(ext) ||
+    mimeType === 'application/pdf' ||
+    mimeType.includes('presentationml') ||
+    mimeType.includes('wordprocessingml')
+  );
+}
 
 function decodeXmlEntities(text: string): string {
   return text
@@ -156,8 +170,7 @@ async function extractTextFromFile(
   if (ext === '.pptx' || mimeType.includes('presentationml')) return extractTextFromPptx(filePath);
   if (ext === '.docx' || mimeType.includes('wordprocessingml')) return extractTextFromDocx(filePath);
   if (ext === '.pdf' || mimeType === 'application/pdf') return extractTextFromPdf(filePath);
-  const { readFile } = await import('node:fs/promises');
-  return (await readFile(filePath, 'utf8')).slice(0, 8000);
+  return '';
 }
 
 // ── Skill matching ────────────────────────────────────────────────────────────
@@ -206,6 +219,19 @@ export async function POST(req: NextRequest) {
 
     const file = form.get('file') as File | null;
     if (!file) return NextResponse.json({ error: 'No file provided' }, { status: 400 });
+    if (mode !== 'import') return NextResponse.json({ error: 'Invalid upload mode' }, { status: 400 });
+    if (file.size > MAX_UPLOAD_BYTES) {
+      return NextResponse.json(
+        { error: `File is too large. Upload a PDF, PPTX, or DOCX under ${MAX_UPLOAD_BYTES / 1024 / 1024} MB.` },
+        { status: 413 },
+      );
+    }
+    if (!isSupportedResource(file.name, file.type)) {
+      return NextResponse.json(
+        { error: 'Unsupported file type. Upload a PDF, PPTX, or DOCX file.' },
+        { status: 400 },
+      );
+    }
 
     uploadedFileName = file.name;
     uploadedFileType = file.type;
@@ -367,60 +393,35 @@ export async function POST(req: NextRequest) {
 
         send({
           stage: 'persisting',
-          message: `Saving ${itemInputs.length} Do Now question${itemInputs.length !== 1 ? 's' : ''}…`,
+          message: `Preparing ${itemInputs.length} Do Now question${itemInputs.length !== 1 ? 's' : ''}…`,
           total: itemInputs.length,
           saved: 0,
         });
 
-        let doNowItems: AiDoNowItem[] = [];
-        if (itemInputs.length > 0) {
-          try {
-            const created = await prisma.$transaction(
-              itemInputs.map(({ q, resolvedSkillId }) => {
-                const options =
-                  q.type === 'MCQ' && Array.isArray(q.options) && q.options.length === 4
-                    ? { choices: q.options, acceptedAnswers: q.answer ? [q.answer] : [] }
-                    : { acceptedAnswers: q.answer ? [q.answer] : [], responseMode: 'write' };
-                return prisma.item.create({
-                  data: {
-                    question: q.stem,
-                    type: q.type === 'MCQ' ? 'MCQ' : 'EXTENDED_WRITING',
-                    options: options as never,
-                    answer: q.answer ?? '',
-                    misconceptionMap: {} as never,
-                    subjectId,
-                    skills: { create: { skillId: resolvedSkillId } },
-                  },
-                  select: { id: true },
-                });
-              }),
-            );
-            doNowItems = created.map((item, i) => {
-              const q = itemInputs[i]!.q;
-              const isMcq = q.type === 'MCQ' && Array.isArray(q.options) && q.options.length === 4;
-              const answerMode: 'MCQ' | 'SHORT_ANSWER' = isMcq ? 'MCQ' : 'SHORT_ANSWER';
-              const content: Record<string, unknown> = isMcq
-                ? {
-                    question: q.stem,
-                    options: q.options!,
-                    correctIndex: Math.max(0, q.options!.indexOf(q.answer ?? '')),
-                  }
-                : { question: q.stem, answer: q.answer ?? '' };
-              return {
-                skillId: itemInputs[i]!.resolvedSkillId,
-                itemId: item.id,
-                stemPreview: q.stem.slice(0, 100) + (q.stem.length > 100 ? '…' : ''),
-                answerMode,
-                content,
-              };
-            });
-          } catch (err) {
-            console.warn('[lesson-plan/route] Failed to persist Do Now items:', err);
-          }
-        }
+        const doNowItems: AiDoNowItem[] = itemInputs.map(({ q, resolvedSkillId }) => {
+          const isMcq = q.type === 'MCQ' && Array.isArray(q.options) && q.options.length === 4;
+          const answerMode: 'MCQ' | 'SHORT_ANSWER' = isMcq ? 'MCQ' : 'SHORT_ANSWER';
+          const content: Record<string, unknown> = isMcq
+            ? {
+                question: q.stem,
+                options: q.options!,
+                correctIndex: Math.max(0, q.options!.indexOf(q.answer ?? '')),
+              }
+            : { question: q.stem, answer: q.answer ?? '' };
+
+          return {
+            skillId: resolvedSkillId,
+            itemId: `generated-${crypto.randomUUID()}`,
+            sourceItemId: null,
+            stemPreview: q.stem.slice(0, 100) + (q.stem.length > 100 ? '…' : ''),
+            answerMode,
+            content,
+          };
+        });
+
         send({
           stage: 'persisting',
-          message: `Saved ${doNowItems.length} question${doNowItems.length !== 1 ? 's' : ''}`,
+          message: `Prepared ${doNowItems.length} question${doNowItems.length !== 1 ? 's' : ''}`,
           total: itemInputs.length,
           saved: doNowItems.length,
         });
@@ -435,9 +436,10 @@ export async function POST(req: NextRequest) {
         send({ stage: 'done', plan: response });
         controller.close();
       } catch (err) {
+        console.error('[teacher/ai/lesson-plan]', err instanceof Error ? err.message : err);
         send({
           stage: 'error',
-          message: err instanceof Error ? err.message : 'An unexpected error occurred.',
+          message: 'An unexpected error occurred while building the lesson plan.',
         });
         controller.close();
       } finally {

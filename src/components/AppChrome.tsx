@@ -411,7 +411,10 @@ export function AppChrome({
     (async () => {
       try {
         const res = await fetch("/api/student/nav-summary");
-        if (!res.ok) return;
+        if (!res.ok) {
+          if (!cancelled) setStudentSubjects([]);
+          return;
+        }
         const data = (await res.json()) as { subjects: StudentSubjectNav[] };
         if (!cancelled) setStudentSubjects(data.subjects ?? []);
       } catch {

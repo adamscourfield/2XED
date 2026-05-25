@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/features/auth/authOptions';
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 import { prisma } from '@/db/prisma';
 import { checkRateLimit } from '@/lib/rateLimit';
 
@@ -101,9 +100,7 @@ export async function POST(
   if (!checkRateLimit(`slides-ai:${user.id}`, 20, 60_000)) {
     return NextResponse.json({ error: 'Too many requests — please wait before generating again.' }, { status: 429 });
   }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const blockModel = (prisma as any).lessonBlock;
+  const blockModel = prisma.lessonBlock;
   if (!blockModel) return NextResponse.json({ error: 'Model unavailable' }, { status: 503 });
 
   const block = await blockModel.findUnique({
@@ -157,6 +154,6 @@ export async function POST(
     return NextResponse.json({ slides });
   } catch (e) {
     console.error('[slides-ai] generation failed:', (e as Error).message);
-    return NextResponse.json({ error: (e as Error).message }, { status: 500 });
+    return NextResponse.json({ error: 'AI generation failed. Please try again.' }, { status: 500 });
   }
 }

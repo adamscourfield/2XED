@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { z } from 'zod';
 import { authOptions } from '@/features/auth/authOptions';
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 import { prisma } from '@/db/prisma';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -42,9 +41,7 @@ export async function GET() {
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const user = session.user as { id: string; role?: string };
   if (!requireTeacher(user)) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const model = (prisma as any).curriculumPlan;
+  const model = prisma.curriculumPlan;
   if (!model) return NextResponse.json({ plans: [] });
 
   const plans = await model.findMany({
@@ -100,9 +97,7 @@ export async function POST(req: NextRequest) {
   const parsed = createSchema.safeParse(await req.json());
   if (!parsed.success)
     return NextResponse.json({ error: 'Invalid input', issues: parsed.error.issues }, { status: 400 });
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const model = (prisma as any).curriculumPlan;
+  const model = prisma.curriculumPlan;
   if (!model) return NextResponse.json({ error: 'Model unavailable' }, { status: 503 });
 
   const plan = await model.create({

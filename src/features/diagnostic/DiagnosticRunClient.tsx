@@ -110,6 +110,13 @@ export function DiagnosticRunClient({ subject, skill, item, sessionId, itemsSeen
         throw new Error(data?.error || 'Could not save this answer.');
       }
 
+      const data = (await res.json()) as { done?: boolean };
+      if (data.done) {
+        router.refresh();
+        router.push(`/learn/${subjectSlug}`);
+        return;
+      }
+
       router.refresh();
       router.push(`/diagnostic/${subjectSlug}/run`);
     } catch (error) {

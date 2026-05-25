@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json(
-      { error: 'Marking failed', details: error.message },
+      { error: 'Marking failed' },
       { status: 500 }
     );
   }

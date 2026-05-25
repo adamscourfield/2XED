@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/features/auth/authOptions';
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 import { prisma } from '@/db/prisma';
 import { z } from 'zod';
 
@@ -15,11 +14,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ less
   const session = await getServerSession(authOptions);
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const user = session.user as { id: string; role?: string };
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const lessonModel = (prisma as any).lesson;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const blockModel = (prisma as any).lessonBlock;
+  const lessonModel = prisma.lesson;
+  const blockModel = prisma.lessonBlock;
   if (!lessonModel || !blockModel) return NextResponse.json({ error: 'Model unavailable' }, { status: 503 });
 
   const lesson = await lessonModel.findUnique({ where: { id: lessonId }, select: { teacherUserId: true } });
@@ -44,8 +40,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ less
   // Update each block's sortOrder in a transaction
   await prisma.$transaction(
     parsed.data.blockIds.map((blockId, index) =>
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (prisma as any).lessonBlock.update({
+      prisma.lessonBlock.update({
         where: { id: blockId },
         data: { sortOrder: index },
       })

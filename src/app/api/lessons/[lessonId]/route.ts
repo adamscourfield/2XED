@@ -1,13 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/features/auth/authOptions';
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 import { prisma } from '@/db/prisma';
 import { z } from 'zod';
 
 async function authorize(lessonId: string, userId: string, role: string) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const lessonModel = (prisma as any).lesson;
+  const lessonModel = prisma.lesson;
   if (!lessonModel) return null;
   const lesson = await lessonModel.findUnique({ where: { id: lessonId } });
   if (!lesson) return null;
@@ -20,9 +18,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ les
   const session = await getServerSession(authOptions);
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const user = session.user as { id: string; role?: string };
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const lessonModel = (prisma as any).lesson;
+  const lessonModel = prisma.lesson;
   if (!lessonModel) return NextResponse.json({ error: 'Model unavailable' }, { status: 503 });
 
   const lesson = await lessonModel.findUnique({
@@ -78,9 +74,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ le
   const body = await req.json();
   const parsed = patchSchema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: 'Invalid input' }, { status: 400 });
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const updated = await (prisma as any).lesson.update({
+  const updated = await prisma.lesson.update({
     where: { id: lessonId },
     data: parsed.data,
     select: { id: true, title: true, topic: true, isPublished: true, curriculumUnitId: true, updatedAt: true },
@@ -97,9 +91,7 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
 
   const lesson = await authorize(lessonId, user.id, user.role ?? '');
   if (!lesson) return NextResponse.json({ error: 'Not found' }, { status: 404 });
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  await (prisma as any).lesson.delete({ where: { id: lessonId } });
+  await prisma.lesson.delete({ where: { id: lessonId } });
 
   return NextResponse.json({ ok: true });
 }

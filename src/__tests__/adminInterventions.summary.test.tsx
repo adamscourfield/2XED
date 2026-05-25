@@ -5,6 +5,7 @@ const getServerSessionMock = vi.fn();
 const redirectMock = vi.fn();
 const interventionFindManyMock = vi.fn();
 const eventFindManyMock = vi.fn();
+const subjectFindManyMock = vi.fn();
 
 vi.mock('next-auth', () => ({
   getServerSession: getServerSessionMock,
@@ -34,6 +35,9 @@ vi.mock('@/db/prisma', () => ({
     event: {
       findMany: eventFindManyMock,
     },
+    subject: {
+      findMany: subjectFindManyMock,
+    },
   },
 }));
 
@@ -43,9 +47,11 @@ describe('admin interventions page summary cards', () => {
     redirectMock.mockReset();
     interventionFindManyMock.mockReset();
     eventFindManyMock.mockReset();
+    subjectFindManyMock.mockReset();
 
     getServerSessionMock.mockResolvedValue({ user: { id: 'admin-1', role: 'ADMIN' } });
     interventionFindManyMock.mockResolvedValue([]);
+    subjectFindManyMock.mockResolvedValue([{ slug: 'maths', title: 'Maths' }]);
   });
 
   it('shows route A/B/C summary, shadow pass/fail, secure fast-pass, and intervention flagged counts', async () => {

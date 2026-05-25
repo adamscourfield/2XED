@@ -1,7 +1,10 @@
+import React from 'react';
 import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
 import { authOptions } from '@/features/auth/authOptions';
 import { prisma } from '@/db/prisma';
+import { AdminRebaselineClient } from '@/features/admin/AdminRebaselineClient';
+import { AdminReteachPolicyPanel } from '@/features/reteach/AdminReteachPolicyPanel';
 
 type RouteRecommendationEvent = {
   name: string;
@@ -20,7 +23,7 @@ export default async function AdminInterventionsPage() {
 
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
-  const [flags, events] = await Promise.all([
+  const [flags, events, subjects] = await Promise.all([
     prisma.interventionFlag.findMany({
       where: { createdAt: { gte: sevenDaysAgo } },
       select: { id: true },
@@ -38,6 +41,10 @@ export default async function AdminInterventionsPage() {
         },
       },
       select: { name: true, payload: true },
+    }),
+    prisma.subject.findMany({
+      orderBy: { title: 'asc' },
+      select: { slug: true, title: true },
     }),
   ]);
 
@@ -69,6 +76,14 @@ export default async function AdminInterventionsPage() {
       <section>
         <h2>Interventions flagged (7d)</h2>
         <div>{Math.max(flags.length, interventionFlagged)}</div>
+      </section>
+      <section>
+        <h2>Reteach policy</h2>
+        <AdminReteachPolicyPanel />
+      </section>
+      <section>
+        <h2>Re-baseline student</h2>
+        <AdminRebaselineClient subjects={subjects} />
       </section>
     </main>
   );

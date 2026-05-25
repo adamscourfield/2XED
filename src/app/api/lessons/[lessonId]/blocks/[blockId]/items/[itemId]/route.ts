@@ -1,15 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
+import type { Prisma } from '@prisma/client';
 import { authOptions } from '@/features/auth/authOptions';
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 import { prisma } from '@/db/prisma';
 import { z } from 'zod';
 
 const ANSWER_MODES = ['MCQ', 'ORDER', 'SHORT_ANSWER', 'PICK'] as const;
 
 async function authorizeItem(lessonId: string, blockId: string, itemId: string, userId: string, role: string) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const itemModel = (prisma as any).lessonItem;
+  const itemModel = prisma.lessonItem;
   if (!itemModel) return null;
   const item = await itemModel.findUnique({
     where: { id: itemId },
@@ -67,10 +66,15 @@ export async function PATCH(
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const updated = await (prisma as any).lessonItem.update({
+  const updateData: Prisma.LessonItemUncheckedUpdateInput = {};
+  if (parsed.data.answerMode !== undefined) updateData.answerMode = parsed.data.answerMode;
+  if (parsed.data.content !== undefined) updateData.content = parsed.data.content as Prisma.InputJsonValue;
+  if (parsed.data.skillId !== undefined) updateData.skillId = parsed.data.skillId;
+  if (parsed.data.sortOrder !== undefined) updateData.sortOrder = parsed.data.sortOrder;
+
+  const updated = await prisma.lessonItem.update({
     where: { id: itemId },
-    data: parsed.data,
+    data: updateData,
   });
 
   return NextResponse.json(updated);
@@ -88,8 +92,7 @@ export async function DELETE(
   const item = await authorizeItem(lessonId, blockId, itemId, user.id, user.role ?? '');
   if (!item) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  await (prisma as any).lessonItem.delete({ where: { id: itemId } });
+  await prisma.lessonItem.delete({ where: { id: itemId } });
 
   return NextResponse.json({ ok: true });
 }

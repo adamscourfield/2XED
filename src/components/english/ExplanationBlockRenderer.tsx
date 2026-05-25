@@ -384,10 +384,11 @@ function renderBlock(block: ExplanationBlock): ReactNode {
     case 'TEXT':
       return (
         <div
-          className="prose prose-sm max-w-none leading-relaxed"
+          className="prose prose-sm max-w-none whitespace-pre-wrap leading-relaxed"
           style={{ color: 'var(--anx-text)' }}
-          dangerouslySetInnerHTML={{ __html: block.content }}
-        />
+        >
+          {block.content}
+        </div>
       );
 
     case 'IMAGE': {

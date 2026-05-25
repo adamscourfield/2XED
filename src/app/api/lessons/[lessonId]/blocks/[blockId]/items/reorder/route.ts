@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/features/auth/authOptions';
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 import { prisma } from '@/db/prisma';
 import { z } from 'zod';
 
@@ -13,9 +12,7 @@ export async function PUT(
   const session = await getServerSession(authOptions);
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const user = session.user as { id: string; role?: string };
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const blockModel = (prisma as any).lessonBlock;
+  const blockModel = prisma.lessonBlock;
   if (!blockModel) return NextResponse.json({ error: 'Model unavailable' }, { status: 503 });
 
   const block = await blockModel.findUnique({
@@ -32,8 +29,7 @@ export async function PUT(
   if (!parsed.success) return NextResponse.json({ error: 'Invalid input' }, { status: 400 });
 
   // SEC-2: Verify all submitted itemIds actually belong to this block
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const itemModel = (prisma as any).lessonItem;
+  const itemModel = prisma.lessonItem;
   const ownedItems = await itemModel.findMany({
     where: { id: { in: parsed.data.itemIds }, blockId },
     select: { id: true },
@@ -44,8 +40,7 @@ export async function PUT(
 
   await prisma.$transaction(
     parsed.data.itemIds.map((itemId, index) =>
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (prisma as any).lessonItem.update({
+      prisma.lessonItem.update({
         where: { id: itemId },
         data: { sortOrder: index },
       })

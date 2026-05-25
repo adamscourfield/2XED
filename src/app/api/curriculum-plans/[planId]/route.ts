@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { z } from 'zod';
 import { authOptions } from '@/features/auth/authOptions';
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 import { prisma } from '@/db/prisma';
 
 export interface CurriculumUnitDetail {
@@ -36,8 +35,7 @@ const patchSchema = z.object({
 });
 
 async function resolvePlan(planId: string, userId: string, role: string) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const model = (prisma as any).curriculumPlan;
+  const model = prisma.curriculumPlan;
   if (!model) return null;
   return model.findUnique({
     where: { id: planId },
@@ -144,9 +142,7 @@ export async function PATCH(
   const parsed = patchSchema.safeParse(await req.json());
   if (!parsed.success)
     return NextResponse.json({ error: 'Invalid input', issues: parsed.error.issues }, { status: 400 });
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  await (prisma as any).curriculumPlan.update({
+  await prisma.curriculumPlan.update({
     where: { id: planId },
     data: parsed.data,
   });
@@ -168,8 +164,6 @@ export async function DELETE(
 
   const plan = await resolvePlan(planId, user.id, user.role ?? '');
   if (!plan) return NextResponse.json({ error: 'Not found' }, { status: 404 });
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  await (prisma as any).curriculumPlan.delete({ where: { id: planId } });
+  await prisma.curriculumPlan.delete({ where: { id: planId } });
   return new NextResponse(null, { status: 204 });
 }

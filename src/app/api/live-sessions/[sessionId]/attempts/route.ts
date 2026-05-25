@@ -12,6 +12,9 @@ import { aiMarkingService, markSchema } from '@/features/qa/AIMarkingService';
 import { parseOpeningCheckQueue } from '@/lib/live/live-check-plan';
 import { RUBRIC_CORRECT_THRESHOLD } from '@/lib/live/markingConstants';
 
+const SNAPSHOT_MAX_BYTES = 5 * 1024 * 1024;
+const STROKES_MAX_COUNT = 10_000;
+
 const schema = z.object({
   itemId: z.string().min(1),
   skillId: z.string().min(1),
@@ -26,10 +29,23 @@ const schema = z.object({
     .optional(),
   responseTimeMs: z.number().int().min(0),
   confidence: z.enum(['low', 'mid', 'high']).optional(),
-}).refine((data) => data.answer.trim().length > 0 || !!data.canvasData, {
-  message: 'Answer or canvas data is required',
-  path: ['answer'],
-});
+})
+  .refine((data) => data.answer.trim().length > 0 || !!data.canvasData, {
+    message: 'Answer or canvas data is required',
+    path: ['answer'],
+  })
+  .refine((data) => !data.canvasData || data.canvasData.snapshotBase64.length <= SNAPSHOT_MAX_BYTES, {
+    message: 'Canvas snapshot is too large',
+    path: ['canvasData', 'snapshotBase64'],
+  })
+  .refine((data) => !data.canvasData?.snapshotCropped || data.canvasData.snapshotCropped.length <= SNAPSHOT_MAX_BYTES, {
+    message: 'Cropped canvas snapshot is too large',
+    path: ['canvasData', 'snapshotCropped'],
+  })
+  .refine((data) => !data.canvasData?.strokes || data.canvasData.strokes.length <= STROKES_MAX_COUNT, {
+    message: 'Canvas stroke data is too large',
+    path: ['canvasData', 'strokes'],
+  });
 
 interface Props {
   params: Promise<{ sessionId: string }>;
@@ -111,6 +127,13 @@ export async function POST(req: NextRequest, { params }: Props) {
   });
   if (!skillBelongsToSubject) {
     return NextResponse.json({ error: 'Invalid skillId for this session' }, { status: 400 });
+  }
+
+  const itemBelongsToSkill = await prisma.itemSkill.count({
+    where: { itemId, skillId },
+  });
+  if (!itemBelongsToSkill) {
+    return NextResponse.json({ error: 'Invalid item for this skill' }, { status: 400 });
   }
 
   // Idempotency guard — if this exact item was already submitted in this session

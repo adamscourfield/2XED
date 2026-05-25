@@ -6,11 +6,12 @@
  *   2. Creates a DO_NOW block and populates it with selected Do Now items
  *   3. Creates EXPLAIN / CHECK / PRACTICE blocks per skill phase config
  *
- * Returns the updated title and the new block list.
+ * Returns the updated title and the full block list.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
+import type { LessonBlockType, Prisma } from '@prisma/client';
 import { authOptions } from '@/features/auth/authOptions';
 import { prisma } from '@/db/prisma';
 import type { AiLessonPlanResponse } from '@/app/api/teacher/ai/lesson-plan/route';
@@ -25,12 +26,9 @@ export async function POST(
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const user = session.user as { id: string; role?: string };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const lessonModel = (prisma as any).lesson;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const blockModel = (prisma as any).lessonBlock;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const itemModel = (prisma as any).lessonItem;
+  const lessonModel = prisma.lesson;
+  const blockModel = prisma.lessonBlock;
+  const itemModel = prisma.lessonItem;
 
   if (!lessonModel || !blockModel || !itemModel) {
     return NextResponse.json({ error: 'Model unavailable' }, { status: 503 });
@@ -60,7 +58,7 @@ export async function POST(
   let sortOrder: number = lastBlock ? lastBlock.sortOrder + 1 : 0;
 
   interface BlockDef {
-    type: string;
+    type: LessonBlockType;
     title: string | null;
     doNowItems?: AiLessonPlanResponse['doNowItems'];
   }
@@ -77,52 +75,47 @@ export async function POST(
     if (skill.hasPractice) blockDefs.push({ type: 'PRACTICE', title: skill.skillName });
   }
 
-  const createdBlocks = await prisma.$transaction(async (tx) => {
+  const blocks = await prisma.$transaction(async (tx) => {
     if (plan.title?.trim()) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await (tx as any).lesson.update({
+      await tx.lesson.update({
         where: { id: lessonId },
         data: { title: plan.title.trim() },
       });
     }
 
-    const blocks = [];
-
     for (const def of blockDefs) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const block = await (tx as any).lessonBlock.create({
+      const block = await tx.lessonBlock.create({
         data: { lessonId, type: def.type, title: def.title ?? null, sortOrder: sortOrder++ },
         include: { items: { orderBy: { sortOrder: 'asc' as const } } },
       });
 
       if (def.doNowItems && def.doNowItems.length > 0) {
-        const createdItems = [];
         for (let i = 0; i < def.doNowItems.length; i++) {
           const doNow = def.doNowItems[i]!;
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const lessonItem = await (tx as any).lessonItem.create({
+          await tx.lessonItem.create({
             data: {
               blockId: block.id,
               itemType: 'QUESTION',
               answerMode: doNow.answerMode ?? 'MCQ',
-              content: doNow.content ?? { question: doNow.stemPreview },
-              sourceItemId: doNow.itemId,
+              content: (doNow.content ?? { question: doNow.stemPreview }) as Prisma.InputJsonValue,
+              sourceItemId: doNow.sourceItemId ?? null,
+              skillId: doNow.skillId || null,
               sortOrder: i,
             },
           });
-          createdItems.push(lessonItem);
         }
-        block.items = createdItems;
       }
-
-      blocks.push(block);
     }
 
-    return blocks;
+    return tx.lessonBlock.findMany({
+      where: { lessonId },
+      orderBy: { sortOrder: 'asc' as const },
+      include: { items: { orderBy: { sortOrder: 'asc' as const } } },
+    });
   });
 
   return NextResponse.json(
-    { title: plan.title ?? '', blocks: createdBlocks },
+    { title: plan.title ?? '', blocks },
     { status: 201 },
   );
 }

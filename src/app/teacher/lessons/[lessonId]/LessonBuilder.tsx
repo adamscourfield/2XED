@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useDebounce } from '@/hooks/useDebounce';
 import { CheckBlockEditor, PracticeBlockEditor } from './QuestionEditor';
 import { ExplainBlockEditor, ModelBlockEditor } from './SlideEditor';
@@ -79,6 +80,21 @@ function formatMins(mins: number): string {
   const m = mins % 60;
   return m === 0 ? `${h}h` : `${h}h ${m}m`;
 }
+
+function blockLabel(type: BlockType): string {
+  return BLOCK_META[type].label;
+}
+
+function blockCountOfType(blocks: LessonBlock[], type: BlockType): number {
+  return blocks.filter((block) => block.type === type).length;
+}
+
+type LessonChecklistItem = {
+  id: string;
+  label: string;
+  done: boolean;
+  hint: string;
+};
 
 // ─── Item-title extractor (for auto-generating block titles) ──────────────────
 
@@ -466,6 +482,135 @@ function StudentPreviewContent({ block, lessonTitle }: { block: LessonBlock | nu
   );
 }
 
+function LessonReadinessCard({
+  lessonTitle,
+  lessonTopic,
+  isPublished,
+  blocks,
+}: {
+  lessonTitle: string;
+  lessonTopic: string;
+  isPublished: boolean;
+  blocks: LessonBlock[];
+}) {
+  const checklist = useMemo<LessonChecklistItem[]>(() => {
+    const hasDoNow = blockCountOfType(blocks, 'DO_NOW') > 0;
+    const hasTeach = blockCountOfType(blocks, 'EXPLAIN') + blockCountOfType(blocks, 'MODEL') > 0;
+    const hasPractice = blockCountOfType(blocks, 'PRACTICE') > 0;
+    const hasCheck = blockCountOfType(blocks, 'CHECK') > 0;
+    const hasContent = blocks.some((block) => block.items.length > 0);
+
+    return [
+      {
+        id: 'title',
+        label: 'Clear lesson title',
+        done: lessonTitle.trim().length >= 6,
+        hint: 'Rename the lesson so it is easy to spot in the library.',
+      },
+      {
+        id: 'objective',
+        label: 'Shared learning objective',
+        done: lessonTopic.trim().length >= 12,
+        hint: 'Add a one-sentence objective students should reach by the end.',
+      },
+      {
+        id: 'opener',
+        label: 'Lesson opener',
+        done: hasDoNow,
+        hint: `Add a ${blockLabel('DO_NOW')} block to activate prior knowledge.`,
+      },
+      {
+        id: 'instruction',
+        label: 'Teacher input or modelling',
+        done: hasTeach,
+        hint: `Add ${blockLabel('EXPLAIN')} or ${blockLabel('MODEL')} before independent work.`,
+      },
+      {
+        id: 'practice',
+        label: 'Student practice',
+        done: hasPractice,
+        hint: `Add at least one ${blockLabel('PRACTICE')} block for independent application.`,
+      },
+      {
+        id: 'check',
+        label: 'Check for understanding',
+        done: hasCheck,
+        hint: `Use a ${blockLabel('CHECK')} block to see who is ready to move on.`,
+      },
+      {
+        id: 'content',
+        label: 'At least one block has content',
+        done: hasContent,
+        hint: 'Open a block and add slides or questions before going live.',
+      },
+      {
+        id: 'publish',
+        label: 'Published and ready to teach',
+        done: isPublished,
+        hint: 'Flip the Draft toggle when this lesson is ready for students.',
+      },
+    ];
+  }, [blocks, isPublished, lessonTitle, lessonTopic]);
+
+  const completed = checklist.filter((item) => item.done).length;
+  const remaining = checklist.find((item) => !item.done);
+  const percent = Math.round((completed / checklist.length) * 100);
+
+  return (
+    <section className="rounded-3xl border border-[#e8e7f8] bg-[linear-gradient(180deg,#ffffff_0%,#f7f7ff_100%)] p-4 shadow-[0_18px_40px_rgba(88,80,236,0.08)]">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[#7c76b8]">
+            Readiness
+          </p>
+          <h3 className="mt-1 text-sm font-semibold text-[#111827]">
+            {completed === checklist.length ? 'Ready to teach' : 'Build progress'}
+          </h3>
+        </div>
+        <div className="rounded-2xl bg-[#ede9fe] px-3 py-2 text-right">
+          <p className="text-lg font-bold text-[#4c3ecf]">{percent}%</p>
+          <p className="text-[11px] text-[#6b62b3]">{completed}/{checklist.length} done</p>
+        </div>
+      </div>
+
+      <div className="mt-4 h-2 overflow-hidden rounded-full bg-[#ebe9ff]">
+        <div className="h-full rounded-full bg-[linear-gradient(90deg,#5850ec_0%,#9f7aea_100%)]" style={{ width: `${percent}%` }} />
+      </div>
+
+      <div className="mt-4 space-y-2">
+        {checklist.map((item) => (
+          <div
+            key={item.id}
+            className={`rounded-2xl border px-3 py-2.5 ${
+              item.done ? 'border-[#d9f2e5] bg-[#f2fbf7]' : 'border-[#ececf3] bg-white'
+            }`}
+          >
+            <div className="flex items-start gap-3">
+              <span
+                className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-bold ${
+                  item.done ? 'bg-[#10b981] text-white' : 'bg-[#eef0f6] text-[#8a8fa3]'
+                }`}
+              >
+                {item.done ? '✓' : '•'}
+              </span>
+              <div>
+                <p className={`text-sm font-medium ${item.done ? 'text-[#185b42]' : 'text-[#374151]'}`}>{item.label}</p>
+                {!item.done && <p className="mt-1 text-xs text-[#8b92a6]">{item.hint}</p>}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {remaining && (
+        <div className="mt-4 rounded-2xl border border-dashed border-[#d9d5ff] bg-[#faf9ff] px-3.5 py-3 text-sm text-[#5850ec]">
+          Next best step: <span className="font-semibold">{remaining.label}</span>
+        </div>
+      )}
+    </section>
+  );
+}
+
 // UX-10: Preview modal for screens < xl
 function PreviewModal({ block, lessonTitle, onClose }: { block: LessonBlock | null; lessonTitle: string; onClose: () => void }) {
   useEffect(() => {
@@ -505,6 +650,7 @@ function PreviewModal({ block, lessonTitle, onClose }: { block: LessonBlock | nu
 // ─── Main builder ────────────────────────────────────────────────────────────
 
 export function LessonBuilder({ lesson: initialLesson }: { lesson: LessonBuilderData }) {
+  const searchParams = useSearchParams();
   const [lesson, setLesson] = useState<LessonBuilderData>(initialLesson);
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(
     initialLesson.blocks[0]?.id ?? null
@@ -520,10 +666,12 @@ export function LessonBuilder({ lesson: initialLesson }: { lesson: LessonBuilder
 
   // UX-8: confirm modal state
   const [confirmModal, setConfirmModal] = useState<{ message: string; onConfirm: () => void } | null>(null);
+  const [setupNoticeDismissed, setSetupNoticeDismissed] = useState(false);
 
   const debouncedTitle = useDebounce(lesson.title, 600);
   const debouncedTopic = useDebounce(lesson.topic, 600);
   const isFirstRender = useRef(true);
+  const starterSetupFailed = searchParams.get('setup') === 'starter-error';
 
   // Auto-save lesson metadata
   useEffect(() => {
@@ -707,7 +855,9 @@ export function LessonBuilder({ lesson: initialLesson }: { lesson: LessonBuilder
       setSelectedBlockId(blocks[0]?.id ?? null);
       setShowAiBuilder(false);
     } catch (e) {
-      setSaveError(e instanceof Error ? e.message : 'Failed to apply plan');
+      const message = e instanceof Error ? e.message : 'Failed to apply plan';
+      setSaveError(message);
+      throw new Error(message);
     }
   }, [lesson.id]);
 
@@ -895,6 +1045,24 @@ export function LessonBuilder({ lesson: initialLesson }: { lesson: LessonBuilder
 
         {/* ── Centre: block editor ── */}
         <main className="min-w-0 flex-1 overflow-y-auto p-6 lg:p-8">
+          {starterSetupFailed && !setupNoticeDismissed && (
+            <div className="mb-5 flex items-start justify-between gap-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+              <div>
+                <p className="font-semibold">Starter structure partially failed to build.</p>
+                <p className="mt-1 text-amber-800">
+                  The lesson was created successfully, but at least one starter block did not get added automatically.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSetupNoticeDismissed(true)}
+                className="rounded-lg px-2 py-1 text-xs font-semibold text-amber-900 transition hover:bg-amber-100"
+              >
+                Dismiss
+              </button>
+            </div>
+          )}
+
           {!selectedBlock ? (
             showAiBuilder ? (
               /* AI lesson builder — shown when no block selected and AI mode is active */
@@ -956,8 +1124,18 @@ export function LessonBuilder({ lesson: initialLesson }: { lesson: LessonBuilder
         </main>
 
         {/* ── Right: student preview (xl+ only) ── */}
-        <aside className="hidden w-[280px] shrink-0 overflow-y-auto border-l border-[#e5e7eb] bg-white p-4 xl:block">
-          <StudentPreviewContent block={selectedBlock} lessonTitle={lesson.title} />
+        <aside className="hidden w-[320px] shrink-0 overflow-y-auto border-l border-[#e5e7eb] bg-white p-4 xl:block">
+          <div className="space-y-4">
+            <LessonReadinessCard
+              lessonTitle={lesson.title}
+              lessonTopic={lesson.topic}
+              isPublished={lesson.isPublished}
+              blocks={lesson.blocks}
+            />
+            <div className="rounded-3xl border border-[#ececf3] bg-white p-4 shadow-[0_12px_30px_rgba(15,23,42,0.05)]">
+              <StudentPreviewContent block={selectedBlock} lessonTitle={lesson.title} />
+            </div>
+          </div>
         </aside>
       </div>
 

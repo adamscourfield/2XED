@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/features/auth/authOptions';
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 import { prisma } from '@/db/prisma';
 import { z } from 'zod';
 
@@ -18,11 +17,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ les
   const session = await getServerSession(authOptions);
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const user = session.user as { id: string; role?: string };
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const lessonModel = (prisma as any).lesson;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const blockModel = (prisma as any).lessonBlock;
+  const lessonModel = prisma.lesson;
+  const blockModel = prisma.lessonBlock;
   if (!lessonModel || !blockModel) return NextResponse.json({ error: 'Model unavailable' }, { status: 503 });
 
   const lesson = await lessonModel.findUnique({ where: { id: lessonId }, select: { teacherUserId: true } });

@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { z } from 'zod';
 import { authOptions } from '@/features/auth/authOptions';
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 import { prisma } from '@/db/prisma';
 
 const patchSchema = z.object({
@@ -16,8 +15,7 @@ const patchSchema = z.object({
 });
 
 async function resolveUnit(unitId: string, planId: string, userId: string, role: string) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const model = (prisma as any).curriculumUnit;
+  const model = prisma.curriculumUnit;
   if (!model) return null;
   const unit = await model.findUnique({
     where: { id: unitId },
@@ -59,9 +57,7 @@ export async function PATCH(
       return NextResponse.json({ error: 'dateStart must be before dateEnd' }, { status: 400 });
     }
   }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const unitModel = (prisma as any).curriculumUnit;
+  const unitModel = prisma.curriculumUnit;
   const { skillIds, dateStart, dateEnd, ...rest } = parsed.data;
 
   // Build core update data
@@ -71,8 +67,8 @@ export async function PATCH(
 
   // C1: wrap skill replacement in a transaction to prevent partial-update corruption
   if (skillIds !== undefined) {
-    const [, updated] = await (prisma as any).$transaction([
-      (prisma as any).curriculumUnitSkill.deleteMany({ where: { unitId } }),
+    const [, updated] = await prisma.$transaction([
+      prisma.curriculumUnitSkill.deleteMany({ where: { unitId } }),
       unitModel.update({
         where: { id: unitId },
         data: { ...data, skills: { create: skillIds.map((skillId: string) => ({ skillId })) } },
@@ -104,8 +100,6 @@ export async function DELETE(
 
   const unit = await resolveUnit(unitId, planId, user.id, user.role ?? '');
   if (!unit) return NextResponse.json({ error: 'Not found' }, { status: 404 });
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  await (prisma as any).curriculumUnit.delete({ where: { id: unitId } });
+  await prisma.curriculumUnit.delete({ where: { id: unitId } });
   return new NextResponse(null, { status: 204 });
 }

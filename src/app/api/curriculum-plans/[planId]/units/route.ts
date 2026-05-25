@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { z } from 'zod';
 import { authOptions } from '@/features/auth/authOptions';
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 import { prisma } from '@/db/prisma';
 
 const createSchema = z.object({
@@ -15,8 +14,7 @@ const createSchema = z.object({
 });
 
 async function verifyOwner(planId: string, userId: string): Promise<boolean> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const model = (prisma as any).curriculumPlan;
+  const model = prisma.curriculumPlan;
   if (!model) return false;
   const plan = await model.findUnique({ where: { id: planId }, select: { teacherUserId: true } });
   return plan?.teacherUserId === userId;
@@ -45,9 +43,7 @@ export async function POST(
       return NextResponse.json({ error: 'dateStart must be before dateEnd' }, { status: 400 });
     }
   }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const unitModel = (prisma as any).curriculumUnit;
+  const unitModel = prisma.curriculumUnit;
   if (!unitModel) return NextResponse.json({ error: 'Model unavailable' }, { status: 503 });
 
   // Calculate next sortOrder

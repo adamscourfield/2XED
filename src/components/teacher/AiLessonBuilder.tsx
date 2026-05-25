@@ -22,7 +22,7 @@ interface Props {
   subjectId: string;
   subjectTitle?: string;
   initialTopic?: string;
-  onPlanGenerated: (plan: AiLessonPlanResponse) => void;
+  onPlanGenerated: (plan: AiLessonPlanResponse) => void | Promise<void>;
   onClose: () => void;
 }
 
@@ -35,7 +35,7 @@ const STAGE_LABELS: Record<StageKey, string> = {
   extracting:  'Extracting text from file…',
   ai_thinking: 'Claude is building your lesson…',
   matching:    'Matching skills to your curriculum…',
-  persisting:  'Saving questions to Ember…',
+  persisting:  'Preparing lesson plan…',
 };
 
 // Ordered list used to drive the progress timeline.
@@ -171,11 +171,13 @@ function PlanPreview({
   onAccept,
   onReject,
   accepting,
+  applyError,
 }: {
   plan: AiLessonPlanResponse;
   onAccept: (customised: AiLessonPlanResponse) => void;
   onReject: () => void;
   accepting: boolean;
+  applyError: string | null;
 }) {
   const [skills, setSkills] = useState<AiMatchedSkill[]>(() => plan.matchedSkills.map((s) => ({ ...s })));
   const [includeDoNow, setIncludeDoNow] = useState<Record<string, boolean>>(() =>
@@ -330,6 +332,12 @@ function PlanPreview({
       {hasInvalidPlan && (
         <p className="text-xs" style={{ color: 'var(--anx-danger-text)' }}>
           Each skill needs at least one of Explain, Check, or Practice before you can apply.
+        </p>
+      )}
+
+      {applyError && (
+        <p className="rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700">
+          {applyError}
         </p>
       )}
 
@@ -504,6 +512,7 @@ export function AiLessonBuilder({ subjectId, subjectTitle, initialTopic, onPlanG
     setPlan(null);
     setError(null);
     setStreaming(false);
+    setAccepting(false);
     setActiveStage(null);
     setActiveDetail(undefined);
     setCompletedStages([]);
@@ -578,9 +587,15 @@ export function AiLessonBuilder({ subjectId, subjectTitle, initialTopic, onPlanG
     }
   }
 
-  function handleAccept(customised: AiLessonPlanResponse) {
+  async function handleAccept(customised: AiLessonPlanResponse) {
     setAccepting(true);
-    onPlanGenerated(customised);
+    setError(null);
+    try {
+      await onPlanGenerated(customised);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to apply plan.');
+      setAccepting(false);
+    }
   }
 
   // ── Describe step navigation ──────────────────────────────────────────────
@@ -613,6 +628,7 @@ export function AiLessonBuilder({ subjectId, subjectTitle, initialTopic, onPlanG
         onAccept={handleAccept}
         onReject={resetState}
         accepting={accepting}
+        applyError={error}
       />
     );
   }

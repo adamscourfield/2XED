@@ -15,7 +15,6 @@ import { writeFile, unlink } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { authOptions } from '@/features/auth/authOptions';
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 import { prisma } from '@/db/prisma';
 import { extractTextFromFile, FILE_TEXT_LIMIT } from '@/lib/ai/fileExtractor';
 import { checkRateLimit } from '@/lib/rateLimit';
@@ -140,8 +139,7 @@ export async function POST(
   }
 
   // Verify the plan belongs to this teacher
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const planModel = (prisma as any).curriculumPlan;
+  const planModel = prisma.curriculumPlan;
   if (!planModel) return NextResponse.json({ error: 'Model unavailable' }, { status: 503 });
 
   const plan = await planModel.findUnique({

@@ -1,15 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/features/auth/authOptions';
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 import { prisma } from '@/db/prisma';
 import { z } from 'zod';
 
 const BLOCK_TYPES = ['DO_NOW', 'EXPLAIN', 'MODEL', 'CHECK', 'PRACTICE'] as const;
 
 async function authorizeBlock(lessonId: string, blockId: string, userId: string, role: string) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const blockModel = (prisma as any).lessonBlock;
+  const blockModel = prisma.lessonBlock;
   if (!blockModel) return null;
   const block = await blockModel.findUnique({
     where: { id: blockId },
@@ -41,9 +39,7 @@ export async function PATCH(
   const body = await req.json();
   const parsed = patchSchema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: 'Invalid input' }, { status: 400 });
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const updated = await (prisma as any).lessonBlock.update({
+  const updated = await prisma.lessonBlock.update({
     where: { id: blockId },
     data: parsed.data,
     include: { items: { orderBy: { sortOrder: 'asc' as const } } },
@@ -63,9 +59,7 @@ export async function DELETE(
 
   const block = await authorizeBlock(lessonId, blockId, user.id, user.role ?? '');
   if (!block) return NextResponse.json({ error: 'Not found' }, { status: 404 });
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  await (prisma as any).lessonBlock.delete({ where: { id: blockId } });
+  await prisma.lessonBlock.delete({ where: { id: blockId } });
 
   return NextResponse.json({ ok: true });
 }

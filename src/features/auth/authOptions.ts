@@ -4,6 +4,11 @@ import bcrypt from 'bcryptjs';
 import { prisma } from '@/db/prisma';
 import { z } from 'zod';
 
+if (process.env.NODE_ENV !== 'production') {
+  process.env.NEXTAUTH_SECRET ??= 'ember-local-dev-secret';
+  process.env.NEXTAUTH_URL ??= 'http://localhost:3000';
+}
+
 const loginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(6),
@@ -11,6 +16,7 @@ const loginSchema = z.object({
 });
 
 export const authOptions: NextAuthOptions = {
+  secret: process.env.NEXTAUTH_SECRET,
   providers: [
     CredentialsProvider({
       name: 'credentials',

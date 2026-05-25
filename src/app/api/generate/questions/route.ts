@@ -13,6 +13,7 @@ import { getServerSession } from 'next-auth';
 import { z } from 'zod';
 import { authOptions } from '@/features/auth/authOptions';
 import { generateQuestionsForSkill } from '@/lib/ai/questionGenerator';
+import { checkRateLimit } from '@/lib/rateLimit';
 
 const schema = z.object({
   skillCode: z.string().min(1),
@@ -26,6 +27,11 @@ export async function POST(req: NextRequest) {
   const role = (session.user as { role?: string }).role;
   if (role !== 'TEACHER' && role !== 'ADMIN') {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
+  const userId = (session.user as { id: string }).id;
+
+  if (!checkRateLimit(`generate-questions:${userId}`, 10, 60_000)) {
+    return NextResponse.json({ error: 'Too many requests — please slow down.' }, { status: 429 });
   }
 
   const body = await req.json();
@@ -42,6 +48,6 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error';
     console.error('[generate/questions]', message);
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json({ error: 'Question generation failed. Please try again.' }, { status: 500 });
   }
 }

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
+import type { Prisma } from '@prisma/client';
 import { authOptions } from '@/features/auth/authOptions';
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 import { prisma } from '@/db/prisma';
 import { z } from 'zod';
 
@@ -9,8 +9,7 @@ const ITEM_TYPES = ['SLIDE', 'QUESTION', 'IMAGE', 'CANVAS_FRAME'] as const;
 const ANSWER_MODES = ['MCQ', 'ORDER', 'SHORT_ANSWER', 'PICK'] as const;
 
 async function authorizeBlock(lessonId: string, blockId: string, userId: string, role: string) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const blockModel = (prisma as any).lessonBlock;
+  const blockModel = prisma.lessonBlock;
   if (!blockModel) return null;
   const block = await blockModel.findUnique({
     where: { id: blockId },
@@ -42,8 +41,7 @@ export async function POST(
   const block = await authorizeBlock(lessonId, blockId, user.id, user.role ?? '');
   if (!block) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const itemModel = (prisma as any).lessonItem;
+  const itemModel = prisma.lessonItem;
   if (!itemModel) return NextResponse.json({ error: 'Model unavailable' }, { status: 503 });
 
   const body = await req.json();
@@ -95,7 +93,7 @@ export async function POST(
       blockId,
       itemType: parsed.data.itemType,
       answerMode: parsed.data.answerMode ?? null,
-      content: parsed.data.content,
+      content: parsed.data.content as Prisma.InputJsonValue,
       skillId: parsed.data.skillId ?? null,
       sourceItemId: parsed.data.sourceItemId ?? null,
       sortOrder,

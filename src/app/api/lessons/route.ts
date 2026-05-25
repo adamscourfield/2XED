@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/features/auth/authOptions';
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 import { prisma } from '@/db/prisma';
 import { z } from 'zod';
 
@@ -25,9 +24,7 @@ export async function POST(req: NextRequest) {
   const body = await req.json();
   const parsed = createSchema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: 'Invalid input', issues: parsed.error.issues }, { status: 400 });
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const lessonModel = (prisma as any).lesson;
+  const lessonModel = prisma.lesson;
   if (!lessonModel) return NextResponse.json({ error: 'Lesson model not available — run prisma generate' }, { status: 503 });
 
   const lesson = await lessonModel.create({
@@ -55,9 +52,7 @@ export async function GET(req: NextRequest) {
   if (user.role !== 'TEACHER' && user.role !== 'ADMIN') {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const lessonModel = (prisma as any).lesson;
+  const lessonModel = prisma.lesson;
   if (!lessonModel) return NextResponse.json({ lessons: [] });
 
   const lessons = await lessonModel.findMany({
