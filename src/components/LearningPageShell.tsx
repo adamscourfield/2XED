@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import React, { ReactNode } from 'react';
 import { AppChrome, type AppChromeVariant } from '@/components/AppChrome';
 import type { StudentTopBarSubjectOption } from '@/components/student/StudentTopBarSubjectSelector';
 

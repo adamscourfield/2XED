@@ -5,6 +5,7 @@ import { authOptions } from '@/features/auth/authOptions';
 import { prisma } from '@/db/prisma';
 import { AdminRebaselineClient } from '@/features/admin/AdminRebaselineClient';
 import { AdminReteachPolicyPanel } from '@/features/reteach/AdminReteachPolicyPanel';
+import { LearningPageShell } from '@/components/LearningPageShell';
 
 type RouteRecommendationEvent = {
   name: string;
@@ -60,31 +61,36 @@ export default async function AdminInterventionsPage() {
   const interventionFlagged = typedEvents.filter((e) => e.name === 'intervention_flagged').length;
 
   return (
-    <main>
-      <section>
-        <h1>Interventions</h1>
-        <div>A: {routeA} · B: {routeB} · C: {routeC}</div>
-      </section>
-      <section>
-        <h2>Secure fast-pass (7d)</h2>
-        <div>{secureFastPass}</div>
-      </section>
-      <section>
-        <h2>Shadow pairs (7d)</h2>
-        <div>Passed: {shadowPassed} · Failed: {shadowFailed}</div>
-      </section>
-      <section>
-        <h2>Interventions flagged (7d)</h2>
-        <div>{Math.max(flags.length, interventionFlagged)}</div>
-      </section>
-      <section>
-        <h2>Reteach policy</h2>
-        <AdminReteachPolicyPanel />
-      </section>
-      <section>
-        <h2>Re-baseline student</h2>
-        <AdminRebaselineClient subjects={subjects} />
-      </section>
-    </main>
+    <LearningPageShell
+      title="Interventions"
+      subtitle="Review route signals and manage high-impact support controls."
+      appChrome="teacher"
+      appChromeShowLeadershipNav
+      maxWidthClassName="max-w-6xl"
+    >
+      <div className="space-y-6">
+        <section className="grid gap-4 md:grid-cols-4" aria-label="Seven day intervention summary">
+          {[
+            ['Routes', `A: ${routeA} · B: ${routeB} · C: ${routeC}`],
+            ['Secure fast-pass', String(secureFastPass)],
+            ['Shadow pairs', `Passed: ${shadowPassed} · Failed: ${shadowFailed}`],
+            ['Flags', String(Math.max(flags.length, interventionFlagged))],
+          ].map(([label, value]) => (
+            <div key={label} className="anx-card p-4">
+              <p className="m-0 text-xs font-semibold uppercase tracking-wide text-[color:var(--anx-text-muted)]">{label}</p>
+              <p className="m-0 mt-2 text-lg font-bold text-[color:var(--anx-text)]">{value}</p>
+            </div>
+          ))}
+        </section>
+        <section aria-labelledby="reteach-policy-heading">
+          <h2 id="reteach-policy-heading" className="mb-3 text-base font-semibold text-[color:var(--anx-text)]">Reteach policy</h2>
+          <AdminReteachPolicyPanel />
+        </section>
+        <section aria-labelledby="rebaseline-heading">
+          <h2 id="rebaseline-heading" className="mb-3 text-base font-semibold text-[color:var(--anx-text)]">Re-baseline student</h2>
+          <AdminRebaselineClient subjects={subjects} />
+        </section>
+      </div>
+    </LearningPageShell>
   );
 }

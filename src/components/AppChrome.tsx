@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -383,6 +384,7 @@ export function AppChrome({
   const { data: authSession, status: sessionStatus } = useSession();
   const [menuOpen, setMenuOpen] = useState(false);
   const [studentSubjects, setStudentSubjects] = useState<StudentSubjectNav[] | null>(null);
+  const [studentNavSlow, setStudentNavSlow] = useState(false);
 
   const role = (authSession?.user as { role?: string } | undefined)?.role;
   const userName = authSession?.user?.name ?? authSession?.user?.email ?? "Account";
@@ -408,6 +410,9 @@ export function AppChrome({
     if (variant !== "student" || studentLayout === "topbar") return;
     if (role !== "STUDENT" || sessionStatus !== "authenticated") return;
     let cancelled = false;
+    const slowTimer = window.setTimeout(() => {
+      if (!cancelled) setStudentNavSlow(true);
+    }, 3500);
     (async () => {
       try {
         const res = await fetch("/api/student/nav-summary");
@@ -416,13 +421,17 @@ export function AppChrome({
           return;
         }
         const data = (await res.json()) as { subjects: StudentSubjectNav[] };
-        if (!cancelled) setStudentSubjects(data.subjects ?? []);
+        if (!cancelled) {
+          setStudentSubjects(data.subjects ?? []);
+          setStudentNavSlow(false);
+        }
       } catch {
         if (!cancelled) setStudentSubjects([]);
       }
     })();
     return () => {
       cancelled = true;
+      window.clearTimeout(slowTimer);
     };
   }, [variant, role, sessionStatus, studentLayout]);
 
@@ -582,23 +591,34 @@ export function AppChrome({
               onNavigate={onNavigate}
             />
             {studentSubjects === null
-              ? [0, 1].map((i) => (
-                  <div
-                    key={i}
-                    className="flex animate-pulse items-center gap-3 rounded-2xl px-3 py-2.5"
-                  >
-                    <span className="h-9 w-9 rounded-lg bg-[#f0f1f4]" />
-                    <span className="flex-1 space-y-2">
-                      <span className="block h-3 w-24 rounded bg-[#f0f1f4]" />
-                      <span className="block h-2 w-32 rounded bg-[#f0f1f4]" />
-                    </span>
-                  </div>
-                ))
+              ? (
+                  <>
+                    {[0, 1].map((i) => (
+                      <div
+                        key={i}
+                        className="flex animate-pulse items-center gap-3 rounded-2xl px-3 py-2.5"
+                      >
+                        <span className="h-9 w-9 rounded-lg bg-[#f0f1f4]" />
+                        <span className="flex-1 space-y-2">
+                          <span className="block h-3 w-24 rounded bg-[#f0f1f4]" />
+                          <span className="block h-2 w-32 rounded bg-[#f0f1f4]" />
+                        </span>
+                      </div>
+                    ))}
+                    {studentNavSlow ? (
+                      <p className="px-3 text-xs text-[color:var(--anx-text-muted)]" role="status">
+                        Loading subjects is taking longer than usual.
+                      </p>
+                    ) : null}
+                  </>
+                )
               : studentSubjects.map((sub) => {
                   const active = isSubjectNavActive(pathname, sub.slug);
                   const desc = sub.onboardingComplete
-                    ? `${sub.averageMastery}% mastery across this subject`
-                    : "Start diagnostic to unlock practice";
+                    ? sub.dueNowCount > 0
+                      ? `${sub.dueNowCount} review${sub.dueNowCount === 1 ? '' : 's'} due`
+                      : `${sub.averageMastery}% mastery`
+                    : "Start baseline";
                   return (
                     <NavRow
                       key={sub.id}

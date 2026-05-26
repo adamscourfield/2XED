@@ -657,6 +657,8 @@ export function LessonBuilder({ lesson: initialLesson }: { lesson: LessonBuilder
   );
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [applyingPlan, setApplyingPlan] = useState(false);
+  const [applyNotice, setApplyNotice] = useState<string | null>(null);
   const [showAddPanel, setShowAddPanel] = useState(false);
   const [showGoLive, setShowGoLive] = useState(false);
   const [showPreviewModal, setShowPreviewModal] = useState(false);  // UX-10
@@ -672,6 +674,16 @@ export function LessonBuilder({ lesson: initialLesson }: { lesson: LessonBuilder
   const debouncedTopic = useDebounce(lesson.topic, 600);
   const isFirstRender = useRef(true);
   const starterSetupFailed = searchParams.get('setup') === 'starter-error';
+
+  useEffect(() => {
+    if (!saving && !applyingPlan) return;
+    const handler = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = '';
+    };
+    window.addEventListener('beforeunload', handler);
+    return () => window.removeEventListener('beforeunload', handler);
+  }, [saving, applyingPlan]);
 
   // Auto-save lesson metadata
   useEffect(() => {
@@ -843,6 +855,9 @@ export function LessonBuilder({ lesson: initialLesson }: { lesson: LessonBuilder
   }, [lesson.id]);
 
   const handlePlanGenerated = useCallback(async (plan: AiLessonPlanResponse) => {
+    if (applyingPlan) return;
+    setApplyingPlan(true);
+    setApplyNotice(null);
     try {
       const res = await fetch(`/api/lessons/${lesson.id}/apply-plan`, {
         method: 'POST',
@@ -851,15 +866,20 @@ export function LessonBuilder({ lesson: initialLesson }: { lesson: LessonBuilder
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const { title, blocks } = (await res.json()) as { title: string; blocks: LessonBlock[] };
+      const addedCount = Math.max(0, blocks.length - lesson.blocks.length);
       setLesson((prev) => ({ ...prev, title: title || prev.title, blocks }));
       setSelectedBlockId(blocks[0]?.id ?? null);
       setShowAiBuilder(false);
+      setApplyNotice(`Plan applied. ${addedCount} block${addedCount === 1 ? '' : 's'} added.`);
     } catch (e) {
       const message = e instanceof Error ? e.message : 'Failed to apply plan';
-      setSaveError(message);
-      throw new Error(message);
+      const friendly = `Could not apply the AI plan: ${message}`;
+      setSaveError(friendly);
+      throw new Error(friendly);
+    } finally {
+      setApplyingPlan(false);
     }
-  }, [lesson.id]);
+  }, [applyingPlan, lesson.blocks.length, lesson.id]);
 
   const selectedBlock = lesson.blocks.find((b) => b.id === selectedBlockId) ?? null;
 
@@ -924,6 +944,7 @@ export function LessonBuilder({ lesson: initialLesson }: { lesson: LessonBuilder
           <button
             type="button"
             onClick={() => { setShowAiBuilder((v) => !v); setSelectedBlockId(null); }}
+            disabled={applyingPlan}
             className={`hidden items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-semibold transition sm:inline-flex ${
               showAiBuilder
                 ? 'border-[#5850ec]/40 bg-[#f5f3ff] text-[#5850ec]'
@@ -936,7 +957,7 @@ export function LessonBuilder({ lesson: initialLesson }: { lesson: LessonBuilder
 
           {/* Save status */}
           <span className="text-xs text-[#9ca3af]">
-            {saving ? 'Saving…' : saveError ? <span className="text-red-500">{saveError}</span> : 'Saved'}
+            {applyingPlan ? 'Applying AI plan…' : saving ? 'Saving…' : saveError ? <span className="text-red-500" role="alert">{saveError}</span> : 'Saved'}
           </span>
 
           {/* Publish toggle */}
@@ -1062,6 +1083,11 @@ export function LessonBuilder({ lesson: initialLesson }: { lesson: LessonBuilder
               </button>
             </div>
           )}
+          {applyNotice ? (
+            <div className="mb-5 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900" role="status" aria-live="polite">
+              {applyNotice}
+            </div>
+          ) : null}
 
           {!selectedBlock ? (
             showAiBuilder ? (
@@ -1072,7 +1098,7 @@ export function LessonBuilder({ lesson: initialLesson }: { lesson: LessonBuilder
                   subjectTitle={lesson.subject.title}
                   initialTopic={lesson.topic}
                   onPlanGenerated={handlePlanGenerated}
-                  onClose={() => setShowAiBuilder(false)}
+                  onClose={() => { if (!applyingPlan) setShowAiBuilder(false); }}
                 />
               </div>
             ) : (

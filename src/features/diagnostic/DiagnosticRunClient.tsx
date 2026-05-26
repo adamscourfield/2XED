@@ -23,6 +23,7 @@ export function DiagnosticRunClient({ subject, skill, item, sessionId, itemsSeen
   const [selectedAnswer, setSelectedAnswer] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [complete, setComplete] = useState(false);
   const router = useRouter();
   const itemContent = getItemContent(item);
   const questionText = useMemo(() => stripStudentQuestionLabel(item.question) || item.question, [item.question]);
@@ -112,8 +113,7 @@ export function DiagnosticRunClient({ subject, skill, item, sessionId, itemsSeen
 
       const data = (await res.json()) as { done?: boolean };
       if (data.done) {
-        router.refresh();
-        router.push(`/learn/${subjectSlug}`);
+        setComplete(true);
         return;
       }
 
@@ -124,6 +124,30 @@ export function DiagnosticRunClient({ subject, skill, item, sessionId, itemsSeen
     } finally {
       setSubmitting(false);
     }
+  }
+
+  if (complete) {
+    return (
+      <main className="anx-shell anx-scene flex items-center justify-center py-10">
+        <div className="anx-panel w-full max-w-md p-8 text-center">
+          <p className="text-sm font-semibold text-[color:var(--anx-primary)]">{subject.title}</p>
+          <h1 className="mt-2 text-2xl font-bold text-[color:var(--anx-text)]">We found your starting point</h1>
+          <p className="mt-3 text-sm leading-relaxed text-[color:var(--anx-text-secondary)]">
+            Your next practice will start with the skills that need the most attention.
+          </p>
+          <button
+            type="button"
+            onClick={() => {
+              router.refresh();
+              router.push(`/learn/${subjectSlug}`);
+            }}
+            className="anx-btn-primary mt-6 w-full py-3"
+          >
+            Start practice
+          </button>
+        </div>
+      </main>
+    );
   }
 
   return (
@@ -171,7 +195,7 @@ export function DiagnosticRunClient({ subject, skill, item, sessionId, itemsSeen
           <div className="space-y-3">
             {renderAnswerInput(itemContent.type)}
             {submitError ? (
-              <div className="anx-callout-warning">
+              <div className="anx-callout-warning" role="alert">
                 {submitError}
               </div>
             ) : null}

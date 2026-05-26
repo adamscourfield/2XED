@@ -11,8 +11,14 @@ vi.mock('next-auth', () => ({
   getServerSession: getServerSessionMock,
 }));
 
+vi.mock('next-auth/react', () => ({
+  useSession: () => ({ data: { user: { id: 'admin-1', role: 'ADMIN', email: 'admin@example.com' } }, status: 'authenticated' }),
+  signOut: vi.fn(),
+}));
+
 vi.mock('next/navigation', () => ({
   redirect: redirectMock,
+  usePathname: () => '/admin/interventions',
 }));
 
 vi.mock('@/features/auth/authOptions', () => ({ authOptions: {} }));
@@ -74,10 +80,10 @@ describe('admin interventions page summary cards', () => {
     const html = renderToStaticMarkup(jsx);
 
     expect(html).toContain('A: 1 · B: 2 · C: 1');
-    expect(html).toContain('Secure fast-pass (7d)');
+    expect(html).toContain('Secure fast-pass');
     expect(html).toContain('>1<');
     expect(html).toContain('Passed: 2 · Failed: 1');
-    expect(html).toContain('Interventions flagged (7d)');
+    expect(html).toContain('Flags');
     expect(html).toContain('>3<');
   });
 });

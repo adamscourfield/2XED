@@ -25,6 +25,7 @@ export function BaselineRunClient({ subjectSlug }: { subjectSlug: string }) {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
 
   const answerType = useMemo(
     () => parseAnswerType(item?.type, item?.question, item?.options, item?.answer),
@@ -112,6 +113,9 @@ export function BaselineRunClient({ subjectSlug }: { subjectSlug: string }) {
         }),
       });
       if (!res.ok) throw new Error('Could not save your answer. Tap Next again.');
+      const data = (await res.json()) as { duplicate?: boolean };
+      if (data.duplicate) setNotice('Already saved. Moving to the next question…');
+      else setNotice(null);
       await loadNext(sessionId);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not save your answer. Tap Next again.');
@@ -120,8 +124,8 @@ export function BaselineRunClient({ subjectSlug }: { subjectSlug: string }) {
     }
   }
 
-  if (loading) return <div className="p-8 text-sm" style={{ color: 'var(--anx-text-secondary)' }}>Getting your baseline ready…</div>;
-  if (error) return <div className="p-8 text-sm" style={{ color: 'var(--anx-danger)' }}>{error}</div>;
+  if (loading) return <div className="p-8 text-sm" style={{ color: 'var(--anx-text-secondary)' }} role="status">Getting your baseline ready…</div>;
+  if (error) return <div className="p-8 text-sm" style={{ color: 'var(--anx-danger)' }} role="alert">{error}</div>;
   if (!item) return <div className="p-8 text-sm" style={{ color: 'var(--anx-text-secondary)' }}>Loading your next question…</div>;
 
   return (
@@ -210,6 +214,11 @@ export function BaselineRunClient({ subjectSlug }: { subjectSlug: string }) {
                 )}
               </div>
             )}
+            {notice ? (
+              <div className="anx-callout-info" role="status" aria-live="polite">
+                {notice}
+              </div>
+            ) : null}
           </div>
         )}
         actions={(

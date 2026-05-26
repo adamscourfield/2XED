@@ -52,7 +52,7 @@ export async function GET() {
       id: subject.id,
       title: subject.title,
       slug: subject.slug,
-      href: `/learn/${subject.slug}`,
+      href: onboardingComplete ? `/learn/${subject.slug}` : `/baseline/${subject.slug}`,
       averageMastery: Math.round(averageMastery * 100),
       dueNowCount,
       onboardingComplete,

@@ -41,6 +41,14 @@ interface AcceptFormState {
   sortOrder: number;
 }
 
+interface CheckpointDraft {
+  stem: string;
+  inputType: 'MCQ' | 'SHORT_TEXT' | 'NUMERIC';
+  optionsText: string;
+  acceptedAnswersText: string;
+  instructionText: string;
+}
+
 const ALL_TYPES = 'ALL';
 
 export function BookletReviewClient({ blocks, skills, alreadyAccepted }: BookletReviewClientProps) {
@@ -61,6 +69,7 @@ export function BookletReviewClient({ blocks, skills, alreadyAccepted }: Booklet
   const [editingId, setEditingId] = useState<string | null>(null);
   const [acceptingId, setAcceptingId] = useState<string | null>(null);
   const [acceptForms, setAcceptForms] = useState<Record<string, AcceptFormState>>({});
+  const [checkpointDrafts, setCheckpointDrafts] = useState<Record<string, CheckpointDraft>>({});
   const [submitting, setSubmitting] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [typeFilter, setTypeFilter] = useState<string>(ALL_TYPES);
@@ -130,6 +139,49 @@ export function BookletReviewClient({ blocks, skills, alreadyAccepted }: Booklet
     }));
   }
 
+  function defaultCheckpointDraft(block: StagedBlock): CheckpointDraft {
+    return {
+      stem: getBlockText(block).trim() || 'Checkpoint question',
+      inputType: 'SHORT_TEXT',
+      optionsText: '',
+      acceptedAnswersText: '',
+      instructionText: 'Answer the checkpoint question.',
+    };
+  }
+
+  function getCheckpointDraft(block: StagedBlock): CheckpointDraft {
+    return checkpointDrafts[block.id] ?? defaultCheckpointDraft(block);
+  }
+
+  function updateCheckpointDraft(block: StagedBlock, patch: Partial<CheckpointDraft>) {
+    setCheckpointDrafts((prev) => ({
+      ...prev,
+      [block.id]: { ...(prev[block.id] ?? defaultCheckpointDraft(block)), ...patch },
+    }));
+  }
+
+  function buildSubmitContent(block: StagedBlock): string {
+    if (getBlockType(block) !== 'CHECKPOINT') return getBlockText(block);
+    const draft = getCheckpointDraft(block);
+    const options = draft.optionsText.split('\n').map((v) => v.trim()).filter(Boolean);
+    const acceptedAnswers = draft.acceptedAnswersText.split('\n').map((v) => v.trim()).filter(Boolean);
+    return JSON.stringify({
+      id: block.id,
+      skillCode: '',
+      presentationHint: 'sequential',
+      submitRule: 'all_together',
+      instructionText: draft.instructionText.trim() || undefined,
+      questions: [{
+        index: 0,
+        stem: draft.stem.trim(),
+        inputType: draft.inputType,
+        options: draft.inputType === 'MCQ' ? options : undefined,
+        acceptedAnswers: acceptedAnswers.length > 0 ? acceptedAnswers : undefined,
+        points: 1,
+      }],
+    });
+  }
+
   async function handleAcceptSubmit(block: StagedBlock) {
     const form = acceptForms[block.id];
     if (!form?.skillId) return;
@@ -145,7 +197,7 @@ export function BookletReviewClient({ blocks, skills, alreadyAccepted }: Booklet
           skillId: form.skillId,
           blockType: getBlockType(block),
           sortOrder: form.sortOrder,
-          content: getBlockText(block),
+          content: buildSubmitContent(block),
           sourceRef: block.id,
         }),
       });
@@ -220,6 +272,14 @@ export function BookletReviewClient({ blocks, skills, alreadyAccepted }: Booklet
 
   return (
     <div className="space-y-6">
+      {blocks.length === 0 ? (
+        <div className="anx-card p-6 text-sm text-[color:var(--anx-text-secondary)]">
+          <p className="m-0 font-semibold text-[color:var(--anx-text)]">No staged booklet blocks</p>
+          <p className="m-0 mt-1">
+            Upload and extract a booklet first, then use this review queue to approve, edit, or reject each detected block.
+          </p>
+        </div>
+      ) : null}
       {/* Summary stats */}
       <div className="anx-card flex flex-wrap gap-6 p-4">
         <div className="anx-stat">
@@ -344,6 +404,56 @@ export function BookletReviewClient({ blocks, skills, alreadyAccepted }: Booklet
                       onChange={(e) => handleEditChange(block.id, 'editedText', e.target.value)}
                     />
                   </div>
+                  {getBlockType(block) === 'CHECKPOINT' ? (
+                    <div className="rounded-lg border border-[#e5e7eb] bg-[#f9fafb] p-3">
+                      <p className="mb-3 text-xs font-semibold" style={{ color: 'var(--anx-text-muted)' }}>
+                        Checkpoint editor
+                      </p>
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        <label className="text-xs" style={{ color: 'var(--anx-text-muted)' }}>
+                          Prompt
+                          <textarea
+                            className="anx-input mt-1 w-full text-sm"
+                            rows={3}
+                            value={getCheckpointDraft(block).stem}
+                            onChange={(e) => updateCheckpointDraft(block, { stem: e.target.value })}
+                          />
+                        </label>
+                        <label className="text-xs" style={{ color: 'var(--anx-text-muted)' }}>
+                          Answer type
+                          <select
+                            className="anx-input mt-1 w-full text-sm"
+                            value={getCheckpointDraft(block).inputType}
+                            onChange={(e) => updateCheckpointDraft(block, { inputType: e.target.value as CheckpointDraft['inputType'] })}
+                          >
+                            <option value="SHORT_TEXT">Short text</option>
+                            <option value="NUMERIC">Numeric</option>
+                            <option value="MCQ">Multiple choice</option>
+                          </select>
+                        </label>
+                        {getCheckpointDraft(block).inputType === 'MCQ' ? (
+                          <label className="text-xs" style={{ color: 'var(--anx-text-muted)' }}>
+                            Options, one per line
+                            <textarea
+                              className="anx-input mt-1 w-full text-sm"
+                              rows={4}
+                              value={getCheckpointDraft(block).optionsText}
+                              onChange={(e) => updateCheckpointDraft(block, { optionsText: e.target.value })}
+                            />
+                          </label>
+                        ) : null}
+                        <label className="text-xs" style={{ color: 'var(--anx-text-muted)' }}>
+                          Accepted answers, one per line
+                          <textarea
+                            className="anx-input mt-1 w-full text-sm"
+                            rows={4}
+                            value={getCheckpointDraft(block).acceptedAnswersText}
+                            onChange={(e) => updateCheckpointDraft(block, { acceptedAnswersText: e.target.value })}
+                          />
+                        </label>
+                      </div>
+                    </div>
+                  ) : null}
                 </div>
               ) : (
                 <p className="text-sm leading-relaxed whitespace-pre-wrap" style={{ color: 'var(--anx-text)' }}>
