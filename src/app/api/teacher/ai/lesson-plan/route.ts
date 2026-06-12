@@ -21,6 +21,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { authOptions } from '@/features/auth/authOptions';
 import { prisma } from '@/db/prisma';
+import { checkRateLimit } from '@/lib/rateLimit';
 import {
   generateLessonFromTopic,
   extractLessonFromResource,
@@ -139,6 +140,12 @@ export async function POST(req: NextRequest) {
 
   const role = (session.user as { role?: string }).role;
   if (role !== 'TEACHER') return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+
+  // Each request triggers a Claude call (plus file parsing in import mode).
+  const teacherUserId = (session.user as { id: string }).id;
+  if (!checkRateLimit(`lesson-plan:${teacherUserId}`, 5, 60_000)) {
+    return NextResponse.json({ error: 'Too many requests — please slow down.' }, { status: 429 });
+  }
 
   // ── Parse request body (must read before returning the stream) ────────────
   let mode: string;

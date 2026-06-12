@@ -15,6 +15,9 @@ RUN npm run build
 FROM base AS runner
 WORKDIR /app
 ENV NODE_ENV production
+# unzip is required at runtime: PPTX/DOCX text extraction (src/lib/ai/fileExtractor.ts)
+# shells out to it, and silently extracts nothing when it is missing.
+RUN apk add --no-cache unzip
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 COPY --from=builder /app/public ./public
