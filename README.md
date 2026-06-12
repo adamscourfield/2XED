@@ -89,7 +89,11 @@ npm run dev
 - Student password: password123
 
 ### Key Routes
+- `/teacher/dashboard` — Teacher home: classes, lessons, live sessions
+- `/teacher/lessons` — Lesson library and AI lesson builder
+- `/teacher/curriculum` — Curriculum planner
+- `/teacher/live` — Launch and run live sessions
+- `/student/live` — Student live-lesson surface (join code)
 - `/diagnostic/ks3-maths` — Adaptive diagnostic assessment
 - `/learn/ks3-maths` — Practice sessions with stable mastery gating
-- `/admin/insight/ks3-maths` — Insight dashboard (admin only)
 - `/admin/interventions` — Intervention flags (admin only)

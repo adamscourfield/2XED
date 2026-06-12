@@ -178,6 +178,8 @@ async function callAnthropic(systemPrompt: string, prompt: string): Promise<RawG
   async function attempt(): Promise<string> {
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
+      // Bound each attempt so a hung upstream call fails into the retry path.
+      signal: AbortSignal.timeout(30_000),
       headers: {
         'Content-Type': 'application/json',
         'x-api-key': apiKey!,

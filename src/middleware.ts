@@ -18,6 +18,20 @@ export default withAuth(
       return NextResponse.redirect(new URL('/admin', req.url));
     }
 
+    // Teacher workspace — mirrors the per-page guards (defence in depth)
+    if (pathname === '/teacher' || pathname.startsWith('/teacher/')) {
+      if (!token || (token.role !== 'TEACHER' && token.role !== 'ADMIN' && token.role !== 'LEADERSHIP')) {
+        return NextResponse.redirect(new URL('/dashboard', req.url));
+      }
+    }
+
+    // Student live surface
+    if (pathname === '/student' || pathname.startsWith('/student/')) {
+      if (!token || token.role !== 'STUDENT') {
+        return NextResponse.redirect(new URL('/dashboard', req.url));
+      }
+    }
+
     // Student/teacher-accessible routes
     if (pathname.startsWith('/learn') || pathname.startsWith('/dashboard') || pathname.startsWith('/diagnostic')) {
       if (!token) {
@@ -38,5 +52,15 @@ export default withAuth(
 );
 
 export const config = {
-  matcher: ['/learn/:path*', '/dashboard', '/diagnostic/:path*', '/admin', '/admin/:path*'],
+  matcher: [
+    '/learn/:path*',
+    '/dashboard',
+    '/diagnostic/:path*',
+    '/admin',
+    '/admin/:path*',
+    '/teacher',
+    '/teacher/:path*',
+    '/student',
+    '/student/:path*',
+  ],
 };

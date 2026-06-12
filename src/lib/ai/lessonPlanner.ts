@@ -196,6 +196,8 @@ async function callAnthropic(prompt: string): Promise<AiLessonPlanRaw> {
 
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
+    // Bound the call so a hung upstream request can't hold the SSE stream open.
+    signal: AbortSignal.timeout(60_000),
     headers: {
       'Content-Type': 'application/json',
       'x-api-key': apiKey,
