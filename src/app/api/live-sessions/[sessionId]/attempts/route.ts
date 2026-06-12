@@ -12,6 +12,8 @@ import { aiMarkingService, markSchema } from '@/features/qa/AIMarkingService';
 import { parseOpeningCheckQueue } from '@/lib/live/live-check-plan';
 import { RUBRIC_CORRECT_THRESHOLD } from '@/lib/live/markingConstants';
 import { checkRateLimit } from '@/lib/rateLimit';
+import { nextPracticeIntent } from '@/lib/live/difficultyLadder';
+import { selectLiveItem } from '@/lib/live/selectLiveItem';
 
 const SNAPSHOT_MAX_BYTES = 5 * 1024 * 1024;
 const STROKES_MAX_COUNT = 10_000;
