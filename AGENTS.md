@@ -3,7 +3,7 @@
 ## Cursor Cloud specific instructions
 
 ### Overview
-2XED is a Next.js 15 full-stack adaptive learning platform backed by PostgreSQL 15+. It is a single-service monolith (not a monorepo).
+Ember is a Next.js 15 full-stack adaptive learning platform backed by PostgreSQL 15+. It is a single-service monolith (not a monorepo).
 
 ### Prerequisites
 - **Node.js 20** (use `nvm use 20`; Node 22+ may work but the project targets 20)
@@ -32,8 +32,6 @@ Copy `.env.example` to `.env` before first run. The defaults in `.env.example` a
   npx ts-node -r tsconfig-paths/register --compiler-options '{"module":"CommonJS"}' prisma/ensure-routes-n11-n13.ts
   npx ts-node -r tsconfig-paths/register --compiler-options '{"module":"CommonJS"}' prisma/ensure-routes-n14-n15.ts
   ```
-
-- **Pre-existing lint errors**: `npm run lint` exits non-zero due to existing `react/no-unescaped-entities` and `@typescript-eslint/no-require-imports` errors in the codebase.
 
 ### Test accounts
 | Role | Email | Password |

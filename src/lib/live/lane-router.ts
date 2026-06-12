@@ -95,10 +95,13 @@ export async function assignLane(
     where: { id: participantId },
     include: { session: { select: { skillId: true } } },
   });
+  if (!participant) {
+    throw new Error(`Lane assignment failed: participant ${participantId} not found`);
+  }
 
   // Step 4 — Check for unexpected failure (Lane 3 only)
   let isUnexpectedFailure = false;
-  if (lane === 'LANE_3' && participant?.session.skillId) {
+  if (lane === 'LANE_3' && participant.session.skillId) {
     isUnexpectedFailure = await isUnexpectedLane3Failure(
       participant.studentUserId,
       participant.session.skillId
@@ -107,7 +110,7 @@ export async function assignLane(
 
   // Step 5 — For Lane 2: select recommended explanation
   let recommendedExplanationId: string | null = null;
-  if (lane === 'LANE_2' && participant?.session.skillId) {
+  if (lane === 'LANE_2' && participant.session.skillId) {
     recommendedExplanationId = await selectExplanationRoute(participant.session.skillId, null);
   }
 
@@ -129,7 +132,7 @@ export async function assignLane(
     data: {
       liveSessionId: sessionId,
       participantId,
-      studentUserId: participant!.studentUserId,
+      studentUserId: participant.studentUserId,
       fromLane: null,
       toLane: lane,
       transitionType: 'ASSIGNED',
@@ -278,6 +281,9 @@ export async function handleHandback(
     where: { id: participantId },
     include: { session: { select: { skillId: true, subjectId: true } } },
   });
+  if (!participant) {
+    throw new Error(`Handback failed: participant ${participantId} not found`);
+  }
 
   // Step 1 — Update LiveParticipant
   await prisma.liveParticipant.update({
@@ -294,7 +300,7 @@ export async function handleHandback(
     data: {
       liveSessionId: sessionId,
       participantId,
-      studentUserId: participant!.studentUserId,
+      studentUserId: participant.studentUserId,
       fromLane: 'LANE_3',
       toLane: 'LANE_2',
       transitionType: 'HANDED_BACK',
@@ -303,7 +309,7 @@ export async function handleHandback(
   });
 
   // Step 3 — Select shadow check item
-  const skillId = participant?.session.skillId;
+  const skillId = participant.session.skillId;
   let shadowCheckItemId = '';
 
   if (skillId) {
@@ -311,7 +317,7 @@ export async function handleHandback(
     const attemptedItems = await prisma.liveAttempt.findMany({
       where: {
         liveSessionId: sessionId,
-        studentUserId: participant!.studentUserId,
+        studentUserId: participant.studentUserId,
       },
       select: { itemId: true },
     });
@@ -338,21 +344,21 @@ export async function handleHandback(
   await emitEvent({
     name: 'live_support_recheck_started',
     actorUserId: teacherUserId,
-    studentUserId: participant!.studentUserId,
-    subjectId: participant?.session.subjectId,
+    studentUserId: participant.studentUserId,
+    subjectId: participant.session.subjectId,
     skillId: skillId ?? undefined,
     itemId: shadowCheckItemId || undefined,
     payload: {
       liveSessionId: sessionId,
       participantId,
-      studentUserId: participant!.studentUserId,
+      studentUserId: participant.studentUserId,
       fromLane: 'LANE_3',
       toLane: 'LANE_2',
       shadowCheckItemId: shadowCheckItemId || null,
     },
   });
 
-  return { newLane: 'LANE_2', shadowCheckItemId, studentUserId: participant!.studentUserId };
+  return { newLane: 'LANE_2', shadowCheckItemId, studentUserId: participant.studentUserId };
 }
 
 // ─── checkReteachThreshold ───────────────────────────────────────────────────
