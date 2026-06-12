@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState, Suspense } from 'react';
-import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { redirect, useSearchParams } from 'next/navigation';
 import { AppChrome } from '@/components/AppChrome';
@@ -21,6 +20,7 @@ import { StudentLiveSceneShell } from '@/components/student/live/StudentLiveScen
 import type { StudentLiveChromeMode } from '@/components/student/live/StudentLiveSessionChrome';
 import { appShellPhaseToStripStep, type LiveStripStepId } from '@/components/student/live/StudentLivePhaseStrip';
 import { StudentFeedbackConfetti } from '@/components/student/live/StudentFeedbackEffects';
+import { StudentSessionReview } from '@/components/student/live/StudentSessionReview';
 import { useLivePhasePrimaryFocus } from '@/components/student/live/useLivePhasePrimaryFocus';
 
 interface SkillMeta {
@@ -837,29 +837,7 @@ function StudentLivePageInner() {
           ) : null}
 
           {appState.phase === 'done' ? (
-            <main className="flex flex-1 items-center justify-center px-4 py-10">
-              <div className="anx-card w-full max-w-md space-y-5 p-8 text-center">
-                <div className="text-5xl" aria-hidden>
-                  🎉
-                </div>
-                <div>
-                  <p className="student-dash-eyebrow">Live lesson</p>
-                  <h2 className="mt-2 text-2xl font-bold tracking-tight" style={{ color: 'var(--anx-text)' }}>
-                    All done
-                  </h2>
-                  <p className="mt-2 text-sm leading-relaxed" style={{ color: 'var(--anx-text-muted)' }}>
-                    You&apos;ve completed the questions for this session. Head home when your teacher dismisses you.
-                  </p>
-                </div>
-                <Link
-                  href="/dashboard"
-                  data-live-primary-focus=""
-                  className="anx-btn-primary inline-flex w-full justify-center py-3.5 no-underline sm:w-auto sm:min-w-[12rem]"
-                >
-                  Back to dashboard
-                </Link>
-              </div>
-            </main>
+            <StudentSessionReview sessionId={appState.session.sessionId} />
           ) : null}
 
           {appState.phase === 'practice' || isPracticeMode ? (

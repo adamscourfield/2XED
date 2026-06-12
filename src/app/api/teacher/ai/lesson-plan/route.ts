@@ -17,7 +17,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { writeFile, unlink } from 'node:fs/promises';
-import { execFileSync } from 'node:child_process';
 import os from 'node:os';
 import path from 'node:path';
 import { authOptions } from '@/features/auth/authOptions';
@@ -30,6 +29,8 @@ import {
   type AiDoNowQuestion,
   type SkillContext,
 } from '@/lib/ai/lessonPlanner';
+import { buildClassProfile } from '@/lib/ai/classProfile';
+import { extractFileWithStats, type ExtractionStats } from '@/lib/ai/fileExtractor';
 
 // ── Public types (imported by the client) ─────────────────────────────────────
 
@@ -57,6 +58,8 @@ export interface AiLessonPlanResponse {
   topicSummary: string;
   matchedSkills: AiMatchedSkill[];
   doNowItems: AiDoNowItem[];
+  /** Import mode only: what was captured from the uploaded file and what was lost. */
+  extraction?: { summary: string; warnings: string[] };
 }
 
 /** Discriminated union of all SSE event shapes the server emits. */
@@ -84,93 +87,33 @@ function isSupportedResource(fileName: string, mimeType: string): boolean {
   );
 }
 
-function decodeXmlEntities(text: string): string {
-  return text
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/&#(\d+);/g, (_, code: string) => String.fromCharCode(Number(code)));
-}
-
-function readZipEntry(filePath: string, entry: string): string {
-  try {
-    return execFileSync('unzip', ['-p', filePath, entry], { encoding: 'utf8' });
-  } catch {
-    return '';
+/**
+ * Builds the teacher-facing coverage note for an import: what was read and
+ * what was lost (images, truncation) so they can review before accepting.
+ */
+function buildExtractionCoverage(stats: ExtractionStats, usedChars: number): {
+  summary: string;
+  warnings: string[];
+} {
+  const parts: string[] = [];
+  if (stats.unitCount !== null && stats.unitLabel) {
+    parts.push(`${stats.unitCount} ${stats.unitLabel}`);
   }
-}
+  parts.push(`${stats.totalChars.toLocaleString()} characters of text`);
 
-function listZipEntries(filePath: string, pattern: RegExp): string[] {
-  try {
-    return execFileSync('unzip', ['-Z1', filePath], { encoding: 'utf8' })
-      .split('\n')
-      .map((l) => l.trim())
-      .filter((l) => pattern.test(l));
-  } catch {
-    return [];
-  }
-}
-
-function extractTextFromPptx(filePath: string): string {
-  const entries = listZipEntries(filePath, /^ppt\/slides\/slide\d+\.xml$/).sort((a, b) => {
-    return (
-      Number(a.match(/slide(\d+)/)?.[1] ?? 0) - Number(b.match(/slide(\d+)/)?.[1] ?? 0)
+  const warnings: string[] = [];
+  if (stats.imageCount > 0) {
+    warnings.push(
+      `${stats.imageCount} image${stats.imageCount === 1 ? '' : 's'} in the file ${stats.imageCount === 1 ? 'was' : 'were'} not imported — only text is used. Re-add key diagrams as slide images in the lesson builder.`,
     );
-  });
-  return entries
-    .map((entry) => {
-      const xml = readZipEntry(filePath, entry);
-      const runs: string[] = [];
-      const re = /<a:t[^>]*>([\s\S]*?)<\/a:t>/g;
-      let m: RegExpExecArray | null;
-      while ((m = re.exec(xml)) !== null) {
-        const t = decodeXmlEntities(m[1]).trim();
-        if (t) runs.push(t);
-      }
-      return runs.join(' ');
-    })
-    .filter(Boolean)
-    .join('\n\n');
-}
-
-function extractTextFromDocx(filePath: string): string {
-  const xml = readZipEntry(filePath, 'word/document.xml');
-  if (!xml) return '';
-  const runs: string[] = [];
-  const re = /<w:t[^>]*>([\s\S]*?)<\/w:t>/g;
-  let m: RegExpExecArray | null;
-  while ((m = re.exec(xml)) !== null) {
-    const t = decodeXmlEntities(m[1]);
-    if (t.trim()) runs.push(t);
   }
-  return runs.join(' ').replace(/\s+/g, ' ').trim();
-}
-
-async function extractTextFromPdf(filePath: string): Promise<string> {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-explicit-any
-  const pdfParse = require('pdf-parse') as (buf: Buffer) => Promise<{ text: string }>;
-  const { readFile } = await import('node:fs/promises');
-  const buf = await readFile(filePath);
-  try {
-    const data = await pdfParse(buf);
-    return (data.text ?? '').replace(/\s+/g, ' ').trim();
-  } catch {
-    return '';
+  if (stats.totalChars > usedChars) {
+    warnings.push(
+      `The file was longer than the import limit — only the first ${usedChars.toLocaleString()} of ${stats.totalChars.toLocaleString()} characters were analysed. Check later sections made it into the plan.`,
+    );
   }
-}
 
-async function extractTextFromFile(
-  filePath: string,
-  mimeType: string,
-  fileName: string,
-): Promise<string> {
-  const ext = path.extname(fileName).toLowerCase();
-  if (ext === '.pptx' || mimeType.includes('presentationml')) return extractTextFromPptx(filePath);
-  if (ext === '.docx' || mimeType.includes('wordprocessingml')) return extractTextFromDocx(filePath);
-  if (ext === '.pdf' || mimeType === 'application/pdf') return extractTextFromPdf(filePath);
-  return '';
+  return { summary: `Read ${parts.join(', ')}.`, warnings };
 }
 
 // ── Skill matching ────────────────────────────────────────────────────────────
@@ -205,6 +148,7 @@ export async function POST(req: NextRequest) {
   let priorKnowledge: string | undefined;
   let goal: string | undefined;
   let topicHint: string | undefined;
+  let classroomId: string | undefined;
   let tmpFilePath: string | null = null;
   let uploadedFileName = '';
   let uploadedFileType = '';
@@ -216,6 +160,7 @@ export async function POST(req: NextRequest) {
     mode = (form.get('mode') as string) ?? 'import';
     subjectId = (form.get('subjectId') as string) ?? '';
     topicHint = (form.get('topicHint') as string) || undefined;
+    classroomId = (form.get('classroomId') as string) || undefined;
 
     const file = form.get('file') as File | null;
     if (!file) return NextResponse.json({ error: 'No file provided' }, { status: 400 });
@@ -248,6 +193,7 @@ export async function POST(req: NextRequest) {
       yearGroup?: string;
       priorKnowledge?: string;
       goal?: string;
+      classroomId?: string;
     };
     mode = body.mode ?? 'generate';
     subjectId = body.subjectId ?? '';
@@ -255,6 +201,7 @@ export async function POST(req: NextRequest) {
     yearGroup = body.yearGroup || undefined;
     priorKnowledge = body.priorKnowledge || undefined;
     goal = body.goal || undefined;
+    classroomId = body.classroomId || undefined;
 
     if (!topic.trim()) return NextResponse.json({ error: 'topic is required' }, { status: 400 });
   }
@@ -296,22 +243,46 @@ export async function POST(req: NextRequest) {
           strand: s.strand ?? undefined,
         }));
 
+        // Pull the target class's real attainment data into the prompt so the
+        // plan is pitched at this class, not a generic year group.
+        let classProfile: string | undefined;
+        if (classroomId) {
+          send({ stage: 'parsing', message: 'Analysing class attainment…' });
+          try {
+            const profile = await buildClassProfile({
+              classroomId,
+              subjectId,
+              teacherUserId: (session.user as { id: string }).id,
+            });
+            if (profile) {
+              classProfile = profile.promptText;
+              if (!yearGroup && profile.yearGroup) yearGroup = profile.yearGroup;
+            }
+          } catch (err) {
+            console.warn('[teacher/ai/lesson-plan] class profile failed:', (err as Error).message);
+          }
+        }
+
         // ── Stage: extracting (import mode only) ────────────────────────────
         let resourceText = '';
+        let extraction: { summary: string; warnings: string[] } | undefined;
         if (mode === 'import' && tmpFilePath) {
           send({ stage: 'extracting', message: `Reading ${uploadedFileName}…` });
-          resourceText = await extractTextFromFile(tmpFilePath, uploadedFileType, uploadedFileName);
+          const extracted = await extractFileWithStats(tmpFilePath, uploadedFileType, uploadedFileName);
+          resourceText = extracted.text;
           if (!resourceText.trim()) {
             send({ stage: 'error', message: 'Could not extract text from the uploaded file.' });
             controller.close();
             return;
           }
-          if (resourceText.length > RESOURCE_TEXT_LIMIT) {
-            send({
-              stage: 'extracting',
-              message: `Read ${uploadedFileName} — using first ${RESOURCE_TEXT_LIMIT.toLocaleString()} of ${resourceText.length.toLocaleString()} characters.`,
-            });
-          }
+          extraction = buildExtractionCoverage(
+            extracted.stats,
+            Math.min(resourceText.length, RESOURCE_TEXT_LIMIT),
+          );
+          send({
+            stage: 'extracting',
+            message: [extraction.summary, ...extraction.warnings].join(' '),
+          });
         }
 
         // ── Stage: ai_thinking ──────────────────────────────────────────────
@@ -325,6 +296,7 @@ export async function POST(req: NextRequest) {
               subjectTitle: subject.title,
               topicHint,
               availableSkills,
+              classProfile,
             });
           } else {
             plan = await generateLessonFromTopic({
@@ -334,6 +306,7 @@ export async function POST(req: NextRequest) {
               priorKnowledge,
               goal,
               availableSkills,
+              classProfile,
             });
           }
         } catch (err) {
@@ -432,6 +405,7 @@ export async function POST(req: NextRequest) {
           topicSummary: plan.topicSummary ?? '',
           matchedSkills,
           doNowItems,
+          extraction,
         };
         send({ stage: 'done', plan: response });
         controller.close();
