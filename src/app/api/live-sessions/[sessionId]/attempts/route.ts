@@ -11,6 +11,7 @@ import { generateQuestionsForSkill } from '@/lib/ai/questionGenerator';
 import { aiMarkingService, markSchema } from '@/features/qa/AIMarkingService';
 import { parseOpeningCheckQueue } from '@/lib/live/live-check-plan';
 import { RUBRIC_CORRECT_THRESHOLD } from '@/lib/live/markingConstants';
+import { checkRateLimit } from '@/lib/rateLimit';
 
 const SNAPSHOT_MAX_BYTES = 5 * 1024 * 1024;
 const STROKES_MAX_COUNT = 10_000;
@@ -86,6 +87,12 @@ export async function POST(req: NextRequest, { params }: Props) {
 
   const userId = (session.user as { id: string }).id;
   const { sessionId } = await params;
+
+  // Submissions can trigger AI marking and AI question generation — cap well
+  // above any legitimate answering pace.
+  if (!checkRateLimit(`live-attempts:${userId}`, 30, 60_000)) {
+    return NextResponse.json({ error: 'Too many submissions — please slow down.' }, { status: 429 });
+  }
 
   const parsed = schema.safeParse(await req.json());
   if (!parsed.success) return NextResponse.json({ error: 'Invalid input' }, { status: 400 });

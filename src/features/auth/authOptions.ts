@@ -7,6 +7,10 @@ import { z } from 'zod';
 if (process.env.NODE_ENV !== 'production') {
   process.env.NEXTAUTH_SECRET ??= 'ember-local-dev-secret';
   process.env.NEXTAUTH_URL ??= 'http://localhost:3000';
+} else if (!process.env.NEXTAUTH_SECRET) {
+  // Fail fast with a clear message instead of NextAuth 500ing on every
+  // request (or worse, a future refactor reintroducing a known fallback).
+  throw new Error('NEXTAUTH_SECRET must be set in production.');
 }
 
 const loginSchema = z.object({
