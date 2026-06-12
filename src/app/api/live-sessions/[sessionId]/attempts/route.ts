@@ -11,6 +11,8 @@ import { generateQuestionsForSkill } from '@/lib/ai/questionGenerator';
 import { aiMarkingService, markSchema } from '@/features/qa/AIMarkingService';
 import { parseOpeningCheckQueue } from '@/lib/live/live-check-plan';
 import { RUBRIC_CORRECT_THRESHOLD } from '@/lib/live/markingConstants';
+import { nextPracticeIntent } from '@/lib/live/difficultyLadder';
+import { selectLiveItem } from '@/lib/live/selectLiveItem';
 
 const SNAPSHOT_MAX_BYTES = 5 * 1024 * 1024;
 const STROKES_MAX_COUNT = 10_000;
@@ -343,13 +345,40 @@ export async function POST(req: NextRequest, { params }: Props) {
       ? ((liveSession.phases[liveSession.currentPhaseIndex] as { skillId?: string } | undefined)?.skillId ?? null)
       : null;
     const sessionSkillId = phaseSkillId ?? liveSession.skillId ?? skillId;
-    let poolItem = await prisma.item.findFirst({
-      where: {
-        id: { notIn: Array.from(answeredSet) },
-        skills: { some: { skillId: sessionSkillId } },
-      },
-      select: { id: true, question: true, type: true, options: true },
+
+    // Automatic difficulty ladder: recent outcomes on this skill decide whether
+    // the next item steps up (challenge), holds (similar), or steps down (easier).
+    const recentAttempts = await prisma.liveAttempt.findMany({
+      where: { liveSessionId: sessionId, studentUserId: userId, skillId: sessionSkillId },
+      orderBy: { createdAt: 'desc' },
+      take: 4,
+      select: { correct: true },
     });
+    let ladderIntent = nextPracticeIntent(recentAttempts.map((a) => a.correct));
+    // A one-off miss that signalled a tagged misconception gets an item
+    // targeting that misconception rather than generic same-level practice.
+    if (ladderIntent === 'PRACTICE_SIMILAR' && !correct && misconceptionId) {
+      ladderIntent = 'PRACTICE_MISCONCEPTION';
+    }
+
+    const selection = await selectLiveItem({
+      sessionId,
+      subjectId: liveSession.subjectId,
+      skillId: sessionSkillId,
+      intent: ladderIntent,
+      audience: 'individual',
+      targetStudentIds: [userId],
+      misconceptionId,
+      excludeItemIds: Array.from(answeredSet),
+    });
+    let poolItem = selection.item
+      ? {
+          id: selection.item.id,
+          question: selection.item.question,
+          type: selection.item.type,
+          options: selection.item.options,
+        }
+      : null;
 
     // Pool exhausted — generate fresh AI questions and serve the first one.
     // Fix: wrap in a 5 s timeout so a slow generation call never blocks a student submission.

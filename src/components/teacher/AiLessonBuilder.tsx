@@ -13,8 +13,9 @@
  * or try again.
  */
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { AiLessonPlanResponse, AiMatchedSkill, SseEvent } from '@/app/api/teacher/ai/lesson-plan/route';
+import type { TeacherClassroomItem } from '@/app/api/teacher/classrooms/route';
 
 // ── Props ─────────────────────────────────────────────────────────────────────
 
@@ -221,6 +222,27 @@ function PlanPreview({
         </p>
       </div>
 
+      {plan.extraction && (
+        <div
+          className="rounded-xl border px-4 py-3 text-xs leading-relaxed"
+          style={{
+            borderColor: plan.extraction.warnings.length > 0 ? 'var(--anx-warning)' : 'var(--anx-outline-variant)',
+            background: plan.extraction.warnings.length > 0 ? 'var(--anx-warning-soft)' : 'var(--anx-surface-container-low)',
+            color: 'var(--anx-text-secondary)',
+          }}
+        >
+          <p className="m-0 font-semibold" style={{ color: 'var(--anx-text)' }}>
+            What was imported
+          </p>
+          <p className="m-0 mt-1">{plan.extraction.summary}</p>
+          {plan.extraction.warnings.map((warning) => (
+            <p key={warning} className="m-0 mt-1">
+              ⚠ {warning}
+            </p>
+          ))}
+        </div>
+      )}
+
       {skills.length > 0 ? (
         <div>
           <p className="mb-2 text-xs font-semibold" style={{ color: 'var(--anx-text-secondary)' }}>
@@ -421,6 +443,36 @@ type Tab = 'describe' | 'upload';
 export function AiLessonBuilder({ subjectId, subjectTitle, initialTopic, onPlanGenerated, onClose }: Props) {
   const [activeTab, setActiveTab] = useState<Tab>('describe');
 
+  // Target class — when set, the server pulls the class's real mastery data
+  // into the generation prompt so the plan is pitched at this class.
+  const [classrooms, setClassrooms] = useState<TeacherClassroomItem[]>([]);
+  const [classroomId, setClassroomId] = useState('');
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch('/api/teacher/classrooms');
+        if (!res.ok) return;
+        const data = (await res.json()) as { classrooms?: TeacherClassroomItem[] };
+        if (!cancelled && Array.isArray(data.classrooms)) setClassrooms(data.classrooms);
+      } catch {
+        // No classrooms — selector simply stays hidden.
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  function handleClassroomChange(id: string) {
+    setClassroomId(id);
+    const selected = classrooms.find((c) => c.id === id);
+    if (selected?.yearGroup) {
+      setDescribeForm((prev) => (prev.yearGroup ? prev : { ...prev, yearGroup: selected.yearGroup ?? '' }));
+    }
+  }
+
   // Describe-mode state
   const [describeStep, setDescribeStep] = useState(0);
   const [describeForm, setDescribeForm] = useState<DescribeForm>({
@@ -542,6 +594,7 @@ export function AiLessonBuilder({ subjectId, subjectTitle, initialTopic, onPlanG
           yearGroup: describeForm.yearGroup || undefined,
           priorKnowledge: describeForm.priorKnowledge || undefined,
           goal: describeForm.goal || undefined,
+          classroomId: classroomId || undefined,
         }),
       });
       if (!res.ok) {
@@ -572,6 +625,7 @@ export function AiLessonBuilder({ subjectId, subjectTitle, initialTopic, onPlanG
       form.set('subjectId', subjectId);
       form.set('file', file);
       if (topicHint.trim()) form.set('topicHint', topicHint.trim());
+      if (classroomId) form.set('classroomId', classroomId);
 
       const res = await fetch('/api/teacher/ai/lesson-plan', { method: 'POST', body: form });
       if (!res.ok) {
@@ -726,6 +780,36 @@ export function AiLessonBuilder({ subjectId, subjectTitle, initialTopic, onPlanG
           </button>
         ))}
       </div>
+
+      {/* Target class — shared by both tabs */}
+      {classrooms.length > 0 && (
+        <div>
+          <label
+            htmlFor="ai-builder-classroom"
+            className="mb-1 block text-sm font-medium"
+            style={{ color: 'var(--anx-text-secondary)' }}
+          >
+            Building for{' '}
+            <span className="text-xs font-normal" style={{ color: 'var(--anx-text-muted)' }}>
+              (optional — uses the class&apos;s real attainment data)
+            </span>
+          </label>
+          <select
+            id="ai-builder-classroom"
+            value={classroomId}
+            onChange={(e) => handleClassroomChange(e.target.value)}
+            className="anx-input w-full text-sm"
+          >
+            <option value="">No specific class</option>
+            {classrooms.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+                {c.yearGroup ? ` · Year ${c.yearGroup}` : ''} · {c.studentCount} students
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
       {error && <div className="anx-callout-danger text-sm">{error}</div>}
 

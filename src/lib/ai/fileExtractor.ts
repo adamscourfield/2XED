@@ -8,6 +8,29 @@ import path from 'node:path';
 
 export const FILE_TEXT_LIMIT = 15_000;
 
+/** What was (and wasn't) captured from an uploaded file, for teacher review. */
+export interface ExtractionStats {
+  /** 'pptx' | 'docx' | 'pdf' | 'text' */
+  format: string;
+  totalChars: number;
+  /** Slides for PPTX, pages for PDF; null when not applicable/known. */
+  unitCount: number | null;
+  unitLabel: 'slides' | 'pages' | null;
+  /** Embedded images detected in the file — these are NOT imported (text only). */
+  imageCount: number;
+}
+
+export interface ExtractionResult {
+  text: string;
+  stats: ExtractionStats;
+}
+
+const IMAGE_ENTRY_RE = /\.(png|jpe?g|gif|bmp|tiff?|emf|wmf|svg)$/i;
+
+function countImageEntries(filePath: string, mediaDir: RegExp): number {
+  return listZipEntries(filePath, mediaDir).filter((entry) => IMAGE_ENTRY_RE.test(entry)).length;
+}
+
 function decodeXmlEntities(text: string): string {
   return text
     .replace(/&amp;/g, '&')
@@ -72,17 +95,79 @@ function extractTextFromDocx(filePath: string): string {
   return runs.join(' ').replace(/\s+/g, ' ').trim();
 }
 
-async function extractTextFromPdf(filePath: string): Promise<string> {
+async function extractTextFromPdf(filePath: string): Promise<{ text: string; pageCount: number | null }> {
   // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-explicit-any
-  const pdfParse = require('pdf-parse') as (buf: Buffer) => Promise<{ text: string }>;
+  const pdfParse = require('pdf-parse') as (buf: Buffer) => Promise<{ text: string; numpages?: number }>;
   const { readFile } = await import('node:fs/promises');
   const buf = await readFile(filePath);
   try {
     const data = await pdfParse(buf);
-    return (data.text ?? '').replace(/\s+/g, ' ').trim();
+    return {
+      text: (data.text ?? '').replace(/\s+/g, ' ').trim(),
+      pageCount: typeof data.numpages === 'number' ? data.numpages : null,
+    };
   } catch {
-    return '';
+    return { text: '', pageCount: null };
   }
+}
+
+export async function extractFileWithStats(
+  filePath: string,
+  mimeType: string,
+  fileName: string,
+): Promise<ExtractionResult> {
+  const ext = path.extname(fileName).toLowerCase();
+
+  if (ext === '.pptx' || mimeType.includes('presentationml')) {
+    const slideEntries = listZipEntries(filePath, /^ppt\/slides\/slide\d+\.xml$/);
+    const text = extractTextFromPptx(filePath);
+    return {
+      text,
+      stats: {
+        format: 'pptx',
+        totalChars: text.length,
+        unitCount: slideEntries.length,
+        unitLabel: 'slides',
+        imageCount: countImageEntries(filePath, /^ppt\/media\//),
+      },
+    };
+  }
+
+  if (ext === '.docx' || mimeType.includes('wordprocessingml')) {
+    const text = extractTextFromDocx(filePath);
+    return {
+      text,
+      stats: {
+        format: 'docx',
+        totalChars: text.length,
+        unitCount: null,
+        unitLabel: null,
+        imageCount: countImageEntries(filePath, /^word\/media\//),
+      },
+    };
+  }
+
+  if (ext === '.pdf' || mimeType === 'application/pdf') {
+    const { text, pageCount } = await extractTextFromPdf(filePath);
+    return {
+      text,
+      stats: {
+        format: 'pdf',
+        totalChars: text.length,
+        unitCount: pageCount,
+        unitLabel: 'pages',
+        imageCount: 0,
+      },
+    };
+  }
+
+  // CSV or plain text
+  const { readFile } = await import('node:fs/promises');
+  const text = (await readFile(filePath, 'utf8')).slice(0, FILE_TEXT_LIMIT);
+  return {
+    text,
+    stats: { format: 'text', totalChars: text.length, unitCount: null, unitLabel: null, imageCount: 0 },
+  };
 }
 
 export async function extractTextFromFile(
@@ -90,11 +175,5 @@ export async function extractTextFromFile(
   mimeType: string,
   fileName: string,
 ): Promise<string> {
-  const ext = path.extname(fileName).toLowerCase();
-  if (ext === '.pptx' || mimeType.includes('presentationml')) return extractTextFromPptx(filePath);
-  if (ext === '.docx' || mimeType.includes('wordprocessingml')) return extractTextFromDocx(filePath);
-  if (ext === '.pdf' || mimeType === 'application/pdf') return extractTextFromPdf(filePath);
-  // CSV or plain text
-  const { readFile } = await import('node:fs/promises');
-  return (await readFile(filePath, 'utf8')).slice(0, FILE_TEXT_LIMIT);
+  return (await extractFileWithStats(filePath, mimeType, fileName)).text;
 }
