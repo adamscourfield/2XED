@@ -1,6 +1,8 @@
 'use client';
 
+import { useState } from 'react';
 import { useLivePhasePrimaryFocus } from '@/components/student/live/useLivePhasePrimaryFocus';
+import { StudentScratchLayer } from '@/components/student/live/StudentScratchLayer';
 import { AnimationRenderer } from '@/components/explanation/AnimationRenderer';
 import { LiveWhiteboardViewer } from '@/components/student/LiveWhiteboardViewer';
 import { HelpIcon } from '@/components/teacher/workspace/icons';
@@ -41,6 +43,7 @@ export function StudentExplanationView({
 }: Props) {
   const schema = explanationRoute.animationSchema as Parameters<typeof AnimationRenderer>[0]['schema'] | null;
   useLivePhasePrimaryFocus(`${explanationRoute.id}-${stepIndex}`);
+  const [notesActive, setNotesActive] = useState(false);
 
   const hasBoard = Boolean(whiteboard && whiteboard.strokes.length > 0);
 
@@ -112,21 +115,36 @@ export function StudentExplanationView({
               Step {Math.min(stepIndex + 1, totalSteps)} of {Math.max(totalSteps, 1)}
             </p>
           </div>
-          <div className="flex items-center gap-2" aria-hidden>
-            {Array.from({ length: Math.max(totalSteps, 1) }).map((_, idx) => (
-              <span
-                key={`step-${idx}`}
-                className="h-2.5 w-2.5 rounded-full"
-                style={{
-                  background:
-                    idx === stepIndex
-                      ? 'var(--anx-primary)'
-                      : idx < stepIndex
-                        ? 'var(--anx-primary-soft)'
-                        : 'var(--anx-surface-container-high)',
-                }}
-              />
-            ))}
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setNotesActive((v) => !v)}
+              aria-pressed={notesActive}
+              className="rounded-full border px-3 py-1.5 text-xs font-semibold transition"
+              style={{
+                borderColor: notesActive ? 'var(--anx-primary)' : 'var(--anx-outline-variant)',
+                background: notesActive ? 'var(--anx-primary-soft)' : 'transparent',
+                color: notesActive ? 'var(--anx-primary)' : 'var(--anx-text-muted)',
+              }}
+            >
+              ✏️ My notes
+            </button>
+            <div className="flex items-center gap-2" aria-hidden>
+              {Array.from({ length: Math.max(totalSteps, 1) }).map((_, idx) => (
+                <span
+                  key={`step-${idx}`}
+                  className="h-2.5 w-2.5 rounded-full"
+                  style={{
+                    background:
+                      idx === stepIndex
+                        ? 'var(--anx-primary)'
+                        : idx < stepIndex
+                          ? 'var(--anx-primary-soft)'
+                          : 'var(--anx-surface-container-high)',
+                  }}
+                />
+              ))}
+            </div>
           </div>
         </div>
 
@@ -177,6 +195,8 @@ export function StudentExplanationView({
                 />
               </div>
             ) : null}
+
+            <StudentScratchLayer scopeId={explanationRoute.id} active={notesActive} />
           </div>
         </div>
       </div>

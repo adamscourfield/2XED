@@ -50,6 +50,8 @@ export interface GenerateLessonParams {
   priorKnowledge?: string;
   goal?: string;
   availableSkills: SkillContext[];
+  /** Real attainment summary for the target class (from buildClassProfile). */
+  classProfile?: string;
 }
 
 export interface ExtractLessonParams {
@@ -57,6 +59,8 @@ export interface ExtractLessonParams {
   subjectTitle: string;
   topicHint?: string;
   availableSkills: SkillContext[];
+  /** Real attainment summary for the target class (from buildClassProfile). */
+  classProfile?: string;
 }
 
 // ── Prompt builders ───────────────────────────────────────────────────────────
@@ -113,12 +117,19 @@ const DO_NOW_RULES = `Do Now question rules:
   • SHORT_ANSWER: no options needed; provide a concise model answer
   • Keep stems concise and student-facing`;
 
+function buildClassProfileSection(classProfile?: string): string {
+  if (!classProfile) return '';
+  return `\nCLASS PROFILE (real attainment data — tailor the lesson to this class):
+${classProfile}
+Use the profile when choosing phases and Do Now questions: skip explanations for secure skills, scaffold known gaps, and pitch Do Now prerequisites at what this class can actually do.\n`;
+}
+
 function buildGeneratePrompt(p: GenerateLessonParams): string {
   return `Generate a lesson plan.
 
 SUBJECT: ${p.subjectTitle}
 TOPIC: ${p.topic}${p.yearGroup ? `\nYEAR GROUP: ${p.yearGroup}` : ''}${p.priorKnowledge ? `\nSTUDENT PRIOR KNOWLEDGE: ${p.priorKnowledge}` : ''}${p.goal ? `\nLESSON GOAL: ${p.goal}` : ''}
-
+${buildClassProfileSection(p.classProfile)}
 AVAILABLE SKILLS (only use codes from this list):
 ${buildSkillList(p.availableSkills)}
 
@@ -135,7 +146,7 @@ function buildExtractPrompt(p: ExtractLessonParams): string {
   return `A teacher has uploaded a teaching resource. Analyse it and generate a lesson plan.
 
 SUBJECT: ${p.subjectTitle}${p.topicHint ? `\nTOPIC HINT: ${p.topicHint}` : ''}
-
+${buildClassProfileSection(p.classProfile)}
 RESOURCE CONTENT${truncated ? ` (first ${RESOURCE_TEXT_LIMIT.toLocaleString()} of ${p.resourceText.length.toLocaleString()} characters)` : ''}:
 ---
 ${p.resourceText.slice(0, RESOURCE_TEXT_LIMIT)}
