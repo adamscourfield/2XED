@@ -38,3 +38,6 @@ test-pdf-extract.mjs
 
 # curriculum source archives (tracked on main; ignored on feature branches)
 Curriculum/**/*.zip
+
+# Load-test fixture (generated, contains seeded IDs)
+scripts/loadtest/fixture.json
