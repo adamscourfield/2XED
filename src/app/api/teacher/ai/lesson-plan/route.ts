@@ -15,12 +15,11 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
 import { writeFile, unlink } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import { authOptions } from '@/features/auth/authOptions';
 import { prisma } from '@/db/prisma';
+import { requireApiUser } from '@/lib/api/auth';
 import { checkRateLimit } from '@/lib/rateLimit';
 import {
   generateLessonFromTopic,
@@ -135,14 +134,11 @@ function matchSkillCodes(aiCodes: string[], dbSkills: DbSkill[]): DbSkill[] {
 
 export async function POST(req: NextRequest) {
   // ── Auth (must happen before the stream starts) ───────────────────────────
-  const session = await getServerSession(authOptions);
-  if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
-  const role = (session.user as { role?: string }).role;
-  if (role !== 'TEACHER') return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  const { user, response: authResponse } = await requireApiUser(['TEACHER']);
+  if (authResponse) return authResponse;
 
   // Each request triggers a Claude call (plus file parsing in import mode).
-  const teacherUserId = (session.user as { id: string }).id;
+  const teacherUserId = user.id;
   if (!checkRateLimit(`lesson-plan:${teacherUserId}`, 5, 60_000)) {
     return NextResponse.json({ error: 'Too many requests — please slow down.' }, { status: 429 });
   }
@@ -259,7 +255,7 @@ export async function POST(req: NextRequest) {
             const profile = await buildClassProfile({
               classroomId,
               subjectId,
-              teacherUserId: (session.user as { id: string }).id,
+              teacherUserId: user.id,
             });
             if (profile) {
               classProfile = profile.promptText;

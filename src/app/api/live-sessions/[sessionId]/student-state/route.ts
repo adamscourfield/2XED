@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/features/auth/authOptions';
 import { prisma } from '@/db/prisma';
+import { requireApiUser } from '@/lib/api/auth';
 import { parseOpeningCheckQueue } from '@/lib/live/live-check-plan';
 
 interface Props {
@@ -22,13 +21,10 @@ interface Props {
  * Students poll this every 3s while in a session.
  */
 export async function GET(_req: NextRequest, { params }: Props) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const { user, response } = await requireApiUser(['STUDENT']);
+  if (response) return response;
 
-  const role = (session.user as { role?: string }).role;
-  if (role !== 'STUDENT') return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-
-  const userId = (session.user as { id: string }).id;
+  const userId = user.id;
   const { sessionId } = await params;
 
   // Verify student is a participant — fetch participant and session in parallel.

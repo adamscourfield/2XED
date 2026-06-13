@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/features/auth/authOptions';
+import { requireApiUser } from '@/lib/api/auth';
 import { aiMarkingService, markSchema } from '@/features/qa/AIMarkingService';
 import { checkRateLimit } from '@/lib/rateLimit';
 
@@ -25,9 +24,9 @@ const RequestSchema = z.object({
 });
 
 export async function POST(req: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  const userId = (session.user as { id: string }).id;
+  const { user, response } = await requireApiUser();
+  if (response) return response;
+  const userId = user.id;
 
   if (!checkRateLimit(`mark:${userId}`, 30, 60_000)) {
     return NextResponse.json({ error: 'Too many requests — please slow down.' }, { status: 429 });

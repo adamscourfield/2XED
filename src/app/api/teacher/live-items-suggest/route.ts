@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/features/auth/authOptions';
 import { prisma } from '@/db/prisma';
+import { requireApiUser } from '@/lib/api/auth';
 import { fetchSampleItemsBySkillIds } from '@/lib/live/live-check-plan';
 import { ensureItemPool } from '@/lib/ai/questionGenerator';
 import {
@@ -33,11 +32,9 @@ function dedupeItems<T extends { id: string }>(items: T[]): T[] {
  * - When lastSessionId is set: class-level wrong rate on items from that live session.
  */
 export async function GET(req: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  const role = (session.user as { role?: string }).role;
-  if (role !== 'TEACHER') return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-  const userId = (session.user as { id: string }).id;
+  const { user, response } = await requireApiUser(['TEACHER']);
+  if (response) return response;
+  const userId = user.id;
 
   const { searchParams } = new URL(req.url);
   const subjectId = searchParams.get('subjectId');

@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/features/auth/authOptions';
 import { prisma } from '@/db/prisma';
+import { requireApiUser } from '@/lib/api/auth';
 import { checkRateLimit } from '@/lib/rateLimit';
 
 interface AiSuggestion {
@@ -88,9 +87,8 @@ export async function POST(
   { params }: { params: Promise<{ lessonId: string; blockId: string }> }
 ) {
   const { lessonId, blockId } = await params;
-  const session = await getServerSession(authOptions);
-  if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  const user = session.user as { id: string; role?: string };
+  const { user, response } = await requireApiUser();
+  if (response) return response;
   const blockModel = prisma.lessonBlock;
   if (!blockModel) return NextResponse.json({ error: 'Model unavailable' }, { status: 503 });
 

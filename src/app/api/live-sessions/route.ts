@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
 import { randomBytes } from 'node:crypto';
 import { z } from 'zod';
-import { authOptions } from '@/features/auth/authOptions';
 import { prisma } from '@/db/prisma';
+import { requireApiUser } from '@/lib/api/auth';
 
 const phaseSchema = z.object({
   index: z.number().int().nonnegative(),
@@ -42,13 +41,10 @@ function generateJoinCode(): string {
 }
 
 export async function POST(req: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const { user, response } = await requireApiUser(['TEACHER']);
+  if (response) return response;
 
-  const role = (session.user as { role?: string }).role;
-  if (role !== 'TEACHER') return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-
-  const userId = (session.user as { id: string }).id;
+  const userId = user.id;
 
   const parsed = schema.safeParse(await req.json());
   if (!parsed.success) return NextResponse.json({ error: 'Invalid input', issues: parsed.error.issues }, { status: 400 });

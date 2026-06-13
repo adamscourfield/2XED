@@ -10,10 +10,9 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
 import type { LessonBlockType, Prisma } from '@prisma/client';
-import { authOptions } from '@/features/auth/authOptions';
 import { prisma } from '@/db/prisma';
+import { requireApiUser } from '@/lib/api/auth';
 import type { AiLessonPlanResponse } from '@/app/api/teacher/ai/lesson-plan/route';
 
 export async function POST(
@@ -22,9 +21,8 @@ export async function POST(
 ) {
   const { lessonId } = await params;
 
-  const session = await getServerSession(authOptions);
-  if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  const user = session.user as { id: string; role?: string };
+  const { user, response } = await requireApiUser();
+  if (response) return response;
 
   const lessonModel = prisma.lesson;
   const blockModel = prisma.lessonBlock;

@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
 import { z } from 'zod';
-import { authOptions } from '@/features/auth/authOptions';
 import { prisma } from '@/db/prisma';
+import { requireApiUser } from '@/lib/api/auth';
 
 const createSchema = z.object({
   title: z.string().min(1).max(200),
@@ -27,9 +26,8 @@ export async function POST(
   { params }: { params: Promise<{ planId: string }> },
 ) {
   const { planId } = await params;
-  const session = await getServerSession(authOptions);
-  if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  const user = session.user as { id: string; role?: string };
+  const { user, response } = await requireApiUser();
+  if (response) return response;
 
   const owned = await verifyOwner(planId, user.id);
   if (!owned) return NextResponse.json({ error: 'Not found' }, { status: 404 });

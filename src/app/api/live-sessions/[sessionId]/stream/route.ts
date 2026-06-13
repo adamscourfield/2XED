@@ -3,9 +3,8 @@
 export const runtime = 'nodejs';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/features/auth/authOptions';
 import { prisma } from '@/db/prisma';
+import { requireApiUser } from '@/lib/api/auth';
 import { getRecommendedExplanationForLiveSession } from '@/lib/live/live-session-explanation-bridge';
 import { RUBRIC_CORRECT_THRESHOLD } from '@/lib/live/markingConstants';
 
@@ -50,13 +49,10 @@ interface Props {
  * the stream drops).
  */
 export async function GET(req: NextRequest, { params }: Props) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const { user, response } = await requireApiUser(['TEACHER']);
+  if (response) return response;
 
-  const role = (session.user as { role?: string }).role;
-  if (role !== 'TEACHER') return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-
-  const userId = (session.user as { id: string }).id;
+  const userId = user.id;
   const { sessionId } = await params;
 
   // Verify ownership

@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/features/auth/authOptions';
 import { prisma } from '@/db/prisma';
+import { requireApiUser } from '@/lib/api/auth';
 
 export interface TeacherClassroomItem {
   id: string;
@@ -17,9 +16,8 @@ export interface TeacherClassroomItem {
  * Returns an empty array (not an error) if no TeacherProfile exists.
  */
 export async function GET() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  const user = session.user as { id: string; role?: string };
+  const { user, response } = await requireApiUser();
+  if (response) return response;
 
   const profile = await prisma.teacherProfile.findUnique({
     where: { userId: user.id },

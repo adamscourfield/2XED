@@ -10,12 +10,11 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
 import { writeFile, unlink } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import { authOptions } from '@/features/auth/authOptions';
 import { prisma } from '@/db/prisma';
+import { requireApiUser } from '@/lib/api/auth';
 import { extractTextFromFile, FILE_TEXT_LIMIT } from '@/lib/ai/fileExtractor';
 import { checkRateLimit } from '@/lib/rateLimit';
 
@@ -125,9 +124,8 @@ export async function POST(
   { params }: { params: Promise<{ planId: string }> },
 ) {
   const { planId } = await params;
-  const session = await getServerSession(authOptions);
-  if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  const user = session.user as { id: string; role?: string };
+  const { user, response } = await requireApiUser();
+  if (response) return response;
   if (user.role !== 'TEACHER' && user.role !== 'ADMIN' && user.role !== 'LEADERSHIP') {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }

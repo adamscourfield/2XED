@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/features/auth/authOptions';
 import { prisma } from '@/db/prisma';
+import { requireApiUser } from '@/lib/api/auth';
 import { z } from 'zod';
 
 async function authorize(lessonId: string, userId: string, role: string) {
@@ -15,9 +14,8 @@ async function authorize(lessonId: string, userId: string, role: string) {
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ lessonId: string }> }) {
   const { lessonId } = await params;
-  const session = await getServerSession(authOptions);
-  if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  const user = session.user as { id: string; role?: string };
+  const { user, response } = await requireApiUser();
+  if (response) return response;
   const lessonModel = prisma.lesson;
   if (!lessonModel) return NextResponse.json({ error: 'Model unavailable' }, { status: 503 });
 
@@ -64,9 +62,8 @@ const patchSchema = z.object({
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ lessonId: string }> }) {
   const { lessonId } = await params;
-  const session = await getServerSession(authOptions);
-  if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  const user = session.user as { id: string; role?: string };
+  const { user, response } = await requireApiUser();
+  if (response) return response;
 
   const lesson = await authorize(lessonId, user.id, user.role ?? '');
   if (!lesson) return NextResponse.json({ error: 'Not found' }, { status: 404 });
@@ -85,9 +82,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ le
 
 export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ lessonId: string }> }) {
   const { lessonId } = await params;
-  const session = await getServerSession(authOptions);
-  if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  const user = session.user as { id: string; role?: string };
+  const { user, response } = await requireApiUser();
+  if (response) return response;
 
   const lesson = await authorize(lessonId, user.id, user.role ?? '');
   if (!lesson) return NextResponse.json({ error: 'Not found' }, { status: 404 });

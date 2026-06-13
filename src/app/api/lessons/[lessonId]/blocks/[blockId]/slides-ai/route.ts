@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/features/auth/authOptions';
 import { prisma } from '@/db/prisma';
+import { requireApiUser } from '@/lib/api/auth';
 import { checkRateLimit } from '@/lib/rateLimit';
 
 interface Slide {
@@ -94,9 +93,8 @@ export async function POST(
   { params }: { params: Promise<{ lessonId: string; blockId: string }> },
 ) {
   const { lessonId, blockId } = await params;
-  const session = await getServerSession(authOptions);
-  if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  const user = session.user as { id: string; role?: string };
+  const { user, response } = await requireApiUser();
+  if (response) return response;
 
   if (!checkRateLimit(`slides-ai:${user.id}`, 20, 60_000)) {
     return NextResponse.json({ error: 'Too many requests — please wait before generating again.' }, { status: 429 });
