@@ -5,7 +5,7 @@ import { prisma } from '@/db/prisma';
 import { requireApiUser } from '@/lib/api/auth';
 import { recordKnowledgeAttempt } from '@/features/knowledge-state/knowledgeStateService';
 import { emitEvent } from '@/features/telemetry/eventService';
-import { escalateLane } from '@/lib/live/lane-router';
+import { escalateLane, reEvaluateLaneFromPractice } from '@/lib/live/lane-router';
 import { generateQuestionsForSkill } from '@/lib/ai/questionGenerator';
 import { aiMarkingService, markSchema } from '@/features/qa/AIMarkingService';
 import { parseOpeningCheckQueue } from '@/lib/live/live-check-plan';
@@ -304,6 +304,28 @@ export async function POST(req: NextRequest, { params }: Props) {
       await prisma.liveParticipant.update({
         where: { id: participant.id },
         data: { openingCheckIndex: { increment: 1 } },
+      });
+    }
+
+    // Keep lanes live: a coping student who now fails a run of practice on this
+    // skill is re-laned downward rather than left on a stale diagnostic placement.
+    const relane = await reEvaluateLaneFromPractice(participant.id, sessionId, skillId);
+    if (relane.changed) {
+      laneAfterAttempt = relane.toLane;
+      await emitEvent({
+        name: 'live_lane_practice_regression',
+        actorUserId: userId,
+        studentUserId: userId,
+        subjectId: liveSession.subjectId,
+        skillId,
+        attemptId: createdAttempt.id,
+        payload: {
+          liveSessionId: sessionId,
+          participantId: participant.id,
+          studentUserId: userId,
+          fromLane: relane.fromLane,
+          toLane: relane.toLane,
+        },
       });
     }
   }
