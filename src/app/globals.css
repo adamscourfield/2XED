@@ -5952,3 +5952,12 @@
   cursor: not-allowed;
   opacity: 0.65;
 }
+
+/* Conductor lane board: gentle pulse on a student who just changed lane. */
+@keyframes anxLaneChipMoved {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--anx-primary) 45%, transparent); }
+  100% { box-shadow: 0 0 0 6px transparent; }
+}
+.anx-lane-chip-moved {
+  animation: anxLaneChipMoved 1.4s ease-out 2;
+}

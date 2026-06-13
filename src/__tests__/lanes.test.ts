@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { LANES, LANE_IDS, laneDef, teacherLaneLabel, studentLaneLabel } from '@/lib/live/lanes';
+import { LANES, LANE_IDS, laneDef, teacherLaneLabel, studentLaneLabel, laneReasonText } from '@/lib/live/lanes';
 
 describe('canonical lanes', () => {
   it('defines exactly the three lanes in order', () => {
@@ -27,5 +27,13 @@ describe('canonical lanes', () => {
     expect(laneDef('WHAT').id).toBe('LANE_2');
     expect(laneDef(null).id).toBe('LANE_2');
     expect(laneDef(undefined).id).toBe('LANE_2');
+  });
+
+  it('maps escalation reasons to friendly text, null for none/unknown', () => {
+    expect(laneReasonText('PRACTICE_REGRESSION')).toBe('Slipped during practice');
+    expect(laneReasonText('MISCONCEPTION_FAILED')).toBe('Hit a known misconception');
+    expect(laneReasonText('MANUAL_TEACHER')).toBe('Moved by you');
+    expect(laneReasonText(null)).toBeNull();
+    expect(laneReasonText('SOMETHING_ELSE')).toBeNull();
   });
 });

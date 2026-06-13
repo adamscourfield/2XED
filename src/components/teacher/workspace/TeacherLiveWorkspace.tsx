@@ -22,6 +22,7 @@ import { EndSessionDialog } from './EndSessionDialog';
 import { InviteIcon, SettingsIcon } from './icons';
 import type { LiveStroke } from '@/lib/live/whiteboard-strokes';
 import { LANES } from '@/lib/live/lanes';
+import { ConductorLaneBoard, type ConductorLaneStudent } from './ConductorLaneBoard';
 
 interface LessonPhase {
   index: number;
@@ -58,6 +59,24 @@ interface LaneStudent {
   name: string | null;
   email: string;
   hasFlag?: boolean;
+  escalationReason?: string | null;
+  isUnexpectedFailure?: boolean;
+  holdingAtFinalCheck?: boolean;
+  movedRecently?: boolean;
+}
+
+/** Fill defaults so the (older, looser) snapshot shape satisfies the board. */
+function toBoardStudent(s: LaneStudent): ConductorLaneStudent {
+  return {
+    id: s.id,
+    name: s.name,
+    email: s.email,
+    hasFlag: s.hasFlag ?? false,
+    escalationReason: s.escalationReason ?? null,
+    isUnexpectedFailure: s.isUnexpectedFailure ?? false,
+    holdingAtFinalCheck: s.holdingAtFinalCheck ?? false,
+    movedRecently: s.movedRecently ?? false,
+  };
 }
 
 interface SupportSummary {
@@ -1071,6 +1090,16 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
             studentResponses={snapshot?.studentResponses ?? null}
             laneCounts={snapshot?.laneCounts ?? null}
           />
+          {snapshot?.laneCounts && snapshot?.laneStudents && (
+            <ConductorLaneBoard
+              laneCounts={snapshot.laneCounts}
+              laneStudents={{
+                LANE_1: snapshot.laneStudents.LANE_1.map(toBoardStudent),
+                LANE_2: snapshot.laneStudents.LANE_2.map(toBoardStudent),
+                LANE_3: snapshot.laneStudents.LANE_3.map(toBoardStudent),
+              }}
+            />
+          )}
           {snapshot?.laneCounts && (
             <LaneSummaryBar
               laneCounts={snapshot.laneCounts}
