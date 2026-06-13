@@ -74,3 +74,29 @@ export function teacherLaneLabel(lane: string | null | undefined): string {
 export function studentLaneLabel(lane: string | null | undefined): string {
   return laneDef(lane).studentLabel;
 }
+
+/**
+ * Short teacher-facing reason a student is in their current lane, mapped from
+ * the EscalationReason enum. Returns null for no/unknown reason so the UI can
+ * simply omit it.
+ */
+export function laneReasonText(reason: string | null | undefined): string | null {
+  switch (reason) {
+    case 'ANCHOR_FAILED':
+      return 'Missed the key question';
+    case 'MISCONCEPTION_FAILED':
+      return 'Hit a known misconception';
+    case 'SCAFFOLDED_CORRECT':
+      return 'Needed full support to get there';
+    case 'HINTS_USED':
+      return 'Needed hints';
+    case 'SHADOW_CHECK_FAILED':
+      return 'Check after support didn’t hold';
+    case 'PRACTICE_REGRESSION':
+      return 'Slipped during practice';
+    case 'MANUAL_TEACHER':
+      return 'Moved by you';
+    default:
+      return null;
+  }
+}

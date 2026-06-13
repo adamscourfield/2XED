@@ -122,9 +122,27 @@ export async function GET(req: NextRequest, { params }: Props) {
       skillSummary.set(attempt.skillId, entry);
     }
 
+    // Students whose lane changed in the last few seconds — drives the
+    // "just moved" pulse on the conductor board so teachers can catch movement.
+    const RECENT_MOVE_MS = 25_000;
+    const recentMoveRows = await prisma.laneTransition.findMany({
+      where: { liveSessionId: sessionId, createdAt: { gt: new Date(Date.now() - RECENT_MOVE_MS) } },
+      select: { participantId: true },
+    });
+    const recentlyMovedParticipantIds = new Set(recentMoveRows.map((r) => r.participantId));
+
     // Lane distribution from participants
     const laneCounts = { LANE_1: 0, LANE_2: 0, LANE_3: 0 };
-    const laneStudents: Record<string, Array<{ id: string; name: string | null; email: string; hasFlag: boolean }>> = {
+    const laneStudents: Record<string, Array<{
+      id: string;
+      name: string | null;
+      email: string;
+      hasFlag: boolean;
+      escalationReason: string | null;
+      isUnexpectedFailure: boolean;
+      holdingAtFinalCheck: boolean;
+      movedRecently: boolean;
+    }>> = {
       LANE_1: [], LANE_2: [], LANE_3: [],
     };
 
@@ -136,6 +154,10 @@ export async function GET(req: NextRequest, { params }: Props) {
           name: p.student.name,
           email: p.student.email,
           hasFlag: p.student.interventionFlags.length > 0,
+          escalationReason: p.escalationReason,
+          isUnexpectedFailure: p.isUnexpectedFailure,
+          holdingAtFinalCheck: p.holdingAtFinalCheck,
+          movedRecently: recentlyMovedParticipantIds.has(p.id),
         });
       }
     }
