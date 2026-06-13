@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState, Suspense } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, Suspense } from 'react';
 import { useSession } from 'next-auth/react';
 import { redirect, useSearchParams } from 'next/navigation';
 import { AppChrome } from '@/components/AppChrome';
@@ -222,6 +222,7 @@ function StudentLivePageInner() {
   const lastBroadcastAtRef = useRef<string | null>(null);
   const lastWhiteboardVersionRef = useRef<number>(-1);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const sseRef = useRef<EventSource | null>(null);
   const sessionRef = useRef<JoinedSession | null>(null);
   const liveWhiteboardRef = useRef<LiveWhiteboardPayload | null>(null);
   const lastExplanationTelemetryIdRef = useRef<string | null>(null);
@@ -280,19 +281,141 @@ function StudentLivePageInner() {
     if (currentItemId) questionStartRef.current = Date.now();
   }, [currentItemId]);
 
+  // Applies a student-state snapshot to the UI. Shared by the SSE stream and the
+  // polling fallback so the two paths can never diverge. Uses refs + functional
+  // setAppState only, so it needs no appState in its closure (stable identity).
+  const processStatePayload = useCallback((data: SessionPoll) => {
+    if (stoppedRef.current || !aliveRef.current) return;
+
+    // Any successfully applied snapshot means we're connected — clear the
+    // reconnecting banner. setState bails out when the value is unchanged.
+    setPollErrorCount(0);
+    consecutiveSuccessRef.current = 0;
+
+    if (data.status === 'COMPLETED') {
+      stoppedRef.current = true;
+      const sess = sessionRef.current;
+      if (sess) setAppState({ phase: 'done', session: sess });
+      return;
+    }
+
+    const phaseChanged = data.currentPhaseIndex !== lastPhaseIndexRef.current && lastPhaseIndexRef.current !== -1;
+    const newBroadcast = data.currentContent?.broadcastAt && data.currentContent.broadcastAt !== lastBroadcastAtRef.current;
+
+    if (phaseChanged) {
+      lastPhaseIndexRef.current = data.currentPhaseIndex;
+    }
+
+    if (data.pendingRecheckItem) {
+      const sess = sessionRef.current;
+      // C1: read the live phase inside a functional updater to avoid stale closure.
+      setAppState((prev) => {
+        const skipRecheckPull =
+          prev.phase === 'question' || prev.phase === 'explanation' || prev.phase === 'feedback';
+        if (sess && !skipRecheckPull && data.pendingRecheckItem) {
+          return { phase: 'question', session: sess, item: data.pendingRecheckItem, source: 'targeted' };
+        }
+        return prev;
+      });
+      if (data.pendingRecheckItem) return;
+    }
+
+    if (newBroadcast && data.currentContent) {
+      lastBroadcastAtRef.current = data.currentContent.broadcastAt ?? null;
+      const cc = data.currentContent;
+      const laneOk = broadcastTargetsStudentLane(cc, data.studentLane);
+      if (cc.contentType === 'EXPLANATION' && laneOk && cc.explanation) {
+        const sess = sessionRef.current;
+        if (sess) {
+          setAppState({
+            phase: 'explanation',
+            session: sess,
+            explanationRoute: cc.explanation,
+            stepIndex: cc.stepIndex ?? 0,
+            totalSteps: cc.totalSteps ?? (((cc.explanation.animationSchema as { steps?: unknown[] } | null)?.steps?.length ?? 1)),
+            whiteboard: liveWhiteboardRef.current,
+          });
+        }
+      } else if (cc.contentType === 'WHITEBOARD' && laneOk && cc.whiteboard) {
+        const wb = cc.whiteboard;
+        const sess = sessionRef.current;
+        if (!sess) return;
+        if (wb.action === 'hide') {
+          lastWhiteboardVersionRef.current = wb.version;
+          liveWhiteboardRef.current = null;
+          // H4: only transition to waiting if we're actually on the whiteboard screen —
+          // don't wipe an in-progress check question.
+          setAppState((prev) =>
+            prev.phase === 'whiteboard'
+              ? { phase: 'waiting', session: sess }
+              : prev
+          );
+        } else if (wb.action === 'show' || wb.action === 'clear') {
+          if (wb.version >= lastWhiteboardVersionRef.current) {
+            lastWhiteboardVersionRef.current = wb.version;
+            liveWhiteboardRef.current = wb;
+            setAppState((prev) => {
+              if (prev.phase === 'explanation' && wb.action === 'show') return { ...prev, whiteboard: wb };
+              return { phase: 'whiteboard', session: sess, whiteboard: wb };
+            });
+          }
+        }
+      } else if (cc.contentType === 'MESSAGE' && laneOk && cc.message) {
+        const sess = sessionRef.current;
+        if (sess) setAppState({ phase: 'between-phases', session: sess, message: cc.message });
+      } else if (cc.contentType === 'PRACTICE' && laneOk && cc.item) {
+        const sess = sessionRef.current;
+        if (sess) {
+          setAppState({
+            phase: 'practice',
+            session: sess,
+            item: cc.item,
+            index: cc.questionNumber ?? 1,
+            total: cc.totalQuestions ?? 1,
+          });
+        }
+      } else if (cc.contentType === 'CHECK' && laneOk && cc.item) {
+        const sess = sessionRef.current;
+        if (sess) {
+          setAppState({
+            phase: 'question',
+            session: sess,
+            item: cc.item,
+            source: 'broadcast',
+          });
+        }
+      }
+    }
+
+    if (lastPhaseIndexRef.current === -1) {
+      lastPhaseIndexRef.current = data.currentPhaseIndex;
+    }
+    if (!lastBroadcastAtRef.current && data.currentContent?.broadcastAt) {
+      lastBroadcastAtRef.current = data.currentContent.broadcastAt;
+    }
+  // setAppState / set*Ref / setPollErrorCount are stable; broadcastTargetsStudentLane is module-level.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Live updates: prefer the SSE student-stream, fall back to polling student-state.
+  // Keyed on session entry/exit only (a boolean) so the EventSource isn't torn
+  // down and reopened on every intra-session phase change.
+  const isInLiveSession = appState.phase !== 'join' && appState.phase !== 'done';
   useEffect(() => {
-    const isInSession = appState.phase !== 'join' && appState.phase !== 'done';
-    if (!isInSession) {
+    if (!isInLiveSession) {
       consecutiveSlowRef.current = 0;
       setSlowPollVisible(false);
       if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; }
+      sseRef.current?.close();
+      sseRef.current = null;
       return;
     }
 
     const sessionId = sessionRef.current?.sessionId;
     if (!sessionId) return;
+    stoppedRef.current = false;
 
-    async function pollSession() {
+    async function pollOnce() {
       // H6: stop if we've already landed on 'done' or unmounted.
       if (stoppedRef.current || !aliveRef.current) return;
       const sid = sessionRef.current?.sessionId;
@@ -320,117 +443,7 @@ function StudentLivePageInner() {
         }
 
         const data: SessionPoll = await res.json();
-
-        if (stoppedRef.current || !aliveRef.current) return;
-
-        // M6: require 2 consecutive successes before clearing error count.
-        consecutiveSuccessRef.current += 1;
-        if (consecutiveSuccessRef.current >= 2) {
-          setPollErrorCount(0);
-          consecutiveSuccessRef.current = 0;
-        }
-
-        if (data.status === 'COMPLETED') {
-          stoppedRef.current = true;
-          const sess = sessionRef.current;
-          if (sess) setAppState({ phase: 'done', session: sess });
-          return;
-        }
-
-        const phaseChanged = data.currentPhaseIndex !== lastPhaseIndexRef.current && lastPhaseIndexRef.current !== -1;
-        const newBroadcast = data.currentContent?.broadcastAt && data.currentContent.broadcastAt !== lastBroadcastAtRef.current;
-
-        if (phaseChanged) {
-          lastPhaseIndexRef.current = data.currentPhaseIndex;
-        }
-
-        if (data.pendingRecheckItem) {
-          const sess = sessionRef.current;
-          // C1: read the live phase inside a functional updater to avoid stale closure.
-          setAppState((prev) => {
-            const skipRecheckPull =
-              prev.phase === 'question' || prev.phase === 'explanation' || prev.phase === 'feedback';
-            if (sess && !skipRecheckPull && data.pendingRecheckItem) {
-              return { phase: 'question', session: sess, item: data.pendingRecheckItem, source: 'targeted' };
-            }
-            return prev;
-          });
-          if (data.pendingRecheckItem) return;
-        }
-
-        if (newBroadcast && data.currentContent) {
-          lastBroadcastAtRef.current = data.currentContent.broadcastAt ?? null;
-          const cc = data.currentContent;
-          const laneOk = broadcastTargetsStudentLane(cc, data.studentLane);
-          if (cc.contentType === 'EXPLANATION' && laneOk && cc.explanation) {
-            const sess = sessionRef.current;
-            if (sess) {
-              setAppState({
-                phase: 'explanation',
-                session: sess,
-                explanationRoute: cc.explanation,
-                stepIndex: cc.stepIndex ?? 0,
-                totalSteps: cc.totalSteps ?? (((cc.explanation.animationSchema as { steps?: unknown[] } | null)?.steps?.length ?? 1)),
-                whiteboard: liveWhiteboardRef.current,
-              });
-            }
-          } else if (cc.contentType === 'WHITEBOARD' && laneOk && cc.whiteboard) {
-            const wb = cc.whiteboard;
-            const sess = sessionRef.current;
-            if (!sess) return;
-            if (wb.action === 'hide') {
-              lastWhiteboardVersionRef.current = wb.version;
-              liveWhiteboardRef.current = null;
-              // H4: only transition to waiting if we're actually on the whiteboard screen —
-              // don't wipe an in-progress check question.
-              setAppState((prev) =>
-                prev.phase === 'whiteboard'
-                  ? { phase: 'waiting', session: sess }
-                  : prev
-              );
-            } else if (wb.action === 'show' || wb.action === 'clear') {
-              if (wb.version >= lastWhiteboardVersionRef.current) {
-                lastWhiteboardVersionRef.current = wb.version;
-                liveWhiteboardRef.current = wb;
-                setAppState((prev) => {
-                  if (prev.phase === 'explanation' && wb.action === 'show') return { ...prev, whiteboard: wb };
-                  return { phase: 'whiteboard', session: sess, whiteboard: wb };
-                });
-              }
-            }
-          } else if (cc.contentType === 'MESSAGE' && laneOk && cc.message) {
-            const sess = sessionRef.current;
-            if (sess) setAppState({ phase: 'between-phases', session: sess, message: cc.message });
-          } else if (cc.contentType === 'PRACTICE' && laneOk && cc.item) {
-            const sess = sessionRef.current;
-            if (sess) {
-              setAppState({
-                phase: 'practice',
-                session: sess,
-                item: cc.item,
-                index: cc.questionNumber ?? 1,
-                total: cc.totalQuestions ?? 1,
-              });
-            }
-          } else if (cc.contentType === 'CHECK' && laneOk && cc.item) {
-            const sess = sessionRef.current;
-            if (sess) {
-              setAppState({
-                phase: 'question',
-                session: sess,
-                item: cc.item,
-                source: 'broadcast',
-              });
-            }
-          }
-        }
-
-        if (lastPhaseIndexRef.current === -1) {
-          lastPhaseIndexRef.current = data.currentPhaseIndex;
-        }
-        if (!lastBroadcastAtRef.current && data.currentContent?.broadcastAt) {
-          lastBroadcastAtRef.current = data.currentContent.broadcastAt;
-        }
+        processStatePayload(data);
       } catch {
         if (!aliveRef.current) return;
         setPollErrorCount((n) => n + 1);
@@ -452,14 +465,41 @@ function StudentLivePageInner() {
       }
     }
 
-    stoppedRef.current = false;
-    const pollMs = appState.phase === 'whiteboard' || appState.phase === 'explanation' ? 1500 : 3000;
-    pollRef.current = setInterval(pollSession, pollMs);
+    function startPollingFallback() {
+      if (pollRef.current) return; // guard: never start twice
+      void pollOnce(); // immediate first read
+      pollRef.current = setInterval(() => void pollOnce(), 3000);
+    }
+
+    // Prefer the push stream; fall back to polling on any SSE failure (including
+    // mid-session drops, which fire onerror).
+    try {
+      const es = new EventSource(`/api/live-sessions/${sessionId}/student-stream`);
+      sseRef.current = es;
+      es.addEventListener('state', (e) => {
+        if (stoppedRef.current || !aliveRef.current) return;
+        try {
+          processStatePayload(JSON.parse((e as MessageEvent).data) as SessionPoll);
+        } catch {
+          // Ignore malformed frames; the next snapshot will resync.
+        }
+      });
+      es.onerror = () => {
+        // Browser auto-reconnects EventSource, but start polling immediately so
+        // the student isn't stranded if the stream is genuinely unavailable.
+        startPollingFallback();
+      };
+    } catch {
+      startPollingFallback();
+    }
+
     return () => {
-      if (pollRef.current) clearInterval(pollRef.current);
+      sseRef.current?.close();
+      sseRef.current = null;
+      if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; }
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [appState.phase]);
+  }, [isInLiveSession, processStatePayload]);
 
   const unifiedSceneKey =
     appState.phase === 'join' ? 'join' : studentLiveSceneKey(appState);

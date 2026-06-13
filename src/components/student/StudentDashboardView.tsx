@@ -2,6 +2,7 @@ import type { CSSProperties } from 'react';
 import Link from 'next/link';
 import type { UserGamificationSummary } from '@/features/gamification/gamificationService';
 import { StudentComingUpWidget } from '@/components/student/StudentComingUpWidget';
+import { StudentFocusWidget } from '@/components/student/StudentFocusWidget';
 
 export type DashboardSubjectSummary = {
   id: string;
@@ -198,6 +199,7 @@ export function StudentDashboardView({
         </div>
 
         <aside className="stu-dash-aside">
+          <StudentFocusWidget />
           <StudentComingUpWidget />
           <section className="stu-dash-card stu-dash-xp-card">
             <h2 className="stu-dash-card-title">Your XP</h2>
