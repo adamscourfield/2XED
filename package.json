@@ -44,7 +44,9 @@
     "content:build:phase1-queue": "node scripts/build-phase1-authoring-queue.mjs",
     "content:build:phase1-briefs": "node scripts/build-phase1-author-briefs.mjs",
     "content:extract:question-bank": "node scripts/extract-pptx-questions.mjs",
-    "db:import:question-bank": "ts-node -r tsconfig-paths/register --compiler-options '{\"module\":\"CommonJS\"}' prisma/import-question-bank.ts"
+    "db:import:question-bank": "ts-node -r tsconfig-paths/register --compiler-options '{\"module\":\"CommonJS\"}' prisma/import-question-bank.ts",
+    "loadtest:seed": "ts-node -r tsconfig-paths/register --compiler-options '{\"module\":\"CommonJS\"}' scripts/loadtest/seed-loadtest.ts",
+    "loadtest:run": "node scripts/loadtest/run-loadtest.mjs"
   },
   "prisma": {
     "seed": "ts-node -r tsconfig-paths/register --compiler-options '{\"module\":\"CommonJS\"}' prisma/seed.ts && ts-node -r tsconfig-paths/register --compiler-options '{\"module\":\"CommonJS\"}' prisma/ensure-routes-n11-n13.ts && ts-node -r tsconfig-paths/register --compiler-options '{\"module\":\"CommonJS\"}' prisma/ensure-routes-n14-n15.ts"
