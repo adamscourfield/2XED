@@ -681,8 +681,22 @@ model Classroom {
   enrollments      ClassroomEnrollment[]
   liveSessions     LiveSession[]
   timetableSlots   ClassroomTimetableSlot[]
+  seatingPlan      SeatingPlan?
 
   @@unique([externalSource, externalClassId])
+}
+
+/// A physical seating layout for a classroom. One plan per classroom, reused
+/// across live sessions. `seats` is a JSON array of { studentUserId, row, col }.
+model SeatingPlan {
+  id          String    @id @default(cuid())
+  classroomId String    @unique
+  rows        Int       @default(5)
+  cols        Int       @default(6)
+  seats       Json      @default("[]")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  classroom   Classroom @relation(fields: [classroomId], references: [id], onDelete: Cascade)
 }
 
 /// Recurring school-style timetable entry (wall-clock in `timezone`).
