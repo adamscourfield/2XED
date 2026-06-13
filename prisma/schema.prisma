@@ -125,6 +125,9 @@ enum EscalationReason {
   SCAFFOLDED_CORRECT
   MANUAL_TEACHER
   HINTS_USED
+  // A student coping at the diagnostic who then fails a run of live practice
+  // questions on the active skill — lane re-evaluated downward mid-lesson.
+  PRACTICE_REGRESSION
 }
 
 enum LaneTransitionType {

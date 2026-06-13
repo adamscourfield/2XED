@@ -361,6 +361,119 @@ export async function handleHandback(
   return { newLane: 'LANE_2', shadowCheckItemId, studentUserId: participant.studentUserId };
 }
 
+// ─── reEvaluateLaneFromPractice ──────────────────────────────────────────────
+
+/**
+ * Consecutive incorrect live-practice answers (on the active skill, since the
+ * student's current lane was assigned) that drop them one lane toward more
+ * support. Set higher than the difficulty step-down (2) so the difficulty
+ * ladder eases the questions first; if the student is still failing after that,
+ * the lane should reflect it.
+ */
+export const LANE_DEMOTE_STREAK = 3;
+
+export type PracticeRelaneResult = {
+  changed: boolean;
+  fromLane: 'LANE_1' | 'LANE_2' | 'LANE_3' | null;
+  toLane: 'LANE_1' | 'LANE_2' | 'LANE_3' | null;
+  recommendedExplanationId: string | null;
+};
+
+const NO_RELANE: PracticeRelaneResult = {
+  changed: false,
+  fromLane: null,
+  toLane: null,
+  recommendedExplanationId: null,
+};
+
+/**
+ * Keeps lanes live: a student who copes at the diagnostic but then fails a run
+ * of practice questions is moved downward (LANE_1 → LANE_2, LANE_2 → LANE_3)
+ * rather than staying green on a stale diagnostic placement.
+ *
+ * Conservative by design:
+ *   - only acts on LANE_1 / LANE_2 (LANE_3 already needs the teacher)
+ *   - never touches a student mid-recheck (that path owns their lane)
+ *   - counts only attempts since the lane was last assigned, and resets that
+ *     timestamp on each move, so one extra miss can't cascade two lanes at once
+ *
+ * Promotion back up stays with the existing teacher handback / shadow-check
+ * flow — this only ever moves a student toward more support.
+ */
+export async function reEvaluateLaneFromPractice(
+  participantId: string,
+  sessionId: string,
+  skillId: string
+): Promise<PracticeRelaneResult> {
+  const participant = await prisma.liveParticipant.findUnique({
+    where: { id: participantId },
+    select: {
+      currentLane: true,
+      studentUserId: true,
+      pendingRecheckItemId: true,
+      laneAssignedAt: true,
+      session: { select: { skillId: true } },
+    },
+  });
+
+  if (!participant) return NO_RELANE;
+  // Don't auto-demote students already needing the teacher, nor those mid-recheck.
+  if (participant.currentLane === 'LANE_3' || participant.pendingRecheckItemId) return NO_RELANE;
+
+  const recentAttempts = await prisma.liveAttempt.findMany({
+    where: {
+      liveSessionId: sessionId,
+      studentUserId: participant.studentUserId,
+      skillId,
+      // Only count answers given since the current lane was assigned, so each
+      // demotion requires a fresh streak rather than re-reading an old one.
+      ...(participant.laneAssignedAt ? { createdAt: { gt: participant.laneAssignedAt } } : {}),
+    },
+    orderBy: { createdAt: 'desc' },
+    take: LANE_DEMOTE_STREAK,
+    // `correct` is already rubric-aware (set by the attempts route at write time).
+    select: { correct: true },
+  });
+
+  if (recentAttempts.length < LANE_DEMOTE_STREAK) return NO_RELANE;
+  if (!recentAttempts.every((a) => !a.correct)) return NO_RELANE;
+
+  const fromLane = participant.currentLane;
+  const toLane: 'LANE_2' | 'LANE_3' = fromLane === 'LANE_1' ? 'LANE_2' : 'LANE_3';
+
+  let recommendedExplanationId: string | null = null;
+  if (toLane === 'LANE_2' && participant.session.skillId) {
+    recommendedExplanationId = await selectExplanationRoute(participant.session.skillId, null);
+  }
+
+  const now = new Date();
+  await prisma.liveParticipant.update({
+    where: { id: participantId },
+    data: {
+      currentLane: toLane,
+      escalationReason: 'PRACTICE_REGRESSION',
+      laneAssignedAt: now,
+      ...(toLane === 'LANE_2' ? { currentExplanationId: recommendedExplanationId } : {}),
+    },
+  });
+
+  await prisma.laneTransition.create({
+    data: {
+      liveSessionId: sessionId,
+      participantId,
+      studentUserId: participant.studentUserId,
+      fromLane,
+      toLane,
+      transitionType: 'ESCALATED',
+      reason: 'PRACTICE_REGRESSION',
+    },
+  });
+
+  if (toLane === 'LANE_3') await checkReteachThreshold(sessionId);
+
+  return { changed: true, fromLane, toLane, recommendedExplanationId };
+}
+
 // ─── checkReteachThreshold ───────────────────────────────────────────────────
 
 export async function checkReteachThreshold(sessionId: string): Promise<void> {
