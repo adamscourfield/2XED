@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/features/auth/authOptions';
 import { prisma } from '@/db/prisma';
+import { requireApiUser } from '@/lib/api/auth';
 import { z } from 'zod';
 
 const BLOCK_TYPES = ['DO_NOW', 'EXPLAIN', 'MODEL', 'CHECK', 'PRACTICE'] as const;
@@ -14,9 +13,8 @@ const createSchema = z.object({
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ lessonId: string }> }) {
   const { lessonId } = await params;
-  const session = await getServerSession(authOptions);
-  if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  const user = session.user as { id: string; role?: string };
+  const { user, response } = await requireApiUser();
+  if (response) return response;
   const lessonModel = prisma.lesson;
   const blockModel = prisma.lessonBlock;
   if (!lessonModel || !blockModel) return NextResponse.json({ error: 'Model unavailable' }, { status: 503 });

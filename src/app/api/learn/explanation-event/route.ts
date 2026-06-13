@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
 import { z } from 'zod';
-import { authOptions } from '@/features/auth/authOptions';
+import { requireApiUser } from '@/lib/api/auth';
 import { emitEvent } from '@/features/telemetry/eventService';
 
 const shownSchema = z.object({
@@ -37,10 +36,10 @@ const retryCompletedSchema = z.object({
 const schema = z.union([shownSchema, retryStartedSchema, retryCompletedSchema]);
 
 export async function POST(req: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const { user, response } = await requireApiUser();
+  if (response) return response;
 
-  const userId = (session.user as { id: string }).id;
+  const userId = user.id;
   const parsed = schema.safeParse(await req.json());
   if (!parsed.success) return NextResponse.json({ error: 'Invalid input' }, { status: 400 });
 

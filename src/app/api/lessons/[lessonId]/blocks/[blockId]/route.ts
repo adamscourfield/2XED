@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/features/auth/authOptions';
 import { prisma } from '@/db/prisma';
+import { requireApiUser } from '@/lib/api/auth';
 import { z } from 'zod';
 
 const BLOCK_TYPES = ['DO_NOW', 'EXPLAIN', 'MODEL', 'CHECK', 'PRACTICE'] as const;
@@ -29,9 +28,8 @@ export async function PATCH(
   { params }: { params: Promise<{ lessonId: string; blockId: string }> }
 ) {
   const { lessonId, blockId } = await params;
-  const session = await getServerSession(authOptions);
-  if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  const user = session.user as { id: string; role?: string };
+  const { user, response } = await requireApiUser();
+  if (response) return response;
 
   const block = await authorizeBlock(lessonId, blockId, user.id, user.role ?? '');
   if (!block) return NextResponse.json({ error: 'Not found' }, { status: 404 });
@@ -53,9 +51,8 @@ export async function DELETE(
   { params }: { params: Promise<{ lessonId: string; blockId: string }> }
 ) {
   const { lessonId, blockId } = await params;
-  const session = await getServerSession(authOptions);
-  if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  const user = session.user as { id: string; role?: string };
+  const { user, response } = await requireApiUser();
+  if (response) return response;
 
   const block = await authorizeBlock(lessonId, blockId, user.id, user.role ?? '');
   if (!block) return NextResponse.json({ error: 'Not found' }, { status: 404 });

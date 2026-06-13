@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
 import { z } from 'zod';
-import { authOptions } from '@/features/auth/authOptions';
 import { prisma } from '@/db/prisma';
+import { requireApiUser } from '@/lib/api/auth';
 import { emitEvent } from '@/features/telemetry/eventService';
 
 const schema = z.object({
@@ -18,13 +17,10 @@ interface Props {
 }
 
 export async function POST(req: NextRequest, { params }: Props) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const { user, response } = await requireApiUser(['STUDENT']);
+  if (response) return response;
 
-  const role = (session.user as { role?: string }).role;
-  if (role !== 'STUDENT') return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-
-  const userId = (session.user as { id: string }).id;
+  const userId = user.id;
   const { sessionId } = await params;
 
   const parsed = schema.safeParse(await req.json());

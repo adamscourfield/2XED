@@ -7,7 +7,12 @@ import { z } from 'zod';
 if (process.env.NODE_ENV !== 'production') {
   process.env.NEXTAUTH_SECRET ??= 'ember-local-dev-secret';
   process.env.NEXTAUTH_URL ??= 'http://localhost:3000';
-} else if (!process.env.NEXTAUTH_SECRET) {
+} else if (
+  !process.env.NEXTAUTH_SECRET &&
+  // `next build` imports route modules to collect page data; the secret is a
+  // runtime requirement, not a build-time one (Docker builds have no secrets).
+  process.env.NEXT_PHASE !== 'phase-production-build'
+) {
   // Fail fast with a clear message instead of NextAuth 500ing on every
   // request (or worse, a future refactor reintroducing a known fallback).
   throw new Error('NEXTAUTH_SECRET must be set in production.');

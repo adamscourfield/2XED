@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
 import { z } from 'zod';
-import { authOptions } from '@/features/auth/authOptions';
 import { prisma } from '@/db/prisma';
+import { requireApiUser } from '@/lib/api/auth';
 import { resolveOpeningCheckQueueForParticipant, type LiveCheckPlan } from '@/lib/live/live-check-plan';
 
 const schema = z.object({
@@ -10,13 +9,10 @@ const schema = z.object({
 });
 
 export async function POST(req: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const { user, response } = await requireApiUser(['STUDENT']);
+  if (response) return response;
 
-  const role = (session.user as { role?: string }).role;
-  if (role !== 'STUDENT') return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-
-  const userId = (session.user as { id: string }).id;
+  const userId = user.id;
 
   const parsed = schema.safeParse(await req.json());
   if (!parsed.success) return NextResponse.json({ error: 'Invalid input' }, { status: 400 });

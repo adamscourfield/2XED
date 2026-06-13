@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
 import { Prisma } from '@prisma/client';
 import { z } from 'zod';
-import { authOptions } from '@/features/auth/authOptions';
 import { prisma } from '@/db/prisma';
+import { requireApiUser } from '@/lib/api/auth';
 import { recordKnowledgeAttempt } from '@/features/knowledge-state/knowledgeStateService';
 import { emitEvent } from '@/features/telemetry/eventService';
 import { escalateLane } from '@/lib/live/lane-router';
@@ -81,13 +80,10 @@ function getWeaknessTags(markingResult: { criteria?: Array<{ element?: string; s
 }
 
 export async function POST(req: NextRequest, { params }: Props) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const { user, response } = await requireApiUser(['STUDENT']);
+  if (response) return response;
 
-  const role = (session.user as { role?: string }).role;
-  if (role !== 'STUDENT') return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-
-  const userId = (session.user as { id: string }).id;
+  const userId = user.id;
   const { sessionId } = await params;
 
   // Submissions can trigger AI marking and AI question generation — cap well

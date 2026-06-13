@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/features/auth/authOptions';
 import { prisma } from '@/db/prisma';
+import { requireApiUser, STAFF_ROLES } from '@/lib/api/auth';
 import { RUBRIC_CORRECT_THRESHOLD } from '@/lib/live/markingConstants';
 
 interface Props {
@@ -24,15 +23,10 @@ function getAttemptOutcome(attempt: { correct: boolean; markingResult: unknown }
 }
 
 export async function GET(_req: NextRequest, { params }: Props) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const { user, response } = await requireApiUser(STAFF_ROLES);
+  if (response) return response;
 
-  const role = (session.user as { role?: string }).role;
-  if (role !== 'TEACHER' && role !== 'ADMIN' && role !== 'LEADERSHIP') {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-  }
-
-  const userId = (session.user as { id: string }).id;
+  const userId = user.id;
   const { sessionId } = await params;
 
   const liveSession = await prisma.liveSession.findUnique({
@@ -67,7 +61,7 @@ export async function GET(_req: NextRequest, { params }: Props) {
   });
 
   if (!liveSession) return NextResponse.json({ error: 'Session not found' }, { status: 404 });
-  if (role === 'TEACHER' && liveSession.teacherUserId !== userId) {
+  if (user.role === 'TEACHER' && liveSession.teacherUserId !== userId) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 

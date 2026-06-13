@@ -9,11 +9,10 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
 import { z } from 'zod';
-import { authOptions } from '@/features/auth/authOptions';
 import { generateQuestionsForSkill } from '@/lib/ai/questionGenerator';
 import { checkRateLimit } from '@/lib/rateLimit';
+import { requireApiUser } from '@/lib/api/auth';
 
 const schema = z.object({
   skillCode: z.string().min(1),
@@ -21,14 +20,9 @@ const schema = z.object({
 });
 
 export async function POST(req: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
-  const role = (session.user as { role?: string }).role;
-  if (role !== 'TEACHER' && role !== 'ADMIN') {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-  }
-  const userId = (session.user as { id: string }).id;
+  const { user, response } = await requireApiUser(['TEACHER', 'ADMIN']);
+  if (response) return response;
+  const userId = user.id;
 
   if (!checkRateLimit(`generate-questions:${userId}`, 10, 60_000)) {
     return NextResponse.json({ error: 'Too many requests — please slow down.' }, { status: 429 });

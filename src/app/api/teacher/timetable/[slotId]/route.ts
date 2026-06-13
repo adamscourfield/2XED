@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
 import { z } from 'zod';
-import { authOptions } from '@/features/auth/authOptions';
 import { prisma } from '@/db/prisma';
+import { requireApiUser } from '@/lib/api/auth';
 
 const recurrenceSchema = z.enum(['WEEKLY', 'BIWEEKLY', 'MONTHLY_NTH']);
 
@@ -45,10 +44,8 @@ async function assertOwnsSlot(userId: string, slotId: string) {
 }
 
 export async function PATCH(req: NextRequest, ctx: { params: Promise<{ slotId: string }> }) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
-  const user = session.user as { id: string; role?: string };
+  const { user, response } = await requireApiUser();
+  if (response) return response;
   const forbidden = assertTeacher(user);
   if (forbidden) return forbidden;
 
@@ -116,10 +113,8 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ slotId: s
 }
 
 export async function DELETE(_req: NextRequest, ctx: { params: Promise<{ slotId: string }> }) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
-  const user = session.user as { id: string; role?: string };
+  const { user, response } = await requireApiUser();
+  if (response) return response;
   const forbidden = assertTeacher(user);
   if (forbidden) return forbidden;
 

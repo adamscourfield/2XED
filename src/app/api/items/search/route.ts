@@ -1,19 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/features/auth/authOptions';
 import { prisma } from '@/db/prisma';
+import { requireApiUser, STAFF_ROLES } from '@/lib/api/auth';
 import type { Prisma } from '@prisma/client';
 
 const TAKE_MAX = 50;
 const TAKE_DEFAULT = 24;
 
 export async function GET(req: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  const role = (session.user as { role?: string }).role;
-  if (role !== 'TEACHER' && role !== 'ADMIN' && role !== 'LEADERSHIP') {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-  }
+  const { user, response } = await requireApiUser(STAFF_ROLES);
+  if (response) return response;
 
   const { searchParams } = new URL(req.url);
   const subjectId = searchParams.get('subjectId');
