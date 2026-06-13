@@ -911,6 +911,16 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
           </button>
 
           <Link
+            href={`/teacher/live/${sessionId}/seating`}
+            className="inline-flex h-8 w-8 items-center justify-center rounded-full border transition hover:bg-[var(--anx-surface-hover)]"
+            style={{ borderColor: 'var(--anx-outline-variant)', color: 'var(--anx-text-secondary)' }}
+            aria-label="Seating plan"
+            title="Seating plan — see lanes on your classroom layout"
+          >
+            <span aria-hidden style={{ fontSize: 15, lineHeight: 1 }}>🪑</span>
+          </Link>
+
+          <Link
             href={`/teacher/live/${sessionId}/lanes`}
             className="inline-flex h-8 w-8 items-center justify-center rounded-full border transition hover:bg-[var(--anx-surface-hover)]"
             style={{ borderColor: 'var(--anx-outline-variant)', color: 'var(--anx-text-secondary)' }}
