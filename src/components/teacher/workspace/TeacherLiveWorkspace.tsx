@@ -21,6 +21,7 @@ import { TeacherBottomBar } from './TeacherBottomBar';
 import { EndSessionDialog } from './EndSessionDialog';
 import { InviteIcon, SettingsIcon } from './icons';
 import type { LiveStroke } from '@/lib/live/whiteboard-strokes';
+import { LANES } from '@/lib/live/lanes';
 
 interface LessonPhase {
   index: number;
@@ -134,14 +135,14 @@ interface Props {
 const BROADCAST_DEBOUNCE_MS = 350;
 
 const LANE_LABELS: Record<string, string> = {
-  LANE_1: 'Got it',
-  LANE_2: 'Nearly there',
-  LANE_3: 'Needs teacher',
+  LANE_1: LANES.LANE_1.teacherLabel,
+  LANE_2: LANES.LANE_2.teacherLabel,
+  LANE_3: LANES.LANE_3.teacherLabel,
 };
 const LANE_COLORS: Record<string, string> = {
-  LANE_1: 'var(--anx-success)',
-  LANE_2: 'var(--anx-warning-text)',
-  LANE_3: 'var(--anx-danger-text)',
+  LANE_1: LANES.LANE_1.colorVar,
+  LANE_2: LANES.LANE_2.colorVar,
+  LANE_3: LANES.LANE_3.colorVar,
 };
 
 function LaneSummaryBar({
