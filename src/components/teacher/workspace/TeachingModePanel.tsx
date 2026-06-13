@@ -8,6 +8,7 @@ import {
   PracticeIcon,
   SparkleIcon,
 } from './icons';
+import { LANES, LANE_IDS } from '@/lib/live/lanes';
 
 export type TeachingMode = 'CHECK' | 'MODEL' | 'EXPLAIN' | 'PRACTICE';
 
@@ -190,11 +191,9 @@ function ExplainMode({
 }
 
 // H1: lane picker so the teacher can target any lane, not just LANE_2
-const LANE_OPTIONS: Array<{ value: 'LANE_1' | 'LANE_2' | 'LANE_3'; label: string }> = [
-  { value: 'LANE_1', label: 'Got it' },
-  { value: 'LANE_2', label: 'Nearly there' },
-  { value: 'LANE_3', label: 'Needs teacher' },
-];
+const LANE_OPTIONS: Array<{ value: 'LANE_1' | 'LANE_2' | 'LANE_3'; label: string }> = LANE_IDS.map(
+  (id) => ({ value: id, label: LANES[id].teacherLabel }),
+);
 
 function PracticeMode({ onAssignPractice }: { onAssignPractice?: Props['onAssignPractice'] }) {
   const [targetLane, setTargetLane] = useState<'LANE_1' | 'LANE_2' | 'LANE_3'>('LANE_2');

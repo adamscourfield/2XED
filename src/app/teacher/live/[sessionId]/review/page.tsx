@@ -5,6 +5,7 @@ import { authOptions } from '@/features/auth/authOptions';
 import { prisma } from '@/db/prisma';
 import { LearningPageShell } from '@/components/LearningPageShell';
 import { RUBRIC_CORRECT_THRESHOLD } from '@/lib/live/markingConstants';
+import { laneDef } from '@/lib/live/lanes';
 
 interface Props {
   params: Promise<{ sessionId: string }>;
@@ -25,22 +26,14 @@ function getAttemptOutcome(attempt: { correct: boolean; markingResult: unknown }
   return attempt.correct ? 'correct' : 'incorrect';
 }
 
-function laneLabel(lane: string): string {
-  if (lane === 'LANE_1') return 'Independent';
-  if (lane === 'LANE_2') return 'Emerging';
-  if (lane === 'LANE_3') return 'Needs support';
-  return lane;
-}
-
 function LaneBadge({ lane }: { lane: string }) {
-  const styles: Record<string, string> = {
-    LANE_1: 'bg-[var(--anx-success-soft)] text-[var(--anx-success)]',
-    LANE_2: 'bg-[var(--anx-warning-soft,#fff8e1)] text-[var(--anx-warning,#b45309)]',
-    LANE_3: 'bg-[var(--anx-danger-soft,#fef2f2)] text-[var(--anx-danger-text,#b91c1c)]',
-  };
+  const def = laneDef(lane);
   return (
-    <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-semibold ${styles[lane] ?? 'bg-[var(--anx-surface-container-low)] text-[var(--anx-text-muted)]'}`}>
-      {laneLabel(lane)}
+    <span
+      className="inline-block rounded-full px-2 py-0.5 text-xs font-semibold"
+      style={{ background: def.softVar, color: def.colorVar }}
+    >
+      {def.teacherLabel}
     </span>
   );
 }

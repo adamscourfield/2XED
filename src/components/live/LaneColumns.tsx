@@ -1,5 +1,7 @@
 'use client';
 
+import { LANES } from '@/lib/live/lanes';
+
 // H9: EscalationReason kept as string so this type is compatible with the
 // useLiveLanes hook — the hook uses string | null, a wider type than the
 // original union. LaneColumns doesn't render escalationReason, so the
@@ -43,12 +45,15 @@ function WaitingBadge({ minutes }: { minutes: number }) {
 export function LaneColumns({ lane1, lane2, lane3, onHandback, actingOnIds }: LaneColumnsProps) {
   return (
     <div className="grid grid-cols-3 gap-4">
-      {/* Lane 1 — Got it */}
+      {/* Lane 1 */}
       {/* H9: show individual student names so teachers know who is in each lane */}
-      <div className="rounded-lg border border-green-200 bg-white p-4">
+      <div className="rounded-lg border bg-white p-4" style={{ borderColor: LANES.LANE_1.colorVar }}>
         <div className="mb-3 flex items-center justify-between">
-          <h3 className="text-lg font-bold text-green-800">Got it</h3>
-          <span className="rounded-full bg-green-100 px-3 py-1 text-sm font-semibold text-green-700">
+          <h3 className="text-lg font-bold" style={{ color: LANES.LANE_1.colorVar }}>{LANES.LANE_1.teacherLabel}</h3>
+          <span
+            className="rounded-full px-3 py-1 text-sm font-semibold"
+            style={{ background: LANES.LANE_1.softVar, color: LANES.LANE_1.colorVar }}
+          >
             {lane1.count}
           </span>
         </div>
@@ -68,11 +73,14 @@ export function LaneColumns({ lane1, lane2, lane3, onHandback, actingOnIds }: La
         )}
       </div>
 
-      {/* Lane 2 — Nearly there */}
-      <div className="rounded-lg border border-amber-200 bg-white p-4">
+      {/* Lane 2 */}
+      <div className="rounded-lg border bg-white p-4" style={{ borderColor: LANES.LANE_2.colorVar }}>
         <div className="mb-3 flex items-center justify-between">
-          <h3 className="text-lg font-bold text-amber-800">Nearly there</h3>
-          <span className="rounded-full bg-amber-100 px-3 py-1 text-sm font-semibold text-amber-700">
+          <h3 className="text-lg font-bold" style={{ color: LANES.LANE_2.colorVar }}>{LANES.LANE_2.teacherLabel}</h3>
+          <span
+            className="rounded-full px-3 py-1 text-sm font-semibold"
+            style={{ background: LANES.LANE_2.softVar, color: LANES.LANE_2.colorVar }}
+          >
             {lane2.count}
           </span>
         </div>
@@ -95,11 +103,14 @@ export function LaneColumns({ lane1, lane2, lane3, onHandback, actingOnIds }: La
         )}
       </div>
 
-      {/* Lane 3 — Needs teacher */}
-      <div className="rounded-lg border border-red-200 bg-white p-4">
+      {/* Lane 3 */}
+      <div className="rounded-lg border bg-white p-4" style={{ borderColor: LANES.LANE_3.colorVar }}>
         <div className="mb-3 flex items-center justify-between">
-          <h3 className="text-lg font-bold text-red-800">Needs teacher</h3>
-          <span className="rounded-full bg-red-100 px-3 py-1 text-sm font-semibold text-red-700">
+          <h3 className="text-lg font-bold" style={{ color: LANES.LANE_3.colorVar }}>{LANES.LANE_3.teacherLabel}</h3>
+          <span
+            className="rounded-full px-3 py-1 text-sm font-semibold"
+            style={{ background: LANES.LANE_3.softVar, color: LANES.LANE_3.colorVar }}
+          >
             {lane3.count}
           </span>
         </div>

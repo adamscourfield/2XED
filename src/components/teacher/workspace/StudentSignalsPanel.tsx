@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { ChevronRightIcon, PeopleIcon, SparkleIcon } from './icons';
+import { laneDef } from '@/lib/live/lanes';
 
 export interface ClassOverview {
   total: number;
@@ -418,11 +419,8 @@ export function StudentSignalsPanel({
               </p>
             ) : (
               studentResponses.map((s) => {
-                const laneColor =
-                  s.lane === 'LANE_3' ? 'var(--anx-danger-text)' :
-                  s.lane === 'LANE_2' ? 'var(--anx-warning-text)' :
-                  'var(--anx-success)';
-                const laneLabel = s.lane === 'LANE_3' ? 'Reteach' : s.lane === 'LANE_2' ? 'Support' : 'On track';
+                const laneColor = laneDef(s.lane).colorVar;
+                const laneLabel = laneDef(s.lane).teacherLabel;
                 return (
                   <div
                     key={s.studentUserId}

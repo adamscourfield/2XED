@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { studentLaneLabel } from '@/lib/live/lanes';
 
 interface SkillBreakdownEntry {
   skillId: string;
@@ -31,19 +32,18 @@ interface MySummary {
   strengths: string[];
 }
 
-const LANE_REVIEW_COPY: Record<string, { title: string; line: string; tone: 'success' | 'warning' | 'info' }> = {
+// Title comes from the canonical lane studentLabel; the encouragement line and
+// tone are review-specific. Keyed by lane id.
+const LANE_REVIEW_COPY: Record<string, { line: string; tone: 'success' | 'warning' | 'info' }> = {
   LANE_1: {
-    title: 'Ready for independent practice',
     line: 'You worked through this on your own — great focus today.',
     tone: 'success',
   },
   LANE_2: {
-    title: 'Nearly there',
     line: 'You got there with a little support — one more practice run will lock it in.',
     tone: 'warning',
   },
   LANE_3: {
-    title: 'We will keep working on this together',
     line: 'This topic needs another look — your teacher knows and will pick it up with you.',
     tone: 'info',
   },
@@ -148,7 +148,7 @@ export function StudentSessionReview({ sessionId }: { sessionId: string }) {
               className="mx-auto mt-3 inline-block rounded-full px-3 py-1 text-sm font-semibold"
               style={{ backgroundColor: laneStyle.bg, color: laneStyle.fg }}
             >
-              {laneCopy.title}
+              {studentLaneLabel(summary.finalLane)}
             </div>
             <p className="mt-2 text-sm leading-relaxed" style={{ color: 'var(--anx-text-muted)' }}>
               {laneCopy.line}
