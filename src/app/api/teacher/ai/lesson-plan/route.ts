@@ -30,6 +30,7 @@ import {
   type SkillContext,
 } from '@/lib/ai/lessonPlanner';
 import { buildClassProfile } from '@/lib/ai/classProfile';
+import { captureException } from '@/lib/observability/logger';
 import { extractFileWithStats, type ExtractionStats } from '@/lib/ai/fileExtractor';
 
 // ── Public types (imported by the client) ─────────────────────────────────────
@@ -413,7 +414,7 @@ export async function POST(req: NextRequest) {
         send({ stage: 'done', plan: response });
         controller.close();
       } catch (err) {
-        console.error('[teacher/ai/lesson-plan]', err instanceof Error ? err.message : err);
+        captureException(err, { route: 'teacher/ai/lesson-plan', mode, subjectId });
         send({
           stage: 'error',
           message: 'An unexpected error occurred while building the lesson plan.',
