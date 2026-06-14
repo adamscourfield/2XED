@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import Link from 'next/link';
+import { captureException } from '@/lib/observability/logger';
 
 interface Props {
   /** The error thrown by the segment, forwarded from the route error boundary. */
@@ -35,8 +36,9 @@ export function LiveErrorState({
   fallbackLabel,
 }: Props) {
   useEffect(() => {
-    // Surface to the console (and any wired error tracking) rather than failing silently.
-    console.error('[live] segment error:', error);
+    // Route through the capture seam so a wired error tracker sees live-surface
+    // failures rather than them only landing in the console.
+    captureException(error, { boundary: 'live-segment', digest: error.digest });
   }, [error]);
 
   return (
