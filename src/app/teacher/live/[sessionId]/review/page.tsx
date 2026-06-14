@@ -6,6 +6,7 @@ import { prisma } from '@/db/prisma';
 import { LearningPageShell } from '@/components/LearningPageShell';
 import { RUBRIC_CORRECT_THRESHOLD } from '@/lib/live/markingConstants';
 import { laneDef } from '@/lib/live/lanes';
+import { Badge } from '@/components/ui';
 
 interface Props {
   params: Promise<{ sessionId: string }>;
@@ -29,12 +30,9 @@ function getAttemptOutcome(attempt: { correct: boolean; markingResult: unknown }
 function LaneBadge({ lane }: { lane: string }) {
   const def = laneDef(lane);
   return (
-    <span
-      className="inline-block rounded-full px-2 py-0.5 text-xs font-semibold"
-      style={{ background: def.softVar, color: def.colorVar }}
-    >
+    <Badge color={def.colorVar} background={def.softVar}>
       {def.teacherLabel}
-    </span>
+    </Badge>
   );
 }
 
