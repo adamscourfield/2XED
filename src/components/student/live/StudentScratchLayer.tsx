@@ -15,7 +15,11 @@ interface ScratchStroke {
 
 type Tool = 'pen' | 'eraser';
 
-const PEN_COLORS = ['#2563eb', '#dc2626', '#16a34a'] as const;
+const PEN_COLORS = [
+  { hex: '#2563eb', name: 'blue' },
+  { hex: '#dc2626', name: 'red' },
+  { hex: '#16a34a', name: 'green' },
+] as const;
 const ERASE_RADIUS = 0.02;
 
 function storageKey(scopeId: string): string {
@@ -60,7 +64,7 @@ export function StudentScratchLayer({ scopeId, active }: Props) {
   const strokesRef = useRef<ScratchStroke[]>([]);
   const drawingRef = useRef<ScratchStroke | null>(null);
   const [tool, setTool] = useState<Tool>('pen');
-  const [color, setColor] = useState<string>(PEN_COLORS[0]);
+  const [color, setColor] = useState<string>(PEN_COLORS[0].hex);
   const [, forceRender] = useState(0);
 
   const repaint = useCallback(() => {
@@ -187,26 +191,29 @@ export function StudentScratchLayer({ scopeId, active }: Props) {
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerUp}
-        aria-label="Your drawing notes"
+        role="img"
+        aria-label="Your private drawing notes — an optional space to annotate the explanation with a stylus or finger"
       />
       {/* Invisible measuring container shares the canvas box */}
       <div ref={containerRef} className="pointer-events-none absolute inset-0" aria-hidden />
       {active ? (
         <div
+          role="toolbar"
+          aria-label="Drawing tools"
           className="absolute bottom-2 left-1/2 z-10 flex -translate-x-1/2 items-center gap-1.5 rounded-full border px-2.5 py-1.5 shadow-sm"
           style={{ background: 'var(--anx-surface-container-lowest)', borderColor: 'var(--anx-outline-variant)' }}
         >
           {PEN_COLORS.map((c) => (
             <button
-              key={c}
+              key={c.hex}
               type="button"
-              onClick={() => { setTool('pen'); setColor(c); }}
-              aria-label={`Pen colour ${c}`}
-              aria-pressed={tool === 'pen' && color === c}
+              onClick={() => { setTool('pen'); setColor(c.hex); }}
+              aria-label={`${c.name} pen`}
+              aria-pressed={tool === 'pen' && color === c.hex}
               className="h-6 w-6 rounded-full border-2 transition"
               style={{
-                background: c,
-                borderColor: tool === 'pen' && color === c ? 'var(--anx-text)' : 'transparent',
+                background: c.hex,
+                borderColor: tool === 'pen' && color === c.hex ? 'var(--anx-text)' : 'transparent',
               }}
             />
           ))}
@@ -225,6 +232,7 @@ export function StudentScratchLayer({ scopeId, active }: Props) {
           <button
             type="button"
             onClick={handleClear}
+            aria-label="Clear all your drawing notes"
             className="rounded-full px-2 py-0.5 text-xs font-semibold transition"
             style={{ color: 'var(--anx-text-muted)' }}
           >

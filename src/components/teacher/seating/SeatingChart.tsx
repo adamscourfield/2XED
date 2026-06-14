@@ -33,11 +33,15 @@ export function SeatingChart({ rows, cols, seats, studentInfo, onCellClick, sele
   for (const s of seats) seatAt.set(`${s.row}:${s.col}`, s);
 
   return (
+    // role="group" (not "grid") — a true ARIA grid needs row containers, which
+    // the flat CSS-grid layout doesn't have; group + strong per-seat labels is
+    // the honest, correct semantic. Each seat is a <button> so it's reachable by
+    // Tab and operable with Enter/Space.
     <div
       className="grid gap-2"
       style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
-      role="grid"
-      aria-label="Seating plan"
+      role="group"
+      aria-label={`Seating plan, ${rows} rows by ${cols} columns`}
     >
       {Array.from({ length: rows }).flatMap((_, row) =>
         Array.from({ length: cols }).map((__, col) => {
@@ -48,13 +52,19 @@ export function SeatingChart({ rows, cols, seats, studentInfo, onCellClick, sele
           const isSelected = selectedCell?.row === row && selectedCell?.col === col;
           const clickable = Boolean(onCellClick);
 
+          const positionLabel = `row ${row + 1}, column ${col + 1}`;
+          const ariaLabel = info
+            ? `${info.name}${def ? `, ${def.teacherLabel}` : ''}, ${positionLabel}`
+            : `Empty seat, ${positionLabel}`;
+
           return (
             <button
               key={`${row}:${col}`}
               type="button"
-              role="gridcell"
               disabled={!clickable}
               onClick={() => onCellClick?.(row, col, seat?.studentUserId ?? null)}
+              aria-label={ariaLabel}
+              aria-pressed={clickable ? isSelected : undefined}
               className={`flex min-h-[3.25rem] flex-col items-center justify-center rounded-lg border p-1 text-center text-xs transition ${
                 clickable ? 'cursor-pointer hover:border-[var(--anx-primary)]' : ''
               } ${info?.movedRecently ? 'anx-lane-chip-moved' : ''}`}
