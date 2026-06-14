@@ -732,6 +732,33 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
       // soft fail — step is already applied locally; next broadcast will sync
     }
   }
+  // Per-lane bulk action: push the AI alternative explanation to a whole support
+  // lane (the amber/red "needs a simpler explanation" move, in one click).
+  const [pushingLane, setPushingLane] = useState<string | null>(null);
+  async function pushExplanationToLane(lane: 'LANE_1' | 'LANE_2' | 'LANE_3') {
+    const rec = snapshot?.recommendedExplanation;
+    if (!rec) return;
+    setPushingLane(lane);
+    try {
+      const res = await fetch(`/api/live-sessions/${sessionId}/broadcast`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contentType: 'EXPLANATION',
+          explanationRouteId: rec.explanationId,
+          stepIndex: 0,
+          lanes: [lane],
+        }),
+      });
+      if (!res.ok) throw new Error('broadcast failed');
+      showToast(true, `Alternative explanation sent to ${LANE_LABELS[lane]}.`);
+    } catch {
+      showToast(false, 'Could not send the explanation — please try again.');
+    } finally {
+      setPushingLane(null);
+    }
+  }
+
   async function handleAssignPractice(
     kind: 'easier' | 'similar' | 'challenge' | 'misconception',
     audience: 'all' | 'lane' | 'individual',
@@ -1108,6 +1135,8 @@ export function TeacherLiveWorkspace({ sessionId }: Props) {
                 LANE_2: snapshot.laneStudents.LANE_2.map(toBoardStudent),
                 LANE_3: snapshot.laneStudents.LANE_3.map(toBoardStudent),
               }}
+              onPushExplanation={snapshot.recommendedExplanation ? pushExplanationToLane : undefined}
+              pushingExplanation={pushingLane !== null}
             />
           )}
           {snapshot?.laneCounts && (

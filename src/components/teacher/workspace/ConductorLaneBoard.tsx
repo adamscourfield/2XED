@@ -17,6 +17,11 @@ export interface ConductorLaneStudent {
 interface Props {
   laneCounts: { LANE_1: number; LANE_2: number; LANE_3: number };
   laneStudents: { LANE_1: ConductorLaneStudent[]; LANE_2: ConductorLaneStudent[]; LANE_3: ConductorLaneStudent[] };
+  /** Push the AI alternative explanation to everyone in a support lane. Enables the
+   *  per-lane bulk action; omit to hide it. */
+  onPushExplanation?: (lane: LaneId) => void;
+  /** True while a push is in flight (disables the buttons). */
+  pushingExplanation?: boolean;
 }
 
 function StudentChip({ student, lane }: { student: ConductorLaneStudent; lane: LaneId }) {
@@ -74,7 +79,7 @@ function StudentChip({ student, lane }: { student: ConductorLaneStudent; lane: L
  * it, *why* (escalation reason), the "usually secure" / "app waiting" flags, and
  * a pulse on students who just changed lane.
  */
-export function ConductorLaneBoard({ laneCounts, laneStudents }: Props) {
+export function ConductorLaneBoard({ laneCounts, laneStudents, onPushExplanation, pushingExplanation }: Props) {
   return (
     <section className="anx-signals-card">
       <p className="text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: 'var(--anx-text-muted)' }}>
@@ -103,6 +108,20 @@ export function ConductorLaneBoard({ laneCounts, laneStudents }: Props) {
                     <StudentChip key={s.id} student={s} lane={lane} />
                   ))}
                 </div>
+              )}
+              {/* Per-lane bulk action: push the AI alternative explanation to a
+                  whole support lane (the amber/red "needs a simpler explanation"
+                  move from the product model). */}
+              {onPushExplanation && lane !== 'LANE_1' && students.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => onPushExplanation(lane)}
+                  disabled={pushingExplanation}
+                  className="mt-2 w-full rounded-lg border px-2 py-1.5 text-xs font-semibold transition hover:bg-[var(--anx-primary-soft)] disabled:opacity-50"
+                  style={{ borderColor: def.colorVar, color: def.colorVar }}
+                >
+                  {pushingExplanation ? 'Sending…' : `Push alt. explanation`}
+                </button>
               )}
             </div>
           );
