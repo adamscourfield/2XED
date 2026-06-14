@@ -1,6 +1,7 @@
 'use client';
 
 import { LANES, LANE_IDS, laneReasonText, type LaneId } from '@/lib/live/lanes';
+import { Badge } from '@/components/ui';
 
 export interface ConductorLaneStudent {
   id: string;
@@ -87,12 +88,9 @@ export function ConductorLaneBoard({ laneCounts, laneStudents }: Props) {
             <div key={lane} className="flex min-w-0 flex-col">
               <div className="mb-2 flex items-center justify-between">
                 <span className="text-sm font-bold" style={{ color: def.colorVar }}>{def.teacherLabel}</span>
-                <span
-                  className="rounded-full px-2 py-0.5 text-xs font-semibold tabular-nums"
-                  style={{ background: def.softVar, color: def.colorVar }}
-                >
+                <Badge color={def.colorVar} background={def.softVar} className="tabular-nums">
                   {laneCounts[lane]}
-                </span>
+                </Badge>
               </div>
               {students.length === 0 ? (
                 <p className="rounded-lg border border-dashed px-2.5 py-3 text-center text-xs"

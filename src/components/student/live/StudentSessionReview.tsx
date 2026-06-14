@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { studentLaneLabel } from '@/lib/live/lanes';
+import { StatTile } from '@/components/ui';
 
 interface SkillBreakdownEntry {
   skillId: string;
@@ -156,30 +157,9 @@ export function StudentSessionReview({ sessionId }: { sessionId: string }) {
           </div>
 
           <div className="grid grid-cols-3 gap-3">
-            <div className="rounded-xl bg-[var(--anx-surface-container-low)] px-3 py-4">
-              <p className="m-0 text-2xl font-bold tabular-nums" style={{ color: 'var(--anx-text)' }}>
-                {summary.attemptCount}
-              </p>
-              <p className="m-0 mt-1 text-xs font-medium" style={{ color: 'var(--anx-text-muted)' }}>
-                Answered
-              </p>
-            </div>
-            <div className="rounded-xl bg-[var(--anx-surface-container-low)] px-3 py-4">
-              <p className="m-0 text-2xl font-bold tabular-nums" style={{ color: 'var(--anx-success)' }}>
-                {summary.correctCount}
-              </p>
-              <p className="m-0 mt-1 text-xs font-medium" style={{ color: 'var(--anx-text-muted)' }}>
-                Correct
-              </p>
-            </div>
-            <div className="rounded-xl bg-[var(--anx-surface-container-low)] px-3 py-4">
-              <p className="m-0 text-2xl font-bold tabular-nums" style={{ color: 'var(--anx-text)' }}>
-                {accuracy}%
-              </p>
-              <p className="m-0 mt-1 text-xs font-medium" style={{ color: 'var(--anx-text-muted)' }}>
-                Accuracy
-              </p>
-            </div>
+            <StatTile value={summary.attemptCount} label="Answered" />
+            <StatTile value={summary.correctCount} label="Correct" valueColor="var(--anx-success)" />
+            <StatTile value={`${accuracy}%`} label="Accuracy" />
           </div>
         </div>
 
