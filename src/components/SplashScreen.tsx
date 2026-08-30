@@ -96,27 +96,7 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
                 className="h-24 w-auto drop-shadow-lg md:h-32"
                 priority
               />
-              <Image
-                src="/Ember_logo_text.png"
-                alt="Ember"
-                width={400}
-                height={120}
-                className="h-12 w-auto drop-shadow-md md:h-16"
-                priority
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.style.display = 'none';
-                  const parent = target.parentElement;
-                  if (parent) {
-                    const fallback = document.createElement('h1');
-                    fallback.className = 'text-5xl md:text-7xl font-bold tracking-tight';
-                    fallback.style.cssText =
-                      'font-family: Space Grotesk, Inter, sans-serif; color: #3B1F7A; letter-spacing: -0.02em;';
-                    fallback.textContent = 'Ember';
-                    parent.appendChild(fallback);
-                  }
-                }}
-              />
+              <h1 className="font-display text-5xl font-bold leading-none tracking-[-0.02em] text-[#2D236E] drop-shadow-sm md:text-6xl">ember</h1>
             </motion.div>
 
             <motion.div
@@ -149,7 +129,7 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
                       color: isSpace ? 'transparent' : '#9B8CB3',
                     }}
                   >
-                    {isSpace ? '\u00A0' : char}
+                    {isSpace ? ' ' : char}
                   </motion.span>
                 );
               })}

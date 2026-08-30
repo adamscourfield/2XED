@@ -713,7 +713,7 @@ export function AppChrome({
           />
         </span>
       </span>
-      <span className="text-[1.25rem] font-bold lowercase leading-none tracking-tight text-[#111827]">ember</span>
+      <span className="font-display text-[1.25rem] font-bold leading-none tracking-[-0.02em] text-[#2D236E]">ember</span>
     </span>
   );
 
@@ -736,6 +736,7 @@ export function AppChrome({
         <>
           <LogoImage className="h-11 w-auto shrink-0 sm:h-12" />
           <div className="min-w-0 text-left">
+            <p className="truncate font-display text-[1.1rem] font-bold leading-tight tracking-[-0.02em] text-[#2D236E]">ember</p>
             <p className="truncate text-xs font-medium text-[color:var(--anx-text-muted)]">{studentTagline}</p>
           </div>
         </>
