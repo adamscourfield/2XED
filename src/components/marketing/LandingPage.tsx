@@ -312,7 +312,7 @@ export default function LandingPage() {
                 <div className="mb-8 text-center">
                   <div className="mb-4 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
                     <Image src="/Ember_logo_icon.png" alt="" width={200} height={200} className="h-14 w-auto sm:h-16" priority />
-                    <Image src="/Ember_logo_text.png" alt="" width={320} height={92} className="h-9 w-auto sm:h-10" priority />
+                    <span className="font-display text-3xl font-bold tracking-[-0.02em] text-[#2D236E]">ember</span>
                   </div>
                   <h2 id="sign-in-heading" className="font-marketing text-2xl font-bold text-gray-900">
                     Welcome back
@@ -417,17 +417,10 @@ export default function LandingPage() {
                 alt="Ember"
                 width={256}
                 height={256}
-                className="h-12 w-auto sm:h-16"
+                className="h-12 w-auto sm:h-14"
                 priority
               />
-              <Image
-                src="/Ember_logo_text.png"
-                alt="Ember"
-                width={360}
-                height={108}
-                className="hidden h-9 w-auto sm:block md:h-11"
-                priority
-              />
+              <span className="font-display text-2xl font-bold tracking-[-0.02em] text-[#2D236E] sm:text-3xl">ember</span>
             </div>
             <div className="hidden items-center gap-8 md:flex">
               <a href="#features" className="text-sm font-medium text-gray-600 transition-colors hover:text-purple-800">
@@ -533,24 +526,17 @@ export default function LandingPage() {
             >
               <motion.div
                 variants={fadeIn}
-                className="flex flex-col items-start gap-3 sm:flex-row sm:items-end sm:gap-5"
+                className="flex items-center gap-5 sm:gap-7"
               >
                 <Image
                   src="/Ember_logo_icon.png"
                   alt=""
                   width={256}
                   height={256}
-                  className="h-16 w-auto shrink-0 drop-shadow-md sm:h-20 md:h-[5.25rem]"
+                  className="h-24 w-auto shrink-0 drop-shadow-xl sm:h-28 md:h-36"
                   priority
                 />
-                <Image
-                  src="/Ember_logo_text.png"
-                  alt=""
-                  width={400}
-                  height={120}
-                  className="h-10 w-auto max-w-full object-contain object-left drop-shadow-sm sm:h-12 md:h-14"
-                  priority
-                />
+                <span className="font-display text-5xl font-bold leading-none tracking-[-0.02em] text-[#2D236E] sm:text-6xl md:text-7xl">ember</span>
               </motion.div>
 
               <motion.div variants={fadeIn} className="inline-flex items-center gap-2 rounded-full border border-purple-200 bg-purple-50 px-4 py-2">
@@ -1117,8 +1103,8 @@ export default function LandingPage() {
           <div className="mb-8 grid gap-8 md:grid-cols-4">
             <div className="md:col-span-1">
               <div className="mb-4 flex flex-wrap items-center gap-3 sm:gap-4">
-                <Image src="/Ember_logo_icon.png" alt="Ember" width={200} height={200} className="h-12 w-auto sm:h-14" />
-                <Image src="/Ember_logo_text.png" alt="Ember" width={320} height={88} className="h-8 w-auto sm:h-9" />
+                <Image src="/Ember_logo_icon.png" alt="Ember" width={200} height={200} className="h-14 w-auto sm:h-16" />
+                <span className="font-display text-2xl font-bold tracking-[-0.02em] text-[#2D236E] sm:text-3xl">ember</span>
               </div>
               <p className="text-sm text-gray-500">
                 Supercharging teachers to 2x student learning through real-time misconception detection.
@@ -1159,7 +1145,7 @@ export default function LandingPage() {
             </div>
           </div>
           <div className="flex flex-col items-center justify-between gap-4 border-t border-gray-100 pt-8 md:flex-row">
-            <div className="text-sm text-gray-500">© 2026 Ember Education. All rights reserved.</div>
+            <div className="text-sm text-gray-500">&copy; 2026 Ember Education. All rights reserved.</div>
             <div className="flex items-center gap-4">
               <a
                 href="#"
